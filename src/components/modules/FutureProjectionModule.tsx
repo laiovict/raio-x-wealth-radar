@@ -48,7 +48,7 @@ const FutureProjectionModule = ({ fullWidth = false }: FutureProjectionModulePro
   };
 
   return (
-    <Card className={`${fullWidth ? "w-full" : "w-full"} shadow-md hover:shadow-lg transition-shadow`}>
+    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full shadow-md hover:shadow-lg transition-shadow`}>
       <CardHeader className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 dark:from-blue-900/30 dark:to-indigo-900/30 pb-2 rounded-t-lg">
         <CardTitle className="text-xl flex items-center justify-between flex-wrap">
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-300 dark:to-indigo-300">
@@ -62,7 +62,7 @@ const FutureProjectionModule = ({ fullWidth = false }: FutureProjectionModulePro
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-4">
-        <div className={`${fullWidth && !isMobile ? "h-80" : isMobile ? "h-48" : "h-64"} mb-4`}>
+        <div className={`${fullWidth && !isMobile ? "h-72" : isMobile ? "h-40" : "h-56"} mb-4`}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 5, right: 20, left: 5, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.2)" />
@@ -129,12 +129,6 @@ const FutureProjectionModule = ({ fullWidth = false }: FutureProjectionModulePro
               {formatCurrency(projection.scenarios.stress["5 anos"])}
             </p>
           </div>
-        </div>
-        
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50/70 dark:from-blue-900/30 dark:to-indigo-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800/30">
-          <p className="text-gray-700 dark:text-gray-200 leading-relaxed">
-            {projection.summary}
-          </p>
         </div>
       </CardContent>
     </Card>

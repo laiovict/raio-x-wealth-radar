@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, X } from "lucide-react";
@@ -141,37 +140,49 @@ const RaioXDashboard = ({
         <TabsContent value="overview" className="space-y-6">
           <FinancialOverviewModule />
           <OnePageFinancialPlanModule />
+          
           <div className="grid grid-cols-1 gap-6">
             <RecommendedActionsModule />
           </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <LifeGoalsModule />
             <AllocationModule />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FinancialInsightsModule />
-            <SocialComparisonModule />
-          </div>
+          
           <div className="grid grid-cols-1 gap-6">
             <WholeBankingModule />
           </div>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <MeuFuturoFinanceiroModule />
-            <FutureProjectionModule />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <PersonalInsightsModule />
-            <SentimentInsightsModule />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <LiquidityReserveModule />
             <InvestmentPlanningModule />
           </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="md:col-span-1">
+              <SocialComparisonModule />
+            </div>
+            <div className="md:col-span-1">
+              <FutureProjectionModule />
+            </div>
+            <div className="md:col-span-1">
+              <SentimentInsightsModule />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FinancialInsightsModule />
+            <PersonalInsightsModule />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <LiquidityReserveModule />
+            <WrappedModule />
+          </div>
+          
           <div className="grid grid-cols-1 gap-6">
             <RecommendationsModule />
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <WrappedModule />
             <AIInsightsHubModule />
           </div>
         </TabsContent>

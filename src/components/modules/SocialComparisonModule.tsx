@@ -14,7 +14,7 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
   const { socialComparison } = data;
 
   return (
-    <Card className={fullWidth ? "w-full" : "w-full"}>
+    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full shadow-md hover:shadow-lg transition-shadow`}>
       <CardHeader className="pb-2 bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-900 dark:to-indigo-900 border-b border-gray-200 dark:border-gray-800">
         <CardTitle className="text-xl text-white flex items-center">
           <span>Comparativo Social</span>
@@ -24,7 +24,7 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
         </CardTitle>
       </CardHeader>
       <CardContent className="bg-white dark:bg-gray-900 pt-4">
-        <div className="space-y-6">
+        <div className="space-y-5 h-full flex flex-col justify-between">
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium text-gray-700 dark:text-gray-300 flex items-center">

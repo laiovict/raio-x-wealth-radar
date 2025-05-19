@@ -38,7 +38,7 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
   };
 
   return (
-    <Card className={`${fullWidth ? "w-full" : "w-full"} shadow-md hover:shadow-lg transition-shadow`}>
+    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full shadow-md hover:shadow-lg transition-shadow`}>
       <CardHeader className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/70 dark:to-indigo-900/70 pb-4 rounded-t-lg border-b border-gray-200 dark:border-gray-700">
         <CardTitle className="text-xl flex items-center">
           <span className="text-blue-800 dark:text-blue-200">
@@ -48,7 +48,7 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
       </CardHeader>
       <CardContent className="pt-5 bg-white dark:bg-slate-900">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {sentiment.assets.map((asset, index) => (
+          {sentiment.assets.slice(0, 2).map((asset, index) => (
             <div 
               key={index} 
               className={`${getSentimentBg(asset.sentiment)} p-4 rounded-lg shadow-sm border transition-all hover:shadow-md hover:translate-y-[-2px]`}
