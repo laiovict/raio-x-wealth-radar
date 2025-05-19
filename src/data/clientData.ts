@@ -159,7 +159,86 @@ export const clientData: Record<string, any> = {
         description: "Conecte sua conta no Banco ABC e a corretora DEF via Pluggy para termos uma visão completa de seus investimentos."
       }
     ],
-    summary: "Priorize aumentar sua alocação em multimercados para melhorar a diversificação. Com urgência, reveja o CDB do Banco XYZ que está com rendimento abaixo do CDI. Para uma análise mais completa, conecte suas contas adicionais quando conveniente."
+    summary: "Priorize aumentar sua alocação em multimercados para melhorar a diversificação. Com urgência, reveja o CDB do Banco XYZ que está com rendimento abaixo do CDI. Para uma análise mais completa, conecte suas contas adicionais quando conveniente.",
+
+    // Insights financeiros adicionais
+    financialInsights: {
+      highestSpendingMonth: {
+        month: "Dezembro",
+        amount: 15200,
+        comparison: "equivalente a 3 iPhones ou 140 lanches no iFood",
+        summary: "Em dezembro, você gastou R$ 15.200, o equivalente a 3 iPhones ou 140 lanches no iFood. Foi seu recorde do ano. Respeitamos o corre, mas talvez... tenha passado da conta?"
+      },
+      wastedMoney: {
+        category: "Assinaturas não utilizadas",
+        amount: 3600,
+        potentialGrowth: 4100,
+        summary: "Só com assinaturas que você mal usa, gastou R$ 3.600 no ano. Se tivesse colocado metade disso num Tesouro IPCA+, teria hoje R$ 4.100. Mas tudo bem, a gente olha pra frente."
+      },
+      topCategories: {
+        categories: ["Delivery", "Assinaturas", "Viagens"],
+        foodDeliveryCount: 87,
+        summary: "Top 3 categorias do seu cartão: Delivery, Assinaturas e Viagens. Spoiler: você pediu 87 vezes no iFood. Sim, a gente contou."
+      },
+      negativeMonths: {
+        count: 3,
+        summary: "Em 3 meses você gastou mais do que entrou. Chamamos isso de 'modo sobrevivência financeira'. Bora sair dele?"
+      },
+      investmentGrowth: {
+        totalContributions: 42000,
+        growthPercentage: 7.8,
+        summary: "Você aportou R$ 42.000 em investimentos. Cresceu 7,8% ao longo do ano - e isso sem esforço real. Imagina se virar hábito?"
+      },
+      potentialSavings: {
+        category: "Alimentação fora",
+        savingsPercentage: 10,
+        monthlySavings: 450,
+        twentyYearProjection: 280000,
+        goalRelation: "casa própria",
+        summary: "Se reduzir 10% dos seus gastos com alimentação fora, dá pra investir R$ 450 todo mês. Isso pode virar R$ 280.000 em 20 anos - que te deixa mais perto da sua casa própria."
+      },
+      installments: {
+        count: 14,
+        summary: "Teve 14 parcelas rodando que você nem lembra mais. Seu 'eu do passado' adorava parcelar. Seu 'eu do presente' tá pagando a conta. Bora conversar com o 'eu do futuro'?"
+      },
+      foodSpending: {
+        total: 18600,
+        equivalentMcDonaldsCombos: 310,
+        equivalentFancyDinners: 24,
+        restaurantName: "Figueira Rubaiyat",
+        summary: "Você gastou R$ 18.600 em comida fora de casa. Isso dá: 310 combos no McDonald's ou 24 jantares no Figueira Rubaiyat. E olha que nem pagamos a sobremesa."
+      },
+      subscriptions: {
+        total: 11,
+        summary: "Você tem 11 assinaturas ativas. Quantas você realmente usa? Spoiler: a gente sabe. E o seu bolso também."
+      },
+      financialLoop: {
+        month: "março",
+        income: 8500,
+        expenses: 8320,
+        repeatedMonths: 5,
+        summary: "Em março, o ciclo foi: Entrou R$ 8.500 → Saiu R$ 8.320 → Sobrou: quase nada. Repetiu isso em 5 meses. E aí, qual vai ser o plano pra quebrar o looping?"
+      },
+      idleMoney: {
+        amount: 28000,
+        days: 45,
+        potentialEarnings: 650,
+        summary: "Você deixou R$ 28.000 na conta corrente por 45 dias. Esse valor podia ter rendido R$ 650 no Tesouro Selic. A gente entende, preguiça de investir. Mas e se fosse automático?"
+      },
+      underperformingInvestments: {
+        amount: 42000,
+        product: "Poupança",
+        yield: 4.2,
+        marketAverage: 9.8,
+        summary: "Você tem R$ 42.000 aplicados em Poupança com rendimento de 4,2% ao ano. A média do mercado foi 9,8%. Bora repensar isso? Seu dinheiro merece mais respeito."
+      },
+      bestInvestment: {
+        name: "MXRF11",
+        return: 18.2,
+        potentialDoubleGain: 3840,
+        summary: "Seu melhor investimento foi MXRF11, com 18,2% de rentabilidade. Se tivesse colocado o dobro, teria ganhado R$ 3.840 a mais. Bora repetir a dose — mas com estratégia."
+      }
+    }
   },
   
   client2: {
@@ -208,13 +287,39 @@ export const clientData: Record<string, any> = {
       summary: "Com seu aporte mensal de R$ 2.000, seu patrimônio pode atingir R$ 490 mil em 5 anos no cenário base. Seu perfil arrojado traz mais volatilidade, mas também maior potencial de crescimento."
     },
     
-    // Apenas exemplos simplificados para o cliente 2...
     liquidity: {
       currentIdle: 5000,
       idealReserve: 15000,
       monthlyExpenses: 7500,
       idealMonths: 2,
       summary: "Sua reserva de emergência está abaixo do ideal. Recomendamos aumentar em R$ 10.000 nos próximos meses, especialmente considerando seu perfil de risco mais arrojado."
+    },
+    
+    // Insights financeiros adicionais
+    financialInsights: {
+      highestSpendingMonth: {
+        month: "Julho",
+        amount: 22400,
+        comparison: "equivalente a uma viagem para a Europa ou 6 meses de aluguel no seu bairro",
+        summary: "Em julho, você gastou R$ 22.400, o equivalente a uma viagem para a Europa ou 6 meses de aluguel no seu bairro. Foi seu recorde do ano. O que aconteceu nesse mês?"
+      },
+      wastedMoney: {
+        category: "Compras por impulso",
+        amount: 8200,
+        potentialGrowth: 9600,
+        summary: "Só com compras por impulso, você gastou R$ 8.200 no ano. Se tivesse investido esse valor em ações, poderia ter R$ 9.600 hoje. Mas não se culpe, vamos planejar melhor daqui pra frente."
+      },
+      topCategories: {
+        categories: ["Viagens", "Restaurantes", "Vestuário"],
+        restaurantCount: 64,
+        summary: "Top 3 categorias do seu cartão: Viagens, Restaurantes e Vestuário. Foram 64 restaurantes diferentes em um ano. Você é uma verdadeira exploradora gastronômica!"
+      },
+      bestInvestment: {
+        name: "Small Caps FIA",
+        return: 24.3,
+        potentialDoubleGain: 6800,
+        summary: "Seu melhor investimento foi o fundo Small Caps FIA, com impressionantes 24,3% de retorno. Se tivesse dobrado sua posição, seriam R$ 6.800 a mais no bolso. Vamos aumentar essa posição?"
+      }
     }
   },
   
@@ -262,6 +367,27 @@ export const clientData: Record<string, any> = {
         }
       },
       summary: "Sua carteira conservadora mostra estabilidade mesmo em cenários de stress. Com seu aporte mensal, deve atingir sua meta de aposentadoria dentro do prazo previsto, com baixa volatilidade."
+    },
+    
+    // Insights financeiros adicionais
+    financialInsights: {
+      retirementReadiness: {
+        percentage: 87,
+        timeToRetirement: "2 anos e 4 meses",
+        summary: "Você está 87% preparado para sua aposentadoria em 2 anos e 4 meses. Para chegar aos 100%, seria ideal aumentar seu aporte mensal em R$ 1.000 ou postergar a aposentadoria em 8 meses."
+      },
+      incomePreservation: {
+        currentIncome: 12500,
+        projectedRetirementIncome: 10800,
+        incomePreservationRate: 86,
+        summary: "Na aposentadoria, você manterá 86% do seu padrão de vida atual, com uma renda projetada de R$ 10.800 por mês. Está dentro do ideal de 80% a 100% recomendado pelos especialistas."
+      },
+      taxEfficiency: {
+        currentTaxRate: 12.4,
+        potentialTaxRate: 9.2,
+        annualSavings: 4600,
+        summary: "Com uma reorganização tributária da sua carteira, você pode reduzir sua alíquota média de 12,4% para 9,2%, economizando R$ 4.600 por ano em impostos. Vamos implementar essa estratégia?"
+      }
     }
   }
 };

@@ -11,6 +11,7 @@ import WrappedModule from "./modules/WrappedModule";
 import SocialComparisonModule from "./modules/SocialComparisonModule";
 import SentimentInsightsModule from "./modules/SentimentInsightsModule";
 import RecommendationsModule from "./modules/RecommendationsModule";
+import FinancialInsightsModule from "./modules/FinancialInsightsModule";
 
 const RaioXDashboard = () => {
   const { data } = useRaioX();
@@ -27,7 +28,7 @@ const RaioXDashboard = () => {
       </div>
 
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid grid-cols-4 md:grid-cols-8 mb-6">
+        <TabsList className="grid grid-cols-3 md:grid-cols-9 mb-6">
           <TabsTrigger value="all">Todos</TabsTrigger>
           <TabsTrigger value="allocation">Alocação</TabsTrigger>
           <TabsTrigger value="projection">Projeção</TabsTrigger>
@@ -35,6 +36,7 @@ const RaioXDashboard = () => {
           <TabsTrigger value="goals">Metas</TabsTrigger>
           <TabsTrigger value="wrapped">Wrapped</TabsTrigger>
           <TabsTrigger value="social">Social</TabsTrigger>
+          <TabsTrigger value="insights">Insights</TabsTrigger>
           <TabsTrigger value="recommendations">Recomendações</TabsTrigger>
         </TabsList>
 
@@ -54,6 +56,9 @@ const RaioXDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <SentimentInsightsModule />
             <RecommendationsModule />
+          </div>
+          <div className="mt-6">
+            <FinancialInsightsModule fullWidth />
           </div>
         </TabsContent>
         
@@ -83,6 +88,10 @@ const RaioXDashboard = () => {
         
         <TabsContent value="sentiment">
           <SentimentInsightsModule fullWidth />
+        </TabsContent>
+        
+        <TabsContent value="insights">
+          <FinancialInsightsModule fullWidth />
         </TabsContent>
         
         <TabsContent value="recommendations">
