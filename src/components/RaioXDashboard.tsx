@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, X } from "lucide-react";
@@ -20,6 +19,7 @@ import AIInsightsHubModule from "./modules/AIInsightsHubModule";
 import RecommendedActionsModule from "./modules/RecommendedActionsModule";
 import InvestmentPlanningModule from "./modules/InvestmentPlanningModule";
 import OnePageFinancialPlanModule from "./modules/OnePageFinancialPlanModule";
+import WholeBankingModule from "./modules/WholeBankingModule";
 
 interface RaioXDashboardProps {
   showPdfPreview?: boolean;
@@ -109,6 +109,9 @@ const RaioXDashboard = ({
 
       {/* Financial Overview - Always visible below the plan */}
       <FinancialOverviewModule />
+      
+      {/* Whole Banking - Always visible after financial overview */}
+      <WholeBankingModule />
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-3 lg:grid-cols-12 md:grid-cols-6">
@@ -117,6 +120,7 @@ const RaioXDashboard = ({
           <TabsTrigger value="ai" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Copiloto IA</TabsTrigger>
           <TabsTrigger value="personal" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Pessoal</TabsTrigger>
           <TabsTrigger value="planning" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Planejamento</TabsTrigger>
+          <TabsTrigger value="banking" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Whole Banking</TabsTrigger>
           <TabsTrigger value="allocation" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Alocação</TabsTrigger>
           <TabsTrigger value="projection" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Projeção</TabsTrigger>
           <TabsTrigger value="liquidity" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Liquidez</TabsTrigger>
@@ -134,6 +138,7 @@ const RaioXDashboard = ({
           </div>
           <div className="grid grid-cols-1 gap-6">
             <InvestmentPlanningModule />
+            <WholeBankingModule />
           </div>
           <PersonalInsightsModule />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -174,6 +179,10 @@ const RaioXDashboard = ({
         
         <TabsContent value="planning">
           <InvestmentPlanningModule fullWidth />
+        </TabsContent>
+        
+        <TabsContent value="banking">
+          <WholeBankingModule fullWidth />
         </TabsContent>
         
         <TabsContent value="allocation">

@@ -1,4 +1,3 @@
-
 import { useRaioX, FinancialSummary } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -56,8 +55,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
               Para acessar seu panorama financeiro completo, é necessário ativar o OpenFinance para permitir a agregação de suas contas e investimentos.
             </p>
             <Button 
-              variant="success" 
-              className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800"
+              variant="purpleGradient"
               onClick={() => {
                 // This event will be caught by the parent components through context
                 // No need to implement anything here, the context refreshAIAnalysis is just a placeholder

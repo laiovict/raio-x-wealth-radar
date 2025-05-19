@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import PluggyConnectModal from "@/components/PluggyConnectModal";
+import { Button } from "@/components/ui/button";
 
 const Index = () => {
   const [selectedClient, setSelectedClient] = useState("client1");
@@ -99,10 +100,10 @@ const Index = () => {
             
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-all">
+                <Button variant="purpleGradient" size="sm" className="flex items-center gap-2">
                   <FileDown className="h-4 w-4" />
                   Exportar Diagnóstico
-                </button>
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="bg-white/90 backdrop-blur-md border border-white/20 rounded-lg shadow-xl">
                 <DropdownMenuItem 
@@ -157,7 +158,7 @@ const Index = () => {
               </svg>
             </button>
             
-            <div className="h-8 w-8 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 flex items-center justify-center text-sm font-medium">
+            <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center text-sm font-medium">
               JO
             </div>
           </div>

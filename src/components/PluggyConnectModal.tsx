@@ -89,7 +89,7 @@ const PluggyConnectModal: React.FC<PluggyConnectModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-[#0f0f11] border border-white/10 text-white max-w-2xl">
         <DialogHeader>
-          <DialogTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+          <DialogTitle className="text-xl bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">
             Conectar ao OpenFinance
           </DialogTitle>
         </DialogHeader>
@@ -97,7 +97,7 @@ const PluggyConnectModal: React.FC<PluggyConnectModalProps> = ({
         <div className="py-4">
           {isLoading && (
             <div className="flex flex-col items-center justify-center py-12">
-              <RefreshCw className="w-12 h-12 text-blue-500 animate-spin mb-4" />
+              <RefreshCw className="w-12 h-12 text-purple-500 animate-spin mb-4" />
               <p className="text-gray-400">Inicializando conexão segura...</p>
             </div>
           )}
@@ -132,7 +132,8 @@ const PluggyConnectModal: React.FC<PluggyConnectModalProps> = ({
               {/* For demo purposes, we'll add a button to simulate success */}
               <Button 
                 onClick={onSuccess} 
-                className="mt-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white"
+                variant="purpleGradient"
+                className="mt-4"
               >
                 Simular Conexão Bem-sucedida
               </Button>
