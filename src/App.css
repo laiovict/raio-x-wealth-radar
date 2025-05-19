@@ -76,3 +76,109 @@
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
+
+/* Enhanced typography for better readability */
+body {
+  font-feature-settings: "ss01", "ss02", "cv01", "cv02", "cv03";
+  letter-spacing: -0.025em;
+}
+
+/* Enhanced Tables */
+.table-container {
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+table.enhanced-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+table.enhanced-table th {
+  background-color: rgba(15, 23, 42, 0.8);
+  color: #e2e8f0;
+  font-weight: 600;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+table.enhanced-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+table.enhanced-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+table.enhanced-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 768px) {
+  .responsive-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Enhanced Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  border: none;
+  border-radius: 0.5rem;
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #4338ca, #6d28d9);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+/* Highlight animations */
+@keyframes highlight-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+}
+
+.highlight-pulse {
+  animation: highlight-pulse 2s infinite;
+}
+
+/* Enhanced charts and visualization colors */
+.chart-colors-primary {
+  --color-1: #8b5cf6;
+  --color-2: #6366f1;
+  --color-3: #3b82f6;
+  --color-4: #0ea5e9;
+  --color-5: #06b6d4;
+}
+
+.chart-colors-accent {
+  --color-1: #f97316;
+  --color-2: #f59e0b;
+  --color-3: #eab308;
+  --color-4: #84cc16;
+  --color-5: #10b981;
+}
+
+.chart-colors-monochrome {
+  --color-1: #f8fafc;
+  --color-2: #e2e8f0;
+  --color-3: #cbd5e1;
+  --color-4: #94a3b8;
+  --color-5: #64748b;
+}
