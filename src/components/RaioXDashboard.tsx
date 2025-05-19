@@ -2,7 +2,7 @@
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import AllocationModule from "./modules/AllocationModule";
 import FutureProjectionModule from "./modules/FutureProjectionModule";
@@ -26,16 +26,35 @@ interface RaioXDashboardProps {
   onClosePdfPreview?: () => void;
   mediaType?: string;
   isClientFull?: boolean;
+  onOpenFinanceActivate?: () => void;
 }
 
 const RaioXDashboard = ({ 
   showPdfPreview = false, 
   onClosePdfPreview = () => {}, 
   mediaType = "pdf",
-  isClientFull = true
+  isClientFull = true,
+  onOpenFinanceActivate
 }: RaioXDashboardProps) => {
   const { data, hasOpenFinance } = useRaioX();
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Listen for the custom event to activate OpenFinance
+  useEffect(() => {
+    const handleActivateOpenFinance = () => {
+      // Display the Pluggy widget through the parent component
+      const event = new CustomEvent('activate-openfinance');
+      document.dispatchEvent(event);
+    };
+
+    // Add event listener
+    document.addEventListener('activate-openfinance', handleActivateOpenFinance);
+
+    // Remove event listener on cleanup
+    return () => {
+      document.removeEventListener('activate-openfinance', handleActivateOpenFinance);
+    };
+  }, []);
 
   if (showPdfPreview) {
     return (

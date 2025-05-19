@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import RaioXDashboard from "@/components/RaioXDashboard";
 import ClientSelector from "@/components/ClientSelector";
 import { RaioXProvider } from "@/context/RaioXContext";
@@ -10,13 +10,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import PluggyConnectModal from "@/components/PluggyConnectModal";
 
 const Index = () => {
   const [selectedClient, setSelectedClient] = useState("client1");
   const [showPdfPreview, setShowPdfPreview] = useState(false);
   const [mediaType, setMediaType] = useState("pdf");
   const [isClientFull] = useState(true); // Em produção, isso viria da autenticação
-  const [hasOpenFinance, setHasOpenFinance] = useState(true); // Flag para simular OpenFinance ativo
+  const [hasOpenFinance, setHasOpenFinance] = useState(false); // Alterado para false como padrão
+  const [showPluggyModal, setShowPluggyModal] = useState(false);
 
   const handleExportMedia = (type: string) => {
     setMediaType(type);
@@ -28,8 +30,36 @@ const Index = () => {
   };
 
   const toggleOpenFinance = () => {
-    setHasOpenFinance(!hasOpenFinance);
+    if (!hasOpenFinance) {
+      // Se o OpenFinance não estiver ativo, abre o modal do Pluggy
+      setShowPluggyModal(true);
+    } else {
+      // Se já estiver ativo, apenas desativa
+      setHasOpenFinance(false);
+    }
   };
+
+  const handlePluggySuccess = () => {
+    setHasOpenFinance(true);
+    setShowPluggyModal(false);
+  };
+
+  // Listen for the custom event to activate OpenFinance from other components
+  useEffect(() => {
+    const handleActivateOpenFinance = () => {
+      if (!hasOpenFinance) {
+        setShowPluggyModal(true);
+      }
+    };
+
+    // Add event listener
+    document.addEventListener('activate-openfinance', handleActivateOpenFinance);
+
+    // Remove event listener on cleanup
+    return () => {
+      document.removeEventListener('activate-openfinance', handleActivateOpenFinance);
+    };
+  }, [hasOpenFinance]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f0f11] to-[#1a1a2e] text-gray-100">
@@ -146,6 +176,13 @@ const Index = () => {
             isClientFull={isClientFull} 
           />
         </RaioXProvider>
+
+        {/* Pluggy Connect Modal */}
+        <PluggyConnectModal 
+          isOpen={showPluggyModal}
+          onClose={() => setShowPluggyModal(false)}
+          onSuccess={handlePluggySuccess}
+        />
       </div>
     </div>
   );
