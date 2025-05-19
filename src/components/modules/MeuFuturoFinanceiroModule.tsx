@@ -3,7 +3,7 @@ import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, ArrowRight } from "lucide-react";
+import { ChevronRight, ArrowRight, TrendingUp, Shield, AlertTriangle } from "lucide-react";
 import { useMobileBreakpoint } from "@/hooks/use-mobile";
 
 interface MeuFuturoFinanceiroModuleProps {
@@ -97,87 +97,126 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false }: MeuFuturoFinanceiroMod
   };
 
   return (
-    <Card className={fullWidth ? "w-full" : "w-full"}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl text-blue-700 dark:text-blue-300">
+    <Card className={`overflow-hidden ${fullWidth ? "w-full" : "w-full"}`}>
+      <CardHeader className="bg-gradient-to-r from-blue-900/80 to-indigo-900/80 pb-3">
+        <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
+          <TrendingUp className="h-5 w-5 text-blue-300" />
           Meu Futuro Financeiro
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Financial Diagnostic */}
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-xl p-5">
-          <h3 className="font-bold text-lg mb-3 text-blue-800 dark:text-blue-200">DIAGNÓSTICO FINANCEIRO</h3>
+      <CardContent className="p-0">
+        {/* Financial Diagnostic Summary - Top Section */}
+        <div className="p-5 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900/50 dark:to-blue-900/30">
+          <h3 className="font-bold text-lg mb-4 text-blue-800 dark:text-blue-300 border-b pb-2 border-blue-200 dark:border-blue-800">
+            DIAGNÓSTICO FINANCEIRO
+          </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <div className="mb-4">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="font-medium">Renda Mensal</span>
-                  <span className="font-bold text-green-700 dark:text-green-400">{formatCurrency(diagnostic.finances.totalMonthlyIncome)}</span>
-                </div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="font-medium">Gastos Mensais</span>
-                  <span className="font-bold text-red-700 dark:text-red-400">{formatCurrency(diagnostic.finances.monthlyExpenses)}</span>
-                </div>
-                <div className="flex justify-between items-center pt-1 border-t border-gray-200 dark:border-gray-700">
-                  <span className="font-medium">Saldo</span>
-                  <span className={`font-bold ${diagnostic.finances.surplus > 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
-                    {formatCurrency(diagnostic.finances.surplus)}
-                  </span>
+            {/* Left Column - Financial Summary */}
+            <div className="space-y-4">
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm">
+                <h4 className="font-semibold text-blue-700 dark:text-blue-400 mb-3 text-sm uppercase">
+                  Resumo Financeiro
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center py-1.5">
+                    <span className="text-gray-700 dark:text-gray-300">Renda Mensal</span>
+                    <span className="font-semibold text-green-600 dark:text-green-400">{formatCurrency(diagnostic.finances.totalMonthlyIncome)}</span>
+                  </div>
+                  <div className="flex justify-between items-center py-1.5">
+                    <span className="text-gray-700 dark:text-gray-300">Gastos Mensais</span>
+                    <span className="font-semibold text-red-600 dark:text-red-400">{formatCurrency(diagnostic.finances.monthlyExpenses)}</span>
+                  </div>
+                  <div className="h-px bg-gray-200 dark:bg-gray-700 my-1"></div>
+                  <div className="flex justify-between items-center pt-1">
+                    <span className="font-medium text-gray-800 dark:text-gray-200">Saldo</span>
+                    <span className={`font-bold ${diagnostic.finances.surplus > 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                      {formatCurrency(diagnostic.finances.surplus)}
+                    </span>
+                  </div>
                 </div>
               </div>
               
-              <div className="mb-4">
-                <h4 className="font-semibold mb-2 text-gray-800 dark:text-gray-200">Patrimônio Atual:</h4>
-                <ul className="space-y-1">
-                  <li className="flex justify-between">
-                    <span>• Imóvel</span>
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm">
+                <h4 className="font-semibold text-blue-700 dark:text-blue-400 mb-3 text-sm uppercase">
+                  Patrimônio Atual
+                </h4>
+                <ul className="space-y-2">
+                  <li className="flex justify-between py-1">
+                    <span className="text-gray-700 dark:text-gray-300">Imóvel</span>
                     <span className="font-medium">{formatCurrency(diagnostic.assets.property)}</span>
                   </li>
-                  <li className="flex justify-between">
-                    <span>• Investimentos</span>
+                  <li className="flex justify-between py-1">
+                    <span className="text-gray-700 dark:text-gray-300">Investimentos</span>
                     <span className="font-medium">{formatCurrency(diagnostic.assets.investments)}</span>
+                  </li>
+                  <li className="flex justify-between py-1">
+                    <span className="text-gray-700 dark:text-gray-300">Veículos</span>
+                    <span className="font-medium">{formatCurrency(diagnostic.assets.vehicles.reduce((acc, vehicle) => acc + vehicle.value, 0))}</span>
                   </li>
                 </ul>
               </div>
             </div>
             
-            <div>
-              <h4 className="font-semibold mb-2 text-gray-800 dark:text-gray-200">Pontos Fortes:</h4>
-              <ul className="space-y-1 mb-4">
-                {diagnostic.strengths.map((strength, index) => (
-                  <li key={index}>• {strength}</li>
-                ))}
-              </ul>
+            {/* Right Column - Strengths and Alerts */}
+            <div className="space-y-4">
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm">
+                <div className="flex items-center mb-3">
+                  <Shield className="h-4 w-4 text-blue-600 dark:text-blue-400 mr-2" />
+                  <h4 className="font-semibold text-blue-700 dark:text-blue-400 text-sm uppercase">
+                    Pontos Fortes
+                  </h4>
+                </div>
+                <ul className="space-y-1.5">
+                  {diagnostic.strengths.map((strength, index) => (
+                    <li key={index} className="flex items-start">
+                      <div className="h-1.5 w-1.5 rounded-full bg-blue-500 dark:bg-blue-400 mt-1.5 mr-2"></div>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{strength}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
               
-              <h4 className="font-semibold mb-2 text-gray-800 dark:text-gray-200">Alertas Críticos:</h4>
-              <ul className="space-y-1">
-                {diagnostic.alerts.map((alert, index) => (
-                  <li key={index} className="text-amber-800 dark:text-amber-300">• {alert}</li>
-                ))}
-              </ul>
+              <div className="bg-white dark:bg-slate-800 rounded-lg p-4 shadow-sm">
+                <div className="flex items-center mb-3">
+                  <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 mr-2" />
+                  <h4 className="font-semibold text-amber-700 dark:text-amber-400 text-sm uppercase">
+                    Alertas Críticos
+                  </h4>
+                </div>
+                <ul className="space-y-1.5">
+                  {diagnostic.alerts.map((alert, index) => (
+                    <li key={index} className="flex items-start">
+                      <div className="h-1.5 w-1.5 rounded-full bg-amber-500 dark:bg-amber-400 mt-1.5 mr-2"></div>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{alert}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           </div>
         </div>
         
-        {/* Plan Phases */}
-        <div className="mt-6">
-          <h3 className="font-bold text-lg mb-4 text-blue-800 dark:text-blue-200">CRONOGRAMA DE MELHORIA</h3>
+        {/* Plan Phases - Bottom Section */}
+        <div className="p-5 bg-white dark:bg-gray-900/50">
+          <h3 className="font-bold text-lg mb-4 text-blue-800 dark:text-blue-300 border-b pb-2 border-blue-200 dark:border-blue-800">
+            CRONOGRAMA DE MELHORIA
+          </h3>
           
           <div className="space-y-4">
             {diagnostic.phases.map((phase, index) => (
               <div 
                 key={index} 
-                className="bg-white dark:bg-gray-800/50 shadow-sm rounded-lg border border-gray-100 dark:border-gray-700 transition-all hover:shadow-md"
+                className="bg-white dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700 rounded-lg shadow-sm overflow-hidden"
               >
-                <div className="border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/80 p-4 rounded-t-lg">
-                  <div className="flex justify-between items-center">
-                    <h4 className="font-medium text-blue-800 dark:text-blue-200">
+                <div className="bg-blue-50 dark:bg-blue-900/20 border-b border-gray-200 dark:border-gray-700 p-3">
+                  <div className="flex flex-wrap justify-between items-center gap-2">
+                    <h4 className="font-semibold text-blue-800 dark:text-blue-300">
                       {phase.name}
                     </h4>
                     <Badge 
-                      variant="outline" 
-                      className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                      variant="secondary" 
+                      className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700/50"
                     >
                       {phase.timeframe}
                     </Badge>
@@ -188,7 +227,7 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false }: MeuFuturoFinanceiroMod
                     {phase.actions.map((action, actionIndex) => (
                       <li key={actionIndex} className="flex items-start">
                         <ChevronRight className="h-4 w-4 mt-1 mr-2 text-blue-600 dark:text-blue-400 flex-shrink-0" />
-                        <span>{action}</span>
+                        <span className="text-gray-700 dark:text-gray-300 text-sm">{action}</span>
                       </li>
                     ))}
                   </ul>
@@ -198,8 +237,10 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false }: MeuFuturoFinanceiroMod
           </div>
         </div>
         
-        <div className="mt-4 flex justify-center">
-          <Button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+        <div className="p-5 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900/50 dark:to-gray-900 flex justify-center">
+          <Button 
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all"
+          >
             Ver Plano Financeiro Completo
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
