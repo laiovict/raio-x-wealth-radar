@@ -3,13 +3,22 @@ import { useState } from "react";
 import RaioXDashboard from "@/components/RaioXDashboard";
 import ClientSelector from "@/components/ClientSelector";
 import { RaioXProvider } from "@/context/RaioXContext";
-import { FileDown } from "lucide-react";
+import { FileDown, Podcast, Video, Lock } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Index = () => {
   const [selectedClient, setSelectedClient] = useState("client1");
   const [showPdfPreview, setShowPdfPreview] = useState(false);
+  const [mediaType, setMediaType] = useState("pdf");
+  const [isClientFull] = useState(true); // Em produção, isso viria da autenticação
 
-  const handleExportPdf = () => {
+  const handleExportMedia = (type: string) => {
+    setMediaType(type);
     setShowPdfPreview(true);
   };
 
@@ -28,13 +37,59 @@ const Index = () => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <button 
-              onClick={handleExportPdf}
-              className="flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-all"
-            >
-              <FileDown className="h-4 w-4" />
-              Exportar Diagnóstico
-            </button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-all">
+                  <FileDown className="h-4 w-4" />
+                  Exportar Diagnóstico
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="bg-white/90 backdrop-blur-md border border-white/20 rounded-lg shadow-xl">
+                <DropdownMenuItem 
+                  onClick={() => handleExportMedia("pdf")}
+                  className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
+                >
+                  <FileDown className="h-4 w-4" />
+                  <span>PDF</span>
+                </DropdownMenuItem>
+                
+                {isClientFull ? (
+                  <>
+                    <DropdownMenuItem 
+                      onClick={() => handleExportMedia("podcast")}
+                      className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
+                    >
+                      <Podcast className="h-4 w-4" />
+                      <span>Podcast</span>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem 
+                      onClick={() => handleExportMedia("video")}
+                      className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
+                    >
+                      <Video className="h-4 w-4" />
+                      <span>Vídeo</span>
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuItem 
+                      className="text-gray-500 flex items-center gap-2 cursor-not-allowed"
+                    >
+                      <Lock className="h-4 w-4" />
+                      <span>Podcast (Apenas clientes)</span>
+                    </DropdownMenuItem>
+                    
+                    <DropdownMenuItem 
+                      className="text-gray-500 flex items-center gap-2 cursor-not-allowed"
+                    >
+                      <Lock className="h-4 w-4" />
+                      <span>Vídeo (Apenas clientes)</span>
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
             
             <button className="rounded-full p-2 text-white bg-white/10 hover:bg-white/20 transition-all">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -54,7 +109,12 @@ const Index = () => {
         />
         
         <RaioXProvider clientId={selectedClient}>
-          <RaioXDashboard showPdfPreview={showPdfPreview} onClosePdfPreview={handleClosePdfPreview} />
+          <RaioXDashboard 
+            showPdfPreview={showPdfPreview} 
+            onClosePdfPreview={handleClosePdfPreview}
+            mediaType={mediaType}
+            isClientFull={isClientFull} 
+          />
         </RaioXProvider>
       </div>
     </div>

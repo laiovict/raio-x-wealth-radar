@@ -18,14 +18,28 @@ import PdfPreview from "./PdfPreview";
 interface RaioXDashboardProps {
   showPdfPreview?: boolean;
   onClosePdfPreview?: () => void;
+  mediaType?: string;
+  isClientFull?: boolean;
 }
 
-const RaioXDashboard = ({ showPdfPreview = false, onClosePdfPreview = () => {} }: RaioXDashboardProps) => {
+const RaioXDashboard = ({ 
+  showPdfPreview = false, 
+  onClosePdfPreview = () => {}, 
+  mediaType = "pdf",
+  isClientFull = true
+}: RaioXDashboardProps) => {
   const { data } = useRaioX();
   const [searchQuery, setSearchQuery] = useState("");
 
   if (showPdfPreview) {
-    return <PdfPreview onClose={onClosePdfPreview} clientData={data} />;
+    return (
+      <PdfPreview 
+        onClose={onClosePdfPreview} 
+        clientData={data} 
+        mediaType={mediaType}
+        isClientFull={isClientFull}
+      />
+    );
   }
 
   return (
