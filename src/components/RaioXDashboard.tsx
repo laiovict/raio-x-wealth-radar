@@ -13,6 +13,7 @@ import SocialComparisonModule from "./modules/SocialComparisonModule";
 import SentimentInsightsModule from "./modules/SentimentInsightsModule";
 import RecommendationsModule from "./modules/RecommendationsModule";
 import FinancialInsightsModule from "./modules/FinancialInsightsModule";
+import PersonalInsightsModule from "./modules/PersonalInsightsModule";
 import PdfPreview from "./PdfPreview";
 
 interface RaioXDashboardProps {
@@ -70,8 +71,9 @@ const RaioXDashboard = ({
       </div>
 
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid grid-cols-3 md:grid-cols-9 mb-6 glass-morphism rounded-lg">
+        <TabsList className="grid grid-cols-3 md:grid-cols-10 mb-6 glass-morphism rounded-lg">
           <TabsTrigger value="all" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Todos</TabsTrigger>
+          <TabsTrigger value="personal" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Pessoal</TabsTrigger>
           <TabsTrigger value="allocation" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Alocação</TabsTrigger>
           <TabsTrigger value="projection" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Projeção</TabsTrigger>
           <TabsTrigger value="liquidity" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Liquidez</TabsTrigger>
@@ -83,6 +85,7 @@ const RaioXDashboard = ({
         </TabsList>
 
         <TabsContent value="all" className="space-y-6">
+          <PersonalInsightsModule />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <AllocationModule />
             <FutureProjectionModule />
@@ -102,6 +105,10 @@ const RaioXDashboard = ({
           <div className="mt-6">
             <FinancialInsightsModule fullWidth />
           </div>
+        </TabsContent>
+        
+        <TabsContent value="personal">
+          <PersonalInsightsModule fullWidth />
         </TabsContent>
         
         <TabsContent value="allocation">
@@ -126,10 +133,6 @@ const RaioXDashboard = ({
         
         <TabsContent value="social">
           <SocialComparisonModule fullWidth />
-        </TabsContent>
-        
-        <TabsContent value="sentiment">
-          <SentimentInsightsModule fullWidth />
         </TabsContent>
         
         <TabsContent value="insights">

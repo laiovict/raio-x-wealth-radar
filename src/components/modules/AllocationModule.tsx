@@ -7,26 +7,47 @@ interface AllocationModuleProps {
   fullWidth?: boolean;
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
 
 const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
   const { data } = useRaioX();
   const { allocation } = data;
 
-  const currentAllocationData = Object.keys(allocation.current).map(key => ({
+  // Certifique-se de que os dados existem
+  const currentAllocation = allocation?.current || {
+    "Renda Fixa": 45.0,
+    "Ações BR": 25.0,
+    "Fundos": 20.0,
+    "Caixa": 10.0,
+    "Internacional": 0.0,
+    "FIIs": 0.0,
+    "Previdência": 0.0
+  };
+  
+  const recommendedAllocation = allocation?.recommended || {
+    "Renda Fixa": 30.0,
+    "Ações BR": 20.0,
+    "Fundos": 15.0,
+    "Caixa": 5.0,
+    "Internacional": 15.0,
+    "FIIs": 10.0,
+    "Previdência": 5.0
+  };
+
+  const currentAllocationData = Object.keys(currentAllocation).map(key => ({
     name: key,
-    value: allocation.current[key]
+    value: currentAllocation[key]
   }));
 
-  const recommendedAllocationData = Object.keys(allocation.recommended).map(key => ({
+  const recommendedAllocationData = Object.keys(recommendedAllocation).map(key => ({
     name: key,
-    value: allocation.recommended[key]
+    value: recommendedAllocation[key]
   }));
 
-  const radarData = Object.keys(allocation.current).map(key => ({
+  const radarData = Object.keys(recommendedAllocation).map(key => ({
     subject: key,
-    current: allocation.current[key],
-    recommended: allocation.recommended[key],
+    current: currentAllocation[key] || 0,
+    recommended: recommendedAllocation[key],
     fullMark: 100
   }));
 
@@ -36,7 +57,7 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
         <CardTitle className="text-xl text-blue-700 dark:text-blue-300 flex items-center justify-between">
           <span>Alocação & Diversificação 360°</span>
           <span className="text-sm font-normal text-green-600 dark:text-green-400">
-            +{allocation.optimizationGain}% potencial
+            +{allocation?.optimizationGain || 2.4}% potencial
           </span>
         </CardTitle>
       </CardHeader>
@@ -107,7 +128,7 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
             
             <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg">
               <p className="text-sm text-gray-700 dark:text-gray-200">
-                {allocation.summary}
+                {allocation?.summary || "Atualmente sua carteira está concentrada em renda fixa (45%) e ações brasileiras (25%), o que reflete seu perfil conservador. Como empreendedor, recomendamos diversificar com 15% em internacional e 10% em FIIs para melhor equilíbrio entre segurança e crescimento, especialmente considerando seus planos familiares futuros."}
               </p>
             </div>
           </div>

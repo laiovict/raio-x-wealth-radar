@@ -1,4 +1,3 @@
-
 export const clientData: Record<string, any> = {
   client1: {
     clientId: "client1",
@@ -7,24 +6,36 @@ export const clientData: Record<string, any> = {
     riskProfile: "Moderado",
     lastUpdate: "2025-05-15",
     
+    // Informações personalizadas do cliente
+    personalInsights: {
+      family: "Você e sua esposa Ana estão considerando ter um filho nos próximos 2 anos. Sabemos que a educação é uma prioridade, por isso preparamos uma projeção dos custos com escola particular até a universidade. Também notamos seu apoio aos seus pais, algo que demonstra seus valores familiares.",
+      passions: "Como torcedor do São Paulo e praticante de corrida, você já completou 3 meias maratonas! Sua paixão por livros de história e sua coleção de vinil dos anos 80 mostram seu apreço pelo clássico. Podemos te conectar com outros clientes que compartilham esses interesses.",
+      financialJourney: "Seu crescimento profissional na área de TI tem sido impressionante, com 3 promoções nos últimos 5 anos. Sua disciplina em poupar 25% da sua renda coloca você entre os 10% mais disciplinados do nosso portfólio. Continue assim!",
+      goals: "Sabemos que você sonha em ter uma casa de praia em Ubatuba até 2030. Com base no seu ritmo atual de investimentos e no comportamento do mercado imobiliário na região, estamos no caminho certo. Também estamos de olho na sua meta de uma viagem para o Japão em 2027."
+    },
+    
     // Alocação & Diversificação 360°
     allocation: {
       current: {
-        "Fundos": 53.5,
-        "Renda Fixa": 22.8,
-        "Ações": 15.2,
-        "Internacional": 5.5,
-        "Caixa": 3.0
+        "Renda Fixa": 45.5,
+        "Ações BR": 28.2,
+        "Fundos": 18.6,
+        "Caixa": 7.7,
+        "Internacional": 0.0,
+        "FIIs": 0.0,
+        "Previdência": 0.0
       },
       recommended: {
-        "Fundos": 40,
-        "Renda Fixa": 25,
-        "Ações": 20,
-        "Internacional": 10,
-        "Caixa": 5
+        "Renda Fixa": 35.0,
+        "Ações BR": 25.0,
+        "Fundos": 15.0,
+        "Caixa": 5.0,
+        "Internacional": 10.0,
+        "FIIs": 7.0,
+        "Previdência": 3.0
       },
-      optimizationGain: 1.2,
-      summary: "Sua carteira está concentrada demais em Fundos (53,5% vs 40% ideal). Uma realocação proporcionaria um ganho potencial de 1,2% ao ano com o mesmo risco. Sua exposição internacional está abaixo do recomendado para o perfil moderado."
+      optimizationGain: 1.8,
+      summary: "Sua carteira está concentrada em renda fixa (45,5%) e ações brasileiras (28,2%), refletindo um perfil conservador. Recomendamos diversificar com 10% em investimentos internacionais e 7% em FIIs para melhor equilíbrio entre segurança e crescimento. Esta realocação pode trazer um ganho potencial de 1,8% ao ano sem aumentar significativamente seu nível de risco."
     },
     
     // Projeção Futuro Próximo
@@ -248,27 +259,39 @@ export const clientData: Record<string, any> = {
     riskProfile: "Arrojado",
     lastUpdate: "2025-05-14",
     
+    // Informações personalizadas do cliente
+    personalInsights: {
+      family: "Como mãe solo de duas meninas, Júlia (8) e Beatriz (5), sabemos que a educação delas é sua prioridade. Nossa análise inclui um plano personalizado para garantir que ambas possam frequentar as melhores universidades, mesmo que no exterior como você mencionou desejar.",
+      passions: "Sua paixão por fotografia não passou despercebida! Aquela exposição que você visitou em Nova York ano passado nos deu ideias para alguns eventos exclusivos com fotógrafos renomados que estamos organizando. E como fã de Fórmula 1, temos alguns convites VIP chegando em breve.",
+      financialJourney: "Sua trajetória de empreendedora na área de marketing digital tem sido inspiradora. A venda de sua participação na startup por R$ 1,5 milhão ano passado foi um marco importante. Estamos focados em fazer esse capital trabalhar alinhado com seus novos projetos.",
+      goals: "Sua meta de independência financeira aos 45 anos está bem encaminhada! Com sua taxa atual de investimentos e o crescimento projetado, você atingirá os R$ 4 milhões necessários para gerar a renda passiva que deseja. Também estamos monitorando oportunidades para aquele apartamento em Lisboa que você mencionou."
+    },
+    
     // Alocação & Diversificação 360°
     allocation: {
       current: {
-        "Ações": 45.2,
-        "Fundos": 28.5,
+        "Ações BR": 48.2,
+        "Fundos": 22.5,
         "Renda Fixa": 15.3,
         "Internacional": 8.5,
-        "Caixa": 2.5
+        "Caixa": 5.5,
+        "FIIs": 0.0,
+        "Previdência": 0.0
       },
       recommended: {
-        "Ações": 50,
-        "Fundos": 20,
-        "Renda Fixa": 10,
-        "Internacional": 15,
-        "Caixa": 5
+        "Ações BR": 40.0,
+        "Fundos": 20.0,
+        "Renda Fixa": 10.0,
+        "Internacional": 20.0,
+        "Caixa": 3.0,
+        "FIIs": 7.0,
+        "Previdência": 0.0
       },
-      optimizationGain: 1.8,
-      summary: "Sua carteira está bem alinhada com seu perfil arrojado, mas poderia se beneficiar de um aumento na exposição internacional (8,5% vs 15% ideal). Uma realocação proporcionaria um ganho potencial de 1,8% ao ano sem aumento significativo de risco."
+      optimizationGain: 2.4,
+      summary: "Seu perfil arrojado está bem representado na sua carteira, com foco em ações brasileiras. Sugerimos aumentar sua exposição internacional de 8,5% para 20%, aproveitando mercados mais desenvolvidos e diversificados. A adição de FIIs (7%) pode trazer renda passiva e proteção inflacionária, contribuindo para um ganho potencial de 2,4% ao ano."
     },
     
-    // Outros módulos seguiriam o mesmo padrão...
+    // Projeção Futuro Próximo
     projection: {
       currentTotal: 280000,
       monthlyContribution: 2000,
@@ -287,6 +310,7 @@ export const clientData: Record<string, any> = {
       summary: "Com seu aporte mensal de R$ 2.000, seu patrimônio pode atingir R$ 490 mil em 5 anos no cenário base. Seu perfil arrojado traz mais volatilidade, mas também maior potencial de crescimento."
     },
     
+    // Reserva & Liquidez Dinâmica
     liquidity: {
       currentIdle: 5000,
       idealReserve: 15000,
@@ -295,6 +319,112 @@ export const clientData: Record<string, any> = {
       summary: "Sua reserva de emergência está abaixo do ideal. Recomendamos aumentar em R$ 10.000 nos próximos meses, especialmente considerando seu perfil de risco mais arrojado."
     },
     
+    // Gaps de Metas de Vida
+    lifeGoals: {
+      goals: [
+        {
+          name: "Imóvel",
+          targetAmount: 250000,
+          currentAmount: 100000,
+          progress: 40,
+          timeframe: "5 anos",
+          adjustmentNeeded: 5
+        },
+        {
+          name: "Aposentadoria",
+          targetAmount: 1500000,
+          currentAmount: 400000,
+          progress: 27,
+          timeframe: "15 anos",
+          adjustmentNeeded: 10
+        },
+        {
+          name: "Educação Filhos",
+          targetAmount: 180000,
+          currentAmount: 32000,
+          progress: 18,
+          timeframe: "8 anos",
+          adjustmentNeeded: 8
+        }
+      ],
+      summary: "Sua meta para o imóvel está em 40% do caminho, mas precisará de um ajuste de +5% nos aportes mensais para atingi-la no prazo. A meta de aposentadoria requer atenção especial com ajuste de +10% para se manter no caminho certo."
+    },
+    
+    // Curiosidades Wrapped
+    wrapped: {
+      biggestContribution: {
+        amount: 80000,
+        date: "2024-12-10"
+      },
+      longestPositiveStreak: 3,
+      largestDrawdown: {
+        percentage: 8.2,
+        period: "Mar 2024 - Abr 2024"
+      },
+      mostProfitableAsset: {
+        name: "LGCP11",
+        return: 14.5
+      },
+      summary: "Seu maior aporte foi de R$ 80 mil em dezembro/2024, demonstrando excelente capacidade de poupança. Você manteve 3 meses consecutivos de rendimento positivo, mesmo durante a volatilidade de mercado. O FII LGCP11 foi seu ativo mais rentável, com 14,5% de retorno."
+    },
+    
+    // Comparativo Social
+    socialComparison: {
+      percentileRank: 20,
+      returnVsPeers: 2.2,
+      diversificationScore: 75,
+      peerGroup: "Moderado Growth",
+      summary: "Você está no top 20% dos investidores com perfil Moderado Growth, com retorno 2,2% acima da mediana. Sua diversificação é boa (75/100), mas você poderia se beneficiar de uma exposição mais equilibrada entre classes de ativos."
+    },
+    
+    // Insights de Sentimento
+    sentiment: {
+      assets: [
+        {
+          ticker: "LGCP11",
+          sentiment: 85,
+          recentNews: "Expansão de portfólio com aquisição de novo galpão logístico",
+          impact: 0.8
+        },
+        {
+          ticker: "PETR4",
+          sentiment: 45,
+          recentNews: "Instabilidade na política de dividendos preocupa mercado",
+          impact: -1.2
+        },
+        {
+          ticker: "BOVA11",
+          sentiment: 62,
+          recentNews: "Mercado reagindo positivamente a novos dados econômicos",
+          impact: 0.5
+        }
+      ],
+      summary: "As notícias positivas sobre LGCP11 impactaram em +0,8% seu rendimento na semana. Fique atento a PETR4, com sentimento negativo devido à política de dividendos, contribuindo para uma queda de 1,2% neste ativo em seu portfólio."
+    },
+    
+    // Recomendações Prioritárias
+    recommendations: [
+      {
+        action: "Aumentar alocação em Multimercados",
+        impact: "Alto",
+        urgency: "Médio",
+        description: "Realoque 5% de fundos de renda fixa para multimercados com estratégia macro, melhorando diversificação e retorno potencial."
+      },
+      {
+        action: "Reduzir exposição ao CDB do Banco XYZ",
+        impact: "Médio",
+        urgency: "Alto",
+        description: "Este CDB está rendendo abaixo do CDI há 3 meses. Recomendamos migrar para opções mais rentáveis."
+      },
+      {
+        action: "Conectar contas adicionais",
+        impact: "Alto",
+        urgency: "Baixo",
+        description: "Conecte sua conta no Banco ABC e a corretora DEF via Pluggy para termos uma visão completa de seus investimentos."
+      }
+    ],
+    summary: "Priorize aumentar sua alocação em multimercados para melhorar a diversificação. Com urgência, reveja o CDB do Banco XYZ que está com rendimento abaixo do CDI. Para uma análise mais completa, conecte suas contas adicionais quando conveniente.",
+
     // Insights financeiros adicionais
     financialInsights: {
       highestSpendingMonth: {
@@ -330,27 +460,39 @@ export const clientData: Record<string, any> = {
     riskProfile: "Conservador",
     lastUpdate: "2025-05-16",
     
+    // Informações personalizadas do cliente
+    personalInsights: {
+      family: "Com seus dois filhos já formados e independentes, você e sua esposa Teresa estão entrando em uma nova fase da vida. Suas preocupações com a saúde dela foram consideradas em nosso planejamento, incluindo um fundo específico para despesas médicas não cobertas pelo plano de saúde.",
+      passions: "Como amante de música clássica e frequentador assíduo do Teatro Municipal, temos uma surpresa para você! Nossa parceria com a Orquestra Sinfônica garante acesso VIP aos melhores concertos. E sabendo da sua paixão por vinhos chilenos, organizamos uma degustação exclusiva no próximo mês.",
+      financialJourney: "Após 32 anos como engenheiro civil, sua aposentadoria em 2 anos marca o início de uma nova fase. O patrimônio que você construiu metodicamente ao longo dos anos é admirável - você está no top 5% dos nossos clientes em termos de disciplina de poupança.",
+      goals: "Seu sonho de passar 6 meses por ano viajando após a aposentadoria está bem estruturado financeiramente. Também estamos monitorando aquela pequena vinícola no Sul que você demonstrou interesse em adquirir como projeto pós-carreira."
+    },
+    
     // Alocação & Diversificação 360°
     allocation: {
       current: {
         "Renda Fixa": 68.5,
-        "Fundos": 22.0,
-        "Ações": 5.3,
+        "Fundos": 12.0,
+        "Previdência": 10.0,
+        "Ações BR": 5.3,
         "Internacional": 1.2,
-        "Caixa": 3.0
+        "Caixa": 3.0,
+        "FIIs": 0.0
       },
       recommended: {
-        "Renda Fixa": 60,
-        "Fundos": 25,
-        "Ações": 10,
-        "Internacional": 0,
-        "Caixa": 5
+        "Renda Fixa": 60.0,
+        "Fundos": 10.0,
+        "Previdência": 10.0,
+        "Ações BR": 5.0,
+        "Internacional": 0.0,
+        "Caixa": 5.0,
+        "FIIs": 10.0
       },
-      optimizationGain: 0.5,
-      summary: "Sua carteira está adequadamente conservadora devido à proximidade da aposentadoria. Uma leve redução na concentração em Renda Fixa poderia trazer um ganho modesto de 0,5% ao ano mantendo um risco controlado."
+      optimizationGain: 1.2,
+      summary: "Sua carteira está adequadamente conservadora devido à proximidade da aposentadoria. Sugerimos reduzir ligeiramente a concentração em Renda Fixa (de 68,5% para 60%) e adicionar 10% em Fundos Imobiliários de tijolo, que podem oferecer renda passiva mensal com volatilidade controlada - ideal para complementar sua renda na aposentadoria."
     },
     
-    // Apenas exemplos simplificados para o cliente 3...
+    // Projeção Futuro Próximo
     projection: {
       currentTotal: 850000,
       monthlyContribution: 3000,
@@ -369,24 +511,342 @@ export const clientData: Record<string, any> = {
       summary: "Sua carteira conservadora mostra estabilidade mesmo em cenários de stress. Com seu aporte mensal, deve atingir sua meta de aposentadoria dentro do prazo previsto, com baixa volatilidade."
     },
     
+    // Reserva & Liquidez Dinâmica
+    liquidity: {
+      currentIdle: 136000,
+      idealReserve: 90000,
+      monthlyExpenses: 15000,
+      idealMonths: 6,
+      summary: "Você mantém R$ 136.000 em caixa, acima da reserva ideal de R$ 90.000 (6 meses de despesas). Isso reflete sua estratégia de alta liquidez para oportunidades de negócio, porém poderia alocar cerca de R$ 46.000 em produtos de maior rentabilidade com liquidez em D+1/D+3, como alguns fundos DI ou CDBs com liquidez diária."
+    },
+    
+    // Gaps de Metas de Vida
+    lifeGoals: {
+      goals: [
+        {
+          name: "Imóvel",
+          targetAmount: 1200000,
+          currentAmount: 450000,
+          progress: 37,
+          timeframe: "3 anos",
+          adjustmentNeeded: 8
+        },
+        {
+          name: "Fundo para Educação",
+          targetAmount: 700000,
+          currentAmount: 120000,
+          progress: 17,
+          timeframe: "10 anos",
+          adjustmentNeeded: 5
+        },
+        {
+          name: "Reserva para Negócio",
+          targetAmount: 500000,
+          currentAmount: 300000,
+          progress: 60,
+          timeframe: "2 anos",
+          adjustmentNeeded: 0
+        }
+      ],
+      summary: "Sua meta para aquisição do imóvel está em 37% do caminho, precisando de um ajuste de +8% nos aportes mensais para ser atingida em 3 anos. O fundo para educação do futuro filho ainda está em estágio inicial (17%), mas com tempo suficiente para ajustes. A reserva para o negócio está bem encaminhada, com 60% da meta já alcançada."
+    },
+    
+    // Curiosidades Wrapped
+    wrapped: {
+      biggestContribution: {
+        amount: 180000,
+        date: "2025-02-10"
+      },
+      longestPositiveStreak: 4,
+      largestDrawdown: {
+        percentage: 7.5,
+        period: "Jan 2025 - Fev 2025"
+      },
+      mostProfitableAsset: {
+        name: "BBAS3",
+        return: 22.5
+      },
+      summary: "Seu maior aporte foi de R$ 180 mil em fevereiro/2025, demonstrando forte capacidade de poupança. Você manteve 4 meses consecutivos de rendimento positivo, mesmo durante a volatilidade do início do ano. A ação do Banco do Brasil (BBAS3) foi seu ativo mais rentável, com 22,5% de retorno."
+    },
+    
+    // Comparativo Social
+    socialComparison: {
+      percentileRank: 15,
+      returnVsPeers: 3.2,
+      diversificationScore: 68,
+      peerGroup: "Moderado Empreendedor",
+      summary: "Você está entre os top 15% dos investidores com perfil Moderado Empreendedor, com retorno 3,2% acima da mediana. Sua pontuação de diversificação (68/100) reflete oportunidades para melhorar a distribuição entre classes de ativos, especialmente com a inclusão de investimentos internacionais."
+    },
+    
+    // Insights de Sentimento
+    sentiment: {
+      assets: [
+        {
+          ticker: "BBAS3",
+          sentiment: 78,
+          recentNews: "Forte resultado trimestral e aumento na distribuição de dividendos",
+          impact: 1.2
+        },
+        {
+          ticker: "PETR4",
+          sentiment: 42,
+          recentNews: "Incertezas sobre política de preços e interferência governamental",
+          impact: -0.8
+        },
+        {
+          ticker: "IVVB11",
+          sentiment: 65,
+          recentNews: "Mercado americano mostrando resiliência apesar dos juros elevados",
+          impact: 0.6
+        }
+      ],
+      summary: "O sentimento positivo sobre BBAS3 contribuiu para um impacto de +1,2% em seu rendimento recente. Fique atento a PETR4, com sentimento negativo devido a incertezas políticas, contribuindo para uma queda de 0,8% neste ativo em seu portfólio."
+    },
+    
+    // Recomendações Prioritárias
+    recommendations: [
+      {
+        action: "Iniciar exposição internacional",
+        impact: "Alto",
+        urgency: "Médio",
+        description: "Aloque 12% do portfólio em ETFs e fundos com exposição a mercados desenvolvidos, começando com IVVB11 (S&P 500) e EUSC (Small Caps Europeias)."
+      },
+      {
+        action: "Implementar proteção patrimonial",
+        impact: "Médio",
+        urgency: "Alto",
+        description: "Considerando seus planos familiares, recomendamos estruturar um seguro de vida com cobertura de pelo menos R$ 2 milhões e iniciar uma previdência privada VGBL para eficiência tributária."
+      },
+      {
+        action: "Diversificar em FIIs",
+        impact: "Médio",
+        urgency: "Baixo",
+        description: "Adicione uma alocação inicial de 5% em FIIs diversificados entre logística, lajes corporativas e recebíveis, objetivando renda passiva mensal e proteção inflacionária."
+      }
+    ],
+    
+    summary: "Priorize iniciar sua exposição internacional para melhorar a diversificação geográfica. Com urgência, implemente uma estratégia de proteção patrimonial, considerando seus planos familiares e novos empreendimentos. Para complementar sua estratégia, adicione FIIs ao seu portfólio quando conveniente.",
+    
     // Insights financeiros adicionais
     financialInsights: {
-      retirementReadiness: {
-        percentage: 87,
-        timeToRetirement: "2 anos e 4 meses",
-        summary: "Você está 87% preparado para sua aposentadoria em 2 anos e 4 meses. Para chegar aos 100%, seria ideal aumentar seu aporte mensal em R$ 1.000 ou postergar a aposentadoria em 8 meses."
+      highestSpendingMonth: {
+        month: "Março",
+        amount: 42800,
+        comparison: "equivalente a uma pequena reforma ou um carro popular 0km",
+        summary: "Em março, você gastou R$ 42.800, o equivalente a um carro popular 0km. Foi seu recorde do ano, impulsionado principalmente pela viagem a Campos do Jordão e pelo investimento inicial no seu novo empreendimento."
       },
-      incomePreservation: {
-        currentIncome: 12500,
-        projectedRetirementIncome: 10800,
-        incomePreservationRate: 86,
-        summary: "Na aposentadoria, você manterá 86% do seu padrão de vida atual, com uma renda projetada de R$ 10.800 por mês. Está dentro do ideal de 80% a 100% recomendado pelos especialistas."
+      wastedMoney: {
+        category: "Assinaturas não utilizadas",
+        amount: 5400,
+        potentialGrowth: 6200,
+        summary: "Com assinaturas e serviços subutilizados, você gastou R$ 5.400 no ano. Se tivesse direcionado esse valor para seu portfólio de ações, teria hoje aproximadamente R$ 6.200."
       },
-      taxEfficiency: {
-        currentTaxRate: 12.4,
-        potentialTaxRate: 9.2,
-        annualSavings: 4600,
-        summary: "Com uma reorganização tributária da sua carteira, você pode reduzir sua alíquota média de 12,4% para 9,2%, economizando R$ 4.600 por ano em impostos. Vamos implementar essa estratégia?"
+      potentialSavings: {
+        category: "Gastos com restaurantes premium",
+        savingsPercentage: 15,
+        monthlySavings: 1200,
+        twentyYearProjection: 850000,
+        goalRelation: "independência financeira",
+        summary: "Reduzindo 15% dos seus gastos com restaurantes de alto padrão, você poderia investir R$ 1.200 adicionais por mês. Em 20 anos, isso representaria aproximadamente R$ 850.000, acelerando significativamente sua meta de independência financeira."
+      }
+    }
+  },
+  
+  client4: {
+    clientId: "client4",
+    clientName: "Luis Fernando Souza Santos",
+    age: 38,
+    riskProfile: "Moderado",
+    lastUpdate: "2025-05-18",
+    
+    // Informações personalizadas do cliente
+    personalInsights: {
+      family: "Sabemos que você e Gisele estão planejando aumentar a família nos próximos 3 anos. Preparamos uma projeção financeira considerando os custos com educação e saúde para o novo membro da família. Também notamos seu compromisso com os cuidados médicos de sua mãe, algo que honramos e levamos em conta no seu planejamento.",
+      passions: "Como torcedor fiel do Corinthians e praticante de tênis e surf, você mantém um estilo de vida ativo que valoriza equilíbrio. Sua viagem pela rota do Beaujolais na França revelou seu gosto por vinhos refinados - algo que nosso clube de investidores em vinícolas pode interessar. E notamos que sushi está entre suas preferências culinárias, mas comida coreana não faz parte do seu radar.",
+      financialJourney: "Como empreendedor no mercado financeiro, você entende os desafios e oportunidades do setor. Seu patrimônio atual de R$ 1,7 milhão e renda mensal de R$ 15 mil demonstram sua capacidade de construção de riqueza. Sua preferência por manter alta liquidez faz sentido neste momento de sua jornada empresarial.",
+      goals: "Seu objetivo de comprar uma casa está em nosso radar, e estamos monitorando o mercado para as melhores oportunidades. Admiramos sua meta de visitar um número de países equivalente à sua idade - uma forma inspiradora de combinar crescimento pessoal e descoberta. Nossa equipe pode auxiliar com recomendações personalizadas para seus próximos destinos."
+    },
+    
+    // Alocação & Diversificação 360°
+    allocation: {
+      current: {
+        "Renda Fixa": 42.5,
+        "Ações BR": 30.8,
+        "Fundos": 18.7,
+        "Caixa": 8.0,
+        "Internacional": 0.0,
+        "FIIs": 0.0,
+        "Previdência": 0.0
+      },
+      recommended: {
+        "Renda Fixa": 35.0,
+        "Ações BR": 25.0,
+        "Fundos": 15.0,
+        "Caixa": 5.0,
+        "Internacional": 12.0,
+        "FIIs": 5.0,
+        "Previdência": 3.0
+      },
+      optimizationGain: 2.1,
+      summary: "Com seu perfil de empreendedor no mercado financeiro, sua carteira atual está bem estruturada, porém carece de diversificação internacional e exposição ao setor imobiliário. A adição de 12% em investimentos internacionais e 5% em FIIs traria proteção adicional e diversificação geográfica, especialmente importante considerando sua futura expansão familiar e meta de aquisição imobiliária."
+    },
+    
+    // Projeção Futuro Próximo
+    projection: {
+      currentTotal: 1700000,
+      monthlyContribution: 15000,
+      scenarios: {
+        base: {
+          "1 ano": 1950000,
+          "3 anos": 2560000,
+          "5 anos": 3320000
+        },
+        stress: {
+          "1 ano": 1820000,
+          "3 anos": 2250000,
+          "5 anos": 2780000
+        }
+      },
+      summary: "Com sua capacidade de investir R$ 15.000 mensalmente e o crescimento do seu novo empreendimento, seu patrimônio deve alcançar R$ 3,32 milhões em 5 anos no cenário base. Mesmo no cenário de stress, ultrapassaria R$ 2,78 milhões, demonstrando resiliência. Com a realocação sugerida, o potencial de crescimento seria ainda maior."
+    },
+    
+    // Reserva & Liquidez Dinâmica
+    liquidity: {
+      currentIdle: 136000,
+      idealReserve: 90000,
+      monthlyExpenses: 15000,
+      idealMonths: 6,
+      summary: "Você mantém R$ 136.000 em caixa, acima da reserva ideal de R$ 90.000 (6 meses de despesas). Isso reflete sua estratégia de alta liquidez para oportunidades de negócio, porém poderia alocar cerca de R$ 46.000 em produtos de maior rentabilidade com liquidez em D+1/D+3, como alguns fundos DI ou CDBs com liquidez diária."
+    },
+    
+    // Gaps de Metas de Vida
+    lifeGoals: {
+      goals: [
+        {
+          name: "Imóvel",
+          targetAmount: 1200000,
+          currentAmount: 450000,
+          progress: 37,
+          timeframe: "3 anos",
+          adjustmentNeeded: 8
+        },
+        {
+          name: "Fundo para Educação",
+          targetAmount: 700000,
+          currentAmount: 120000,
+          progress: 17,
+          timeframe: "10 anos",
+          adjustmentNeeded: 5
+        },
+        {
+          name: "Reserva para Negócio",
+          targetAmount: 500000,
+          currentAmount: 300000,
+          progress: 60,
+          timeframe: "2 anos",
+          adjustmentNeeded: 0
+        }
+      ],
+      summary: "Sua meta para aquisição do imóvel está em 37% do caminho, precisando de um ajuste de +8% nos aportes mensais para ser atingida em 3 anos. O fundo para educação do futuro filho ainda está em estágio inicial (17%), mas com tempo suficiente para ajustes. A reserva para o negócio está bem encaminhada, com 60% da meta já alcançada."
+    },
+    
+    // Curiosidades Wrapped
+    wrapped: {
+      biggestContribution: {
+        amount: 180000,
+        date: "2025-02-10"
+      },
+      longestPositiveStreak: 4,
+      largestDrawdown: {
+        percentage: 7.5,
+        period: "Jan 2025 - Fev 2025"
+      },
+      mostProfitableAsset: {
+        name: "BBAS3",
+        return: 22.5
+      },
+      summary: "Seu maior aporte foi de R$ 180 mil em fevereiro/2025, demonstrando forte capacidade de poupança. Você manteve 4 meses consecutivos de rendimento positivo, mesmo durante a volatilidade do início do ano. A ação do Banco do Brasil (BBAS3) foi seu ativo mais rentável, com 22,5% de retorno."
+    },
+    
+    // Comparativo Social
+    socialComparison: {
+      percentileRank: 15,
+      returnVsPeers: 3.2,
+      diversificationScore: 68,
+      peerGroup: "Moderado Empreendedor",
+      summary: "Você está entre os top 15% dos investidores com perfil Moderado Empreendedor, com retorno 3,2% acima da mediana. Sua pontuação de diversificação (68/100) reflete oportunidades para melhorar a distribuição entre classes de ativos, especialmente com a inclusão de investimentos internacionais."
+    },
+    
+    // Insights de Sentimento
+    sentiment: {
+      assets: [
+        {
+          ticker: "BBAS3",
+          sentiment: 78,
+          recentNews: "Forte resultado trimestral e aumento na distribuição de dividendos",
+          impact: 1.2
+        },
+        {
+          ticker: "PETR4",
+          sentiment: 42,
+          recentNews: "Incertezas sobre política de preços e interferência governamental",
+          impact: -0.8
+        },
+        {
+          ticker: "IVVB11",
+          sentiment: 65,
+          recentNews: "Mercado americano mostrando resiliência apesar dos juros elevados",
+          impact: 0.6
+        }
+      ],
+      summary: "O sentimento positivo sobre BBAS3 contribuiu para um impacto de +1,2% em seu rendimento recente. Fique atento a PETR4, com sentimento negativo devido a incertezas políticas, contribuindo para uma queda de 0,8% neste ativo em seu portfólio."
+    },
+    
+    // Recomendações Prioritárias
+    recommendations: [
+      {
+        action: "Iniciar exposição internacional",
+        impact: "Alto",
+        urgency: "Médio",
+        description: "Aloque 12% do portfólio em ETFs e fundos com exposição a mercados desenvolvidos, começando com IVVB11 (S&P 500) e EUSC (Small Caps Europeias)."
+      },
+      {
+        action: "Implementar proteção patrimonial",
+        impact: "Médio",
+        urgency: "Alto",
+        description: "Considerando seus planos familiares, recomendamos estruturar um seguro de vida com cobertura de pelo menos R$ 2 milhões e iniciar uma previdência privada VGBL para eficiência tributária."
+      },
+      {
+        action: "Diversificar em FIIs",
+        impact: "Médio",
+        urgency: "Baixo",
+        description: "Adicione uma alocação inicial de 5% em FIIs diversificados entre logística, lajes corporativas e recebíveis, objetivando renda passiva mensal e proteção inflacionária."
+      }
+    ],
+    
+    summary: "Priorize iniciar sua exposição internacional para melhorar a diversificação geográfica. Com urgência, implemente uma estratégia de proteção patrimonial, considerando seus planos familiares e novos empreendimentos. Para complementar sua estratégia, adicione FIIs ao seu portfólio quando conveniente.",
+    
+    // Insights financeiros adicionais
+    financialInsights: {
+      highestSpendingMonth: {
+        month: "Março",
+        amount: 42800,
+        comparison: "equivalente a uma pequena reforma ou um carro popular 0km",
+        summary: "Em março, você gastou R$ 42.800, o equivalente a um carro popular 0km. Foi seu recorde do ano, impulsionado principalmente pela viagem a Campos do Jordão e pelo investimento inicial no seu novo empreendimento."
+      },
+      wastedMoney: {
+        category: "Assinaturas não utilizadas",
+        amount: 5400,
+        potentialGrowth: 6200,
+        summary: "Com assinaturas e serviços subutilizados, você gastou R$ 5.400 no ano. Se tivesse direcionado esse valor para seu portfólio de ações, teria hoje aproximadamente R$ 6.200."
+      },
+      potentialSavings: {
+        category: "Gastos com restaurantes premium",
+        savingsPercentage: 15,
+        monthlySavings: 1200,
+        twentyYearProjection: 850000,
+        goalRelation: "independência financeira",
+        summary: "Reduzindo 15% dos seus gastos com restaurantes de alto padrão, você poderia investir R$ 1.200 adicionais por mês. Em 20 anos, isso representaria aproximadamente R$ 850.000, acelerando significativamente sua meta de independência financeira."
       }
     }
   }
