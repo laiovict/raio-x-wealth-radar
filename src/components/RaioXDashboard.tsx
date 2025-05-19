@@ -19,6 +19,7 @@ import FinancialOverviewModule from "./modules/FinancialOverviewModule";
 import AIInsightsHubModule from "./modules/AIInsightsHubModule";
 import RecommendedActionsModule from "./modules/RecommendedActionsModule";
 import InvestmentPlanningModule from "./modules/InvestmentPlanningModule";
+import OnePageFinancialPlanModule from "./modules/OnePageFinancialPlanModule";
 
 interface RaioXDashboardProps {
   showPdfPreview?: boolean;
@@ -84,12 +85,16 @@ const RaioXDashboard = ({
         </div>
       </div>
 
-      {/* Financial Overview - Always visible at the top */}
+      {/* One-Page Financial Plan - Always visible at the very top */}
+      <OnePageFinancialPlanModule />
+
+      {/* Financial Overview - Always visible below the plan */}
       <FinancialOverviewModule />
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-3 lg:grid-cols-12 md:grid-cols-6">
           <TabsTrigger value="all" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Todos</TabsTrigger>
+          <TabsTrigger value="plan" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Plano em Uma Página</TabsTrigger>
           <TabsTrigger value="ai" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Copiloto IA</TabsTrigger>
           <TabsTrigger value="personal" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Pessoal</TabsTrigger>
           <TabsTrigger value="planning" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Planejamento</TabsTrigger>
@@ -131,6 +136,10 @@ const RaioXDashboard = ({
           <div className="mt-6">
             <FinancialInsightsModule fullWidth />
           </div>
+        </TabsContent>
+        
+        <TabsContent value="plan">
+          <OnePageFinancialPlanModule fullWidth />
         </TabsContent>
         
         <TabsContent value="ai" className="space-y-6">
