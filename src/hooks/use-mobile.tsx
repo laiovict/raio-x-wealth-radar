@@ -23,3 +23,9 @@ export function useMobileBreakpoint(breakpoint: number = 768) {
   
   return isMobile;
 }
+
+// Add the useIsMobile function that sidebar.tsx is expecting
+export function useIsMobile() {
+  // Using the standard mobile breakpoint of 768px
+  return useMobileBreakpoint(768);
+}
