@@ -1,7 +1,7 @@
 
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Family, Wine, Wallet, Plane, Home, Briefcase, Heart } from "lucide-react";
+import { Users, Wine, Wallet, Plane, Home, Briefcase, Heart } from "lucide-react";
 
 interface PersonalInsightsModuleProps {
   fullWidth?: boolean;
@@ -21,7 +21,7 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
         <div className="space-y-6">
           <div className="flex items-start gap-4">
             <div className="rounded-full bg-purple-100 p-3 dark:bg-purple-900/30">
-              <Family className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              <Users className="h-6 w-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
               <h3 className="font-semibold text-gray-900 dark:text-gray-100">Sua Família</h3>
