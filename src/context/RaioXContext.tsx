@@ -5,6 +5,7 @@ import { clientData } from '@/data/clientData';
 interface RaioXContextType {
   data: any;
   clientId: string;
+  hasOpenFinance: boolean;
 }
 
 const RaioXContext = createContext<RaioXContextType | undefined>(undefined);
@@ -20,14 +21,15 @@ export const useRaioX = () => {
 interface RaioXProviderProps {
   children: ReactNode;
   clientId: string;
+  hasOpenFinance: boolean;
 }
 
-export const RaioXProvider = ({ children, clientId }: RaioXProviderProps) => {
+export const RaioXProvider = ({ children, clientId, hasOpenFinance }: RaioXProviderProps) => {
   // Get data for the selected client
   const clientInfo = clientData[clientId] || clientData.client1;
 
   return (
-    <RaioXContext.Provider value={{ data: clientInfo, clientId }}>
+    <RaioXContext.Provider value={{ data: clientInfo, clientId, hasOpenFinance }}>
       {children}
     </RaioXContext.Provider>
   );

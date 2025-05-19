@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, X } from "lucide-react";
@@ -29,11 +28,8 @@ const RaioXDashboard = ({
   mediaType = "pdf",
   isClientFull = true
 }: RaioXDashboardProps) => {
-  const { data } = useRaioX();
+  const { data, hasOpenFinance } = useRaioX();
   const [searchQuery, setSearchQuery] = useState("");
-
-  // Check if this client has OpenFinance integrated (in real app, would come from API)
-  const hasOpenFinance = data.hasOpenFinance || false;
 
   if (showPdfPreview) {
     return (
