@@ -36,14 +36,14 @@ const WrappedModule = ({ fullWidth = false }: WrappedModuleProps) => {
 
   return (
     <Card className={fullWidth ? "w-full" : "w-full"}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl text-blue-700 dark:text-blue-300">
+      <CardHeader className="pb-2 bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800">
+        <CardTitle className="text-xl text-blue-800 dark:text-blue-300">
           Curiosidades Wrapped
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="bg-white dark:bg-gray-900">
         <div className={`grid ${fullWidth ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-2"} gap-4 mb-4`}>
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 p-4 rounded-lg">
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/60 dark:to-indigo-900/60 p-4 rounded-lg border border-blue-100 dark:border-blue-800/50">
             <div className="flex items-center mb-2">
               <ArrowUp className="w-5 h-5 text-green-600 dark:text-green-400 mr-2" />
               <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Maior Aporte</p>
@@ -51,12 +51,12 @@ const WrappedModule = ({ fullWidth = false }: WrappedModuleProps) => {
             <p className="text-lg font-bold text-blue-800 dark:text-blue-300">
               {formatCurrency(wrapped.biggestContribution.amount)}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
               {formatDate(wrapped.biggestContribution.date)}
             </p>
           </div>
           
-          <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/40 dark:to-emerald-900/40 p-4 rounded-lg">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/60 dark:to-emerald-900/60 p-4 rounded-lg border border-green-100 dark:border-green-800/50">
             <div className="flex items-center mb-2">
               <TrendingUp className="w-5 h-5 text-green-600 dark:text-green-400 mr-2" />
               <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Sequência Positiva</p>
@@ -64,12 +64,12 @@ const WrappedModule = ({ fullWidth = false }: WrappedModuleProps) => {
             <p className="text-lg font-bold text-green-800 dark:text-green-300">
               {wrapped.longestPositiveStreak} meses
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
               Consecutivos de rendimento
             </p>
           </div>
           
-          <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/40 dark:to-orange-900/40 p-4 rounded-lg">
+          <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/60 dark:to-orange-900/60 p-4 rounded-lg border border-amber-100 dark:border-amber-800/50">
             <div className="flex items-center mb-2">
               <ArrowDown className="w-5 h-5 text-amber-600 dark:text-amber-400 mr-2" />
               <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Maior Drawdown</p>
@@ -77,12 +77,12 @@ const WrappedModule = ({ fullWidth = false }: WrappedModuleProps) => {
             <p className="text-lg font-bold text-amber-800 dark:text-amber-300">
               {wrapped.largestDrawdown.percentage}%
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
               {wrapped.largestDrawdown.period}
             </p>
           </div>
           
-          <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/40 dark:to-indigo-900/40 p-4 rounded-lg">
+          <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/60 dark:to-indigo-900/60 p-4 rounded-lg border border-purple-100 dark:border-purple-800/50">
             <div className="flex items-center mb-2">
               <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400 mr-2" />
               <p className="text-sm font-medium text-gray-700 dark:text-gray-200">Ativo Mais Rentável</p>
@@ -90,14 +90,14 @@ const WrappedModule = ({ fullWidth = false }: WrappedModuleProps) => {
             <p className="text-lg font-bold text-purple-800 dark:text-purple-300">
               {wrapped.mostProfitableAsset.name}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
               +{wrapped.mostProfitableAsset.return}% de retorno
             </p>
           </div>
         </div>
         
-        <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg">
-          <p className="text-sm text-gray-700 dark:text-gray-200">
+        <div className="bg-blue-50 dark:bg-blue-900/40 p-3 rounded-lg border border-blue-100 dark:border-blue-800/50">
+          <p className="text-sm text-gray-800 dark:text-gray-200">
             {wrapped.summary}
           </p>
         </div>

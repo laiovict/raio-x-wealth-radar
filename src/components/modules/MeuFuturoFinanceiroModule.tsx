@@ -98,7 +98,7 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false }: MeuFuturoFinanceiroMod
 
   return (
     <Card className={`overflow-hidden ${fullWidth ? "w-full" : "w-full"}`}>
-      <CardHeader className="bg-gradient-to-r from-blue-900/80 to-indigo-900/80 pb-3">
+      <CardHeader className="bg-gradient-to-r from-blue-900 to-indigo-900 pb-3">
         <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
           <TrendingUp className="h-5 w-5 text-blue-300" />
           Meu Futuro Financeiro
@@ -106,7 +106,7 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false }: MeuFuturoFinanceiroMod
       </CardHeader>
       <CardContent className="p-0">
         {/* Financial Diagnostic Summary - Top Section */}
-        <div className="p-5 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900/50 dark:to-blue-900/30">
+        <div className="p-5 bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
           <h3 className="font-bold text-lg mb-4 text-blue-800 dark:text-blue-300 border-b pb-2 border-blue-200 dark:border-blue-800">
             DIAGNÓSTICO FINANCEIRO
           </h3>
@@ -144,15 +144,15 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false }: MeuFuturoFinanceiroMod
                 <ul className="space-y-2">
                   <li className="flex justify-between py-1">
                     <span className="text-gray-700 dark:text-gray-300">Imóvel</span>
-                    <span className="font-medium">{formatCurrency(diagnostic.assets.property)}</span>
+                    <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(diagnostic.assets.property)}</span>
                   </li>
                   <li className="flex justify-between py-1">
                     <span className="text-gray-700 dark:text-gray-300">Investimentos</span>
-                    <span className="font-medium">{formatCurrency(diagnostic.assets.investments)}</span>
+                    <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(diagnostic.assets.investments)}</span>
                   </li>
                   <li className="flex justify-between py-1">
                     <span className="text-gray-700 dark:text-gray-300">Veículos</span>
-                    <span className="font-medium">{formatCurrency(diagnostic.assets.vehicles.reduce((acc, vehicle) => acc + vehicle.value, 0))}</span>
+                    <span className="font-medium text-gray-900 dark:text-gray-100">{formatCurrency(diagnostic.assets.vehicles.reduce((acc, vehicle) => acc + vehicle.value, 0))}</span>
                   </li>
                 </ul>
               </div>
@@ -198,7 +198,7 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false }: MeuFuturoFinanceiroMod
         </div>
         
         {/* Plan Phases - Bottom Section */}
-        <div className="p-5 bg-white dark:bg-gray-900/50">
+        <div className="p-5 bg-white dark:bg-gray-900">
           <h3 className="font-bold text-lg mb-4 text-blue-800 dark:text-blue-300 border-b pb-2 border-blue-200 dark:border-blue-800">
             CRONOGRAMA DE MELHORIA
           </h3>
@@ -207,16 +207,16 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false }: MeuFuturoFinanceiroMod
             {diagnostic.phases.map((phase, index) => (
               <div 
                 key={index} 
-                className="bg-white dark:bg-gray-800/40 border border-gray-100 dark:border-gray-700 rounded-lg shadow-sm overflow-hidden"
+                className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-sm overflow-hidden"
               >
-                <div className="bg-blue-50 dark:bg-blue-900/20 border-b border-gray-200 dark:border-gray-700 p-3">
+                <div className="bg-blue-50 dark:bg-blue-900/50 border-b border-gray-200 dark:border-gray-700 p-3">
                   <div className="flex flex-wrap justify-between items-center gap-2">
                     <h4 className="font-semibold text-blue-800 dark:text-blue-300">
                       {phase.name}
                     </h4>
                     <Badge 
                       variant="secondary" 
-                      className="bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700/50"
+                      className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-700"
                     >
                       {phase.timeframe}
                     </Badge>
@@ -237,7 +237,7 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false }: MeuFuturoFinanceiroMod
           </div>
         </div>
         
-        <div className="p-5 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900/50 dark:to-gray-900 flex justify-center">
+        <div className="p-5 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 flex justify-center">
           <Button 
             className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all"
           >
