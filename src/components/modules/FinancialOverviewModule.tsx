@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { ArrowUp, ArrowDown, AlertTriangle, RefreshCw } from "lucide-react";
+import { ArrowUp, ArrowDown, AlertTriangle, RefreshCw, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface FinancialOverviewModuleProps {
@@ -11,7 +11,7 @@ interface FinancialOverviewModuleProps {
 }
 
 const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleProps) => {
-  const { hasOpenFinance, financialSummary, isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
+  const { data, hasOpenFinance, financialSummary, isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
 
   // Format currency
   const formatCurrency = (value: number | undefined) => {
@@ -36,7 +36,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
     { month: 'Sep', amount: 1170000 },
     { month: 'Oct', amount: 1200000 },
     { month: 'Nov', amount: 1230000 },
-    { month: 'Dec', amount: financialSummary?.netWorth || 1250000 },
+    { month: 'Dec', amount: hasOpenFinance ? (financialSummary?.netWorth || 1250000) : 1250000 },
   ];
 
   if (!hasOpenFinance) {
@@ -48,23 +48,91 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <AlertTriangle className="w-16 h-16 text-amber-400 mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Visão Financeira 360° Indisponível</h3>
-            <p className="text-gray-400 max-w-md mb-4">
-              Para acessar seu panorama financeiro completo, é necessário ativar o OpenFinance para permitir a agregação de suas contas e investimentos.
-            </p>
-            <Button 
-              variant="purpleGradient"
-              onClick={() => {
-                // This event will be caught by the parent components through context
-                // No need to implement anything here, the context refreshAIAnalysis is just a placeholder
-                const event = new CustomEvent('activate-openfinance');
-                document.dispatchEvent(event);
-              }}
-            >
-              Ativar OpenFinance
-            </Button>
+          <div className="space-y-6">
+            {/* Limited Net Worth Section */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium text-lg text-white">Patrimônio de Investimentos</h3>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-white">
+                    {formatCurrency(1250000)}
+                  </div>
+                  <div className="flex items-center text-sm text-green-400">
+                    <ArrowUp className="h-4 w-4 mr-1" />
+                    <span>+4.3% este mês</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="h-40">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={mockNetWorthHistory}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                    <XAxis dataKey="month" stroke="#666" />
+                    <YAxis 
+                      stroke="#666"
+                      tickFormatter={(value) => {
+                        if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+                        if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
+                        return value.toString();
+                      }}
+                    />
+                    <Tooltip
+                      formatter={(value: number) => [formatCurrency(value), "Valor"]}
+                      labelFormatter={(label) => `Mês: ${label}`}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="amount" 
+                      stroke="#8884d8" 
+                      dot={false}
+                      strokeWidth={3}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            
+            {/* OpenFinance needed banner */}
+            <div className="p-4 border border-blue-500/20 rounded-lg bg-blue-900/10">
+              <div className="flex items-start gap-4">
+                <div className="p-2 bg-blue-900/30 rounded-full">
+                  <Lock className="h-6 w-6 text-blue-300" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-medium text-white mb-2">Visão 360° Limitada</h3>
+                  <p className="text-gray-300 mb-4">
+                    Você está visualizando apenas seus dados de investimentos. Para acessar seu panorama financeiro completo, 
+                    incluindo despesas, contas bancárias e uma visão 360° do seu patrimônio, ative o OpenFinance.
+                  </p>
+                  <Button 
+                    variant="purpleGradient"
+                    onClick={() => {
+                      const event = new CustomEvent('activate-openfinance');
+                      document.dispatchEvent(event);
+                    }}
+                  >
+                    Ativar OpenFinance
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Investment Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="p-4 rounded-lg bg-gradient-to-br from-purple-900/40 to-purple-800/20">
+                <div className="text-sm text-gray-400 mb-1">Total Investido</div>
+                <div className="text-xl font-bold text-white">{formatCurrency(1450000)}</div>
+              </div>
+              <div className="p-4 rounded-lg bg-gradient-to-br from-blue-900/40 to-blue-800/20">
+                <div className="text-sm text-gray-400 mb-1">Retorno Acumulado</div>
+                <div className="text-xl font-bold text-white">+12.3%</div>
+              </div>
+              <div className="p-4 rounded-lg bg-gradient-to-br from-green-900/40 to-green-800/20">
+                <div className="text-sm text-gray-400 mb-1">Dividendos Anuais</div>
+                <div className="text-xl font-bold text-white">{formatCurrency(42000)}</div>
+              </div>
+            </div>
           </div>
         </CardContent>
       </Card>

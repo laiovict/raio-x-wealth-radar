@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, X } from "lucide-react";
@@ -150,6 +151,7 @@ const RaioXDashboard = ({
             <AllocationModule />
           </div>
           
+          {/* Always show WholeBankingModule - it'll adapt based on hasOpenFinance state */}
           <div className="grid grid-cols-1 gap-6">
             <WholeBankingModule />
           </div>

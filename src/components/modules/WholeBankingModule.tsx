@@ -3,7 +3,7 @@ import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Shield, CreditCard, Repeat, Handshake, AlertTriangle, RefreshCw } from "lucide-react";
+import { Shield, CreditCard, Repeat, Handshake, AlertTriangle, RefreshCw, Lock } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
 interface WholeBankingModuleProps {
@@ -115,22 +115,76 @@ const WholeBankingModule = ({ fullWidth = false }: WholeBankingModuleProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <AlertTriangle className="w-16 h-16 text-amber-400 mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Visão Bancária 360° Indisponível</h3>
-            <p className="text-gray-400 max-w-md mb-4">
-              Para acessar seus produtos bancários, seguros, operações de crédito e informações sobre consórcios, é necessário ativar o OpenFinance.
-            </p>
-            <Button 
-              variant="success" 
-              className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white hover:from-purple-700 hover:to-indigo-800"
-              onClick={() => {
-                const event = new CustomEvent('activate-openfinance');
-                document.dispatchEvent(event);
-              }}
-            >
-              Ativar OpenFinance
-            </Button>
+          <div className="p-4 border border-purple-500/20 rounded-lg bg-purple-900/10">
+            <div className="flex items-start gap-4">
+              <div className="p-2 bg-purple-900/30 rounded-full">
+                <Lock className="h-6 w-6 text-purple-300" />
+              </div>
+              <div>
+                <h3 className="text-lg font-medium text-white mb-2">Conecte seu Open Banking</h3>
+                <p className="text-gray-300 mb-4">
+                  Para acessar informações além dos investimentos como crédito, seguros, consórcios e despesas recorrentes, 
+                  ative o OpenFinance para permitir uma análise completa de sua vida financeira.
+                </p>
+                <div className="flex space-x-4">
+                  <Button 
+                    variant="success" 
+                    className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white hover:from-purple-700 hover:to-indigo-800"
+                    onClick={() => {
+                      const event = new CustomEvent('activate-openfinance');
+                      document.dispatchEvent(event);
+                    }}
+                  >
+                    Ativar OpenFinance
+                  </Button>
+                  <Button variant="ghost" className="text-gray-300 hover:text-white">
+                    Saiba Mais
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+            <div className="p-4 rounded-lg bg-gradient-to-br from-blue-900/40 to-blue-800/20 border border-blue-500/20">
+              <h4 className="font-medium text-white mb-3 flex items-center">
+                <CreditCard className="w-4 h-4 mr-2 text-blue-400" />
+                Crédito
+              </h4>
+              <p className="text-gray-300 text-sm">
+                Visualize seus financiamentos, empréstimos e linhas de crédito após ativar o OpenFinance.
+              </p>
+            </div>
+            
+            <div className="p-4 rounded-lg bg-gradient-to-br from-green-900/40 to-green-800/20 border border-green-500/20">
+              <h4 className="font-medium text-white mb-3 flex items-center">
+                <Shield className="w-4 h-4 mr-2 text-green-400" />
+                Seguros
+              </h4>
+              <p className="text-gray-300 text-sm">
+                Acompanhe seus seguros e proteja seu patrimônio com uma visão integrada após ativar o OpenFinance.
+              </p>
+            </div>
+            
+            <div className="p-4 rounded-lg bg-gradient-to-br from-amber-900/40 to-amber-800/20 border border-amber-500/20">
+              <h4 className="font-medium text-white mb-3 flex items-center">
+                <Repeat className="w-4 h-4 mr-2 text-amber-400" />
+                Despesas Recorrentes
+              </h4>
+              <p className="text-gray-300 text-sm">
+                Monitore assinaturas e despesas fixas para otimizar seu orçamento após ativar o OpenFinance.
+              </p>
+            </div>
+            
+            <div className="p-4 rounded-lg bg-gradient-to-br from-indigo-900/40 to-indigo-800/20 border border-indigo-500/20">
+              <h4 className="font-medium text-white mb-3 flex items-center">
+                <Handshake className="w-4 h-4 mr-2 text-indigo-400" />
+                Consórcios
+              </h4>
+              <p className="text-gray-300 text-sm">
+                Acompanhe o progresso dos seus consórcios e planeje suas conquistas após ativar o OpenFinance.
+              </p>
+            </div>
           </div>
         </CardContent>
       </Card>
