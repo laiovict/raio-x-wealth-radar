@@ -25,15 +25,15 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
   // If client doesn't have financial insights data
   if (!financialInsights) {
     return (
-      <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 bg-white bg-opacity-5 backdrop-blur-sm`}>
+      <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
         <CardHeader className="pb-2">
-          <CardTitle className="text-xl text-blue-300">
+          <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
             Insights Financeiros Detalhados
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8">
-            <PiggyBank className="w-16 h-16 text-gray-600 mb-4" />
+            <PiggyBank className="w-16 h-16 text-gray-500 mb-4" />
             <p className="text-gray-400 text-center">
               Insights financeiros detalhados não disponíveis para este cliente.
               <br />
@@ -64,10 +64,10 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
   };
 
   return (
-    <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 bg-white bg-opacity-5 backdrop-blur-sm`}>
+    <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-xl text-blue-300">
+          <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
             Insights Financeiros Detalhados
           </CardTitle>
           <span className="text-sm text-gray-400">
@@ -79,14 +79,14 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
         <div className="space-y-6">
           {/* Highest Spending Month */}
           {financialInsights.highestSpendingMonth && (
-            <div className="border border-white/10 bg-white bg-opacity-5 rounded-lg p-4">
+            <div className="border border-amber-500/20 bg-gradient-to-br from-amber-800/10 to-amber-600/5 backdrop-blur-sm rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <div className="bg-amber-800 p-2 rounded-full">
+                <div className="bg-gradient-to-br from-amber-700 to-amber-900 p-2 rounded-full">
                   <DollarSign className="w-5 h-5 text-amber-300" />
                 </div>
                 <div>
                   <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-amber-300 mb-1">
+                    <h3 className="font-medium text-amber-400 mb-1">
                       Você viveu no limite?
                     </h3>
                     <span className="text-xs text-gray-400">Mai 19, 2025</span>
@@ -96,9 +96,9 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                   </p>
                   
                   {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-amber-500" 
+                      className="h-full bg-gradient-to-r from-amber-500 to-amber-300" 
                       style={{ width: "40%" }}
                     ></div>
                   </div>
@@ -114,10 +114,10 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
 
           {/* Wasted Money */}
           {financialInsights.wastedMoney && (
-            <div className="border border-white/10 bg-white bg-opacity-5 rounded-lg p-4">
+            <div className="border border-red-500/20 bg-gradient-to-br from-red-800/10 to-red-600/5 backdrop-blur-sm rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <div className="bg-red-900 p-2 rounded-full">
-                  <ArrowDown className="w-5 h-5 text-red-400" />
+                <div className="bg-gradient-to-br from-red-700 to-red-900 p-2 rounded-full">
+                  <ArrowDown className="w-5 h-5 text-red-300" />
                 </div>
                 <div>
                   <div className="flex items-center justify-between">
@@ -131,9 +131,9 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                   </p>
                   
                   {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-red-500" 
+                      className="h-full bg-gradient-to-r from-red-500 to-red-300" 
                       style={{ width: "40%" }}
                     ></div>
                   </div>
@@ -149,10 +149,10 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
 
           {/* Top Categories */}
           {financialInsights.topCategories && (
-            <div className="border border-white/10 bg-white bg-opacity-5 rounded-lg p-4">
+            <div className="border border-blue-500/20 bg-gradient-to-br from-blue-800/10 to-blue-600/5 backdrop-blur-sm rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <div className="bg-blue-900 p-2 rounded-full">
-                  <Wallet className="w-5 h-5 text-blue-400" />
+                <div className="bg-gradient-to-br from-blue-700 to-blue-900 p-2 rounded-full">
+                  <Wallet className="w-5 h-5 text-blue-300" />
                 </div>
                 <div>
                   <div className="flex items-center justify-between">
@@ -163,7 +163,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                   </div>
                   <div className="flex flex-wrap gap-2 mb-2">
                     {financialInsights.topCategories.categories.map((category, index) => (
-                      <Badge key={index} className="bg-blue-900 text-blue-200 hover:bg-blue-800">
+                      <Badge key={index} className="bg-blue-900/50 text-blue-200 hover:bg-blue-800/50 border border-blue-500/30">
                         {category}
                       </Badge>
                     ))}
@@ -173,9 +173,9 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                   </p>
                   
                   {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-blue-500" 
+                      className="h-full bg-gradient-to-r from-blue-500 to-blue-300" 
                       style={{ width: "40%" }}
                     ></div>
                   </div>
@@ -191,10 +191,10 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
 
           {/* Negative Months */}
           {financialInsights.negativeMonths && (
-            <div className="border border-white/10 bg-white bg-opacity-5 rounded-lg p-4">
+            <div className="border border-orange-500/20 bg-gradient-to-br from-orange-800/10 to-orange-600/5 backdrop-blur-sm rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <div className="bg-orange-900 p-2 rounded-full">
-                  <Calendar className="w-5 h-5 text-orange-400" />
+                <div className="bg-gradient-to-br from-orange-700 to-orange-900 p-2 rounded-full">
+                  <Calendar className="w-5 h-5 text-orange-300" />
                 </div>
                 <div>
                   <div className="flex items-center justify-between">
@@ -208,9 +208,9 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                   </p>
                   
                   {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-orange-500" 
+                      className="h-full bg-gradient-to-r from-orange-500 to-orange-300" 
                       style={{ width: "40%" }}
                     ></div>
                   </div>
@@ -226,10 +226,10 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
 
           {/* Investment Growth */}
           {financialInsights.investmentGrowth && (
-            <div className="border border-white/10 bg-white bg-opacity-5 rounded-lg p-4">
+            <div className="border border-green-500/20 bg-gradient-to-br from-green-800/10 to-green-600/5 backdrop-blur-sm rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <div className="bg-green-900 p-2 rounded-full">
-                  <ArrowUp className="w-5 h-5 text-green-400" />
+                <div className="bg-gradient-to-br from-green-700 to-green-900 p-2 rounded-full">
+                  <ArrowUp className="w-5 h-5 text-green-300" />
                 </div>
                 <div>
                   <div className="flex items-center justify-between">
@@ -243,9 +243,9 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                   </p>
                   
                   {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-green-500" 
+                      className="h-full bg-gradient-to-r from-green-500 to-green-300" 
                       style={{ width: "40%" }}
                     ></div>
                   </div>
@@ -261,10 +261,10 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
 
           {/* Potential Savings */}
           {financialInsights.potentialSavings && (
-            <div className="border border-white/10 bg-white bg-opacity-5 rounded-lg p-4">
+            <div className="border border-indigo-500/20 bg-gradient-to-br from-indigo-800/10 to-indigo-600/5 backdrop-blur-sm rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <div className="bg-indigo-900 p-2 rounded-full">
-                  <PiggyBank className="w-5 h-5 text-indigo-400" />
+                <div className="bg-gradient-to-br from-indigo-700 to-indigo-900 p-2 rounded-full">
+                  <PiggyBank className="w-5 h-5 text-indigo-300" />
                 </div>
                 <div>
                   <div className="flex items-center justify-between">
@@ -278,9 +278,9 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                   </p>
                   
                   {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-indigo-500" 
+                      className="h-full bg-gradient-to-r from-indigo-500 to-indigo-300" 
                       style={{ width: "40%" }}
                     ></div>
                   </div>
@@ -296,10 +296,10 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
 
           {/* Best Investment */}
           {financialInsights.bestInvestment && (
-            <div className="border border-white/10 bg-white bg-opacity-5 rounded-lg p-4">
+            <div className="border border-purple-500/20 bg-gradient-to-br from-purple-800/10 to-purple-600/5 backdrop-blur-sm rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <div className="bg-purple-900 p-2 rounded-full">
-                  <Coins className="w-5 h-5 text-purple-400" />
+                <div className="bg-gradient-to-br from-purple-700 to-purple-900 p-2 rounded-full">
+                  <Coins className="w-5 h-5 text-purple-300" />
                 </div>
                 <div>
                   <div className="flex items-center justify-between">
@@ -313,9 +313,9 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                   </p>
                   
                   {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-purple-500" 
+                      className="h-full bg-gradient-to-r from-purple-500 to-purple-300" 
                       style={{ width: "40%" }}
                     ></div>
                   </div>
@@ -331,10 +331,10 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
 
           {/* Retirement Specific Insights */}
           {financialInsights.retirementReadiness && (
-            <div className="border border-white/10 bg-white bg-opacity-5 rounded-lg p-4">
+            <div className="border border-teal-500/20 bg-gradient-to-br from-teal-800/10 to-teal-600/5 backdrop-blur-sm rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <div className="bg-teal-900 p-2 rounded-full">
-                  <PiggyBank className="w-5 h-5 text-teal-400" />
+                <div className="bg-gradient-to-br from-teal-700 to-teal-900 p-2 rounded-full">
+                  <PiggyBank className="w-5 h-5 text-teal-300" />
                 </div>
                 <div>
                   <div className="flex items-center justify-between">
@@ -348,9 +348,9 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                   </p>
                   
                   {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-teal-500" 
+                      className="h-full bg-gradient-to-r from-teal-500 to-teal-300" 
                       style={{ width: "40%" }}
                     ></div>
                   </div>
