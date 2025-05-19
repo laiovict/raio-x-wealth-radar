@@ -70,7 +70,7 @@ const RaioXDashboard = ({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-16 min-h-screen max-h-full">
       <div className="flex flex-col items-center justify-center mb-8">
         <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-300 to-indigo-400 bg-clip-text text-transparent mb-2">
           Bem vindo {data.clientName}!
@@ -115,7 +115,7 @@ const RaioXDashboard = ({
       <WholeBankingModule />
 
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-3 lg:grid-cols-12 md:grid-cols-6">
+        <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-3 lg:grid-cols-12 md:grid-cols-6 scrollbar-none">
           <TabsTrigger value="all" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Todos</TabsTrigger>
           <TabsTrigger value="plan" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Plano em Uma Página</TabsTrigger>
           <TabsTrigger value="ai" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Copiloto IA</TabsTrigger>
@@ -139,7 +139,6 @@ const RaioXDashboard = ({
           </div>
           <div className="grid grid-cols-1 gap-6">
             <InvestmentPlanningModule />
-            {/* Removed the duplicate WholeBankingModule from here */}
           </div>
           <PersonalInsightsModule />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -2,6 +2,7 @@
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend } from "recharts";
+import { useMobileBreakpoint } from "@/hooks/use-mobile";
 
 interface AllocationModuleProps {
   fullWidth?: boolean;
@@ -12,6 +13,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'
 const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
   const { data } = useRaioX();
   const { allocation } = data;
+  const isMobile = useMobileBreakpoint();
 
   // Certifique-se de que os dados existem
   const currentAllocation = allocation?.current || {
@@ -50,11 +52,20 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
     recommended: recommendedAllocation[key],
     fullMark: 100
   }));
+  
+  // Format label to be smaller on mobile
+  const renderPieLabel = ({ name, percent }) => {
+    if (isMobile) {
+      // For mobile, show just the percentage
+      return `${(percent * 100).toFixed(0)}%`;
+    }
+    return `${name} ${(percent * 100).toFixed(0)}%`;
+  };
 
   return (
     <Card className={fullWidth ? "w-full" : "w-full"}>
       <CardHeader className="pb-2">
-        <CardTitle className="text-xl text-blue-700 dark:text-blue-300 flex items-center justify-between">
+        <CardTitle className="text-xl text-blue-700 dark:text-blue-300 flex items-center justify-between flex-wrap">
           <span>Alocação & Diversificação 360°</span>
           <span className="text-sm font-normal text-green-600 dark:text-green-400">
             +{allocation?.optimizationGain || 2.4}% potencial
@@ -62,24 +73,24 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className={`grid ${fullWidth ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1"} gap-4`}>
+        <div className={`grid ${fullWidth && !isMobile ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1"} gap-4`}>
           <div className="space-y-2">
-            <div className="h-[300px]">
+            <div className={`${isMobile ? "h-[220px]" : "h-[300px]"}`}>
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
                   <PolarGrid />
-                  <PolarAngleAxis dataKey="subject" />
-                  <PolarRadiusAxis angle={30} domain={[0, 100]} />
+                  <PolarAngleAxis dataKey="subject" tick={{ fontSize: isMobile ? 10 : 12 }} />
+                  <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: isMobile ? 10 : 12 }} />
                   <Radar name="Atual" dataKey="current" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
                   <Radar name="Recomendada" dataKey="recommended" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.6} />
-                  <Legend />
+                  <Legend wrapperStyle={{ fontSize: isMobile ? 10 : 12 }} />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
           </div>
           
           <div className="space-y-4">
-            <div className="h-64 md:h-52">
+            <div className={`${isMobile ? "h-52" : "h-64 md:h-52"}`}>
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <p className="text-sm font-medium text-center mb-2">Alocação Atual</p>
@@ -90,10 +101,10 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        outerRadius={60}
+                        outerRadius={isMobile ? 40 : 60}
                         fill="#8884d8"
                         dataKey="value"
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        label={renderPieLabel}
                       >
                         {currentAllocationData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -111,10 +122,10 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        outerRadius={60}
+                        outerRadius={isMobile ? 40 : 60}
                         fill="#8884d8"
                         dataKey="value"
-                        label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        label={renderPieLabel}
                       >
                         {recommendedAllocationData.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
