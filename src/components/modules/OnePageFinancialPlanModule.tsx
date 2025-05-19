@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Pencil, Check, ArrowUp, ArrowDown, Minus, Target, Wallet, PiggyBank, CalendarClock } from "lucide-react";
+import { Pencil, Check, ArrowUp, ArrowDown, Minus, Target, Wallet, PiggyBank, CalendarClock, Briefcase } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface OnePageFinancialPlanModuleProps {
@@ -16,7 +16,7 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
   const { data, hasOpenFinance, financialSummary } = useRaioX();
   const [isEditingPurpose, setIsEditingPurpose] = useState(false);
   const [financialPurpose, setFinancialPurpose] = useState(
-    data.financialPurpose || "Construir segurança financeira para minha família e ter liberdade para escolher como viver minha vida."
+    data.financialPurpose || "Reduzir significativamente minha carga horária aos 45 anos com segurança financeira, e atingir independência financeira completa aos 50 anos."
   );
   const [tempPurpose, setTempPurpose] = useState(financialPurpose);
 
@@ -37,11 +37,36 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
   };
 
   // Get top 3 goals from the life goals data
-  const topGoals = data.lifeGoals?.goals.slice(0, 3) || [];
+  const topGoals = [
+    {
+      name: "Redução de carga horária aos 45 anos",
+      targetAmount: 6000000,
+      currentAmount: 2300000,
+      progress: 38,
+      timeframe: "8 anos (2033)",
+      adjustmentNeeded: 4
+    },
+    {
+      name: "Aposentadoria completa aos 50 anos",
+      targetAmount: 10000000,
+      currentAmount: 2300000,
+      progress: 23,
+      timeframe: "13 anos (2038)",
+      adjustmentNeeded: 8
+    },
+    {
+      name: "Fundo para sucessão familiar",
+      targetAmount: 10000000,
+      currentAmount: 10000000,
+      progress: 100,
+      timeframe: "Imediato (Seguros de vida)",
+      adjustmentNeeded: 0
+    }
+  ];
   
   // Monthly cash flow data
-  const monthlyIncome = financialSummary?.monthlyIncome || 18500;
-  const monthlyExpenses = financialSummary?.monthlyExpenses || 12000;
+  const monthlyIncome = financialSummary?.monthlyIncome || 120000;
+  const monthlyExpenses = financialSummary?.monthlyExpenses || 25000;
   const monthlySavings = monthlyIncome - monthlyExpenses;
   const savingsRate = ((monthlySavings / monthlyIncome) * 100).toFixed(1);
   
@@ -52,22 +77,22 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
   const nextActions = [
     { 
       id: "1", 
-      description: "Aumentar aporte para aposentadoria em R$ 850/mês",
-      deadline: "Até 30/06/2025", 
+      description: "Otimizar estrutura tributária PJ para reduzir carga fiscal",
+      deadline: "Próximos 60 dias", 
       completed: false,
       priority: "high" 
     },
     { 
       id: "2", 
-      description: "Revisar seguros pessoais e de vida",
-      deadline: "Até 15/07/2025", 
+      description: "Diversificar investimentos internacionais além da Avenue",
+      deadline: "Próximos 90 dias", 
       completed: false,
       priority: "medium" 
     },
     { 
       id: "3", 
-      description: "Rebalancear portfólio para reduzir exposição em tecnologia",
-      deadline: "Próximos 45 dias", 
+      description: "Estruturar planejamento sucessório formal (testamento/holding)",
+      deadline: "Até 31/12/2025", 
       completed: false,
       priority: "medium" 
     }
@@ -200,12 +225,15 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-              <p className="text-sm text-gray-400 mb-1">Patrimônio Líquido</p>
-              <div className="flex items-center">
-                <span className="text-xl font-bold text-white">{formatCurrency(financialSummary?.netWorth)}</span>
-                <div className="ml-2 text-green-400 flex items-center text-xs">
-                  <ArrowUp className="h-3 w-3 mr-1" />
-                  <span>+4.3% (30d)</span>
+              <p className="text-sm text-gray-400 mb-1">Patrimônio Total</p>
+              <div className="flex items-center justify-between">
+                <span className="text-xl font-bold text-white">{formatCurrency(4800000)}</span>
+                <div className="flex flex-col items-end">
+                  <div className="text-green-400 flex items-center text-xs">
+                    <ArrowUp className="h-3 w-3 mr-1" />
+                    <span>+12.8% (YTD)</span>
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1">Inclui participações societárias</div>
                 </div>
               </div>
             </div>
@@ -250,7 +278,7 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
                   {cashFlowTrend === "up" ? (
                     <>
                       <ArrowUp className="h-3 w-3 mr-1" />
-                      <span>Tendência Positiva</span>
+                      <span>Excelente</span>
                     </>
                   ) : cashFlowTrend === "down" ? (
                     <>
@@ -266,8 +294,98 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
                 </div>
               </div>
               <p className="text-xs text-gray-400 mt-2">
-                <span className="text-blue-400">Dica:</span> Uma taxa de poupança saudável fica entre 15-20% da renda.
+                <span className="text-blue-400">Destaque:</span> Sua taxa está entre as 1% mais altas, indicando excelente capacidade de acumulação.
               </p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Business Participation Section */}
+        <div>
+          <h3 className="text-white font-medium flex items-center mb-3">
+            <Briefcase className="mr-2 h-5 w-5 text-blue-400" />
+            Minhas Participações Societárias
+          </h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="text-white font-medium">Núcleo Oftalmológico (Valadares)</h4>
+                  <p className="text-xs text-gray-400 mt-1">Clínica principal com mais de 40 funcionários</p>
+                </div>
+                <Badge variant="outline">Principal</Badge>
+              </div>
+              <div className="mt-3 flex items-center justify-between">
+                <div className="text-sm">
+                  <div className="text-gray-400">Participação: 100%</div>
+                  <div className="text-white mt-1">Valor estimado: <span className="font-medium">Em análise</span></div>
+                </div>
+                <div className="text-xs text-green-400 flex items-center">
+                  <ArrowUp className="h-3 w-3 mr-1" />
+                  <span>Crescimento estável</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="text-white font-medium">Instituto de Olhos (Teófilo Otoni)</h4>
+                  <p className="text-xs text-gray-400 mt-1">Atendimento semanal com mais de 25 funcionários</p>
+                </div>
+                <Badge variant="outline">Sociedade</Badge>
+              </div>
+              <div className="mt-3 flex items-center justify-between">
+                <div className="text-sm">
+                  <div className="text-gray-400">Participação: 10%</div>
+                  <div className="text-white mt-1">Valor estimado: <span className="font-medium">{formatCurrency(1600000)}</span></div>
+                </div>
+                <div className="text-xs text-green-400 flex items-center">
+                  <ArrowUp className="h-3 w-3 mr-1" />
+                  <span>Alto crescimento</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="text-white font-medium">Instituto de Olhos (Caratinga)</h4>
+                  <p className="text-xs text-gray-400 mt-1">Atendimento semanal com 5 funcionários</p>
+                </div>
+                <Badge variant="outline">Sociedade</Badge>
+              </div>
+              <div className="mt-3 flex items-center justify-between">
+                <div className="text-sm">
+                  <div className="text-gray-400">Participação: 25%</div>
+                  <div className="text-white mt-1">Valor estimado: <span className="font-medium">{formatCurrency(750000)}</span></div>
+                </div>
+                <div className="text-xs text-yellow-400 flex items-center">
+                  <Minus className="h-3 w-3 mr-1" />
+                  <span>Crescimento moderado</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="text-white font-medium">Investimento em Terreno</h4>
+                  <p className="text-xs text-gray-400 mt-1">Sociedade com amigo</p>
+                </div>
+                <Badge variant="outline">Imóvel</Badge>
+              </div>
+              <div className="mt-3 flex items-center justify-between">
+                <div className="text-sm">
+                  <div className="text-gray-400">Participação: 50%</div>
+                  <div className="text-white mt-1">Valor estimado: <span className="font-medium">{formatCurrency(100000)}</span></div>
+                </div>
+                <div className="text-xs text-gray-400 flex items-center">
+                  <Minus className="h-3 w-3 mr-1" />
+                  <span>Valorização lenta</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -349,3 +467,4 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
 };
 
 export default OnePageFinancialPlanModule;
+
