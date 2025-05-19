@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, X } from "lucide-react";
@@ -14,6 +15,9 @@ import RecommendationsModule from "./modules/RecommendationsModule";
 import FinancialInsightsModule from "./modules/FinancialInsightsModule";
 import PersonalInsightsModule from "./modules/PersonalInsightsModule";
 import PdfPreview from "./PdfPreview";
+import FinancialOverviewModule from "./modules/FinancialOverviewModule";
+import AIInsightsHubModule from "./modules/AIInsightsHubModule";
+import RecommendedActionsModule from "./modules/RecommendedActionsModule";
 
 interface RaioXDashboardProps {
   showPdfPreview?: boolean;
@@ -63,16 +67,26 @@ const RaioXDashboard = ({
           </button>
         </div>
         
-        <div className="mt-6 mb-2">
-          <button className="glass-morphism px-8 py-2 rounded-full text-white hover:bg-white/10 transition-all">
+        <div className="mt-6 mb-2 flex space-x-2">
+          <button className="glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all">
             Insights
+          </button>
+          <button className="glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all">
+            Meus Objetivos
+          </button>
+          <button className="glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all">
+            Copiloto IA
           </button>
         </div>
       </div>
 
+      {/* Financial Overview - Always visible at the top */}
+      <FinancialOverviewModule />
+
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid grid-cols-3 md:grid-cols-10 mb-6 glass-morphism rounded-lg">
+        <TabsList className="grid grid-cols-3 md:grid-cols-11 mb-6 glass-morphism rounded-lg overflow-x-auto">
           <TabsTrigger value="all" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Todos</TabsTrigger>
+          <TabsTrigger value="ai" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Copiloto IA</TabsTrigger>
           <TabsTrigger value="personal" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Pessoal</TabsTrigger>
           <TabsTrigger value="allocation" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Alocação</TabsTrigger>
           <TabsTrigger value="projection" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Projeção</TabsTrigger>
@@ -85,6 +99,10 @@ const RaioXDashboard = ({
         </TabsList>
 
         <TabsContent value="all" className="space-y-6">
+          <div className="grid grid-cols-1 gap-6">
+            <AIInsightsHubModule />
+            <RecommendedActionsModule />
+          </div>
           <PersonalInsightsModule />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <AllocationModule />
@@ -104,6 +122,13 @@ const RaioXDashboard = ({
           </div>
           <div className="mt-6">
             <FinancialInsightsModule fullWidth />
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="ai" className="space-y-6">
+          <div className="grid grid-cols-1 gap-6">
+            <AIInsightsHubModule fullWidth />
+            <RecommendedActionsModule fullWidth />
           </div>
         </TabsContent>
         

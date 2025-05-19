@@ -3,7 +3,7 @@ import { useState } from "react";
 import RaioXDashboard from "@/components/RaioXDashboard";
 import ClientSelector from "@/components/ClientSelector";
 import { RaioXProvider } from "@/context/RaioXContext";
-import { FileDown, Podcast, Video, Lock, Shield } from "lucide-react";
+import { FileDown, Podcast, Video, Lock, Shield, ToggleLeft, ToggleRight } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +16,7 @@ const Index = () => {
   const [showPdfPreview, setShowPdfPreview] = useState(false);
   const [mediaType, setMediaType] = useState("pdf");
   const [isClientFull] = useState(true); // Em produção, isso viria da autenticação
-  const [hasOpenFinance] = useState(true); // Flag para simular OpenFinance ativo
+  const [hasOpenFinance, setHasOpenFinance] = useState(true); // Flag para simular OpenFinance ativo
 
   const handleExportMedia = (type: string) => {
     setMediaType(type);
@@ -25,6 +25,10 @@ const Index = () => {
 
   const handleClosePdfPreview = () => {
     setShowPdfPreview(false);
+  };
+
+  const toggleOpenFinance = () => {
+    setHasOpenFinance(!hasOpenFinance);
   };
 
   return (
@@ -39,10 +43,28 @@ const Index = () => {
           
           <div className="flex items-center space-x-4">
             <div className="flex items-center mr-2">
-              <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full flex items-center text-sm dark:bg-green-900/30 dark:text-green-400">
-                <Shield className="h-3.5 w-3.5 mr-1" />
-                <span>OpenFinance Ativo</span>
-              </div>
+              <button 
+                className={`flex items-center px-3 py-1 rounded-full transition-colors ${
+                  hasOpenFinance 
+                    ? 'bg-green-900/30 text-green-400' 
+                    : 'bg-gray-700/30 text-gray-400'
+                }`}
+                onClick={toggleOpenFinance}
+              >
+                {hasOpenFinance ? (
+                  <>
+                    <Shield className="h-3.5 w-3.5 mr-1" />
+                    <span>OpenFinance Ativo</span>
+                    <ToggleRight className="h-4 w-4 ml-2" />
+                  </>
+                ) : (
+                  <>
+                    <Lock className="h-3.5 w-3.5 mr-1" />
+                    <span>OpenFinance Inativo</span>
+                    <ToggleLeft className="h-4 w-4 ml-2" />
+                  </>
+                )}
+              </button>
             </div>
             
             <DropdownMenu>
