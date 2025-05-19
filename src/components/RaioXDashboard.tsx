@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, X } from "lucide-react";
@@ -138,7 +139,7 @@ const RaioXDashboard = ({
           </div>
           <div className="grid grid-cols-1 gap-6">
             <InvestmentPlanningModule />
-            <WholeBankingModule />
+            {/* Removed the duplicate WholeBankingModule from here */}
           </div>
           <PersonalInsightsModule />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
