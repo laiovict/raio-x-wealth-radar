@@ -32,6 +32,9 @@ const RaioXDashboard = ({
   const { data } = useRaioX();
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Check if this client has OpenFinance integrated (in real app, would come from API)
+  const hasOpenFinance = data.hasOpenFinance || false;
+
   if (showPdfPreview) {
     return (
       <PdfPreview 
@@ -39,6 +42,7 @@ const RaioXDashboard = ({
         clientData={data} 
         mediaType={mediaType}
         isClientFull={isClientFull}
+        hasOpenFinance={hasOpenFinance}
       />
     );
   }

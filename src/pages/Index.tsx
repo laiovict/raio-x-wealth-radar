@@ -3,7 +3,7 @@ import { useState } from "react";
 import RaioXDashboard from "@/components/RaioXDashboard";
 import ClientSelector from "@/components/ClientSelector";
 import { RaioXProvider } from "@/context/RaioXContext";
-import { FileDown, Podcast, Video, Lock } from "lucide-react";
+import { FileDown, Podcast, Video, Lock, Shield } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +16,7 @@ const Index = () => {
   const [showPdfPreview, setShowPdfPreview] = useState(false);
   const [mediaType, setMediaType] = useState("pdf");
   const [isClientFull] = useState(true); // Em produção, isso viria da autenticação
+  const [hasOpenFinance] = useState(true); // Flag para simular OpenFinance ativo
 
   const handleExportMedia = (type: string) => {
     setMediaType(type);
@@ -37,6 +38,13 @@ const Index = () => {
           </div>
           
           <div className="flex items-center space-x-4">
+            <div className="flex items-center mr-2">
+              <div className="bg-green-100 text-green-700 px-3 py-1 rounded-full flex items-center text-sm dark:bg-green-900/30 dark:text-green-400">
+                <Shield className="h-3.5 w-3.5 mr-1" />
+                <span>OpenFinance Ativo</span>
+              </div>
+            </div>
+            
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 px-4 py-2 text-sm font-medium text-white hover:opacity-90 transition-all">
@@ -108,7 +116,7 @@ const Index = () => {
           setSelectedClient={setSelectedClient} 
         />
         
-        <RaioXProvider clientId={selectedClient}>
+        <RaioXProvider clientId={selectedClient} hasOpenFinance={hasOpenFinance}>
           <RaioXDashboard 
             showPdfPreview={showPdfPreview} 
             onClosePdfPreview={handleClosePdfPreview}

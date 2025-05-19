@@ -1,18 +1,20 @@
 
-import { X, FileDown, Podcast, Video, Lock } from "lucide-react";
+import { X, FileDown, Podcast, Video, Lock, Shield } from "lucide-react";
 
 interface PdfPreviewProps {
   onClose: () => void;
   clientData: any;
   mediaType?: string;
   isClientFull?: boolean;
+  hasOpenFinance?: boolean;
 }
 
 const PdfPreview = ({ 
   onClose, 
   clientData, 
   mediaType = "pdf",
-  isClientFull = true 
+  isClientFull = true,
+  hasOpenFinance = false
 }: PdfPreviewProps) => {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -138,9 +140,16 @@ const PdfPreview = ({
               </h3>
               <p className="text-gray-400 mt-1">Uma visão completa da sua jornada financeira</p>
             </div>
-            <div className="text-right">
+            <div className="flex flex-col items-end">
               <p className="text-sm text-gray-400">Data do diagnóstico</p>
               <p className="text-lg font-medium text-white">19 de Maio, 2025</p>
+              
+              {hasOpenFinance && (
+                <div className="mt-2 bg-green-100 text-green-700 px-2 py-1 text-xs rounded-full flex items-center dark:bg-green-900/30 dark:text-green-400">
+                  <Shield className="h-3 w-3 mr-1" />
+                  <span>OpenFinance</span>
+                </div>
+              )}
             </div>
           </div>
           
@@ -162,6 +171,87 @@ const PdfPreview = ({
             </div>
           </div>
         </div>
+        
+        {/* OpenFinance Analytics (if enabled) */}
+        {hasOpenFinance && (
+          <div className="bg-gradient-to-br from-green-500/10 to-blue-500/10 rounded-xl p-6 border border-green-500/20">
+            <div className="flex items-center gap-2 mb-4">
+              <Shield className="h-5 w-5 text-green-500" />
+              <h3 className="text-xl font-bold text-white">Dados OpenFinance</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <h4 className="text-green-400 font-medium mb-2">Seu Comportamento Financeiro</h4>
+                <div className="space-y-3">
+                  <div className="bg-white/10 p-3 rounded-lg">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-300">Recorrência de Investimentos</span>
+                      <span className="text-sm font-medium text-green-400">A+</span>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">Investiu consistentemente nos últimos 24 meses</p>
+                  </div>
+                  
+                  <div className="bg-white/10 p-3 rounded-lg">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-300">Disciplina de Gastos</span>
+                      <span className="text-sm font-medium text-yellow-400">B</span>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">Excedeu o orçamento em 18% em 3 dos últimos 6 meses</p>
+                  </div>
+                  
+                  <div className="bg-white/10 p-3 rounded-lg">
+                    <div className="flex justify-between">
+                      <span className="text-sm text-gray-300">Resiliência Financeira</span>
+                      <span className="text-sm font-medium text-green-400">A</span>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">Reserva de emergência cobre 8 meses de despesas</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="text-blue-400 font-medium mb-2">Análise Cross-Institucional</h4>
+                <div className="bg-white/10 p-4 rounded-lg">
+                  <p className="text-sm text-gray-300 mb-3">Comparação de taxas em diferentes instituições:</p>
+                  
+                  <div className="space-y-2">
+                    <div className="flex items-center">
+                      <span className="w-24 text-xs text-gray-400">Banco A</span>
+                      <div className="flex-grow h-2 bg-gray-700 rounded-full">
+                        <div className="h-full bg-red-500 rounded-full" style={{width: "85%"}}></div>
+                      </div>
+                      <span className="ml-2 text-xs text-red-400">2.1%</span>
+                    </div>
+                    
+                    <div className="flex items-center">
+                      <span className="w-24 text-xs text-gray-400">Banco B</span>
+                      <div className="flex-grow h-2 bg-gray-700 rounded-full">
+                        <div className="h-full bg-yellow-500 rounded-full" style={{width: "60%"}}></div>
+                      </div>
+                      <span className="ml-2 text-xs text-yellow-400">1.4%</span>
+                    </div>
+                    
+                    <div className="flex items-center">
+                      <span className="w-24 text-xs text-gray-400">Reinvent</span>
+                      <div className="flex-grow h-2 bg-gray-700 rounded-full">
+                        <div className="h-full bg-green-500 rounded-full" style={{width: "35%"}}></div>
+                      </div>
+                      <span className="ml-2 text-xs text-green-400">0.8%</span>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-3 pt-3 border-t border-gray-700">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-400">Economia potencial anual:</span>
+                      <span className="text-green-400 font-medium">{formatCurrency(8750)}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Narrativa Principal */}
         <div className="bg-white/5 backdrop-blur-md rounded-xl p-6 border border-white/10">
@@ -275,8 +365,21 @@ const PdfPreview = ({
                   </p>
                 </div>
                 
+                {hasOpenFinance && (
+                  <div className="bg-white/10 rounded-lg p-4 border-l-2 border-green-500">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-green-500" />
+                      <h4 className="text-md font-medium text-white">3. Otimização cross-institucional</h4>
+                    </div>
+                    <p className="text-gray-300 mt-1">
+                      De acordo com seus dados OpenFinance, consolidar seus investimentos do Banco A para Reinvent pode reduzir taxas administrativas em 62%.
+                      <span className="text-blue-300 block mt-1">Impacto estimado: +R$ 8.750/ano</span>
+                    </p>
+                  </div>
+                )}
+                
                 <div className="bg-white/10 rounded-lg p-4">
-                  <h4 className="text-md font-medium text-white">3. Implementar automação financeira</h4>
+                  <h4 className="text-md font-medium text-white">{hasOpenFinance ? "4" : "3"}. Implementar automação financeira</h4>
                   <p className="text-gray-300 mt-1">
                     Configure transferências automáticas para investir 25% da sua renda no primeiro dia do mês.
                     <span className="text-blue-300 block mt-1">Impacto estimado: +R$ 75.000 em 3 anos</span>
@@ -284,20 +387,25 @@ const PdfPreview = ({
                 </div>
                 
                 <div className="bg-white/10 rounded-lg p-4">
-                  <h4 className="text-md font-medium text-white">4. Realocar investimentos de baixa performance</h4>
+                  <h4 className="text-md font-medium text-white">{hasOpenFinance ? "5" : "4"}. Realocar investimentos de baixa performance</h4>
                   <p className="text-gray-300 mt-1">
                     Três de seus fundos tiveram performance abaixo do benchmark por 18 meses consecutivos. Recomendamos realocação.
                     <span className="text-blue-300 block mt-1">Impacto estimado: +R$ 12.850/ano</span>
                   </p>
                 </div>
                 
-                <div className="bg-white/10 rounded-lg p-4">
-                  <h4 className="text-md font-medium text-white">5. Estratégia fiscal otimizada</h4>
-                  <p className="text-gray-300 mt-1">
-                    Implementar estratégia de declaração com compensação de perdas e reestruturação de carteira.
-                    <span className="text-blue-300 block mt-1">Impacto estimado: -R$ 8.700 em impostos</span>
-                  </p>
-                </div>
+                {hasOpenFinance && (
+                  <div className="bg-white/10 rounded-lg p-4 border-l-2 border-green-500">
+                    <div className="flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-green-500" />
+                      <h4 className="text-md font-medium text-white">6. Estratégia tributária avançada</h4>
+                    </div>
+                    <p className="text-gray-300 mt-1">
+                      Usando dados consolidados OpenFinance, identificamos oportunidade para compensação de perdas fiscais em múltiplas instituições.
+                      <span className="text-blue-300 block mt-1">Impacto estimado: -R$ 12.960 em impostos</span>
+                    </p>
+                  </div>
+                )}
               </>
             ) : (
               <div className="mt-4 bg-gradient-to-br from-indigo-600/20 to-purple-600/20 rounded-lg p-6">
@@ -320,6 +428,7 @@ const PdfPreview = ({
           <h3 className="text-2xl font-bold text-white mb-2">Vamos implementar essas melhorias juntos?</h3>
           <p className="text-gray-300 max-w-2xl mx-auto mb-6">
             Nossa equipe está pronta para executar este plano personalmente com você.
+            {hasOpenFinance ? " Com OpenFinance, temos todos os dados necessários para agir imediatamente." : ""}
             Agende uma call agora e vamos transformar seu diagnóstico em ação concreta.
           </p>
           <button className="px-8 py-3 bg-white text-indigo-800 rounded-full font-bold hover:bg-opacity-90 transition-all">
@@ -330,6 +439,7 @@ const PdfPreview = ({
         <div className="text-center text-gray-500 text-sm mt-8">
           <p>© 2025 Reinvent Financial Services • Diagnóstico gerado em 19/05/2025</p>
           <p className="mt-1">Dados baseados em análise de transações e portfólio até 15/05/2025</p>
+          {hasOpenFinance && <p className="mt-1 text-green-500">Com dados enriquecidos via OpenFinance</p>}
         </div>
       </div>
     );
@@ -342,6 +452,12 @@ const PdfPreview = ({
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
             {renderMediaTypeIcon()}
             {renderMediaTypeTitle()} • {clientData.clientName}
+            {hasOpenFinance && (
+              <span className="ml-2 bg-green-100 text-green-700 px-2 py-0.5 text-xs rounded-full flex items-center dark:bg-green-900/30 dark:text-green-400">
+                <Shield className="h-3 w-3 mr-1" />
+                <span>OpenFinance</span>
+              </span>
+            )}
           </h2>
           <div className="flex items-center space-x-4">
             <button 
