@@ -14,7 +14,6 @@ import { Button } from "@/components/ui/button";
 import { useMobileBreakpoint } from "@/hooks/use-mobile";
 
 const Index = () => {
-  const [selectedClient, setSelectedClient] = useState("client1");
   const [showPdfPreview, setShowPdfPreview] = useState(false);
   const [mediaType, setMediaType] = useState("pdf");
   const [isClientFull] = useState(true); // Em produção, isso viria da autenticação
@@ -292,12 +291,9 @@ const Index = () => {
           )}
         </div>
         
-        <ClientSelector 
-          selectedClient={selectedClient} 
-          setSelectedClient={setSelectedClient} 
-        />
+        <ClientSelector />
         
-        <RaioXProvider clientId={selectedClient} hasOpenFinance={hasOpenFinance}>
+        <RaioXProvider clientId="client1" hasOpenFinance={hasOpenFinance}>
           <RaioXDashboard 
             showPdfPreview={showPdfPreview} 
             onClosePdfPreview={handleClosePdfPreview}
