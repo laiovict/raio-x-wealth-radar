@@ -21,6 +21,7 @@ import RecommendedActionsModule from "./modules/RecommendedActionsModule";
 import InvestmentPlanningModule from "./modules/InvestmentPlanningModule";
 import OnePageFinancialPlanModule from "./modules/OnePageFinancialPlanModule";
 import WholeBankingModule from "./modules/WholeBankingModule";
+import MeuFuturoFinanceiroModule from "./modules/MeuFuturoFinanceiroModule";
 
 interface RaioXDashboardProps {
   showPdfPreview?: boolean;
@@ -114,11 +115,15 @@ const RaioXDashboard = ({
       {/* Whole Banking - Always visible after financial overview */}
       <WholeBankingModule />
 
+      {/* Meu Futuro Financeiro - New module inspired by the images */}
+      <MeuFuturoFinanceiroModule />
+
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-3 lg:grid-cols-12 md:grid-cols-6 scrollbar-none">
           <TabsTrigger value="all" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Todos</TabsTrigger>
           <TabsTrigger value="plan" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Plano em Uma Página</TabsTrigger>
           <TabsTrigger value="ai" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Copiloto IA</TabsTrigger>
+          <TabsTrigger value="future" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Meu Futuro</TabsTrigger>
           <TabsTrigger value="personal" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Pessoal</TabsTrigger>
           <TabsTrigger value="planning" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Planejamento</TabsTrigger>
           <TabsTrigger value="banking" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Whole Banking</TabsTrigger>
@@ -171,6 +176,11 @@ const RaioXDashboard = ({
             <AIInsightsHubModule fullWidth />
             <RecommendedActionsModule fullWidth />
           </div>
+        </TabsContent>
+        
+        {/* New tab for Meu Futuro Financeiro */}
+        <TabsContent value="future">
+          <MeuFuturoFinanceiroModule fullWidth />
         </TabsContent>
         
         <TabsContent value="personal">

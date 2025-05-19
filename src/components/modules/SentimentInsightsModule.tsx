@@ -2,6 +2,8 @@
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { TrendingUp, TrendingDown, Newspaper } from "lucide-react";
+import { useMobileBreakpoint } from "@/hooks/use-mobile";
 
 interface SentimentInsightsModuleProps {
   fullWidth?: boolean;
@@ -10,6 +12,7 @@ interface SentimentInsightsModuleProps {
 const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleProps) => {
   const { data } = useRaioX();
   const { sentiment } = data;
+  const isMobile = useMobileBreakpoint();
 
   const getSentimentColor = (score: number) => {
     if (score >= 70) return "text-green-600 dark:text-green-400";
@@ -18,9 +21,9 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
   };
 
   const getSentimentBg = (score: number) => {
-    if (score >= 70) return "bg-green-50 dark:bg-green-900/20";
-    if (score >= 50) return "bg-amber-50 dark:bg-amber-900/20";
-    return "bg-red-50 dark:bg-red-900/20";
+    if (score >= 70) return "bg-green-50 dark:bg-green-900/20 border-green-100 dark:border-green-800/30";
+    if (score >= 50) return "bg-amber-50 dark:bg-amber-900/20 border-amber-100 dark:border-amber-800/30";
+    return "bg-red-50 dark:bg-red-900/20 border-red-100 dark:border-red-800/30";
   };
 
   const getImpactColor = (impact: number) => {
@@ -35,43 +38,53 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
   };
 
   return (
-    <Card className={fullWidth ? "w-full" : "w-full"}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl text-blue-700 dark:text-blue-300">
-          Insights de Sentimento
+    <Card className={`${fullWidth ? "w-full" : "w-full"} shadow-md hover:shadow-lg transition-shadow`}>
+      <CardHeader className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 dark:from-blue-900/30 dark:to-indigo-900/30 pb-4 rounded-t-lg border-b border-gray-100 dark:border-gray-800">
+        <CardTitle className="text-xl flex items-center">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-300 dark:to-indigo-300">
+            Insights de Sentimento
+          </span>
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+      <CardContent className="pt-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {sentiment.assets.map((asset, index) => (
             <div 
               key={index} 
-              className={`${getSentimentBg(asset.sentiment)} p-3 rounded-lg`}
+              className={`${getSentimentBg(asset.sentiment)} p-4 rounded-lg shadow-sm border transition-all hover:shadow-md hover:translate-y-[-2px]`}
             >
-              <div className="flex justify-between items-center mb-1">
+              <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
-                  <span className="font-medium">{asset.ticker}</span>
-                  <Badge className="ml-2" variant="outline">
+                  <span className="text-lg font-semibold">{asset.ticker}</span>
+                  <Badge className="ml-2 px-2" variant="outline">
                     <span className={getSentimentColor(asset.sentiment)}>
                       {asset.sentiment}/100
                     </span>
                   </Badge>
                 </div>
-                <span className={getImpactColor(asset.impact)}>
+                <span className={`flex items-center font-medium ${getImpactColor(asset.impact)}`}>
+                  {asset.impact > 0 ? (
+                    <TrendingUp className="h-4 w-4 mr-1" />
+                  ) : (
+                    <TrendingDown className="h-4 w-4 mr-1" />
+                  )}
                   {getImpactPrefix(asset.impact)}{asset.impact}%
                 </span>
               </div>
-              <p className="text-sm text-gray-700 dark:text-gray-200">
-                {asset.recentNews}
-              </p>
+              <div className="flex items-start mt-2">
+                <Newspaper className="h-4 w-4 mr-2 mt-1 flex-shrink-0 text-gray-400" />
+                <p className="text-gray-700 dark:text-gray-200 text-sm">
+                  {asset.recentNews}
+                </p>
+              </div>
             </div>
           ))}
-          
-          <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg">
-            <p className="text-sm text-gray-700 dark:text-gray-200">
-              {sentiment.summary}
-            </p>
-          </div>
+        </div>
+        
+        <div className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 dark:from-blue-900/20 dark:to-indigo-900/20 p-4 rounded-lg border border-blue-100 dark:border-blue-800/30 mt-4">
+          <p className="text-gray-700 dark:text-gray-200">
+            {sentiment.summary}
+          </p>
         </div>
       </CardContent>
     </Card>
