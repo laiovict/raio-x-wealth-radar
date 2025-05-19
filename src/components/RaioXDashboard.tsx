@@ -152,6 +152,28 @@ const RaioXDashboard = ({
             <FinancialInsightsModule />
             <SocialComparisonModule />
           </div>
+          <div className="grid grid-cols-1 gap-6">
+            <WholeBankingModule />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <MeuFuturoFinanceiroModule />
+            <FutureProjectionModule />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <PersonalInsightsModule />
+            <SentimentInsightsModule />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <LiquidityReserveModule />
+            <InvestmentPlanningModule />
+          </div>
+          <div className="grid grid-cols-1 gap-6">
+            <RecommendationsModule />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <WrappedModule />
+            <AIInsightsHubModule />
+          </div>
         </TabsContent>
         
         {/* Financial Plan tab */}

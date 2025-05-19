@@ -44,7 +44,7 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
           
           <div className={`grid ${fullWidth ? "grid-cols-2" : "grid-cols-1 md:grid-cols-2"} gap-4`}>
             <div className="bg-green-50 dark:bg-green-900/40 p-3 rounded-lg border border-green-200 dark:border-green-800/50">
-              <p className="text-sm font-medium text-green-800 dark:text-green-200 mb-1">
+              <p className="text-sm font-medium text-green-800 dark:text-green-300 mb-1">
                 Retorno vs Pares
               </p>
               <p className="text-lg font-bold text-green-700 dark:text-green-300">
@@ -56,7 +56,7 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
             </div>
             
             <div className="bg-blue-50 dark:bg-blue-900/40 p-3 rounded-lg border border-blue-200 dark:border-blue-800/50">
-              <p className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
+              <p className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-1">
                 Score de Diversificação
               </p>
               <div className="flex items-center">
