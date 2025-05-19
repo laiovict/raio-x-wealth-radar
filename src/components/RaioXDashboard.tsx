@@ -1,7 +1,7 @@
 
 import { useRaioX } from "@/context/RaioXContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Search } from "lucide-react";
 
 import AllocationModule from "./modules/AllocationModule";
 import FutureProjectionModule from "./modules/FutureProjectionModule";
@@ -18,26 +18,40 @@ const RaioXDashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-blue-700 dark:text-blue-300">
-          RaioX Financeiro: {data.clientName}
+      <div className="flex flex-col items-center justify-center mb-8">
+        <h2 className="text-3xl font-bold text-white mb-2">
+          Bem vindo {data.clientName}!
         </h2>
-        <div className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-100 px-3 py-1 rounded-full text-sm font-medium">
-          {new Date().toLocaleDateString('pt-BR')}
+        
+        <div className="w-full max-w-md relative">
+          <input 
+            type="text" 
+            placeholder="Como posso facilitar sua vida?" 
+            className="w-full bg-opacity-20 bg-white border border-white/10 rounded-full px-5 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white">
+            <Search className="h-5 w-5" />
+          </button>
+        </div>
+        
+        <div className="mt-6 mb-2">
+          <button className="bg-opacity-20 bg-white px-8 py-2 rounded-full text-white hover:bg-opacity-30 transition-all">
+            Insights
+          </button>
         </div>
       </div>
 
       <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid grid-cols-3 md:grid-cols-9 mb-6">
-          <TabsTrigger value="all">Todos</TabsTrigger>
-          <TabsTrigger value="allocation">Alocação</TabsTrigger>
-          <TabsTrigger value="projection">Projeção</TabsTrigger>
-          <TabsTrigger value="liquidity">Liquidez</TabsTrigger>
-          <TabsTrigger value="goals">Metas</TabsTrigger>
-          <TabsTrigger value="wrapped">Wrapped</TabsTrigger>
-          <TabsTrigger value="social">Social</TabsTrigger>
-          <TabsTrigger value="insights">Insights</TabsTrigger>
-          <TabsTrigger value="recommendations">Recomendações</TabsTrigger>
+        <TabsList className="grid grid-cols-3 md:grid-cols-9 mb-6 bg-opacity-20 bg-white backdrop-blur-sm border border-white/10 rounded-lg">
+          <TabsTrigger value="all" className="data-[state=active]:bg-blue-700 data-[state=active]:text-white">Todos</TabsTrigger>
+          <TabsTrigger value="allocation" className="data-[state=active]:bg-blue-700 data-[state=active]:text-white">Alocação</TabsTrigger>
+          <TabsTrigger value="projection" className="data-[state=active]:bg-blue-700 data-[state=active]:text-white">Projeção</TabsTrigger>
+          <TabsTrigger value="liquidity" className="data-[state=active]:bg-blue-700 data-[state=active]:text-white">Liquidez</TabsTrigger>
+          <TabsTrigger value="goals" className="data-[state=active]:bg-blue-700 data-[state=active]:text-white">Metas</TabsTrigger>
+          <TabsTrigger value="wrapped" className="data-[state=active]:bg-blue-700 data-[state=active]:text-white">Wrapped</TabsTrigger>
+          <TabsTrigger value="social" className="data-[state=active]:bg-blue-700 data-[state=active]:text-white">Social</TabsTrigger>
+          <TabsTrigger value="insights" className="data-[state=active]:bg-blue-700 data-[state=active]:text-white">Insights</TabsTrigger>
+          <TabsTrigger value="recommendations" className="data-[state=active]:bg-blue-700 data-[state=active]:text-white">Recomendações</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="space-y-6">
