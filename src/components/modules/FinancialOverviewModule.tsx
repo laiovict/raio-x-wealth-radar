@@ -1,11 +1,11 @@
-
 import { useRaioX, FinancialSummary } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { ArrowUp, ArrowDown, AlertTriangle, RefreshCw, Lock } from "lucide-react";
+import { ArrowUp, ArrowDown, AlertTriangle, RefreshCw, Lock, Shield, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 interface FinancialOverviewModuleProps {
   fullWidth?: boolean;
@@ -24,6 +24,7 @@ interface EnhancedFinancialSummary extends Omit<FinancialSummary, 'topRisks'> {
 
 const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleProps) => {
   const { data, hasOpenFinance, financialSummary, isAIAnalysisLoading, refreshAIAnalysis, selectedClient } = useRaioX();
+  const [showBehavioralInsights, setShowBehavioralInsights] = useState(false);
 
   // Format currency
   const formatCurrency = (value: number | undefined) => {
@@ -180,6 +181,87 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
 
   // Default trend values when not available
   const defaultTrend = "+3.5%";
+  
+  // Financial behavior data from images
+  const financialBehaviorData = {
+    investmentConsistency: {
+      grade: "A+",
+      description: "Investiu consistentemente nos últimos 24 meses"
+    },
+    spendingDiscipline: {
+      grade: "B",
+      description: "Excedeu o orçamento em 18% em 3 dos últimos 6 meses"
+    },
+    financialResilience: {
+      grade: "A",
+      description: "Reserva de emergência cobre 8 meses de despesas"
+    }
+  };
+  
+  // Cross-institutional analysis data
+  const crossInstitutionalData = {
+    bankComparisons: [
+      { name: "Banco A", rate: 2.1, color: "#FF6B6B" },
+      { name: "Banco B", rate: 1.4, color: "#FFD166" },
+      { name: "Reinvent", rate: 0.8, color: "#06D6A0" }
+    ],
+    potentialSavings: 8750
+  };
+  
+  // Financial history highlights data
+  const financialHistoryData = [
+    {
+      id: 1,
+      title: "Você viveu no limite?",
+      description: "Em março, você gastou R$ 15.800, o equivalente a 3 iPhones Pro Max ou 1 mês num apê no Jardins. Foi seu recorde do ano.",
+      progress: 85,
+      color: "#FFD166"
+    },
+    {
+      id: 2,
+      title: "Dinheiro que escorreu pelo ralo",
+      description: "Só com assinaturas não utilizadas, você gastou R$ 4.320 no último ano. Se tivesse colocado metade disso num CDB, teria hoje R$ 2.376 adicionais.",
+      progress: 60,
+      color: "#FF6B6B"
+    },
+    {
+      id: 3,
+      title: "O que você mais comprou?",
+      description: "Top 3 categorias do seu cartão: Delivery (R$ 12.840), Assinaturas (R$ 8.620) e Eletrônicos (R$ 7.980). Spoiler: você pediu 98 vezes no iFood.",
+      progress: 75,
+      color: "#4D96FF"
+    },
+    {
+      id: 4,
+      title: "A hora que você brilhou",
+      description: "Seu melhor investimento foi HGLG11, com 22% de rentabilidade. Se tivesse colocado o dobro, teria ganho R$ 28.600 adicionais.",
+      progress: 100,
+      color: "#06D6A0"
+    },
+    {
+      id: 5,
+      title: "E se você focasse de verdade?",
+      description: "Se reduzir 15% dos seus gastos com restaurantes, dá pra investir R$ 960 todo mês. Isso pode virar R$ 1.470.000 em 25 anos.",
+      progress: 50,
+      color: "#9C27B0"
+    }
+  ];
+  
+  // Recommended next steps
+  const recommendedSteps = [
+    {
+      id: 1,
+      title: "Otimizar sua alocação atual",
+      description: "Realoque 12% dos seus investimentos de renda fixa para um mix mais diversificado de FIIs e multimercados.",
+      impact: "+R$ 24.600/ano"
+    },
+    {
+      id: 2,
+      title: "Revisar custos fixos mensais",
+      description: "Consolidar assinaturas duplicadas e renegociar pacotes bancários pode liberar até R$ 780/mês para investimentos.",
+      impact: "+R$ 9.360/ano"
+    }
+  ];
 
   if (!hasOpenFinance) {
     return (
@@ -314,6 +396,45 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
+          {/* Main Financial Overview Section */}
+          <div className="bg-gray-900/50 rounded-xl p-6 border border-white/5">
+            <div className="flex flex-col md:flex-row justify-between mb-4">
+              <div>
+                <h2 className="text-lg text-blue-400">Seu panorama financeiro</h2>
+                <p className="text-sm text-gray-400">Uma visão completa da sua jornada financeira</p>
+              </div>
+              <div className="text-sm text-right">
+                <div className="text-gray-400">Data do diagnóstico</div>
+                <div className="text-white font-medium">19 de Maio, 2025</div>
+                {hasOpenFinance && (
+                  <Badge variant="outline" className="bg-green-900/20 text-green-400 border-green-500/30 mt-1">
+                    OpenFinance
+                  </Badge>
+                )}
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+              <div className="bg-indigo-900/20 border border-indigo-500/20 rounded-lg p-4">
+                <div className="text-sm text-gray-400">Patrimônio total</div>
+                <div className="text-2xl font-bold text-white">{formatCurrency(finData.netWorth)}</div>
+                <div className="text-sm text-green-400">+12,5% desde o último trimestre</div>
+              </div>
+              
+              <div className="bg-purple-900/20 border border-purple-500/20 rounded-lg p-4">
+                <div className="text-sm text-gray-400">Score de diversificação</div>
+                <div className="text-2xl font-bold text-white">73/100</div>
+                <div className="text-sm text-blue-400">Melhor que 65% dos investidores</div>
+              </div>
+              
+              <div className="bg-green-900/20 border border-green-500/20 rounded-lg p-4">
+                <div className="text-sm text-gray-400">Potencial de otimização</div>
+                <div className="text-2xl font-bold text-white">+R$ 37.500/ano</div>
+                <div className="text-sm text-gray-400">Com ajustes na alocação atual</div>
+              </div>
+            </div>
+          </div>
+          
           {/* Net Worth Section */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
@@ -397,6 +518,152 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
               </div>
             </div>
           </div>
+          
+          {/* OpenFinance Insights - New Section */}
+          {hasOpenFinance && (
+            <div className="mt-6">
+              <div className="mb-4 border-b border-white/10 pb-2">
+                <div className="flex items-center text-lg font-medium text-white gap-2">
+                  <Shield className="h-5 w-5 text-green-400" />
+                  <span>Dados OpenFinance</span>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Financial Behavior */}
+                <div className="space-y-4">
+                  <h4 className="text-base font-medium text-white">Seu Comportamento Financeiro</h4>
+                  
+                  <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                    <div>
+                      <div className="text-sm font-medium text-white">Recorrência de Investimentos</div>
+                      <div className="text-xs text-gray-400">{financialBehaviorData.investmentConsistency.description}</div>
+                    </div>
+                    <Badge className="bg-green-600 hover:bg-green-700">{financialBehaviorData.investmentConsistency.grade}</Badge>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                    <div>
+                      <div className="text-sm font-medium text-white">Disciplina de Gastos</div>
+                      <div className="text-xs text-gray-400">{financialBehaviorData.spendingDiscipline.description}</div>
+                    </div>
+                    <Badge className="bg-yellow-600 hover:bg-yellow-700">{financialBehaviorData.spendingDiscipline.grade}</Badge>
+                  </div>
+                  
+                  <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+                    <div>
+                      <div className="text-sm font-medium text-white">Resiliência Financeira</div>
+                      <div className="text-xs text-gray-400">{financialBehaviorData.financialResilience.description}</div>
+                    </div>
+                    <Badge className="bg-green-600 hover:bg-green-700">{financialBehaviorData.financialResilience.grade}</Badge>
+                  </div>
+                </div>
+                
+                {/* Cross-Institutional Analysis */}
+                <div className="space-y-4">
+                  <h4 className="text-base font-medium text-white">Análise Cross-Institucional</h4>
+                  
+                  <div className="p-3 bg-white/5 rounded-lg">
+                    <div className="mb-2 text-sm font-medium text-white">Comparação de taxas em diferentes instituições:</div>
+                    
+                    {crossInstitutionalData.bankComparisons.map((bank) => (
+                      <div key={bank.name} className="mb-2">
+                        <div className="flex justify-between text-xs text-gray-400 mb-1">
+                          <span>{bank.name}</span>
+                          <span>{bank.rate}%</span>
+                        </div>
+                        <div className="w-full bg-gray-700 rounded-full h-2">
+                          <div 
+                            className="h-2 rounded-full" 
+                            style={{
+                              width: `${(bank.rate/3)*100}%`,
+                              backgroundColor: bank.color
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                    
+                    <div className="mt-3 text-sm">
+                      <div className="text-gray-400">Economia potencial anual:</div>
+                      <div className="font-medium text-green-400">R$ {crossInstitutionalData.potentialSavings}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          
+          {/* Financial History Highlights - New Section */}
+          {hasOpenFinance && (
+            <div className="mt-6">
+              <div className="mb-4 flex justify-between items-center">
+                <div className="text-lg font-medium text-white">
+                  Sua história financeira em 2025
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-blue-400" 
+                  onClick={() => setShowBehavioralInsights(!showBehavioralInsights)}
+                >
+                  {showBehavioralInsights ? "Mostrar menos" : "Mostrar mais"}
+                </Button>
+              </div>
+              
+              {showBehavioralInsights && (
+                <div className="space-y-4">
+                  {financialHistoryData.map((item) => (
+                    <div key={item.id} className="p-4 bg-white/5 rounded-lg border border-white/10">
+                      <div className="flex gap-4">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white" style={{ backgroundColor: item.color }}>
+                          {item.id}
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-base font-medium text-white mb-1">{item.title}</h4>
+                          <p className="text-sm text-gray-400 mb-2">{item.description}</p>
+                          <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
+                            <div 
+                              className="h-2 rounded-full" 
+                              style={{
+                                width: `${item.progress}%`,
+                                backgroundColor: item.color
+                              }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Recommended Next Steps - New Section */}
+          {hasOpenFinance && (
+            <div className="mt-6">
+              <div className="mb-4 border-b border-white/10 pb-2">
+                <div className="text-lg font-medium text-white">
+                  Próximos Passos Recomendados
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                {recommendedSteps.map((step) => (
+                  <div key={step.id} className="p-4 bg-blue-900/20 border border-blue-500/20 rounded-lg">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="text-base font-medium text-white">
+                        {step.id}. {step.title}
+                      </h4>
+                      <Badge className="bg-green-600">{step.impact}</Badge>
+                    </div>
+                    <p className="text-sm text-gray-300">{step.description}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           
           {/* Top Risks - Add null check for topRisks */}
           <div>
