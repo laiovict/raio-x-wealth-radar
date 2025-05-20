@@ -18,15 +18,77 @@ interface FinancialInsightsModuleProps {
   fullWidth?: boolean;
 }
 
+// Define more specific types for each insight type
+interface BaseInsight {
+  summary?: string; // Make summary optional across all insight types
+}
+
+interface HighestSpendingMonth extends BaseInsight {
+  month: string;
+  amount: number;
+  categories: { name: string; amount: number; }[];
+}
+
+interface WastedMoney extends BaseInsight {
+  total: number;
+  categories: { name: string; amount: number; }[];
+}
+
+interface TopCategories extends BaseInsight {
+  categories: { name: string; amount: number; percentage: number; }[];
+  total: number;
+}
+
+interface NegativeMonths extends BaseInsight {
+  count: number;
+  months: string[];
+  totalDeficit: number;
+}
+
+interface InvestmentGrowth extends BaseInsight {
+  annual: number;
+  total: number;
+  bestAsset: { name: string; growth: number; };
+}
+
+interface PotentialSavings extends BaseInsight {
+  amount: number;
+  suggestions: string[];
+}
+
+interface BestInvestment extends BaseInsight {
+  name: string;
+  return: number;
+  period: string;
+}
+
+interface RetirementReadiness extends BaseInsight {
+  score: number;
+  years: number;
+  monthlyNeeded: number;
+}
+
+// Define the full structure of financial insight data
+interface FinancialInsightData {
+  highestSpendingMonth?: HighestSpendingMonth;
+  wastedMoney?: WastedMoney;
+  topCategories?: TopCategories;
+  negativeMonths?: NegativeMonths;
+  investmentGrowth?: InvestmentGrowth;
+  potentialSavings?: PotentialSavings;
+  bestInvestment?: BestInvestment;
+  retirementReadiness?: RetirementReadiness;
+}
+
 const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleProps) => {
   const { data } = useRaioX();
   const [currentDate] = useState(new Date());
   
-  // Use the financialInsightData property from RaioXData instead of financialInsights
-  const financialInsights = data.financialInsightData;
+  // Get financial insights data or create a synthetic version if it doesn't exist
+  const financialInsights: FinancialInsightData = data.financialInsightData || {};
   
-  // If client doesn't have financial insights data
-  if (!financialInsights) {
+  // If client doesn't have financial insights data at all
+  if (!financialInsights || Object.keys(financialInsights).length === 0) {
     return (
       <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
         <CardHeader className="pb-2">
