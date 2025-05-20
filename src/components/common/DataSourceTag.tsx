@@ -6,9 +6,9 @@ import {
   TooltipProvider, 
   TooltipTrigger 
 } from "@/components/ui/tooltip";
-import { CheckCircle, Database, Globe } from 'lucide-react';
-
-export type DataSourceType = 'xp' | 'openfinance' | 'synthetic';
+import { CheckCircle, Database } from 'lucide-react';
+import { Globe } from '@/components/common/icons';
+import { DataSourceType } from '@/types/raioXTypes';
 
 interface DataSourceTagProps {
   source?: DataSourceType;
@@ -37,6 +37,13 @@ const DataSourceTag: React.FC<DataSourceTagProps> = ({ source, className = '' })
             <span className="sr-only">Dados Open Finance</span>
           </>
         );
+      case 'supabase':
+        return (
+          <>
+            <Database className="inline-block h-3 w-3 text-green-500" />
+            <span className="sr-only">Dados Supabase</span>
+          </>
+        );
       case 'synthetic':
         return (
           <>
@@ -55,6 +62,8 @@ const DataSourceTag: React.FC<DataSourceTagProps> = ({ source, className = '' })
         return "Dados reais da XP Investimentos";
       case 'openfinance':
         return "Dados obtidos via Open Finance";
+      case 'supabase':
+        return "Dados reais do banco de dados";
       case 'synthetic':
         return "Dados sintéticos para demonstração";
       default:

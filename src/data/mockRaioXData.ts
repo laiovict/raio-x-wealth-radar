@@ -1,4 +1,3 @@
-
 import { 
   SentimentData, 
   SocialComparisonData, 
@@ -237,7 +236,7 @@ export const defaultRaioXData: RaioXData = {
     ...(clientData.financialSummary || {}), 
     dataSource: 'synthetic' 
   },
-  financialInsights: (clientData.financialInsights || []).map(insight => ({ 
+  financialInsightData: (clientData.financialInsights || []).map(insight => ({ 
     ...insight, 
     dataSource: 'synthetic' 
   })),
@@ -245,6 +244,7 @@ export const defaultRaioXData: RaioXData = {
     ...action, 
     dataSource: 'synthetic' 
   })),
+  
   assetAllocation: {
     equities: 30,
     fixedIncome: 40,

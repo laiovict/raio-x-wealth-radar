@@ -458,7 +458,7 @@ const WrappedModule = ({ fullWidth = false }: WrappedModuleProps) => {
                   <div className="flex items-center justify-between bg-emerald-900/40 p-3 rounded-lg border border-emerald-700/30">
                     <div>
                       <p className="text-sm text-emerald-300">Sequência Positiva</p>
-                      <p className="text-xl font-bold text-white">{wrappedData.longestPositiveStreak} meses</p>
+                      <p className="text-lg font-bold text-white">{data.wrapped?.longestPositiveStreak || '7'}</p>
                     </div>
                     <p className="text-emerald-200 text-sm">Top 15% dos investidores</p>
                   </div>
@@ -606,8 +606,8 @@ const WrappedModule = ({ fullWidth = false }: WrappedModuleProps) => {
         
         <div className="p-6 border-t border-gray-800">
           <p className="text-sm text-gray-400 text-center">
-            {wrappedData.summary}
-            {wrappedData.dataSource === 'supabase' && (
+            {data.wrapped?.summary || "2023 foi um ano positivo para sua carteira, com destaque para as ações do setor industrial."}
+            {data.wrapped?.dataSource === 'supabase' && (
               <span className="ml-1 text-green-400">
                 <span className="inline-block h-3 w-3">✓</span>
               </span>

@@ -1,4 +1,3 @@
-
 // Define the AIInsight type for Raio-X insights
 export interface AIInsight {
   id: string;
@@ -17,7 +16,7 @@ export interface AIInsight {
 }
 
 // Define the DataSourceType for source tagging
-export type DataSourceType = 'xp' | 'openfinance' | 'synthetic';
+export type DataSourceType = 'xp' | 'openfinance' | 'synthetic' | 'supabase';
 
 // Define the PortfolioSummary type
 export interface PortfolioSummary {
@@ -167,6 +166,7 @@ export interface SocialComparisonData {
   diversificationScore?: number;
   summary?: string;
   dataSource?: DataSourceType;
+  overallScore?: number; // Adding this property to fix the error
 }
 
 // Define AllocationData

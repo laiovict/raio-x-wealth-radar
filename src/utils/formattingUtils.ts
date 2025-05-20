@@ -1,59 +1,62 @@
 
-import { toNumber } from './typeConversionHelpers';
+import { toNumber } from '@/utils/typeConversionHelpers';
 
 /**
- * Format a value as currency
- * 
- * @param value Value to format as currency (can be string or number)
- * @param options Formatting options
+ * Format a currency value
+ * @param value Number or string to format
+ * @param minimumFractionDigits Minimum fraction digits (default 0)
+ * @param maximumFractionDigits Maximum fraction digits (default 0)
  * @returns Formatted currency string
  */
-export const formatCurrency = (
-  value: string | number | undefined | null,
-  minimumFractionDigits = 0, 
-  maximumFractionDigits = 0
-): string => {
-  // Convert value to number using our utility
+export const formatCurrency = (value: number | string, minimumFractionDigits = 0, maximumFractionDigits = 0): string => {
   const numValue = toNumber(value);
   
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
     minimumFractionDigits,
-    maximumFractionDigits,
+    maximumFractionDigits
   }).format(numValue);
 };
 
 /**
- * Format a value as percentage
- * 
- * @param value Value to format as percentage
- * @param digits Number of decimal digits to display
+ * Format a percentage value
+ * @param value Number to format
+ * @param minimumFractionDigits Minimum fraction digits (default 1)
+ * @param maximumFractionDigits Maximum fraction digits (default 1)
  * @returns Formatted percentage string
  */
-export const formatPercentage = (
-  value: string | number | undefined | null,
-  digits = 1
-): string => {
-  const numValue = toNumber(value);
-  return `${numValue.toFixed(digits)}%`;
+export const formatPercentage = (value: number, minimumFractionDigits = 1, maximumFractionDigits = 1): string => {
+  return `${value.toFixed(minimumFractionDigits)}%`;
 };
 
 /**
  * Format a date value
- * 
  * @param date Date to format
- * @param options Formatting options
+ * @param options Intl.DateTimeFormatOptions
  * @returns Formatted date string
  */
-export const formatDate = (
-  date: Date | string,
-  options?: Intl.DateTimeFormatOptions
-): string => {
+export const formatDate = (date: Date | string, options?: Intl.DateTimeFormatOptions): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   return dateObj.toLocaleDateString('pt-BR', options || {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric'
   });
+};
+
+/**
+ * Format a number value
+ * @param value Number to format
+ * @param minimumFractionDigits Minimum fraction digits (default 0)
+ * @param maximumFractionDigits Maximum fraction digits (default 0)
+ * @returns Formatted number string
+ */
+export const formatNumber = (value: number | string, minimumFractionDigits = 0, maximumFractionDigits = 0): string => {
+  const numValue = toNumber(value);
+  
+  return new Intl.NumberFormat('pt-BR', {
+    minimumFractionDigits,
+    maximumFractionDigits
+  }).format(numValue);
 };

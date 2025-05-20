@@ -13,7 +13,7 @@ export const getClientOpenFinanceAccounts = async (clientId: number | null): Pro
   
   try {
     const { data: response, error } = await supabase
-      .from('open_finance_accounts')
+      .from('investorXOpenFinanceAccount')
       .select('*')
       .eq('investor_account_on_brokerage_house', clientId);
     

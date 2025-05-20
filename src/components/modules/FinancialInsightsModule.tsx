@@ -97,6 +97,11 @@ interface FinancialInsightData {
   dataSource?: DataSourceType;
 }
 
+// Add this at the beginning of the file, after existing imports
+interface FinancialInsightsModuleProps {
+  fullWidth?: boolean;
+}
+
 const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleProps) => {
   const { 
     data, 

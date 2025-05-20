@@ -49,3 +49,67 @@ export const toString = (value: string | number | undefined | null): string => {
 export const compareToNumber = (value: string | number | undefined | null, compareValue: number): boolean => {
   return toNumber(value) > compareValue;
 };
+
+/**
+ * Helper function to fix allocation defaults
+ * @param allocation The allocation object to fix
+ * @returns The fixed allocation object
+ */
+export const fixAllocationDefaults = (allocation: any): any => {
+  if (!allocation) return null;
+  
+  // Ensure all required properties exist
+  const result = {
+    current: { ...allocation.current },
+    recommended: { ...allocation.recommended },
+    optimizationGain: allocation.optimizationGain || 0,
+    dataSource: allocation.dataSource || 'synthetic'
+  };
+  
+  return result;
+};
+
+/**
+ * Helper function to fix liquidity defaults
+ * @param liquidity The liquidity object to fix
+ * @returns The fixed liquidity object
+ */
+export const fixLiquidityDefaults = (liquidity: any): any => {
+  if (!liquidity) return null;
+  
+  // Ensure all required properties exist
+  const result = {
+    currentIdle: liquidity.currentIdle || 0,
+    recommended: liquidity.recommended || 0,
+    difference: liquidity.difference || 0,
+    currentIdleMonths: liquidity.currentIdleMonths || 0,
+    recommendedMonths: liquidity.recommendedMonths || 0,
+    dataSource: liquidity.dataSource || 'synthetic'
+  };
+  
+  return result;
+};
+
+/**
+ * Helper function to perform arithmetic operations safely with any type
+ * @param a First value
+ * @param operation Operation to perform (+, -, *, /)
+ * @param b Second value
+ * @returns Result of operation as number
+ */
+export const arithmeticOperation = (
+  a: string | number | undefined | null,
+  operation: '+' | '-' | '*' | '/',
+  b: string | number | undefined | null
+): number => {
+  const numA = toNumber(a);
+  const numB = toNumber(b);
+  
+  switch (operation) {
+    case '+': return numA + numB;
+    case '-': return numA - numB;
+    case '*': return numA * numB;
+    case '/': return numB !== 0 ? numA / numB : 0;
+    default: return 0;
+  }
+};
