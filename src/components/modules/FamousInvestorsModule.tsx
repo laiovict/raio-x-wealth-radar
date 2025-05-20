@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -72,7 +71,6 @@ const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps
       name: "Warren Buffett",
       quote: "Seja ganancioso quando outros estão com medo, e tenha medo quando outros estão gananciosos.",
       strategy: "Investimento em valor, empresas com vantagens competitivas duradouras",
-      image: "https://upload.wikimedia.org/wikipedia/commons/d/d4/Warren_Buffett_at_the_2015_SelectUSA_Investment_Summit.jpg",
       bg: "from-blue-600/20 to-blue-900/30",
       accent: "bg-blue-400/20",
       pattern: "radial-gradient(circle at 30% 40%, rgba(56, 189, 248, 0.1) 0%, transparent 40%), radial-gradient(circle at 80% 10%, rgba(14, 165, 233, 0.2) 0%, transparent 30%)",
@@ -81,7 +79,6 @@ const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps
       name: "Ray Dalio",
       quote: "O dinheiro é só uma ferramenta para ajudar você a conseguir o que quer, não é o objetivo em si.",
       strategy: "Diversificação global, alocação em todas as condições de mercado",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Raymond_Dalio_World_Economic_Forum_2013.jpg/440px-Raymond_Dalio_World_Economic_Forum_2013.jpg",
       bg: "from-emerald-600/20 to-emerald-900/30",
       accent: "bg-emerald-400/20",
       pattern: "radial-gradient(circle at 70% 60%, rgba(16, 185, 129, 0.1) 0%, transparent 50%), radial-gradient(circle at 20% 30%, rgba(5, 150, 105, 0.2) 0%, transparent 40%)",
@@ -90,7 +87,6 @@ const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps
       name: "Benjamin Graham",
       quote: "No curto prazo, o mercado é uma máquina de votação, mas no longo prazo, é uma máquina de pesagem.",
       strategy: "Margem de segurança, análise fundamental detalhada",
-      image: "https://upload.wikimedia.org/wikipedia/en/thumb/0/0d/Benjamin_Graham.jpg/300px-Benjamin_Graham.jpg",
       bg: "from-amber-600/20 to-amber-900/30",
       accent: "bg-amber-400/20",
       pattern: "radial-gradient(circle at 60% 20%, rgba(251, 191, 36, 0.15) 0%, transparent 40%), radial-gradient(circle at 30% 70%, rgba(245, 158, 11, 0.1) 0%, transparent 30%)",
@@ -99,7 +95,6 @@ const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps
       name: "Peter Lynch",
       quote: "Invista no que você conhece.",
       strategy: "Crescimento a preço razoável, vantagens competitivas claras",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9d/Peter_Lynch_%28cropped%29.jpg/440px-Peter_Lynch_%28cropped%29.jpg",
       bg: "from-purple-600/20 to-purple-900/30",
       accent: "bg-purple-400/20",
       pattern: "radial-gradient(circle at 40% 50%, rgba(168, 85, 247, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.2) 0%, transparent 30%)",
@@ -108,7 +103,6 @@ const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps
       name: "Howard Marks",
       quote: "As coisas mais perigosas são aquelas em que os riscos não são visíveis.",
       strategy: "Contrário, ciclos de mercado, psicologia do investidor",
-      image: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Howard_Marks_in_2013.jpg/440px-Howard_Marks_in_2013.jpg",
       bg: "from-red-600/20 to-red-900/30",
       accent: "bg-red-400/20",
       pattern: "radial-gradient(circle at 20% 40%, rgba(248, 113, 113, 0.1) 0%, transparent 40%), radial-gradient(circle at 70% 60%, rgba(239, 68, 68, 0.15) 0%, transparent 30%)",
@@ -165,24 +159,15 @@ const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps
                     <div className="absolute top-1/3 right-1/4 w-32 h-32 bg-gradient-to-br from-emerald-600/10 to-teal-600/10 rounded-full blur-2xl"></div>
                     <div className="absolute bottom-1/4 left-1/3 w-24 h-24 bg-gradient-to-br from-amber-600/10 to-orange-600/10 rounded-full blur-2xl"></div>
                     
-                    {/* Content */}
+                    {/* Content - Removed photos section and adjusted layout */}
                     <div className={`relative z-10 p-8 h-full backdrop-blur-sm rounded-xl ${investor.bg} bg-opacity-30`}>
-                      <div className="flex flex-col md:flex-row items-center gap-6 mb-6">
-                        <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white/20 flex-shrink-0 shadow-lg">
-                          <img 
-                            src={investor.image} 
-                            alt={investor.name}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                        <div>
-                          <h3 className="text-2xl font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent mb-3">
-                            {investor.name}
-                          </h3>
-                          <p className="text-xl italic text-white/90 mb-4 leading-relaxed">
-                            "{investor.quote}"
-                          </p>
-                        </div>
+                      <div className="mb-6">
+                        <h3 className="text-2xl font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent mb-3">
+                          {investor.name}
+                        </h3>
+                        <p className="text-xl italic text-white/90 mb-4 leading-relaxed">
+                          "{investor.quote}"
+                        </p>
                       </div>
                       
                       <div className={`${investor.accent} backdrop-blur-md rounded-lg p-5 border border-white/10 shadow-inner`}>

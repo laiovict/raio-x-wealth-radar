@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -156,22 +155,24 @@ const Index = () => {
       selectedClient={selectedClient}
     >
       <div className="min-h-screen h-screen flex flex-col bg-gradient-to-br from-[#0f0f11] to-[#1a1a2e] text-white">
-        <nav className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 border-b border-white/10 gap-4">
+        <nav className="backdrop-blur-md bg-black/20 border-b border-white/5 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sticky top-0 z-10">
           <div className="flex items-center gap-4">
-            <img 
-              src="/lovable-uploads/4b258bed-71ae-4d4c-847b-12968969f2d4.png"
-              alt="Reinvent Logo"
-              className="h-12 w-auto"
-            />
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-              Raio-X Financeiro
-            </h1>
+            <div className="flex items-center">
+              <img 
+                src="/lovable-uploads/4b258bed-71ae-4d4c-847b-12968969f2d4.png"
+                alt="Reinvent Logo"
+                className="h-8 w-auto mr-3"
+              />
+              <h1 className="text-xl font-light tracking-wider text-white">
+                Raio-X <span className="font-medium">Financeiro</span>
+              </h1>
+            </div>
           </div>
           
           <div className="flex flex-wrap items-center gap-3">
             {selectedClient && (
               <Button 
-                className="bg-gradient-to-r from-emerald-600 to-green-700 text-white hover:from-emerald-700 hover:to-green-800"
+                className="bg-white/10 hover:bg-white/20 text-white border-0 rounded-full text-sm font-normal px-5"
                 onClick={() => window.open(getMonthlyReportUrl(), '_blank')}
               >
                 <Download className="mr-2 h-4 w-4" />
@@ -182,7 +183,7 @@ const Index = () => {
             {userRole === "advisor" ? (
               <Button
                 variant="outline"
-                className="border-blue-500 text-blue-400 hover:bg-blue-900/30"
+                className="border-white/10 text-white hover:bg-white/10 rounded-full text-sm font-normal px-5"
                 onClick={() => handlePdfPreview('pdf')}
               >
                 Exportar PDF
@@ -191,7 +192,7 @@ const Index = () => {
             
             <Button 
               variant="ghost" 
-              className="text-gray-400 hover:text-white hover:bg-white/10"
+              className="text-white/70 hover:text-white hover:bg-white/10 rounded-full"
               onClick={handleLogout}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -205,7 +206,6 @@ const Index = () => {
             <div className="mb-6">
               {userRole === "advisor" && <ClientSelector onClientSelect={handleClientSelect} />}
               
-              {/* Position TopControls prominently after the welcome banner */}
               {selectedClient && (
                 <TopControls 
                   isAdvisor={userRole === "advisor"} 
