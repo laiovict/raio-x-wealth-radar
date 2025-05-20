@@ -1,10 +1,62 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
+// Define types for our translations
+type TranslationKeys = {
+  welcomeMessage: string;
+  searchPlaceholder: string;
+  openFinanceActive: string;
+  activateOpenFinance: string;
+  behavioralFinanceTitle: string;
+  behavioralFinanceLockedDesc: string;
+  behavioralFinanceDesc: string;
+  lossAversion: string;
+  lossAversionDesc: string;
+  lossAversionRec: string;
+  recencyBias: string;
+  recencyBiasDesc: string;
+  recencyBiasRec: string;
+  overconfidence: string;
+  overconfidenceDesc: string;
+  overconfidenceRec: string;
+  emotionalInvesting: string;
+  emotionalInvestingDescLaio: string;
+  emotionalInvestingRecLaio: string;
+  recommendation: string;
+  exportPdf: string;
+  quickAi: string;
+  myGoals: string;
+  planning: string;
+  quickInsights: string;
+  chatWithRM: string;
+  overviewTab: string;
+  planTab: string;
+  futureTab: string;
+  aiTab: string;
+  chatTab: string;
+  planningTab: string;
+  investmentsTab: string;
+  goalsTab: string;
+  insightsTab: string;
+  socialTab: string;
+  bankingTab: string;
+  behaviorTab: string;
+  loadingClients: string;
+  selectClient: string;
+  noClientsFound: string;
+  login: string;
+};
+
+type Translations = {
+  en: TranslationKeys;
+  pt: TranslationKeys;
+  es?: TranslationKeys;
+};
+
 interface LanguageContextProps {
   language: string;
   setLanguage: (language: string) => void;
-  t: (key: string) => string;
+  t: (key: keyof TranslationKeys) => string;
 }
 
 const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
@@ -13,7 +65,7 @@ interface LanguageProviderProps {
   children: React.ReactNode;
 }
 
-const translations = {
+const translations: Translations = {
   en: {
     welcomeMessage: "Welcome",
     searchPlaceholder: "Search...",
@@ -53,7 +105,6 @@ const translations = {
     socialTab: "Social",
     bankingTab: "Banking",
     behaviorTab: "Behavior",
-    // Add missing translations used in ClientSelector
     loadingClients: "Loading clients...",
     selectClient: "Select client",
     noClientsFound: "No clients found",
@@ -98,7 +149,6 @@ const translations = {
     socialTab: "Social",
     bankingTab: "Bancos",
     behaviorTab: "Comportamento",
-    // Add missing translations used in ClientSelector
     loadingClients: "Carregando clientes...",
     selectClient: "Selecionar cliente",
     noClientsFound: "Nenhum cliente encontrado",
@@ -107,14 +157,29 @@ const translations = {
 };
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
+  // Set initial language from localStorage or use 'pt' as default
   const [language, setLanguage] = useState(localStorage.getItem('language') || 'pt');
 
   useEffect(() => {
     localStorage.setItem('language', language);
   }, [language]);
 
-  const t = (key: string): string => {
-    return translations[language as keyof typeof translations][key as keyof (typeof translations)["en"]] || key;
+  // Updated translation function with proper type checking
+  const t = (key: keyof TranslationKeys): string => {
+    // Check if the language exists in our translations
+    if (!translations[language as keyof typeof translations]) {
+      console.warn(`Language "${language}" not found in translations. Using "pt" as fallback.`);
+      return translations.pt[key] || key;
+    }
+    
+    // Check if the key exists in the current language
+    const translation = translations[language as keyof typeof translations][key];
+    if (!translation) {
+      console.warn(`Translation key "${String(key)}" not found for language "${language}". Using key as fallback.`);
+      return String(key);
+    }
+    
+    return translation;
   };
 
   return (

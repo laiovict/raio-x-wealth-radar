@@ -26,8 +26,8 @@ const LanguageSelector = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent className="bg-white/90 backdrop-blur-md border border-white/20 rounded-lg shadow-xl">
         <DropdownMenuItem
-          onClick={() => setLanguage('pt-BR')}
-          className={`cursor-pointer ${language === 'pt-BR' ? 'bg-blue-50 dark:bg-blue-900/50' : ''}`}
+          onClick={() => setLanguage('pt')}
+          className={`cursor-pointer ${language === 'pt' || language === 'pt-BR' ? 'bg-blue-50 dark:bg-blue-900/50' : ''}`}
         >
           🇧🇷 Português
         </DropdownMenuItem>
@@ -36,12 +36,6 @@ const LanguageSelector = () => {
           className={`cursor-pointer ${language === 'en' ? 'bg-blue-50 dark:bg-blue-900/50' : ''}`}
         >
           🇺🇸 English
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => setLanguage('es')}
-          className={`cursor-pointer ${language === 'es' ? 'bg-blue-50 dark:bg-blue-900/50' : ''}`}
-        >
-          🇪🇸 Español
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
