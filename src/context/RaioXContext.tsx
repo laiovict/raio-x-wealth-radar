@@ -1,18 +1,63 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import clientData from "@/data/clientData";
+import { clientData } from "@/data/clientData";
 import { supabase } from "@/integrations/supabase/client";
+
+// Define interfaces for the AI insights
+export interface AIInsight {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  priority: string;
+  timestamp: Date;
+  isNew: boolean;
+}
+
+// Define interface for financial summary
+export interface FinancialSummary {
+  totalAssets: number;
+  monthlyIncome: number;
+  monthlyExpenses: number;
+  savingsRate: number;
+}
+
+// Define interface for recommended actions
+export interface RecommendedAction {
+  id: string;
+  action: string;
+  impact: string;
+  urgency: string;
+  description: string;
+}
 
 interface RaioXContextType {
   data: any;
   hasOpenFinance: boolean;
   selectedClient: number | null;
+  // Adding missing properties
+  aiInsights: AIInsight[];
+  financialSummary: FinancialSummary;
+  recommendedActions: RecommendedAction[];
+  isAIAnalysisLoading: boolean;
+  refreshAIAnalysis: () => void;
 }
 
 export const RaioXContext = createContext<RaioXContextType>({
   data: {},
   hasOpenFinance: false,
   selectedClient: null,
+  // Initialize with empty values
+  aiInsights: [],
+  financialSummary: {
+    totalAssets: 0,
+    monthlyIncome: 0,
+    monthlyExpenses: 0,
+    savingsRate: 0
+  },
+  recommendedActions: [],
+  isAIAnalysisLoading: false,
+  refreshAIAnalysis: () => {}
 });
 
 interface RaioXProviderProps {
@@ -29,6 +74,15 @@ export const RaioXProvider: React.FC<RaioXProviderProps> = ({
   selectedClient = null,
 }) => {
   const [data, setData] = useState(clientData[clientId]);
+  const [isAIAnalysisLoading, setIsAIAnalysisLoading] = useState(false);
+  const [aiInsights, setAiInsights] = useState<AIInsight[]>([]);
+  const [financialSummary, setFinancialSummary] = useState<FinancialSummary>({
+    totalAssets: 0,
+    monthlyIncome: 0,
+    monthlyExpenses: 0,
+    savingsRate: 0
+  });
+  const [recommendedActions, setRecommendedActions] = useState<RecommendedAction[]>([]);
   
   // Effect to fetch client data when selectedClient changes
   useEffect(() => {
@@ -115,17 +169,123 @@ export const RaioXProvider: React.FC<RaioXProviderProps> = ({
 
           setData(adaptedData);
           console.log('Client data updated:', adaptedData);
+          
+          // Generate mock AI insights based on the data
+          generateMockAIInsights(adaptedData);
         } catch (error) {
           console.error('Error in client data fetch:', error);
         }
       } else {
         // If no client selected, use default data
         setData(clientData[clientId]);
+        
+        // Generate mock AI insights for default client
+        generateMockAIInsights(clientData[clientId]);
       }
     };
 
     fetchClientData();
   }, [selectedClient, clientId]);
+  
+  // Function to generate mock AI insights
+  const generateMockAIInsights = (clientData: any) => {
+    setIsAIAnalysisLoading(true);
+    
+    // Simulate API delay
+    setTimeout(() => {
+      // Generate mock financial summary
+      const summary: FinancialSummary = {
+        totalAssets: clientData.portfolioSummary?.total_portfolio_value || 450000,
+        monthlyIncome: 12000,
+        monthlyExpenses: 8000,
+        savingsRate: 33
+      };
+      setFinancialSummary(summary);
+      
+      // Generate mock AI insights
+      const insights: AIInsight[] = [
+        {
+          id: '1',
+          title: 'Concentração excessiva em Renda Fixa',
+          description: 'Sua carteira possui mais de 45% em ativos de renda fixa, o que pode limitar seu potencial de retorno no longo prazo.',
+          category: 'risk',
+          priority: 'high',
+          timestamp: new Date(),
+          isNew: true
+        },
+        {
+          id: '2',
+          title: 'Oportunidade em Fundos Imobiliários',
+          description: 'Considerando seu perfil de investidor e objetivos, uma alocação de 7-10% em FIIs poderia trazer diversificação e renda passiva.',
+          category: 'opportunity',
+          priority: 'medium',
+          timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+          isNew: false
+        },
+        {
+          id: '3',
+          title: 'Gap no objetivo para compra de imóvel',
+          description: 'Com o ritmo atual de investimentos, você alcançará apenas 85% da meta para compra do imóvel no prazo estipulado.',
+          category: 'goal',
+          priority: 'high',
+          timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+          isNew: true
+        },
+        {
+          id: '4',
+          title: 'Economia potencial em IOF',
+          description: 'Realizando saques programados com 30 dias de antecedência, você pode economizar aproximadamente R$ 1.200/ano em IOF.',
+          category: 'tax',
+          priority: 'low',
+          timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+          isNew: false
+        },
+        {
+          id: '5',
+          title: 'Reserva de emergência abaixo do ideal',
+          description: 'Sua reserva atual cobre apenas 1,2 meses de despesas, quando o ideal para seu perfil são 3 meses.',
+          category: 'budget',
+          priority: 'medium',
+          timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+          isNew: true
+        }
+      ];
+      setAiInsights(insights);
+      
+      // Generate mock recommended actions
+      const actions: RecommendedAction[] = [
+        {
+          id: '1',
+          action: 'Aumentar alocação internacional',
+          impact: 'Alto',
+          urgency: 'Médio',
+          description: 'Adicione 8% de exposição a mercados internacionais via ETFs ou fundos para aumentar diversificação geográfica.'
+        },
+        {
+          id: '2',
+          action: 'Reforçar reserva de emergência',
+          impact: 'Médio',
+          urgency: 'Alto',
+          description: 'Direcione R$ 2.000 mensais para sua reserva de emergência até atingir o equivalente a 3 meses de despesas.'
+        },
+        {
+          id: '3',
+          action: 'Consolidar investimentos',
+          impact: 'Médio',
+          urgency: 'Baixo',
+          description: 'Você possui investimentos espalhados em 3 instituições diferentes, gerando complexidade e dificultando a visão consolidada.'
+        }
+      ];
+      setRecommendedActions(actions);
+      
+      setIsAIAnalysisLoading(false);
+    }, 1500);
+  };
+  
+  // Function to refresh AI analysis
+  const refreshAIAnalysis = () => {
+    generateMockAIInsights(data);
+  };
 
   return (
     <RaioXContext.Provider
@@ -133,6 +293,11 @@ export const RaioXProvider: React.FC<RaioXProviderProps> = ({
         data,
         hasOpenFinance,
         selectedClient,
+        aiInsights,
+        financialSummary,
+        recommendedActions,
+        isAIAnalysisLoading,
+        refreshAIAnalysis
       }}
     >
       {children}
