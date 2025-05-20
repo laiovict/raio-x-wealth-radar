@@ -683,13 +683,21 @@ export const RaioXProvider = ({
         
         // Calculate dividend totals
         if (dividendHistory && dividendHistory.length > 0) {
-          import('@/services/portfolioService').then(({ calculateTotalDividends, calculateMonthlyAverageDividends }) => {
+          try {
             const totalDivs = calculateTotalDividends(dividendHistory);
             const avgMonthlyDivs = calculateMonthlyAverageDividends(dividendHistory);
             
             setTotalDividends(totalDivs);
             setAverageMonthlyDividends(avgMonthlyDivs);
-          });
+            
+            console.log("Dividend calculations:", {
+              totalDividends: totalDivs,
+              avgMonthlyDividends: avgMonthlyDivs,
+              dividendCount: dividendHistory.length
+            });
+          } catch (error) {
+            console.error("Error calculating dividend stats:", error);
+          }
         }
         
         // Update portfolio data with real values from Supabase

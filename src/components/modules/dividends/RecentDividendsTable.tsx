@@ -3,12 +3,23 @@ import React from 'react';
 
 interface RecentDividendsTableProps {
   recentDividends: any[];
+  dataSource?: 'supabase' | 'synthetic';
 }
 
-const RecentDividendsTable: React.FC<RecentDividendsTableProps> = ({ recentDividends }) => {
+const RecentDividendsTable: React.FC<RecentDividendsTableProps> = ({ 
+  recentDividends, 
+  dataSource = 'synthetic' 
+}) => {
   return (
     <div className="bg-white/5 rounded-lg p-4">
-      <h3 className="font-medium text-white mb-4">Pagamentos Recentes</h3>
+      <h3 className="font-medium text-white mb-4 flex items-center">
+        Pagamentos Recentes
+        {dataSource === 'supabase' && (
+          <span className="ml-1 text-green-400">
+            <span className="inline-block h-3 w-3">✓</span>
+          </span>
+        )}
+      </h3>
       
       <div className="overflow-x-auto">
         <table className="w-full">

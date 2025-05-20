@@ -30,6 +30,11 @@ const DividendModule = ({ fullWidth = false }: DividendModuleProps) => {
   // Check if we have real data from Supabase
   const hasRealData = dividendHistory && dividendHistory.length > 0;
   
+  // Determine data source
+  const dataSource = hasRealData && dividendHistory && dividendHistory[0]?.dataSource === 'supabase' 
+    ? 'supabase' 
+    : 'synthetic';
+  
   if (!hasRealData) {
     return (
       <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
@@ -52,8 +57,12 @@ const DividendModule = ({ fullWidth = false }: DividendModuleProps) => {
           <span>Histórico de Dividendos</span>
           <span className="text-sm font-normal text-green-500 flex items-center">
             <span className="ml-1 text-green-400">
-              <span className="inline-block h-3 w-3">✓</span>
-            </span> Dados reais
+              {dataSource === 'supabase' ? (
+                <span className="inline-block h-3 w-3">✓</span>
+              ) : (
+                <span className="text-yellow-400 text-xs ml-1">Exemplo</span>
+              )}
+            </span>
           </span>
         </CardTitle>
       </CardHeader>
@@ -64,13 +73,14 @@ const DividendModule = ({ fullWidth = false }: DividendModuleProps) => {
           totalDividends={totalDividends || 0} 
           averageMonthlyDividends={averageMonthlyDividends || 0}
           dividendCount={dividendHistory?.length || 0}
+          dataSource={dataSource}
         />
         
         {/* Chart */}
-        <DividendChart chartData={chartData} />
+        <DividendChart chartData={chartData} dataSource={dataSource} />
         
         {/* Recent Dividends Table */}
-        <RecentDividendsTable recentDividends={recentDividends} />
+        <RecentDividendsTable recentDividends={recentDividends} dataSource={dataSource} />
       </CardContent>
     </Card>
   );

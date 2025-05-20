@@ -1,5 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
+import { parseValueToNumber } from "@/components/modules/dividends/dividendUtils";
 
 // Define the data source type
 export type DataSource = 'synthetic' | 'supabase';
@@ -233,9 +234,9 @@ export const calculateTotalDividends = (dividendHistory: any[]) => {
   if (!dividendHistory || !dividendHistory.length) return 0;
   
   return dividendHistory.reduce((total, item) => {
-    // Parse the value string to a number
-    const value = parseFloat(item.value?.replace(/[^\d.,]/g, '').replace(',', '.') || '0');
-    return total + (isNaN(value) ? 0 : value);
+    // Use the parseValueToNumber helper to handle Brazilian currency format
+    const value = parseValueToNumber(item.value || '0');
+    return total + value;
   }, 0);
 };
 
@@ -258,15 +259,15 @@ export const calculateMonthlyAverageDividends = (dividendHistory: any[], monthsT
     const paymentDate = item.payment_date.split(' ')[0]; // Format: "YYYY-MM-DD HH:MM:SS" or "YYYY-MM-DD"
     const yearMonth = paymentDate.substring(0, 7); // "YYYY-MM"
     
-    // Parse the value string to a number
-    const value = parseFloat(item.value?.replace(/[^\d.,]/g, '').replace(',', '.') || '0');
+    // Parse the value using the helper function
+    const value = parseValueToNumber(item.value || '0');
     
     // Add to month total
     if (!dividendsByMonth[yearMonth]) {
       dividendsByMonth[yearMonth] = 0;
     }
     
-    dividendsByMonth[yearMonth] += (isNaN(value) ? 0 : value);
+    dividendsByMonth[yearMonth] += value;
   });
   
   // Get the list of months
@@ -280,4 +281,47 @@ export const calculateMonthlyAverageDividends = (dividendHistory: any[], monthsT
   if (relevantMonths.length === 0) return 0;
   
   return totalDividends / Math.min(relevantMonths.length, monthsToConsider);
+};
+
+/**
+ * Gets a summary of dividend performance
+ * @param dividendHistory Array of dividend history items
+ * @param portfolioValue Total portfolio value
+ * @returns Dividend performance summary
+ */
+export const getDividendPerformanceSummary = (dividendHistory: any[], portfolioValue: number) => {
+  const totalDividends = calculateTotalDividends(dividendHistory);
+  const monthlyAverage = calculateMonthlyAverageDividends(dividendHistory);
+  
+  // Calculate dividend yield (annualized)
+  const annualDividends = monthlyAverage * 12;
+  const dividendYield = portfolioValue > 0 ? (annualDividends / portfolioValue) * 100 : 0;
+  
+  // Count unique assets that paid dividends
+  const uniqueAssets = new Set();
+  dividendHistory.forEach(item => {
+    if (item.asset) uniqueAssets.add(item.asset);
+  });
+  
+  // Group by type
+  const dividendsByType: Record<string, number> = {};
+  dividendHistory.forEach(item => {
+    const type = item.type || 'Dividend';
+    if (!dividendsByType[type]) {
+      dividendsByType[type] = 0;
+    }
+    dividendsByType[type] += parseValueToNumber(item.value || '0');
+  });
+  
+  return {
+    totalDividends,
+    monthlyAverage,
+    dividendYield,
+    dividendCount: dividendHistory.length,
+    uniqueAssetsCount: uniqueAssets.size,
+    dividendsByType,
+    dataSource: dividendHistory.length > 0 && dividendHistory[0].dataSource === 'supabase' 
+      ? 'supabase' as DataSource 
+      : 'synthetic' as DataSource
+  };
 };

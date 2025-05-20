@@ -15,6 +15,24 @@ export const formatCurrency = (value: number) => {
 };
 
 /**
+ * Format percentage values
+ */
+export const formatPercentage = (value: number) => {
+  return `${value.toFixed(2)}%`;
+};
+
+/**
+ * Parse string value to number, handling Brazilian currency format
+ */
+export const parseValueToNumber = (value: string): number => {
+  if (!value) return 0;
+  
+  // Remove R$, spaces, and convert comma to dot
+  const cleanValue = value.replace(/[^\d.,]/g, '').replace(',', '.');
+  return parseFloat(cleanValue) || 0;
+};
+
+/**
  * Group dividends by month for chart display
  */
 export const groupDividendsByMonth = (dividendHistory: any[]) => {
@@ -38,8 +56,8 @@ export const groupDividendsByMonth = (dividendHistory: any[]) => {
     
     const monthName = `${monthNames[parseInt(month) - 1]}/${year.slice(2)}`;
     
-    // Parse value
-    const value = parseFloat(item.value?.replace(/[^\d.,]/g, '').replace(',', '.') || '0');
+    // Parse value using the helper function
+    const value = parseValueToNumber(item.value || '0');
     
     if (!monthlyData[monthName]) {
       monthlyData[monthName] = {
@@ -49,7 +67,7 @@ export const groupDividendsByMonth = (dividendHistory: any[]) => {
       };
     }
     
-    monthlyData[monthName].amount += (isNaN(value) ? 0 : value);
+    monthlyData[monthName].amount += value;
     monthlyData[monthName].count += 1;
   });
   
@@ -69,4 +87,34 @@ export const groupDividendsByMonth = (dividendHistory: any[]) => {
       return monthOrder[aMonth] - monthOrder[bMonth];
     })
     .slice(-12); // Get last 12 months
+};
+
+/**
+ * Calculate monthly dividend yield based on portfolio total value
+ */
+export const calculateDividendYield = (monthlyDividends: number, portfolioValue: number): number => {
+  if (!portfolioValue || portfolioValue <= 0) return 0;
+  
+  // Calculate annualized dividend yield percentage
+  const annualDividends = monthlyDividends * 12;
+  return (annualDividends / portfolioValue) * 100;
+};
+
+/**
+ * Get dividend growth trend based on history
+ * Returns -1 (declining), 0 (stable), or 1 (growing)
+ */
+export const getDividendTrend = (dividendHistory: any[]): number => {
+  if (!dividendHistory || dividendHistory.length < 6) return 0; // Need at least 6 months of data
+  
+  const monthlyData = groupDividendsByMonth(dividendHistory);
+  if (monthlyData.length < 6) return 0;
+  
+  // Compare first 3 months with last 3 months
+  const firstThreeMonths = monthlyData.slice(0, 3).reduce((sum, item) => sum + item.amount, 0);
+  const lastThreeMonths = monthlyData.slice(-3).reduce((sum, item) => sum + item.amount, 0);
+  
+  if (lastThreeMonths > firstThreeMonths * 1.1) return 1; // Growing (10% or more)
+  if (lastThreeMonths < firstThreeMonths * 0.9) return -1; // Declining (10% or more)
+  return 0; // Stable
 };
