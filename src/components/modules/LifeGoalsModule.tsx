@@ -13,19 +13,19 @@ interface LifeGoalsModuleProps {
   fullWidth?: boolean;
 }
 
-// Goal interface to ensure type safety
-interface Goal {
-  name: string;
-  timeframe: string;
-  progress: number;
-  currentAmount: number;
-  targetAmount: number;
-  adjustmentNeeded: number;
-  category: string;
-}
+// Using the Goal interface from RaioXContext to avoid type conflicts
+// Note: We're not defining our own Goal interface anymore
 
 interface LifeGoals {
-  goals: Goal[];
+  goals: Array<{
+    name: string;
+    timeframe: string;
+    progress: number;
+    currentAmount: number;
+    targetAmount: number;
+    adjustmentNeeded: number;
+    category?: string; // Making category optional to match RaioXContext
+  }>;
   summary: string;
 }
 
