@@ -115,37 +115,62 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
         }
         
         // Fetch OpenFinance data
-        const openFinanceAccounts = await getClientOpenFinanceAccounts(selectedClient);
-        setOpenFinanceAccounts(openFinanceAccounts);
+        let openFinanceAccounts: string[] = [];
+        try {
+          openFinanceAccounts = await getClientOpenFinanceAccounts(selectedClient);
+          setOpenFinanceAccounts(openFinanceAccounts);
+        } catch (error) {
+          console.error("Error fetching OpenFinance accounts:", error);
+          openFinanceAccounts = [];
+          setOpenFinanceAccounts([]);
+        }
         
         // Check if we have OpenFinance accounts
+        let hasOFData = false;
+        let ofInvestments: any[] = [];
+        let ofTransactions: any[] = [];
+        let ofInsights = null;
+        
         if (openFinanceAccounts && openFinanceAccounts.length > 0) {
           console.log(`Found ${openFinanceAccounts.length} OpenFinance accounts for client ${selectedClient}`);
           
-          // Fetch OpenFinance investments
-          const openFinanceInvestments = await getClientOpenFinanceInvestments(selectedClient);
-          setOpenFinanceInvestments(openFinanceInvestments);
-          
-          // Fetch OpenFinance transactions
-          const openFinanceTransactions = await getClientOpenFinanceTransactions(selectedClient, 500);
-          setOpenFinanceTransactions(openFinanceTransactions);
-          
-          // Generate financial insights from OpenFinance transactions
-          const openFinanceInsights = await generateOpenFinanceInsights(selectedClient);
-          setOpenFinanceInsights(openFinanceInsights);
-          
-          // Set hasOpenFinanceData flag
-          setHasOpenFinanceData(
-            openFinanceAccounts.length > 0 && 
-            (openFinanceInvestments.length > 0 || openFinanceTransactions.length > 0)
-          );
+          try {
+            // Fetch OpenFinance investments
+            ofInvestments = await getClientOpenFinanceInvestments(selectedClient);
+            setOpenFinanceInvestments(ofInvestments);
+            
+            // Fetch OpenFinance transactions
+            ofTransactions = await getClientOpenFinanceTransactions(selectedClient, 500);
+            setOpenFinanceTransactions(ofTransactions);
+            
+            // Generate financial insights from OpenFinance transactions
+            ofInsights = await generateOpenFinanceInsights(selectedClient);
+            setOpenFinanceInsights(ofInsights);
+            
+            // Set hasOpenFinanceData flag
+            hasOFData = openFinanceAccounts.length > 0 && 
+                    (ofInvestments.length > 0 || ofTransactions.length > 0);
+            setHasOpenFinanceData(hasOFData);
+          } catch (error) {
+            console.error("Error fetching OpenFinance data:", error);
+            hasOFData = false;
+            setHasOpenFinanceData(false);
+          }
         } else {
+          hasOFData = false;
           setHasOpenFinanceData(false);
         }
         
         // Generate consolidated financial report
-        const consolidatedReport = await generateConsolidatedFinancialReport(selectedClient);
-        setConsolidatedFinancialReport(consolidatedReport);
+        let consolidatedReport = null;
+        try {
+          consolidatedReport = await generateConsolidatedFinancialReport(selectedClient);
+          setConsolidatedFinancialReport(consolidatedReport);
+        } catch (error) {
+          console.error("Error generating consolidated financial report:", error);
+          consolidatedReport = null;
+          setConsolidatedFinancialReport(null);
+        }
         
         // Check if we have any real data from Supabase
         const hasRealData = summary || 
@@ -164,30 +189,47 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
             return {
               ...prevData,
               clientName,
-              portfolioSummary: summary,
+              portfolioSummary: summary || prevData.portfolioSummary,
               fixedIncome: fixedIncome || [],
               investmentFunds: investmentFunds || [],
               realEstate: realEstate || [],
               stocks: stocksData || [],
-              profitability,
+              profitability: profitability || prevData.profitability,
               dividendHistory: dividendHistory || [],
               clientSummary,
               // Add OpenFinance data
               openFinanceData: {
-                hasOpenFinanceData,
-                openFinanceAccounts,
-                openFinanceInvestments: openFinanceInvestments || [],
-                openFinanceTransactions: openFinanceTransactions || [],
-                openFinanceInsights,
+                hasOpenFinanceData: hasOFData,
+                openFinanceAccounts: openFinanceAccounts || [],
+                openFinanceInvestments: ofInvestments || [],
+                openFinanceTransactions: ofTransactions || [],
+                openFinanceInsights: ofInsights,
               },
               // Add financial insights based on OpenFinance data if available
-              financialInsightData: hasOpenFinanceData && openFinanceInsights 
-                ? openFinanceInsights 
+              financialInsightData: hasOFData && ofInsights 
+                ? ofInsights 
                 : prevData.financialInsightData,
               // Track OpenFinance status
-              hasOpenFinance: hasOpenFinanceData
+              hasOpenFinance: hasOFData
             };
           });
+        } else {
+          // If we don't have real data, use default data with client ID
+          setPortfolioData(prevData => ({
+            ...defaultRaioXData,
+            clientName: `Cliente ${selectedClient}`,
+            openFinanceData: {
+              hasOpenFinanceData: hasOFData,
+              openFinanceAccounts: openFinanceAccounts || [],
+              openFinanceInvestments: ofInvestments || [],
+              openFinanceTransactions: ofTransactions || [],
+              openFinanceInsights: ofInsights,
+            },
+            financialInsightData: hasOFData && ofInsights 
+              ? ofInsights 
+              : prevData.financialInsightData,
+            hasOpenFinance: hasOFData
+          }));
         }
       } catch (error) {
         console.error("Error fetching client data:", error);

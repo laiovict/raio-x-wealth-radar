@@ -40,11 +40,10 @@ export const toString = (value: string | number | undefined | null): string => {
 };
 
 /**
- * Safely convert a value to string for use in formatters
- * Handles both string and number inputs
+ * Convert a value to a string, ensuring it's suitable for formatting functions
  * 
- * @param value The value to process
- * @returns The string representation suitable for formatters
+ * @param value The value to convert
+ * @returns The value as a string
  */
 export const toFormattableString = (value: string | number | undefined | null): string => {
   if (value === undefined || value === null) return '0';
@@ -153,4 +152,30 @@ export const determineDataSource = <T>(
     return { value: realValue, dataSource: realSource };
   }
   return { value: syntheticValue, dataSource: 'synthetic' };
+};
+
+/**
+ * Safe type conversion for DataSourceType
+ * Ensures compatibility with components that expect only 'synthetic' | 'supabase'
+ * 
+ * @param sourceType The original DataSourceType value
+ * @returns A compatible data source type
+ */
+export const toCompatibleDataSource = (sourceType: string | undefined): 'synthetic' | 'supabase' => {
+  if (!sourceType || sourceType === 'synthetic') return 'synthetic';
+  // Map all real sources (xp, openfinance) to supabase for compatibility
+  return 'supabase';
+};
+
+/**
+ * Check if we have actual data or need to use synthetic data
+ * 
+ * @param value The value to check
+ * @returns Whether the value represents actual data
+ */
+export const hasActualData = (value: any): boolean => {
+  if (value === undefined || value === null) return false;
+  if (typeof value === 'string' && value.trim() === '') return false;
+  if (typeof value === 'number' && value === 0) return false;
+  return true;
 };

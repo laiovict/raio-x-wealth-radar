@@ -239,19 +239,30 @@ export const defaultRaioXData: RaioXData = {
     dataSource: 'synthetic' 
   },
   financialInsightData: mockFinancialInsightData,
-  // Fixed: renamed recommendedActions to recommendations
+  // Fixed: renamed to recommendations
   recommendations: (clientData.recommendedActions || []).map(action => ({ 
     ...action, 
     dataSource: 'synthetic' 
   })),
   
-  assetAllocation: {
-    equities: 30,
-    fixedIncome: 40,
-    alternatives: 10,
-    cash: 15,
-    realEstate: 5
+  // Fixed: renamed assetAllocation to allocation
+  allocation: {
+    current: {
+      "Renda Fixa": 45,
+      "Ações BR": 25,
+      "Fundos": 20,
+      "Caixa": 10
+    },
+    recommended: {
+      "Renda Fixa": 30,
+      "Ações BR": 30,
+      "Fundos": 15,
+      "Internacional": 15,
+      "Caixa": 10
+    },
+    dataSource: 'synthetic'
   },
+  
   lifeGoals: {
     goals: [
       {
@@ -307,27 +318,9 @@ export const defaultRaioXData: RaioXData = {
     },
     dataSource: 'synthetic'
   },
-  recommendations: [
-    {
-      action: "Diversificar portfólio internacional",
-      description: "Adicionar ETFs globais para reduzir a concentração no mercado doméstico",
-      urgency: "Médio",
-      impact: "Alto",
-      dataSource: 'synthetic'
-    },
-    {
-      action: "Aumentar reserva de emergência",
-      description: "Atingir o equivalente a 6 meses de despesas em ativos de alta liquidez",
-      urgency: "Alto",
-      impact: "Médio",
-      dataSource: 'synthetic'
-    }
-  ],
   sentiment: mockSentimentData,
   socialComparison: mockSocialComparison,
-  allocation: mockAllocationData,
   wrapped: mockWrappedData,
-  // Removed duplicate financialInsightData property
   openFinanceMonths: 0,
   hasOpenFinance: false,
   summary: "Seu portfólio está bem diversificado, mas poderia se beneficiar de maior exposição internacional. Sua saúde financeira está em ótimo estado, com fluxo de caixa positivo e bons índices de poupança.",

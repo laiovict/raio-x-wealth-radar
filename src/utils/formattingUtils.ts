@@ -3,7 +3,7 @@
  * Formatting utilities for consistent display across the application
  */
 
-import { toNumber, toFormattableString } from './typeConversionHelpers';
+import { toNumber, toString } from './typeConversionHelpers';
 
 /**
  * Format a value as currency (BRL)
