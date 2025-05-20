@@ -58,19 +58,17 @@ const FutureProjectionModule = ({ fullWidth = false }: FutureProjectionModulePro
 
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} h-full shadow-md hover:shadow-lg transition-shadow`}>
-      <CardHeader className="bg-gradient-to-r from-blue-50/80 to-indigo-50/80 dark:from-blue-900/30 dark:to-indigo-900/30 pb-2 rounded-t-lg">
-        <CardTitle className="text-xl flex items-center justify-between flex-wrap">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-300 dark:to-indigo-300">
-            Projeção Futuro Próximo
-          </span>
+      <CardHeader className="bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-900 dark:to-indigo-900 pb-2 border-b border-gray-200 dark:border-gray-800">
+        <CardTitle className="text-xl text-white flex items-center justify-between flex-wrap">
+          <span>Projeção Futuro Próximo</span>
           <div className="flex space-x-2">
-            <Badge variant="outline" className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300">
+            <Badge variant="outline" className="bg-blue-600/20 text-blue-100 border-blue-400/30">
               Aporte: {formatCurrency(projection.monthlyContribution)}/mês
             </Badge>
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4">
+      <CardContent className="bg-white dark:bg-gray-900 pt-4">
         <div className={`${fullWidth && !isMobile ? "h-72" : isMobile ? "h-40" : "h-56"} mb-4`}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 5, right: 20, left: 5, bottom: 5 }}>
