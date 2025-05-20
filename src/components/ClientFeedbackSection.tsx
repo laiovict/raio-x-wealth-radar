@@ -18,13 +18,14 @@ const ClientFeedbackSection = ({ isAdvisorView = false }: ClientFeedbackSectionP
       
       {isAdvisorView ? (
         <>
+          {/* Advisors see the list of all feedback */}
           <FeedbackList clientId={null} />
           <FeedbackForm clientId={selectedClient} isAdvisor={true} />
         </>
       ) : (
         <>
+          {/* Clients only see their feedback form without the list */}
           <FeedbackForm clientId={selectedClient} />
-          <FeedbackList clientId={selectedClient} />
         </>
       )}
     </div>
