@@ -5,7 +5,7 @@ import { Target, FileClock, Users } from './CustomIcons';
 import { useRaioX } from "@/context/RaioXContext";
 import { toNumber } from '@/utils/typeConversionHelpers';
 import { calculateInvestmentData, createInvestmentSummary } from './utils';
-import { formatCurrency } from '@/utils/raioXUtils';
+import { formatCurrency } from '@/utils/formattingUtils';
 import { FinancialPlanData, InvestmentData } from './types';
 
 export const usePlanData = () => {
@@ -28,7 +28,7 @@ export const usePlanData = () => {
   };
 
   // Calculate investment data from portfolio summary
-  const investmentData: InvestmentData = useMemo(() => {
+  const investmentData = useMemo(() => {
     return calculateInvestmentData(portfolioSummary, profitability);
   }, [portfolioSummary, profitability]);
 
@@ -50,7 +50,7 @@ export const usePlanData = () => {
         title: "Fluxo de Caixa",
         icon: <Clock className="h-5 w-5 text-green-500" />,
         summary: "Renda mensal líquida de R$ 12.500 com despesas fixas de R$ 8.750 (70% da renda).",
-        dataSource: investmentData.dataSource,
+        dataSource: investmentData.dataSource || 'synthetic',
         details: [
           { label: "Receita total", value: "R$ 15.000/mês" },
           { label: "Impostos", value: "R$ 2.500 (16,7%)" },
@@ -69,7 +69,7 @@ export const usePlanData = () => {
         title: "Investimentos",
         icon: <TrendingUp className="h-5 w-5 text-blue-500" />,
         summary: createInvestmentSummary(investmentData),
-        dataSource: investmentData.dataSource,
+        dataSource: investmentData.dataSource || 'synthetic',
         details: [
           { label: "Valor total investido", value: formatCurrency(investmentData.totalValue.toString()) },
           { label: "Renda fixa", value: `${formatCurrency(investmentData.fixedIncomeValue.toString())} (${Math.round(investmentData.fixedIncomePercentage)}%)` },

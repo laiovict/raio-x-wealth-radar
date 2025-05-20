@@ -6,7 +6,7 @@ import { ArrowUp, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
-import { formatCurrency } from '@/utils/raioXUtils';
+import { formatCurrency } from '@/utils/formattingUtils';
 import { toNumber } from '@/utils/typeConversionHelpers';
 import DataSourceTag from '@/components/common/DataSourceTag';
 import { DataSourceType } from '@/types/raioXTypes';
@@ -161,7 +161,7 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
                 <div className="mt-2 text-xs text-amber-400 flex items-center">
                   <ArrowUp className="h-3.5 w-3.5 mr-1" />
                   <span>
-                    {`Sugestão: Aumentar aportes em ${formatCurrency((goal.targetAmount * goal.adjustmentNeeded / 100 / 12).toString())} mensais`}
+                    {`Sugestão: Aumentar aportes em ${formatCurrency(((goal.targetAmount * goal.adjustmentNeeded / 100) / 12).toString())} mensais`}
                   </span>
                 </div>
               )}

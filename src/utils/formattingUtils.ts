@@ -1,4 +1,3 @@
-
 /**
  * Formatting utilities for consistent display across the application
  */
