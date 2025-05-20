@@ -7,6 +7,7 @@ import { toNumber } from '@/utils/typeConversionHelpers';
 import { calculateInvestmentData, createInvestmentSummary } from './utils';
 import { formatCurrency } from '@/utils/formattingUtils';
 import { FinancialPlanData, InvestmentData } from './types';
+import { DataSourceType } from '@/types/raioXTypes';
 
 export const usePlanData = () => {
   const { portfolioSummary, profitability, financialSummary } = useRaioX();
@@ -50,7 +51,7 @@ export const usePlanData = () => {
         title: "Fluxo de Caixa",
         icon: <Clock className="h-5 w-5 text-green-500" />,
         summary: "Renda mensal líquida de R$ 12.500 com despesas fixas de R$ 8.750 (70% da renda).",
-        dataSource: investmentData.dataSource || 'synthetic',
+        dataSource: (investmentData.dataSource || 'synthetic') as DataSourceType,
         details: [
           { label: "Receita total", value: "R$ 15.000/mês" },
           { label: "Impostos", value: "R$ 2.500 (16,7%)" },
@@ -69,7 +70,7 @@ export const usePlanData = () => {
         title: "Investimentos",
         icon: <TrendingUp className="h-5 w-5 text-blue-500" />,
         summary: createInvestmentSummary(investmentData),
-        dataSource: investmentData.dataSource || 'synthetic',
+        dataSource: (investmentData.dataSource || 'synthetic') as DataSourceType,
         details: [
           { label: "Valor total investido", value: formatCurrency(investmentData.totalValue.toString()) },
           { label: "Renda fixa", value: `${formatCurrency(investmentData.fixedIncomeValue.toString())} (${Math.round(investmentData.fixedIncomePercentage)}%)` },
@@ -91,7 +92,7 @@ export const usePlanData = () => {
         title: "Objetivos Financeiros",
         icon: <Target className="h-5 w-5 text-purple-500" />,
         summary: "3 objetivos principais definidos, com gap de 35% no financeiro para aposentadoria.",
-        dataSource: 'synthetic',
+        dataSource: 'synthetic' as DataSourceType,
         details: [
           { 
             label: "Aposentadoria", 
@@ -119,7 +120,7 @@ export const usePlanData = () => {
         title: "Proteção Patrimonial",
         icon: <Shield className="h-5 w-5 text-red-500" />,
         summary: "Cobertura básica de seguros, com gaps em seguro de vida e previdência.",
-        dataSource: 'synthetic',
+        dataSource: 'synthetic' as DataSourceType,
         details: [
           { label: "Seguro de vida", value: "R$ 500.000 (recomendado: R$ 1,2M)" },
           { label: "Seguro saúde", value: "Plano empresarial completo" },
@@ -137,7 +138,7 @@ export const usePlanData = () => {
         title: "Planejamento Tributário",
         icon: <FileClock className="h-5 w-5 text-amber-500" />,
         summary: "Potencial economia de R$ 9.500/ano com otimizações tributárias.",
-        dataSource: 'synthetic',
+        dataSource: 'synthetic' as DataSourceType,
         details: [
           { label: "IR pessoa física", value: "Alíquota efetiva: 15,5%" },
           { label: "Declaração completa", value: "Sim (mais vantajosa)" },
@@ -155,7 +156,7 @@ export const usePlanData = () => {
         title: "Planejamento Sucessório",
         icon: <Users className="h-5 w-5 text-indigo-500" />,
         summary: "Sem planejamento sucessório formal estabelecido.",
-        dataSource: 'synthetic',
+        dataSource: 'synthetic' as DataSourceType,
         details: [
           { label: "Testamento", value: "Não possui" },
           { label: "Holding familiar", value: "Não possui" },

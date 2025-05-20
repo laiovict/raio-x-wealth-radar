@@ -564,11 +564,11 @@ export const getStyledPortfolioSummaryData = (portfolioSummary: any, colorScale:
                 parseFloat(portfolioSummary.stocks_representation || "0") : 
                 portfolioSummary.stocks_representation || 0;
   
-  // Format values for display (using .toString() to fix TypeScript errors)
-  const fixedIncomeValue = formatCurrency(portfolioSummary.fixed_income_value?.toString() || "0");
-  const fundsValue = formatCurrency(portfolioSummary.investment_fund_value?.toString() || "0");
-  const realEstateValue = formatCurrency(portfolioSummary.real_estate_value?.toString() || "0");
-  const stocksValue = formatCurrency(portfolioSummary.stocks_value?.toString() || "0");
+  // Format values for display (using toString to ensure we have strings)
+  const fixedIncomeValue = formatCurrency(portfolioSummary.fixed_income_value ? portfolioSummary.fixed_income_value.toString() : "0");
+  const fundsValue = formatCurrency(portfolioSummary.investment_fund_value ? portfolioSummary.investment_fund_value.toString() : "0");
+  const realEstateValue = formatCurrency(portfolioSummary.real_estate_value ? portfolioSummary.real_estate_value.toString() : "0");
+  const stocksValue = formatCurrency(portfolioSummary.stocks_value ? portfolioSummary.stocks_value.toString() : "0");
   
   // Return the formatted data
   return [

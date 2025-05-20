@@ -46,7 +46,7 @@ export const toFullDataSource = (
  * @returns 'synthetic' or 'supabase' for legacy component compatibility
  */
 export const toCompatibleDataSource = (sourceType?: DataSourceType | string): 'synthetic' | 'supabase' => {
-  return toLimitedDataSource(sourceType);
+  return toLimitedDataSource(sourceType as DataSourceType);
 };
 
 /**
@@ -73,7 +73,7 @@ export interface WithDataSource {
 export const adaptForLimitedComponents = <T extends WithDataSource>(obj: T): T & {dataSource: 'synthetic' | 'supabase'} => {
   return {
     ...obj,
-    dataSource: toLimitedDataSource(obj.dataSource)
+    dataSource: toLimitedDataSource(obj.dataSource as DataSourceType)
   };
 };
 

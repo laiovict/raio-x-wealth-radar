@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -51,7 +52,7 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
           targetAmount: 800000,
           adjustmentNeeded: 10,
           category: "investment",
-          dataSource: hasRealData ? 'supabase' : 'synthetic'
+          dataSource: hasRealData ? 'supabase' as const : 'synthetic' as const
         },
         {
           name: "Reserva de Emergência",
@@ -61,7 +62,7 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
           targetAmount: 50000,
           adjustmentNeeded: 0,
           category: "saving",
-          dataSource: hasRealData ? 'supabase' : 'synthetic'
+          dataSource: hasRealData ? 'supabase' as const : 'synthetic' as const
         },
         {
           name: "Compra de Imóvel",
@@ -71,11 +72,11 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
           targetAmount: 300000,
           adjustmentNeeded: 15,
           category: "property",
-          dataSource: hasRealData ? 'supabase' : 'synthetic'
+          dataSource: hasRealData ? 'supabase' as const : 'synthetic' as const
         }
       ],
       summary: "Seus objetivos financeiros estão em bom progresso. A reserva de emergência está quase completa, mas os objetivos de longo prazo precisam de aportes consistentes.",
-      dataSource: hasRealData ? 'supabase' : 'synthetic'
+      dataSource: hasRealData ? 'supabase' as const : 'synthetic' as const
     };
   }, [data?.lifeGoals, portfolioSummary]);
   

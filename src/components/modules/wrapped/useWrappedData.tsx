@@ -56,10 +56,10 @@ export const useWrappedData = () => {
         // Enhance the wrapped data with real dividend information
         if (largestDividend.value > 0) {
           defaultWrapped.mostProfitableAsset = {
-            name: largestDividend.asset,
+            name: largestDividend.asset || "",
             return: Math.round(largestDividend.value / 100) / 10 * 100 // Convert to percentage with rounding
           };
-          defaultWrapped.dataSource = 'supabase';
+          defaultWrapped.dataSource = 'supabase' as const;
         }
       } catch (error) {
         console.error("Error processing dividend history:", error);
