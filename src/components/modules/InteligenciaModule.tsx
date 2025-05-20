@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -105,6 +106,46 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
       detail: { tabId: 'chat' }
     });
     document.dispatchEvent(tabsEvent);
+  };
+
+  // Add the missing functions that were causing the errors
+  const getUrgencyColor = (urgency: string) => {
+    switch (urgency.toLowerCase()) {
+      case "alto":
+        return "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200";
+      case "médio":
+        return "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200";
+      case "baixo":
+        return "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200";
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
+    }
+  };
+
+  const getUrgencyIcon = (urgency: string) => {
+    switch (urgency.toLowerCase()) {
+      case "alto":
+        return <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />;
+      case "médio":
+        return <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />;
+      case "baixo":
+        return <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />;
+      default:
+        return null;
+    }
+  };
+
+  const getImpactColor = (impact: string) => {
+    switch (impact.toLowerCase()) {
+      case "alto":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200";
+      case "médio":
+        return "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200";
+      case "baixo":
+        return "bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-200";
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
+    }
   };
 
   // Get client-specific recommended actions
