@@ -1,21 +1,23 @@
-
 import { DividendHistory, FinancialSummary } from '@/types/raioXTypes';
-import { toNumber } from '@/utils/formattingUtils';
+import { toNumber } from '@/utils/typeConversionHelpers';
 
 /**
  * Format currency values consistently
- * @param value Number to format as currency
+ * @param value Number or string to format as currency
  * @param minimumFractionDigits Minimum fraction digits
  * @param maximumFractionDigits Maximum fraction digits
  * @returns Formatted currency string
  */
-export const formatCurrency = (value: number, minimumFractionDigits = 0, maximumFractionDigits = 0) => {
+export const formatCurrency = (value: number | string, minimumFractionDigits = 0, maximumFractionDigits = 0): string => {
+  // Convert value to number if it's a string
+  const numValue = toNumber(value);
+  
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
     minimumFractionDigits,
     maximumFractionDigits,
-  }).format(value);
+  }).format(numValue);
 };
 
 /**
