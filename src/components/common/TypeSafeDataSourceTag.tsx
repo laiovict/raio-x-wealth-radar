@@ -3,6 +3,7 @@ import React from 'react';
 import DataSourceTag from '@/components/common/DataSourceTag';
 import { DataSourceType } from '@/types/raioXTypes';
 import { toLimitedDataSource } from '@/utils/dataSourceAdapter';
+import { toSafeString } from '@/utils/typeConversionHelpers';
 
 /**
  * A wrapper component for DataSourceTag that ensures type compatibility
@@ -13,7 +14,7 @@ import { toLimitedDataSource } from '@/utils/dataSourceAdapter';
  * data source information across the application.
  */
 interface TypeSafeDataSourceTagProps {
-  source?: DataSourceType | string;
+  source?: DataSourceType | string | number;
   className?: string;
   showLabel?: boolean;
 }
@@ -23,10 +24,11 @@ const TypeSafeDataSourceTag: React.FC<TypeSafeDataSourceTagProps> = ({
   className,
   showLabel = false
 }) => {
-  if (!source) return null;
+  if (source === undefined || source === null) return null;
   
-  // Convert any DataSourceType to the limited types expected by DataSourceTag
-  const compatibleSource = toLimitedDataSource(source as DataSourceType);
+  // Convert source to string and then to the limited types expected by DataSourceTag
+  const sourceAsString = toSafeString(source);
+  const compatibleSource = toLimitedDataSource(sourceAsString as DataSourceType);
   
   return (
     <div className="flex items-center">

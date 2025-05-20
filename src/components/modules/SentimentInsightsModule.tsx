@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,8 +16,13 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
   const isMobile = useMobileBreakpoint();
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Create sentiment data based on actual client stocks
-  const [clientSentimentData, setClientSentimentData] = useState(data.sentiment);
+  // Create sentiment data based on actual client stocks with safe defaults
+  const [clientSentimentData, setClientSentimentData] = useState({
+    assets: [],
+    summary: "",
+    dataSource: 'synthetic' as const
+    // Initialize with empty assets array to prevent undefined.slice() error
+  });
 
   useEffect(() => {
     // Set loaded state immediately to avoid streaming issues
@@ -27,8 +31,9 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
     }, 300);
     
     // Generate sentiment data based on the client's actual stocks
-    if (stocks && stocks.length > 0) {
+    if (stocks && Array.isArray(stocks) && stocks.length > 0) {
       // Extract ticker symbols from client's stocks (up to 2 for display)
+      // Ensure we have a valid array before slicing
       const clientStocks = stocks.slice(0, 2).map(stockItem => ({
         ticker: stockItem.asset || "",
         sentiment: Math.floor(Math.random() * 30) + 60, // Generate a sentiment score between 60-90
@@ -44,10 +49,13 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
           dataSource: 'supabase' as const
         });
       }
+    } else if (data.sentiment && data.sentiment.assets) {
+      // Use existing sentiment data if available
+      setClientSentimentData(data.sentiment);
     }
     
     return () => clearTimeout(timer);
-  }, [stocks]);
+  }, [stocks, data.sentiment]);
   
   // Helper function to generate relevant news for stocks
   const generateNewsForStock = (ticker: string) => {
@@ -154,7 +162,9 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
   
   // Generate summary based on stocks data
   const generateSummaryFromStocks = (stocks: any[]) => {
-    if (stocks.length === 0) return "Sem dados de sentimento disponíveis para sua carteira atual.";
+    if (!stocks || !Array.isArray(stocks) || stocks.length === 0) {
+      return "Sem dados de sentimento disponíveis para sua carteira atual.";
+    }
     
     const positiveStocks = stocks.filter(s => s.impact > 0);
     const negativeStocks = stocks.filter(s => s.impact < 0);
@@ -238,7 +248,9 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
         {isLoaded ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {clientSentimentData.assets.slice(0, 2).map((asset, index) => (
+              {/* Ensure assets exist and is an array before attempting to slice */}
+              {clientSentimentData.assets && Array.isArray(clientSentimentData.assets) && 
+               clientSentimentData.assets.slice(0, 2).map((asset, index) => (
                 <div 
                   key={index} 
                   className={`${getSentimentBg(asset.sentiment)} p-4 rounded-lg shadow-sm border transition-all hover:shadow-md hover:translate-y-[-2px]`}
@@ -283,9 +295,10 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
               ))}
             </div>
             
+            {/* Ensure we have summary data or provide a fallback */}
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 p-4 rounded-lg border border-blue-100 dark:border-blue-800/50 mt-4">
               <p className="text-gray-800 dark:text-gray-100">
-                {clientSentimentData.summary}
+                {clientSentimentData.summary || "Sem dados disponíveis para análise de sentimento."}
               </p>
             </div>
           </>

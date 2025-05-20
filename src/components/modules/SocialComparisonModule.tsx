@@ -33,6 +33,7 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
     // If we don't have socialComparison but have portfolio data, create insights
     if (data.portfolioSummary) {
       // Calculate percentile rank based on portfolio diversity
+      // Parse safely ensuring we handle both string and number types
       const diversityScore = 
         data.portfolioSummary.fixed_income_representation > 0 ? 25 : 0 +
         parseFloat(toParseableString(data.portfolioSummary.stocks_representation)) > 0 ? 25 : 0 +
