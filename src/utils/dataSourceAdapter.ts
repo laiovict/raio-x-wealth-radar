@@ -32,6 +32,14 @@ export const toFullDataSource = (limitedType: 'synthetic' | 'supabase', actualSo
 };
 
 /**
+ * Convert to compatible data source format for older components
+ * Alias for toLimitedDataSource
+ */
+export const toCompatibleDataSource = (sourceType?: DataSourceType): 'synthetic' | 'supabase' => {
+  return toLimitedDataSource(sourceType);
+};
+
+/**
  * Check if a value is from a real data source or is synthetic
  */
 export const isRealData = (sourceType?: DataSourceType): boolean => {

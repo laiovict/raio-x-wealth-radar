@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { toLimitedDataSource } from '@/utils/dataSourceAdapter';
 import { DataSourceType } from '@/types/raioXTypes';
+import { ensureNumber, ensureString } from '@/utils/typeConversionHelpers';
 
 /**
  * Hook to adapt objects with full DataSourceType to legacy components
@@ -23,17 +24,25 @@ export const useLegacyComponentAdapter = <T extends Record<string, any>>(
     
     // Convert any DataSourceType properties
     Object.entries(adaptedObject).forEach(([key, value]) => {
+      // Handle DataSource types
       if (key === 'dataSource' && typeof value === 'string') {
         adaptedObject[key] = toLimitedDataSource(value as DataSourceType);
-      } else if (typeof value === 'object' && value !== null) {
+      } 
+      // Handle nested objects
+      else if (typeof value === 'object' && value !== null) {
         if (Array.isArray(value)) {
           // Handle arrays of objects
           adaptedObject[key] = value.map(item => {
-            if (item && typeof item === 'object' && 'dataSource' in item) {
-              return {
-                ...item,
-                dataSource: toLimitedDataSource(item.dataSource as DataSourceType)
-              };
+            if (item && typeof item === 'object') {
+              // Process each item in array
+              const processedItem = { ...item };
+              
+              // Handle dataSource property in array items
+              if ('dataSource' in item) {
+                processedItem.dataSource = toLimitedDataSource(item.dataSource as DataSourceType);
+              }
+              
+              return processedItem;
             }
             return item;
           });

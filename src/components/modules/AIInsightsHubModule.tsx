@@ -31,53 +31,53 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'risk':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
+        return 'bg-red-200 text-red-800 dark:bg-red-900/50 dark:text-red-300 border border-red-300 dark:border-red-800';
       case 'opportunity':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+        return 'bg-green-200 text-green-800 dark:bg-green-900/50 dark:text-green-300 border border-green-300 dark:border-green-800';
       case 'goal':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
+        return 'bg-blue-200 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 border border-blue-300 dark:border-blue-800';
       case 'education':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
+        return 'bg-purple-200 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300 border border-purple-300 dark:border-purple-800';
       case 'tax':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
+        return 'bg-orange-200 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300 border border-orange-300 dark:border-orange-800';
       case 'budget':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+        return 'bg-yellow-200 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300 border border-yellow-300 dark:border-yellow-800';
       case 'allocation':
-        return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300';
+        return 'bg-indigo-200 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800';
       case 'savings':
-        return 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300';
+        return 'bg-teal-200 text-teal-800 dark:bg-teal-900/50 dark:text-teal-300 border border-teal-300 dark:border-teal-800';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
+        return 'bg-gray-200 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300 border border-gray-300 dark:border-gray-800';
     }
   };
 
   const getPriorityColor = (priority?: string) => {
     switch (priority) {
       case 'high':
-        return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
+        return 'bg-red-200 text-red-800 dark:bg-red-900/50 dark:text-red-300 border border-red-300 dark:border-red-800';
       case 'medium':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+        return 'bg-yellow-200 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300 border border-yellow-300 dark:border-yellow-800';
       case 'low':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+        return 'bg-green-200 text-green-800 dark:bg-green-900/50 dark:text-green-300 border border-green-300 dark:border-green-800';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
+        return 'bg-gray-200 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300 border border-gray-300 dark:border-gray-800';
     }
   };
 
   const getAgentColor = (agent?: string) => {
     switch (agent) {
       case 'planner':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
+        return 'bg-blue-200 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300 border border-blue-300 dark:border-blue-800';
       case 'investor':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+        return 'bg-green-200 text-green-800 dark:bg-green-900/50 dark:text-green-300 border border-green-300 dark:border-green-800';
       case 'farmer':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
+        return 'bg-orange-200 text-orange-800 dark:bg-orange-900/50 dark:text-orange-300 border border-orange-300 dark:border-orange-800';
       case 'insurancer':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
+        return 'bg-purple-200 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300 border border-purple-300 dark:border-purple-800';
       case 'credit':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+        return 'bg-yellow-200 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300 border border-yellow-300 dark:border-yellow-800';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
+        return 'bg-gray-200 text-gray-800 dark:bg-gray-900/50 dark:text-gray-300 border border-gray-300 dark:border-gray-800';
     }
   };
 
@@ -178,9 +178,9 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
   ];
 
   return (
-    <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
+    <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/20 glass-morphism`}>
       <CardHeader className="pb-2">
-        <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+        <CardTitle className="text-xl font-bold text-indigo-600 dark:text-indigo-300">
           Central de Insights IA
         </CardTitle>
       </CardHeader>
@@ -188,21 +188,21 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
         {/* Search and Filter */}
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
           <div className="relative flex-grow">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4" />
             <input 
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Pesquisar insights..." 
-              className="pl-10 pr-4 py-2 w-full bg-white/5 border border-white/10 rounded-md text-white placeholder-gray-400"
+              className="pl-10 pr-4 py-2 w-full bg-white/80 dark:bg-gray-800/80 border border-gray-300 dark:border-gray-700 rounded-md text-gray-800 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
             />
           </div>
           <div className="flex items-center">
             <Button 
-              variant="ghost" 
+              variant="outline" 
               size="sm" 
               onClick={refreshAIAnalysis} 
-              className="flex items-center gap-2 text-gray-300 hover:text-white"
+              className="flex items-center gap-2 text-indigo-700 dark:text-indigo-300 border-indigo-300 dark:border-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-900/30"
               disabled={isAIAnalysisLoading}
             >
               <RefreshCw className={`h-4 w-4 ${isAIAnalysisLoading ? 'animate-spin' : ''}`} />
@@ -212,13 +212,13 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
         </div>
 
         <div className="flex flex-col gap-3 mb-4">
-          <div className="flex items-center gap-2 text-sm text-gray-400">
+          <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
             <Filter className="h-4 w-4" />
             <span>Categorias:</span>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 sm:flex-wrap">
             <Badge 
-              className={`cursor-pointer ${!categoryFilter ? 'bg-blue-600' : 'bg-white/10'} hover:bg-blue-700`}
+              className={`cursor-pointer ${!categoryFilter ? 'bg-indigo-600 dark:bg-indigo-700 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200'} hover:bg-indigo-700 dark:hover:bg-indigo-600`}
               onClick={() => setCategoryFilter(null)}
             >
               Todos
@@ -226,7 +226,7 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
             {categories.map(category => (
               <Badge 
                 key={category.id}
-                className={`cursor-pointer ${categoryFilter === category.id ? 'bg-blue-600' : 'bg-white/10'} hover:bg-blue-700`}
+                className={`cursor-pointer ${categoryFilter === category.id ? 'bg-indigo-600 dark:bg-indigo-700 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200'} hover:bg-indigo-700 dark:hover:bg-indigo-600`}
                 onClick={() => setCategoryFilter(categoryFilter === category.id ? null : category.id)}
               >
                 {category.label}
@@ -234,13 +234,13 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
             ))}
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-400 mt-2">
+          <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 mt-2">
             <Brain className="h-4 w-4" />
             <span>Agentes:</span>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 sm:flex-wrap">
             <Badge 
-              className={`cursor-pointer ${!agentFilter ? 'bg-blue-600' : 'bg-white/10'} hover:bg-blue-700`}
+              className={`cursor-pointer ${!agentFilter ? 'bg-indigo-600 dark:bg-indigo-700 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200'} hover:bg-indigo-700 dark:hover:bg-indigo-600`}
               onClick={() => setAgentFilter(null)}
             >
               Todos
@@ -248,7 +248,7 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
             {agents.map(agent => (
               <Badge 
                 key={agent.id}
-                className={`cursor-pointer ${agentFilter === agent.id ? 'bg-blue-600' : 'bg-white/10'} hover:bg-blue-700`}
+                className={`cursor-pointer ${agentFilter === agent.id ? 'bg-indigo-600 dark:bg-indigo-700 text-white' : 'bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200'} hover:bg-indigo-700 dark:hover:bg-indigo-600`}
                 onClick={() => setAgentFilter(agentFilter === agent.id ? null : agent.id)}
               >
                 {agent.label}
@@ -275,20 +275,20 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
               
               {/* Basic insights without OpenFinance */}
               <div className="space-y-3">
-                <div className="border border-white/10 rounded-lg p-4 bg-white/5">
+                <div className="border border-gray-300 dark:border-gray-700 rounded-lg p-4 bg-white/80 dark:bg-gray-800/80 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-2">
-                        <Badge className="bg-blue-600">Novo</Badge>
+                        <Badge className="bg-indigo-600 text-white">Novo</Badge>
                         <Badge className={getCategoryColor('education')}>
                           {getCategoryLabel('education')}
                         </Badge>
                       </div>
-                      <h3 className="text-white font-medium">Conheça as características de cada tipo de investimento</h3>
+                      <h3 className="text-gray-900 dark:text-white font-medium">Conheça as características de cada tipo de investimento</h3>
                     </div>
-                    <span className="text-xs text-gray-400">Hoje</span>
+                    <span className="text-xs text-gray-600 dark:text-gray-400">Hoje</span>
                   </div>
-                  <p className="mt-2 text-sm text-gray-300">
+                  <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
                     Entender as características de cada tipo de investimento é essencial para tomar decisões informadas. 
                     Explore a diferença entre renda fixa e variável.
                   </p>
@@ -296,7 +296,7 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                      className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
                       onClick={() => handleViewDetails('basic-1')}
                     >
                       Ver detalhes <ChevronRight className="ml-1 h-4 w-4" />
@@ -304,7 +304,7 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
                   </div>
                 </div>
                 
-                <div className="border border-white/10 rounded-lg p-4 bg-white/5">
+                <div className="border border-gray-300 dark:border-gray-700 rounded-lg p-4 bg-white/80 dark:bg-gray-800/80 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-2">
@@ -315,11 +315,11 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
                           Prioridade: {getPriorityLabel('medium')}
                         </Badge>
                       </div>
-                      <h3 className="text-white font-medium">Diversificação é chave para redução de risco</h3>
+                      <h3 className="text-gray-900 dark:text-white font-medium">Diversificação é chave para redução de risco</h3>
                     </div>
-                    <span className="text-xs text-gray-400">2 dias atrás</span>
+                    <span className="text-xs text-gray-600 dark:text-gray-400">2 dias atrás</span>
                   </div>
-                  <p className="mt-2 text-sm text-gray-300">
+                  <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
                     Sua carteira mostra concentração em poucos ativos. Considere diversificar 
                     entre diferentes classes para reduzir o risco geral da sua carteira.
                   </p>
@@ -327,7 +327,7 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                      className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
                       onClick={() => handleViewDetails('basic-2')}
                     >
                       Ver detalhes <ChevronRight className="ml-1 h-4 w-4" />
@@ -335,7 +335,7 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
                   </div>
                 </div>
                 
-                <div className="border border-white/10 rounded-lg p-4 bg-white/5">
+                <div className="border border-gray-300 dark:border-gray-700 rounded-lg p-4 bg-white/80 dark:bg-gray-800/80 shadow-sm">
                   <div className="flex items-start justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-2">
@@ -349,11 +349,11 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
                           </div>
                         </Badge>
                       </div>
-                      <h3 className="text-white font-medium">Defina objetivos financeiros claros</h3>
+                      <h3 className="text-gray-900 dark:text-white font-medium">Defina objetivos financeiros claros</h3>
                     </div>
-                    <span className="text-xs text-gray-400">5 dias atrás</span>
+                    <span className="text-xs text-gray-600 dark:text-gray-400">5 dias atrás</span>
                   </div>
-                  <p className="mt-2 text-sm text-gray-300">
+                  <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">
                     Estabelecer metas financeiras específicas ajuda a direcionar suas estratégias de investimento. 
                     Defina prioridades como aposentadoria, educação ou compra de imóveis.
                   </p>
@@ -361,7 +361,7 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
                     <Button 
                       variant="ghost" 
                       size="sm" 
-                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                      className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
                       onClick={() => handleViewDetails('basic-3')}
                     >
                       Ver detalhes <ChevronRight className="ml-1 h-4 w-4" />
@@ -383,12 +383,12 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
             filteredInsights.map((insight) => (
               <div 
                 key={insight.id}
-                className={`border border-white/10 rounded-lg p-4 bg-white/5 ${insight.isNew ? 'ring-2 ring-blue-500/50' : ''}`}
+                className={`border border-gray-300 dark:border-gray-700 rounded-lg p-4 bg-white/80 dark:bg-gray-800/80 shadow-sm ${insight.isNew ? 'ring-2 ring-indigo-500/50' : ''}`}
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      {insight.isNew && <Badge className="bg-blue-600">Novo</Badge>}
+                    <div className="flex items-center gap-2 mb-2 flex-wrap">
+                      {insight.isNew && <Badge className="bg-indigo-600 text-white">Novo</Badge>}
                       <Badge className={getCategoryColor(insight.category)}>
                         {getCategoryLabel(insight.category)}
                       </Badge>
@@ -405,18 +405,18 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
                           </div>
                         </Badge>
                       )}
-                      {insight.isSynthetic && <Badge variant="outline" className="text-gray-400 border-gray-500">Beta</Badge>}
+                      {insight.isSynthetic && <Badge variant="outline" className="text-gray-600 dark:text-gray-400 border-gray-400 dark:border-gray-500">Beta</Badge>}
                     </div>
-                    <h3 className="text-white font-medium">{insight.title}</h3>
+                    <h3 className="text-gray-900 dark:text-white font-medium">{insight.title}</h3>
                   </div>
-                  <span className="text-xs text-gray-400">{formatDate(insight.timestamp)}</span>
+                  <span className="text-xs text-gray-600 dark:text-gray-400">{formatDate(insight.timestamp)}</span>
                 </div>
-                <p className="mt-2 text-sm text-gray-300">{insight.description}</p>
+                <p className="mt-2 text-sm text-gray-700 dark:text-gray-300">{insight.description}</p>
                 <div className="mt-3 flex justify-end">
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                    className="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
                     onClick={() => handleViewDetails(insight.id)}
                   >
                     Ver detalhes <ChevronRight className="ml-1 h-4 w-4" />

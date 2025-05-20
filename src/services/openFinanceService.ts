@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { mockFinancialInsightData } from '@/data/mockRaioXData';
-import { toNumber, toString, formatCurrency } from '@/utils/typeConversionHelpers';
+import { ensureNumber, ensureString } from '@/utils/typeConversionHelpers';
 
 /**
  * Get Open Finance accounts for a client
@@ -12,9 +12,9 @@ export const getClientOpenFinanceAccounts = async (clientId: number | null): Pro
   if (!clientId) return [];
   
   try {
-    // Use lowercase table name to match the actual database table name
+    // Use exact table name with correct capitalization
     const { data: accounts, error } = await supabase
-      .from('investorxopenfinanceaccount') 
+      .from('investorXOpenFinanceAccount') 
       .select('*')
       .eq('investor_account_on_brokerage_house', clientId);
     
@@ -58,9 +58,9 @@ export const getClientOpenFinanceInvestments = async (clientId: number | null): 
       { name: "Fundo de Investimento", type: "Multimercado", value: 25000, yield: "8.5%", dataSource: "synthetic" }
     ];
     
-    // Use lowercase table name to match the actual database table name
+    // Use exact table name with correct capitalization
     const { data: accounts, error: accountError } = await supabase
-      .from('investorxopenfinanceaccount') 
+      .from('investorXOpenFinanceAccount') 
       .select('account_id')
       .eq('investor_account_on_brokerage_house', clientId);
     
@@ -125,9 +125,9 @@ export const getClientOpenFinanceTransactions = async (clientId: number | null, 
   ];
   
   try {
-    // Use lowercase table name to match the actual database table name
+    // Use exact table name with correct capitalization
     const { data: accounts, error: accountError } = await supabase
-      .from('investorxopenfinanceaccount')
+      .from('investorXOpenFinanceAccount')
       .select('account_id')
       .eq('investor_account_on_brokerage_house', clientId);
     
@@ -136,7 +136,7 @@ export const getClientOpenFinanceTransactions = async (clientId: number | null, 
       return mockData;
     }
     
-    // Extract account IDs, ensuring they are valid
+    // Extract account IDs
     const accountIds = accounts
       .filter(a => a && a.account_id)
       .map(a => a.account_id);
@@ -231,7 +231,7 @@ const generateInsightsFromTransactions = (transactions: any[]) => {
       }
       
       // Only count outgoing transactions (negative amounts)
-      const amount = toNumber(transaction.amount);
+      const amount = ensureNumber(transaction.amount);
       if (amount < 0) {
         spendingByMonth[yearMonth] += Math.abs(amount);
       }
@@ -306,17 +306,17 @@ export const generateConsolidatedFinancialReport = async (clientId: number | nul
       
       // Calculate total investment value
       totalInvestmentValue: openFinanceInvestments.reduce((total, investment) => {
-        return total + toNumber(investment.book_amount || 0);
+        return total + ensureNumber(investment.book_amount || 0);
       }, 0),
       
       // Calculate income and expenses from transactions
       totalIncome: openFinanceTransactions.reduce((total, transaction) => {
-        const amount = toNumber(transaction.amount);
+        const amount = ensureNumber(transaction.amount);
         return total + (amount > 0 ? amount : 0);
       }, 0),
       
       totalExpenses: openFinanceTransactions.reduce((total, transaction) => {
-        const amount = toNumber(transaction.amount);
+        const amount = ensureNumber(transaction.amount);
         return total + (amount < 0 ? Math.abs(amount) : 0);
       }, 0),
       

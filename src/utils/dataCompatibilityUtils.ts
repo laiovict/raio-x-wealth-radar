@@ -4,7 +4,9 @@ import {
   formatCurrency, 
   toNumber, 
   toString,
-  formatPercentage
+  formatPercentage,
+  ensureNumber,
+  ensureString
 } from '@/utils/typeConversionHelpers';
 
 /**
@@ -100,4 +102,41 @@ export const processMixedTypeArray = <T extends Record<string, any>>(
     
     return result as T;
   });
+};
+
+/**
+ * Convert any data source type to a 'synthetic' | 'supabase' format
+ * that's compatible with legacy components
+ */
+export const getCompatibleDataSource = (source?: DataSourceType): 'synthetic' | 'supabase' => {
+  if (!source || source === 'synthetic') return 'synthetic';
+  return 'supabase';
+};
+
+/**
+ * Convert string value to number for calculations 
+ * @param value String or number value
+ * @returns Number value or 0 if invalid
+ */
+export const convertToNumber = (value: string | number | undefined | null): number => {
+  if (value === undefined || value === null) return 0;
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') {
+    // Clean the string, handling currency symbols, commas, etc.
+    const cleaned = value.replace(/[^\d.,\-]/g, '').replace(',', '.');
+    const num = parseFloat(cleaned);
+    return isNaN(num) ? 0 : num;
+  }
+  return 0;
+};
+
+/**
+ * Convert any value to string format for display
+ * @param value Any value to convert
+ * @returns String representation
+ */
+export const convertToString = (value: any): string => {
+  if (value === undefined || value === null) return '';
+  if (typeof value === 'string') return value;
+  return String(value);
 };
