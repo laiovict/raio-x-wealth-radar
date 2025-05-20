@@ -146,7 +146,7 @@ const RaioXDashboard = ({
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-6 scrollbar-none">
           <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Visão Geral</TabsTrigger>
-          <TabsTrigger value="status" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Como Estou</TabsTrigger>
+          <TabsTrigger value="status" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('statusTab')}</TabsTrigger>
           <TabsTrigger value="actions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('planTab')}</TabsTrigger>
           <TabsTrigger value="market" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('aiTab')}</TabsTrigger>
           <TabsTrigger value="future" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('futureTab')}</TabsTrigger>

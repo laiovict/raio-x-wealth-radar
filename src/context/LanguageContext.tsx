@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 // Define types for our translations
@@ -31,6 +30,7 @@ type TranslationKeys = {
   quickInsights: string;
   chatWithRM: string;
   overviewTab: string;
+  statusTab: string; // Added this missing translation key
   planTab: string;
   futureTab: string;
   aiTab: string;
@@ -130,6 +130,7 @@ const translations: Translations = {
     quickInsights: "Insights",
     chatWithRM: "Chat with RM",
     overviewTab: "How am I?",
+    statusTab: "Status",
     planTab: "What should I change?",
     futureTab: "What about my future?",
     aiTab: "What's happening?",
@@ -209,6 +210,7 @@ const translations: Translations = {
     quickInsights: "Insights",
     chatWithRM: "Falar com RM",
     overviewTab: "Como estou?",
+    statusTab: "Como estou?",
     planTab: "O que preciso mudar?",
     futureTab: "E meu futuro?",
     aiTab: "O que está acontecendo?",
