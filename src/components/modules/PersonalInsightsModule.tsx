@@ -160,46 +160,79 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
         }
         
         // Extract sections using keyword matching
-        setSections({
+        const extractedSections = {
           professional: extractSectionFromText(summaryText, TOPIC_KEYWORDS.professional),
           financial: extractSectionFromText(summaryText, TOPIC_KEYWORDS.financial),
           assets: extractSectionFromText(summaryText, TOPIC_KEYWORDS.assets),
           goals: extractSectionFromText(summaryText, TOPIC_KEYWORDS.goals),
           timeline: extractSectionFromText(summaryText, TOPIC_KEYWORDS.timeline),
           risk: extractSectionFromText(summaryText, TOPIC_KEYWORDS.risk)
-        });
+        };
+        
+        console.log("Extracted sections:", extractedSections);
+        setSections(extractedSections);
       } catch (error) {
         console.error("Error processing client summary:", error);
-        // Fallback to synthetic data
-        setDataSource('synthetic');
+        
+        // Even if there's an error, we still have the summary data from Supabase
+        // So we'll use a fallback approach but maintain the dataSource as 'supabase'
+        setDataSource('supabase');
+        
+        // Try to use the entire summary text for all sections as a fallback
+        if (clientSummary?.summary) {
+          const generalSummary = clientSummary.summary;
+          setSections({
+            professional: generalSummary,
+            financial: generalSummary,
+            assets: generalSummary,
+            goals: generalSummary,
+            timeline: generalSummary,
+            risk: generalSummary
+          });
+        }
       }
     } else {
-      // No client summary available, use synthetic data
-      console.log("No client summary available, using synthetic data");
-      setDataSource('synthetic');
+      // No client summary available
+      console.log("No client summary available, using default data");
+      
+      // Check if we have the client summary in data.clientSummary as a fallback
+      if (data.clientSummary?.summary) {
+        try {
+          console.log("Using fallback client summary from data.clientSummary");
+          const summaryText = data.clientSummary.summary;
+          setParsedSummary(summaryText);
+          setDataSource('supabase');
+          
+          // Extract age
+          const age = extractAge(summaryText);
+          if (age) {
+            setClientAge(age);
+          }
+          
+          // Extract sections using keyword matching
+          setSections({
+            professional: extractSectionFromText(summaryText, TOPIC_KEYWORDS.professional),
+            financial: extractSectionFromText(summaryText, TOPIC_KEYWORDS.financial),
+            assets: extractSectionFromText(summaryText, TOPIC_KEYWORDS.assets),
+            goals: extractSectionFromText(summaryText, TOPIC_KEYWORDS.goals),
+            timeline: extractSectionFromText(summaryText, TOPIC_KEYWORDS.timeline),
+            risk: extractSectionFromText(summaryText, TOPIC_KEYWORDS.risk)
+          });
+        } catch (e) {
+          console.error("Error processing fallback client summary:", e);
+          setDataSource('supabase'); // Still maintain it's from Supabase
+        }
+      } else {
+        setDataSource('synthetic');
+      }
     }
-  }, [clientSummary]);
-  
-  // Fallback content for when no summary is available
-  const getFallbackSection = (section: string): string => {
-    const fallbacks = {
-      professional: "Profissional com experiência no mercado, buscando otimizar seus investimentos e planejar para o futuro.",
-      financial: "Investidor com boa gestão de recursos e interesse em diversificar seus investimentos para alcançar seus objetivos.",
-      assets: "Carteira diversificada com potencial para otimização de acordo com objetivos de longo prazo.",
-      goals: "Objetivos financeiros incluem segurança para o futuro e crescimento patrimonial sustentável.",
-      timeline: "Horizonte de investimento adequado para estratégias de médio a longo prazo.",
-      risk: "Perfil de risco equilibrado, buscando crescimento com proteção patrimonial."
-    };
-    
-    return fallbacks[section as keyof typeof fallbacks] || "Informação não disponível.";
-  };
+  }, [clientSummary, data.clientSummary]);
   
   // Return appropriate section text, falling back if empty
   const getSectionContent = (section: keyof typeof sections): string => {
-    if (dataSource === 'supabase' && sections[section]) {
-      return sections[section];
-    }
-    return getFallbackSection(section);
+    // Always return the section content if it exists (even if empty)
+    // This ensures we use the actual Supabase data
+    return sections[section] || "Informação não disponível no momento.";
   };
   
   return (

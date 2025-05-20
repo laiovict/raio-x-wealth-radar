@@ -324,6 +324,27 @@ export type Database = {
         }
         Relationships: []
       }
+      investorXOpenFinanceInvestments: {
+        Row: {
+          created_at: string | null
+          id: number
+          investor_account_on_brokerage_house: number
+          itemId: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: number
+          investor_account_on_brokerage_house: number
+          itemId?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: number
+          investor_account_on_brokerage_house?: number
+          itemId?: string | null
+        }
+        Relationships: []
+      }
       open_finance_investments: {
         Row: {
           amount_original: number | null

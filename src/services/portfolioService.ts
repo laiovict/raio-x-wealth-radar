@@ -170,9 +170,9 @@ export const getClientProfitability = async (clientId: number | null) => {
 };
 
 /**
- * Fetches client's dividend history
+ * Fetches client's dividend history, filtering out future unpaid dividends
  * @param clientId Client account ID
- * @returns Dividend history data
+ * @returns Dividend history data (only paid dividends)
  */
 export const getClientDividendHistory = async (clientId: number | null) => {
   if (!clientId) return [];
@@ -189,8 +189,31 @@ export const getClientDividendHistory = async (clientId: number | null) => {
       return [];
     }
     
+    if (!data || !data.length) return [];
+    
+    // Filter out future dividends that haven't been paid yet
+    // Only include dividends that have a payment date in the past
+    const now = new Date();
+    const paidDividends = data.filter(dividend => {
+      if (!dividend.payment_date) return true; // Include if no date specified
+      
+      // Parse date (format: "YYYY-MM-DD HH:MM:SS" or "YYYY-MM-DD")
+      const parts = dividend.payment_date.split(' ')[0].split('-');
+      if (parts.length < 3) return true; // Include if can't parse date
+      
+      const paymentDate = new Date(
+        parseInt(parts[0]), // Year
+        parseInt(parts[1]) - 1, // Month (0-indexed)
+        parseInt(parts[2]) // Day
+      );
+      
+      return paymentDate <= now; // Only include if payment date is in the past
+    });
+    
+    console.log(`Filtered dividends: ${paidDividends.length} paid out of ${data.length} total`);
+    
     // Add dataSource metadata to each item
-    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as DataSource })) : [];
+    return paidDividends.map(item => ({ ...item, dataSource: 'supabase' as DataSource }));
   } catch (error) {
     console.error("Error in dividend history fetch:", error);
     return [];
@@ -323,5 +346,135 @@ export const getDividendPerformanceSummary = (dividendHistory: any[], portfolioV
     dataSource: dividendHistory.length > 0 && dividendHistory[0].dataSource === 'supabase' 
       ? 'supabase' as DataSource 
       : 'synthetic' as DataSource
+  };
+};
+
+/**
+ * Gets the client's total portfolio value including OpenFinance investments
+ * @param clientId Client account ID
+ * @param portfolioSummary Portfolio summary from XP
+ * @returns Total portfolio value including external investments
+ */
+export const getConsolidatedPortfolioValue = async (clientId: number | null, portfolioSummary: any) => {
+  if (!clientId) return null;
+  
+  try {
+    // Get OpenFinance accounts mapped to this client
+    const { data: accountData, error: accountError } = await supabase
+      .from('investorXOpenFinanceAccount')
+      .select('account_id')
+      .eq('investor_account_on_brokerage_house', clientId);
+    
+    if (accountError || !accountData || accountData.length === 0) {
+      // Return XP portfolio value only
+      return portfolioSummary ? {
+        xpValue: parseValueToNumber(portfolioSummary.total_portfolio_value || '0'),
+        externalValue: 0,
+        totalValue: parseValueToNumber(portfolioSummary.total_portfolio_value || '0'),
+        dataSource: 'supabase' as DataSource
+      } : null;
+    }
+    
+    const accountIds = accountData.map(item => item.account_id).filter(Boolean);
+    
+    // Get OpenFinance investments
+    const { data: investmentData, error: investmentError } = await supabase
+      .from('open_finance_investments')
+      .select('book_amount')
+      .in('item_id', accountIds);
+    
+    if (investmentError || !investmentData) {
+      console.error("Error fetching OpenFinance investment values:", investmentError);
+      return portfolioSummary ? {
+        xpValue: parseValueToNumber(portfolioSummary.total_portfolio_value || '0'),
+        externalValue: 0,
+        totalValue: parseValueToNumber(portfolioSummary.total_portfolio_value || '0'),
+        dataSource: 'supabase' as DataSource
+      } : null;
+    }
+    
+    // Calculate total external investment value
+    const externalValue = investmentData.reduce((sum, item) => {
+      return sum + (Number(item.book_amount) || 0);
+    }, 0);
+    
+    // Calculate total combined value
+    const xpValue = parseValueToNumber(portfolioSummary?.total_portfolio_value || '0');
+    
+    return {
+      xpValue,
+      externalValue,
+      totalValue: xpValue + externalValue,
+      dataSource: 'supabase' as DataSource
+    };
+  } catch (error) {
+    console.error("Error calculating consolidated portfolio value:", error);
+    return portfolioSummary ? {
+      xpValue: parseValueToNumber(portfolioSummary.total_portfolio_value || '0'),
+      externalValue: 0,
+      totalValue: parseValueToNumber(portfolioSummary.total_portfolio_value || '0'),
+      dataSource: 'supabase' as DataSource
+    } : null;
+  }
+};
+
+/**
+ * Generate a consolidated financial report merging XP and OpenFinance data
+ * @param clientId Client account ID
+ * @returns Consolidated financial report
+ */
+export const generateConsolidatedFinancialReport = async (clientId: number | null) => {
+  if (!clientId) return null;
+  
+  // Get XP portfolio data
+  const portfolioSummary = await getClientPortfolioSummary(clientId);
+  const dividendHistory = await getClientDividendHistory(clientId);
+  const fixedIncome = await getClientFixedIncome(clientId);
+  const investmentFunds = await getClientInvestmentFunds(clientId);
+  const realEstate = await getClientRealEstate(clientId);
+  const stocks = await getClientStocks(clientId);
+  const profitability = await getClientProfitability(clientId);
+  
+  // Get consolidated portfolio value (XP + external)
+  const consolidatedValue = await getConsolidatedPortfolioValue(clientId, portfolioSummary);
+  
+  // Calculate dividend performance
+  const dividendPerformance = getDividendPerformanceSummary(
+    dividendHistory, 
+    portfolioSummary ? parseValueToNumber(portfolioSummary.total_portfolio_value || '0') : 0
+  );
+  
+  // Calculate XP allocation
+  const allocation = {
+    fixedIncome: portfolioSummary ? parseValueToNumber(portfolioSummary.fixed_income_value || '0') : 0,
+    investmentFunds: portfolioSummary ? parseValueToNumber(portfolioSummary.investment_fund_value || '0') : 0,
+    realEstate: portfolioSummary ? parseValueToNumber(portfolioSummary.real_estate_value || '0') : 0,
+    stocks: portfolioSummary ? parseValueToNumber(portfolioSummary.stocks_value || '0') : 0,
+    other: 0,
+    total: consolidatedValue ? consolidatedValue.xpValue : 0
+  };
+  
+  allocation.other = allocation.total - (
+    allocation.fixedIncome + 
+    allocation.investmentFunds + 
+    allocation.realEstate + 
+    allocation.stocks
+  );
+  
+  // Check if we have OpenFinance data
+  const hasOpenFinanceData = consolidatedValue ? consolidatedValue.externalValue > 0 : false;
+  
+  return {
+    allocation,
+    dividendPerformance,
+    portfolioSummary,
+    fixedIncome,
+    investmentFunds,
+    realEstate,
+    stocks,
+    profitability,
+    consolidatedValue,
+    hasOpenFinanceData,
+    dataSource: 'supabase' as DataSource
   };
 };

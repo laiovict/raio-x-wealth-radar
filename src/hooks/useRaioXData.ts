@@ -8,14 +8,24 @@ import {
   getClientStocks, 
   getClientProfitability,
   getClientDividendHistory,
-  getClientSummary
+  getClientSummary,
+  calculateTotalDividends,
+  calculateMonthlyAverageDividends,
+  generateConsolidatedFinancialReport
 } from '@/services/portfolioService';
+
+import {
+  getClientOpenFinanceAccounts,
+  getClientOpenFinanceInvestments,
+  getClientOpenFinanceTransactions,
+  generateOpenFinanceInsights
+} from '@/services/openFinanceService';
+
 import { 
   RaioXData, 
   PortfolioSummary,
   DividendHistory
 } from '@/types/raioXTypes';
-import { calculateTotalDividends, calculateMonthlyAverageDividends } from '@/utils/raioXUtils';
 import { defaultRaioXData } from '@/data/mockRaioXData';
 
 interface UseRaioXDataReturn {
@@ -24,6 +34,12 @@ interface UseRaioXDataReturn {
   totalDividends: number;
   averageMonthlyDividends: number;
   stocks: any[];
+  hasOpenFinanceData: boolean;
+  openFinanceAccounts: string[];
+  openFinanceInvestments: any[];
+  openFinanceTransactions: any[];
+  openFinanceInsights: any;
+  consolidatedFinancialReport: any;
 }
 
 /**
@@ -35,6 +51,14 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
   const [totalDividends, setTotalDividends] = useState<number>(0);
   const [averageMonthlyDividends, setAverageMonthlyDividends] = useState<number>(0);
   const [stocks, setStocks] = useState<any[]>([]);
+  
+  // OpenFinance related states
+  const [hasOpenFinanceData, setHasOpenFinanceData] = useState<boolean>(false);
+  const [openFinanceAccounts, setOpenFinanceAccounts] = useState<string[]>([]);
+  const [openFinanceInvestments, setOpenFinanceInvestments] = useState<any[]>([]);
+  const [openFinanceTransactions, setOpenFinanceTransactions] = useState<any[]>([]);
+  const [openFinanceInsights, setOpenFinanceInsights] = useState<any>(null);
+  const [consolidatedFinancialReport, setConsolidatedFinancialReport] = useState<any>(null);
 
   useEffect(() => {
     const fetchClientData = async () => {
@@ -46,7 +70,7 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
       setIsLoading(true);
       
       try {
-        // Fetch the client's portfolio data
+        // Fetch the XP portfolio data
         const summary = await getClientPortfolioSummary(selectedClient);
         const fixedIncome = await getClientFixedIncome(selectedClient);
         const investmentFunds = await getClientInvestmentFunds(selectedClient);
@@ -55,6 +79,39 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
         const profitability = await getClientProfitability(selectedClient);
         const dividendHistory = await getClientDividendHistory(selectedClient);
         const clientSummary = await getClientSummary(selectedClient);
+        
+        // Fetch OpenFinance data
+        const openFinanceAccounts = await getClientOpenFinanceAccounts(selectedClient);
+        setOpenFinanceAccounts(openFinanceAccounts);
+        
+        // Check if we have OpenFinance accounts
+        if (openFinanceAccounts && openFinanceAccounts.length > 0) {
+          console.log(`Found ${openFinanceAccounts.length} OpenFinance accounts for client ${selectedClient}`);
+          
+          // Fetch OpenFinance investments (excluding XP to avoid duplication)
+          const openFinanceInvestments = await getClientOpenFinanceInvestments(selectedClient);
+          setOpenFinanceInvestments(openFinanceInvestments);
+          
+          // Fetch OpenFinance transactions
+          const openFinanceTransactions = await getClientOpenFinanceTransactions(selectedClient, 500);
+          setOpenFinanceTransactions(openFinanceTransactions);
+          
+          // Generate financial insights from OpenFinance transactions
+          const openFinanceInsights = await generateOpenFinanceInsights(selectedClient);
+          setOpenFinanceInsights(openFinanceInsights);
+          
+          // Set hasOpenFinanceData flag
+          setHasOpenFinanceData(
+            openFinanceAccounts.length > 0 && 
+            (openFinanceInvestments.length > 0 || openFinanceTransactions.length > 0)
+          );
+        } else {
+          setHasOpenFinanceData(false);
+        }
+        
+        // Generate consolidated financial report
+        const consolidatedReport = await generateConsolidatedFinancialReport(selectedClient);
+        setConsolidatedFinancialReport(consolidatedReport);
         
         // Store stocks for other components to use
         if (stocks && stocks.length) {
@@ -82,7 +139,11 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
         }
         
         // Update portfolio data with real values from Supabase
-        if (summary || fixedIncome.length || investmentFunds.length || realEstate.length || stocks.length || profitability || dividendHistory.length || clientSummary) {
+        const hasRealData = summary || fixedIncome.length || investmentFunds.length || 
+                            realEstate.length || stocks.length || profitability || 
+                            dividendHistory.length || clientSummary;
+        
+        if (hasRealData) {
           setPortfolioData(prevData => {
             // Update portfolio data
             const newData = {
@@ -94,7 +155,17 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
               stocks: stocks || [],
               profitability,
               dividendHistory: dividendHistory || [],
-              clientSummary
+              clientSummary,
+              // Add OpenFinance data to the portfolio data
+              openFinanceData: {
+                hasOpenFinanceData,
+                openFinanceAccounts,
+                openFinanceInvestments: openFinanceInvestments || [],
+                openFinanceTransactions: openFinanceTransactions || [],
+                openFinanceInsights,
+              },
+              // Add financial insights based on OpenFinance data
+              financialInsightData: openFinanceInsights || prevData.financialInsightData
             };
             
             // If we have client summary data, update the client name
@@ -120,6 +191,12 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
     isLoading,
     totalDividends,
     averageMonthlyDividends,
-    stocks
+    stocks,
+    hasOpenFinanceData,
+    openFinanceAccounts,
+    openFinanceInvestments,
+    openFinanceTransactions,
+    openFinanceInsights,
+    consolidatedFinancialReport
   };
 };

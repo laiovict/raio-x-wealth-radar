@@ -25,7 +25,13 @@ const RaioXContext = createContext<RaioXContextProps>({
   clientSummary: undefined,
   totalDividends: 0,
   averageMonthlyDividends: 0,
-  stocks: []
+  stocks: [],
+  hasOpenFinanceData: false,
+  openFinanceAccounts: [],
+  openFinanceInvestments: [],
+  openFinanceTransactions: [],
+  openFinanceInsights: null,
+  consolidatedFinancialReport: null
 });
 
 export const RaioXProvider = ({ 
@@ -42,7 +48,13 @@ export const RaioXProvider = ({
     portfolioData, 
     totalDividends, 
     averageMonthlyDividends, 
-    stocks 
+    stocks,
+    hasOpenFinanceData,
+    openFinanceAccounts,
+    openFinanceInvestments,
+    openFinanceTransactions,
+    openFinanceInsights,
+    consolidatedFinancialReport
   } = useRaioXData(selectedClient);
   
   // Function to refresh AI analysis
@@ -80,7 +92,13 @@ export const RaioXProvider = ({
         clientSummary: portfolioData.clientSummary,
         totalDividends,
         averageMonthlyDividends,
-        stocks
+        stocks,
+        hasOpenFinanceData,
+        openFinanceAccounts,
+        openFinanceInvestments,
+        openFinanceTransactions,
+        openFinanceInsights,
+        consolidatedFinancialReport
       }}
     >
       {children}

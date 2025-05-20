@@ -17,7 +17,7 @@ import { useState, useMemo } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { formatCurrency, formatDate } from "@/utils/raioXUtils";
+import { formatCurrency, formatDate } from "@/utils/formattingUtils";
 
 interface FinancialInsightsModuleProps {
   fullWidth?: boolean;
@@ -74,6 +74,17 @@ interface RetirementReadiness extends BaseInsight {
   monthlyNeeded: number;
 }
 
+interface RecurringExpenses extends BaseInsight {
+  items: Array<{
+    description: string;
+    amount: number;
+    category: string;
+    frequency: string;
+    occurrences: number;
+  }>;
+  total: number;
+}
+
 // Define the full structure of financial insight data
 interface FinancialInsightData {
   highestSpendingMonth?: HighestSpendingMonth;
@@ -84,6 +95,7 @@ interface FinancialInsightData {
   potentialSavings?: PotentialSavings;
   bestInvestment?: BestInvestment;
   retirementReadiness?: RetirementReadiness;
+  recurringExpenses?: RecurringExpenses;
   dataSource?: 'supabase' | 'synthetic';
 }
 
@@ -108,12 +120,25 @@ const DataSourceTag = ({ dataSource }: { dataSource?: 'supabase' | 'synthetic' }
 };
 
 const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleProps) => {
-  const { data, portfolioSummary, dividendHistory, profitability } = useRaioX();
+  const { 
+    data, 
+    portfolioSummary, 
+    dividendHistory, 
+    profitability,
+    openFinanceInsights,
+    hasOpenFinanceData
+  } = useRaioX();
   const [currentDate] = useState(new Date());
   const [showDataSourceInfo, setShowDataSourceInfo] = useState(false);
   
   // Enhance financial insights with real data when available
   const financialInsights: FinancialInsightData = useMemo(() => {
+    // If we have OpenFinance insights, use them
+    if (hasOpenFinanceData && openFinanceInsights) {
+      console.log("Using OpenFinance insights:", openFinanceInsights);
+      return openFinanceInsights;
+    }
+    
     // Start with existing insights data or create a new empty object with the correct type
     const insights: FinancialInsightData = data.financialInsightData ? 
       { ...data.financialInsightData } : 
@@ -149,7 +174,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
     }
     
     return insights;
-  }, [data.financialInsightData, portfolioSummary, dividendHistory, profitability]);
+  }, [data.financialInsightData, portfolioSummary, dividendHistory, profitability, openFinanceInsights, hasOpenFinanceData]);
 
   // Informações dos indicadores de fonte de dados
   const dataSourceInfo = {
@@ -199,6 +224,8 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
         return `Seu melhor investimento foi ${data.name}, com retorno de ${data.return}% em ${data.period}.`;
       case 'retirementReadiness':
         return `Com seu ritmo atual, você está a caminho de se aposentar em ${data.years} anos, precisando de ${formatCurrency(data.monthlyNeeded)} mensais.`;
+      case 'recurringExpenses':
+        return `Você tem ${data.items?.length || 0} despesas recorrentes totalizando ${formatCurrency(data.total)} por mês.`;
       default:
         return "Dados adicionais disponíveis ao conectar mais fontes financeiras.";
     }
@@ -397,6 +424,52 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
               </div>
             )}
 
+            {/* Recurring Expenses */}
+            {financialInsights.recurringExpenses && (
+              <div className="border border-purple-500/20 bg-gradient-to-br from-purple-800/10 to-purple-600/5 backdrop-blur-sm rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-gradient-to-br from-purple-700 to-purple-900 p-2 rounded-full">
+                    <Calendar className="w-5 h-5 text-purple-300" />
+                  </div>
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-purple-400 mb-1">
+                        Despesas Recorrentes
+                        <DataSourceTag dataSource={financialInsights.recurringExpenses.dataSource} />
+                      </h3>
+                      <span className="text-xs text-gray-400">Mai 19, 2025</span>
+                    </div>
+                    <p className="text-sm text-gray-300 mb-3">
+                      {financialInsights.recurringExpenses.summary || 
+                        generateSummary('recurringExpenses', financialInsights.recurringExpenses)}
+                    </p>
+                    
+                    {/* Recurring expenses list */}
+                    {financialInsights.recurringExpenses.items && 
+                     financialInsights.recurringExpenses.items.length > 0 && (
+                      <div className="mt-2 space-y-2">
+                        {financialInsights.recurringExpenses.items.slice(0, 4).map((item, i) => (
+                          <div key={i} className="flex justify-between items-center p-2 bg-purple-900/20 rounded-md">
+                            <div className="flex-1">
+                              <div className="text-sm font-medium text-purple-200">
+                                {item.description || `Despesa ${i+1}`}
+                              </div>
+                              <div className="text-xs text-gray-400">
+                                {item.category} • {item.frequency}
+                              </div>
+                            </div>
+                            <div className="text-purple-300 font-medium">
+                              {formatCurrency(item.amount)}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Investment Growth */}
             {financialInsights.investmentGrowth && (
               <div className="border border-green-500/20 bg-gradient-to-br from-green-800/10 to-green-600/5 backdrop-blur-sm rounded-lg p-4">
@@ -454,18 +527,19 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                         generateSummary('potentialSavings', financialInsights.potentialSavings)}
                     </p>
                     
-                    {/* Progress bar */}
-                    <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-gradient-to-r from-indigo-500 to-indigo-300" 
-                        style={{ width: "40%" }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between mt-1 text-xs text-gray-400">
-                      <span>0</span>
-                      <span>40</span>
-                      <span>80</span>
-                    </div>
+                    {/* Suggestions list */}
+                    {financialInsights.potentialSavings.suggestions && 
+                     financialInsights.potentialSavings.suggestions.length > 0 && (
+                      <div className="mt-2 space-y-2">
+                        {financialInsights.potentialSavings.suggestions.slice(0, 3).map((suggestion, i) => (
+                          <div key={i} className="p-2 bg-indigo-900/20 rounded-md">
+                            <div className="text-sm text-indigo-200">
+                              {suggestion}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
