@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useRaioX } from '@/context/RaioXContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -99,7 +98,7 @@ const DividendModule = ({ fullWidth = false }: DividendModuleProps) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col items-center justify-center py-8 text-center">
-          <CoinIcon className="w-16 h-16 text-gray-500 mb-4" />
+          <CoinsIcon className="w-16 h-16 text-gray-500 mb-4" />
           <p className="text-gray-400 max-w-md">
             Dados de dividendos não disponíveis para este cliente.
           </p>
@@ -126,7 +125,7 @@ const DividendModule = ({ fullWidth = false }: DividendModuleProps) => {
           <div className="bg-gradient-to-br from-green-900/20 to-emerald-900/10 rounded-lg p-4 border border-green-500/20">
             <div className="flex items-center justify-between">
               <h3 className="text-gray-400 text-sm">Total Recebido (12 meses)</h3>
-              <CoinIcon className="h-5 w-5 text-green-400" />
+              <CoinsIcon className="h-5 w-5 text-green-400" />
             </div>
             <p className="text-2xl font-semibold text-green-400 mt-2">{formatCurrency(totalDividends || 0)}</p>
           </div>
