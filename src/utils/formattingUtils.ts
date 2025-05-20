@@ -3,7 +3,7 @@
  * Formatting utilities for consistent display across the application
  */
 
-import { toNumber, toString } from './typeConversionHelpers';
+import { toNumber, toString, ensureString, ensureNumber } from './typeConversionHelpers';
 
 /**
  * Format a value as currency (BRL)
@@ -115,4 +115,59 @@ export const formatName = (name: string): string => {
     .split(' ')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
+};
+
+/**
+ * Format a value for display based on its type
+ * Automatically detects if it should be shown as currency, percentage or plain number
+ * 
+ * @param value The value to format
+ * @param type Optional formatting type ('currency', 'percentage', 'number')
+ * @param decimals Number of decimal places for numbers/percentages
+ * @returns Formatted display string
+ */
+export const smartFormat = (
+  value: string | number | undefined | null, 
+  type?: 'currency' | 'percentage' | 'number', 
+  decimals = 2
+): string => {
+  if (value === undefined || value === null) return '';
+  
+  // Determine type automatically if not specified
+  if (!type) {
+    if (toString(value).includes('%')) {
+      type = 'percentage';
+    } else if (toString(value).includes('R$')) {
+      type = 'currency';
+    } else {
+      type = 'number';
+    }
+  }
+  
+  switch (type) {
+    case 'currency':
+      return formatCurrency(value);
+    case 'percentage':
+      return formatPercentage(value, decimals);
+    case 'number':
+      return formatNumber(value, decimals);
+    default:
+      return toString(value);
+  }
+};
+
+/**
+ * Format a number as Brazilian currency (R$) and ensure it's always a string
+ * Safe version that handles any input type
+ * 
+ * @param value The value to format as currency
+ * @returns Formatted currency string
+ */
+export const safeCurrencyFormat = (value: any): string => {
+  // Handle edge cases
+  if (value === undefined || value === null) return 'R$ 0,00';
+  
+  // Convert to number safely
+  const numValue = toNumber(value);
+  return formatCurrency(numValue);
 };

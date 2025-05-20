@@ -12,8 +12,8 @@ export const getClientOpenFinanceAccounts = async (clientId: number | null): Pro
   if (!clientId) return [];
   
   try {
-    // Tabela está em minúsculas no banco de dados - case sensitive
-    const { data: response, error } = await supabase
+    // Use lowercase table name since table is lowercase in the database
+    const { data: accounts, error } = await supabase
       .from('investorxopenfinanceaccount') 
       .select('*')
       .eq('investor_account_on_brokerage_house', clientId);
@@ -24,11 +24,10 @@ export const getClientOpenFinanceAccounts = async (clientId: number | null): Pro
     }
     
     // Fix the property access error by proper typing and null checks
-    if (Array.isArray(response) && response.length > 0) {
-      return response.map((account) => {
+    if (Array.isArray(accounts) && accounts.length > 0) {
+      return accounts.map((account) => {
         // Use account_id como display já que name não está disponível
-        // Verifica se account_id existe e tem o método substring
-        if (account && account.account_id && typeof account.account_id === 'string') {
+        if (account && account.account_id) {
           return `Conta ${account.account_id.substring(0, 8)}`;
         } else {
           return "Conta sem ID";
@@ -58,7 +57,7 @@ export const getClientOpenFinanceInvestments = async (clientId: number | null): 
       { name: "Fundo de Investimento", type: "Multimercado", value: 25000, yield: "8.5%", dataSource: "synthetic" }
     ];
     
-    // Tabela está em minúsculas no banco de dados
+    // Use lowercase table name since table is lowercase in the database
     const { data: accounts, error: accountError } = await supabase
       .from('investorxopenfinanceaccount') 
       .select('account_id')
@@ -69,7 +68,7 @@ export const getClientOpenFinanceInvestments = async (clientId: number | null): 
       return mockData;
     }
     
-    // Extract account IDs, garantindo que são válidos
+    // Extract account IDs, ensuring they are valid
     const accountIds = accounts
       .map(a => a.account_id)
       .filter(id => id !== null && id !== undefined);
@@ -107,26 +106,25 @@ export const getClientOpenFinanceInvestments = async (clientId: number | null): 
 export const getClientOpenFinanceTransactions = async (clientId: number | null, limit = 100): Promise<any[]> => {
   if (!clientId) return [];
   
+  const mockData = [
+    { 
+      description: "Supermercado", 
+      amount: -350.25, 
+      transaction_date: "2025-05-15", 
+      category: "Alimentação", 
+      dataSource: "synthetic" 
+    },
+    {
+      description: "Salário",
+      amount: 5000,
+      transaction_date: "2025-05-01",
+      category: "Receita",
+      dataSource: "synthetic"
+    }
+  ];
+  
   try {
-    // Use mockData for transactions if DB query fails
-    const mockData = [
-      { 
-        description: "Supermercado", 
-        amount: -350.25, 
-        transaction_date: "2025-05-15", 
-        category: "Alimentação", 
-        dataSource: "synthetic" 
-      },
-      {
-        description: "Salário",
-        amount: 5000,
-        transaction_date: "2025-05-01",
-        category: "Receita",
-        dataSource: "synthetic"
-      }
-    ];
-    
-    // Tabela está em minúsculas no banco de dados
+    // Use lowercase table name since table is lowercase in the database
     const { data: accounts, error: accountError } = await supabase
       .from('investorxopenfinanceaccount')
       .select('account_id')
@@ -137,7 +135,7 @@ export const getClientOpenFinanceTransactions = async (clientId: number | null, 
       return mockData;
     }
     
-    // Extract account IDs, garantindo que são válidos
+    // Extract account IDs, ensuring they are valid
     const accountIds = accounts
       .map(a => a.account_id)
       .filter(id => id !== null && id !== undefined);

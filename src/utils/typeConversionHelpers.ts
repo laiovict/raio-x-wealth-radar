@@ -40,7 +40,8 @@ export const toString = (value: string | number | undefined | null): string => {
 };
 
 /**
- * Convert a value to a string, ensuring it's suitable for formatting functions
+ * Convert a value to a string specifically for formatting functions
+ * Ensures the output is suitable for formatting functions that expect strings
  * 
  * @param value The value to convert
  * @returns The value as a string
@@ -59,6 +60,30 @@ export const toFormattableString = (value: string | number | undefined | null): 
  */
 export const compareToNumber = (value: string | number | undefined | null, compareValue: number): boolean => {
   return toNumber(value) > compareValue;
+};
+
+/**
+ * Helper function to ensure a value is treated as a number for UI components
+ * This is particularly useful for components that strictly require number types
+ * 
+ * @param value The value to ensure is a number
+ * @returns A number value
+ */
+export const ensureNumber = (value: string | number | undefined | null): number => {
+  const num = toNumber(value);
+  return isNaN(num) ? 0 : num;
+};
+
+/**
+ * Helper function to ensure a value is treated as a string for UI components
+ * This is particularly useful for components that strictly require string types
+ * 
+ * @param value The value to ensure is a string
+ * @returns A string value
+ */
+export const ensureString = (value: string | number | undefined | null): string => {
+  if (value === undefined || value === null) return '';
+  return typeof value === 'string' ? value : value.toString();
 };
 
 /**
@@ -155,14 +180,15 @@ export const determineDataSource = <T>(
 };
 
 /**
- * Safe type conversion for DataSourceType
- * Ensures compatibility with components that expect only 'synthetic' | 'supabase'
+ * Convert any DataSourceType to compatible format for components
+ * that only support 'synthetic' or 'supabase'
  * 
  * @param sourceType The original DataSourceType value
  * @returns A compatible data source type
  */
-export const toCompatibleDataSource = (sourceType: string | undefined): 'synthetic' | 'supabase' => {
+export const toCompatibleDataSource = (sourceType?: string): 'synthetic' | 'supabase' => {
   if (!sourceType || sourceType === 'synthetic') return 'synthetic';
+  
   // Map all real sources (xp, openfinance) to supabase for compatibility
   return 'supabase';
 };
@@ -178,4 +204,16 @@ export const hasActualData = (value: any): boolean => {
   if (typeof value === 'string' && value.trim() === '') return false;
   if (typeof value === 'number' && value === 0) return false;
   return true;
+};
+
+/**
+ * Get a safe string for display purposes
+ * Ensures the output is never undefined or null
+ * 
+ * @param value The value to make safe for display
+ * @returns A safe string for display
+ */
+export const getSafeDisplayString = (value: any): string => {
+  if (value === undefined || value === null) return '';
+  return String(value);
 };
