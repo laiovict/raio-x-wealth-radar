@@ -65,7 +65,6 @@ const TopControls = ({ isAdvisor, onOpenFinanceToggle }: TopControlsProps) => {
             id="open-finance-mode"
             checked={isOpenFinanceEnabled}
             onCheckedChange={handleOpenFinanceToggle}
-            className={isOpenFinanceEnabled ? 'data-[state=checked]:bg-green-500' : ''}
           />
         </div>
         

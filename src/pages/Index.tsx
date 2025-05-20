@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import ClientSelector from "@/components/ClientSelector";
 import RaioXDashboard from "@/components/RaioXDashboard";
-import LanguageSelector from "@/components/LanguageSelector";
 import { RaioXProvider } from "@/context/RaioXContext";
 import PluggyConnectModal from "@/components/PluggyConnectModal";
 import { Download, ArrowLeft } from "lucide-react";
@@ -203,14 +202,17 @@ const Index = () => {
         
         <div className="flex-grow overflow-auto">
           <div className="container mx-auto px-4 sm:px-6 pt-4">
-            {userRole === "advisor" && <ClientSelector onClientSelect={handleClientSelect} />}
-
-            {selectedClient && (
-              <TopControls 
-                isAdvisor={userRole === "advisor"} 
-                onOpenFinanceToggle={handleOpenFinanceToggle} 
-              />
-            )}
+            <div className="mb-6">
+              {userRole === "advisor" && <ClientSelector onClientSelect={handleClientSelect} />}
+              
+              {/* Position TopControls prominently after the welcome banner */}
+              {selectedClient && (
+                <TopControls 
+                  isAdvisor={userRole === "advisor"} 
+                  onOpenFinanceToggle={handleOpenFinanceToggle} 
+                />
+              )}
+            </div>
 
             <RaioXDashboard
               showPdfPreview={showPdfPreview}
