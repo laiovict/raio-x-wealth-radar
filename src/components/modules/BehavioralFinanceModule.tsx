@@ -2,9 +2,11 @@
 import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
 import { useRaioX } from "@/context/RaioXContext";
-import { Brain, AlertTriangle, TrendingUp, TrendingDown, Lock, Calendar, LineChart } from "lucide-react";
+import { Brain, AlertTriangle, TrendingUp, TrendingDown, Lock, Calendar, LineChart, ThumbsUp, ThumbsDown } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { toast } from "@/hooks/use-toast";
 
 interface BehaviorTrait {
   name: string;
@@ -17,9 +19,9 @@ interface BehaviorTrait {
 const BehavioralFinanceModule = ({ fullWidth = false }) => {
   const { t } = useLanguage();
   const { data, hasOpenFinance, selectedClient } = useRaioX();
-  
-  // This should be determined based on real user data
-  const hasOpenFinanceSixMonths = hasOpenFinance && data?.openFinanceMonths >= 6;
+  const [likesCount, setLikesCount] = useState(0);
+  const [dislikesCount, setDislikesCount] = useState(0);
+  const [userVoted, setUserVoted] = useState<'like' | 'dislike' | null>(null);
   
   // Sample behavioral traits for the demo
   const behaviorTraits: BehaviorTrait[] = [
@@ -111,6 +113,31 @@ const BehavioralFinanceModule = ({ fullWidth = false }) => {
     ]
   };
 
+  // Generic behavioral insights for all users (even without OpenFinance)
+  const genericTraits: BehaviorTrait[] = [
+    {
+      name: "Viés de Confirmação",
+      score: 65,
+      description: "Você tende a buscar informações que confirmam suas crenças existentes sobre investimentos e ignora dados contrários. Isso pode levar a decisões enviesadas.",
+      recommendation: "Procure ativamente por pontos de vista contrários antes de tomar decisões de investimento. Considere seguir especialistas com visões diferentes da sua.",
+      icon: <Brain className="h-5 w-5 text-indigo-400" />
+    },
+    {
+      name: "Efeito Disposição",
+      score: 78,
+      description: "Você demonstra a tendência de vender ativos com lucro muito cedo e manter ativos perdedores por tempo excessivo, esperando uma recuperação.",
+      recommendation: "Estabeleça regras claras para venda de ativos antes de investir. Reavalie periodicamente seus investimentos com base em fundamentos, não no preço de compra.",
+      icon: <TrendingDown className="h-5 w-5 text-orange-400" />
+    },
+    {
+      name: "Aversão à Ambiguidade",
+      score: 59,
+      description: "Você evita investir em produtos ou mercados menos familiares, mesmo quando apresentam boas oportunidades de retorno ou diversificação.",
+      recommendation: "Dedique tempo para estudar classes de ativos menos familiares. Comece com pequenas alocações para ganhar confiança em novos mercados.",
+      icon: <AlertTriangle className="h-5 w-5 text-blue-400" />
+    }
+  ];
+
   // Determine which traits to display based on the selected client
   const getClientTraits = () => {
     // If a client is selected and we have specific traits for them
@@ -119,33 +146,115 @@ const BehavioralFinanceModule = ({ fullWidth = false }) => {
     }
     
     // Default traits if no specific client is selected or no custom traits available
-    return behaviorTraits;
+    return hasOpenFinance ? behaviorTraits : genericTraits;
   };
 
-  // Check if OpenFinance is active but client has less than 6 months of history
-  if (hasOpenFinance && !hasOpenFinanceSixMonths) {
-    return (
-      <Card className={`glass-morphism p-6 ${fullWidth ? 'w-full' : ''}`}>
-        <div className="flex flex-col items-center justify-center py-8 text-center">
-          <Calendar className="h-12 w-12 text-blue-500 mb-4" />
-          <h3 className="text-xl font-bold text-white mb-2">{t('behavioralFinanceTitle')}</h3>
-          <p className="text-gray-400 mb-4 max-w-md">
-            Em 6 meses, vamos mostrar em detalhe como funciona seu comportamento financeiro.
-            Estamos coletando mais dados para oferecer uma análise precisa.
-          </p>
-        </div>
-      </Card>
-    );
-  }
+  // Handle like/dislike votes
+  const handleVote = (type: 'like' | 'dislike') => {
+    if (userVoted === type) {
+      // User is un-voting
+      setUserVoted(null);
+      if (type === 'like') {
+        setLikesCount(prev => prev - 1);
+      } else {
+        setDislikesCount(prev => prev - 1);
+      }
+      toast({
+        title: "Voto removido",
+        description: "Sua avaliação foi removida com sucesso."
+      });
+    } else {
+      // User is changing vote or voting for first time
+      if (userVoted) {
+        // Switch vote
+        if (userVoted === 'like') {
+          setLikesCount(prev => prev - 1);
+          setDislikesCount(prev => prev + 1);
+        } else {
+          setLikesCount(prev => prev + 1);
+          setDislikesCount(prev => prev - 1);
+        }
+      } else {
+        // First vote
+        if (type === 'like') {
+          setLikesCount(prev => prev + 1);
+        } else {
+          setDislikesCount(prev => prev + 1);
+        }
+      }
+      setUserVoted(type);
+      toast({
+        title: type === 'like' ? "Você gostou desta seção" : "Você não gostou desta seção",
+        description: "Obrigado pelo seu feedback! Estamos sempre buscando melhorar."
+      });
+    }
+  };
   
-  // If OpenFinance is not activated at all, show the activation screen
+  // If OpenFinance is not activated at all, show generic behavioral traits
   if (!hasOpenFinance) {
     return (
       <Card className={`glass-morphism p-6 ${fullWidth ? 'w-full' : ''}`}>
-        <div className="flex flex-col items-center justify-center py-8 text-center">
-          <Lock className="h-12 w-12 text-gray-500 mb-4" />
-          <h3 className="text-xl font-bold text-white mb-2">{t('behavioralFinanceTitle')}</h3>
-          <p className="text-gray-400 mb-4 max-w-md">{t('behavioralFinanceLockedDesc')}</p>
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-bold text-white">{t('behavioralFinanceTitle')}</h2>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className={`${userVoted === 'like' ? 'bg-green-900/20 text-green-400' : 'text-gray-400'}`}
+                onClick={() => handleVote('like')}
+              >
+                <ThumbsUp className="h-4 w-4" />
+              </Button>
+              <span className="text-xs text-gray-400">{likesCount}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className={`${userVoted === 'dislike' ? 'bg-red-900/20 text-red-400' : 'text-gray-400'}`}
+                onClick={() => handleVote('dislike')}
+              >
+                <ThumbsDown className="h-4 w-4" />
+              </Button>
+              <span className="text-xs text-gray-400">{dislikesCount}</span>
+            </div>
+          </div>
+        </div>
+        
+        <p className="text-gray-300 mb-6">
+          Estas são as tendências comportamentais que podem impactar seus investimentos. 
+          Para uma análise mais detalhada, ative o Open Finance.
+        </p>
+        
+        <div className="space-y-6">
+          {genericTraits.map((trait, index) => (
+            <div key={index} className="bg-gray-800/40 rounded-lg p-4 border border-gray-700/50">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center">
+                  <div className="p-2 rounded-full bg-gray-700/50 mr-3">
+                    {trait.icon}
+                  </div>
+                  <h3 className="font-semibold text-white">{trait.name}</h3>
+                </div>
+                <div className="text-sm font-medium text-blue-400">{trait.score}/100</div>
+              </div>
+              
+              <Progress value={trait.score} className="h-2 mb-4" />
+              
+              <p className="text-sm text-gray-400 mb-3">{trait.description}</p>
+              
+              <div className="bg-blue-900/20 p-3 rounded border border-blue-900/30">
+                <p className="text-sm text-blue-300">
+                  <span className="font-bold">{t('recommendation')}: </span>
+                  {trait.recommendation}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        <div className="mt-6 flex justify-center">
           <Button 
             variant="outline"
             className="border-blue-500 text-blue-400 hover:bg-blue-900/30"
@@ -165,9 +274,35 @@ const BehavioralFinanceModule = ({ fullWidth = false }) => {
     <Card className={`glass-morphism p-6 ${fullWidth ? 'w-full' : ''}`}>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-white">{t('behavioralFinanceTitle')}</h2>
-        <div className="bg-green-600/20 text-green-400 text-xs px-3 py-1 rounded-full flex items-center">
-          <span className="bg-green-500 w-2 h-2 rounded-full mr-2"></span>
-          {t('openFinanceActive')} 
+        <div className="flex items-center gap-4">
+          <div className="bg-green-600/20 text-green-400 text-xs px-3 py-1 rounded-full flex items-center">
+            <span className="bg-green-500 w-2 h-2 rounded-full mr-2"></span>
+            {t('openFinanceActive')} 
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className={`${userVoted === 'like' ? 'bg-green-900/20 text-green-400' : 'text-gray-400'}`}
+                onClick={() => handleVote('like')}
+              >
+                <ThumbsUp className="h-4 w-4" />
+              </Button>
+              <span className="text-xs text-gray-400">{likesCount}</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className={`${userVoted === 'dislike' ? 'bg-red-900/20 text-red-400' : 'text-gray-400'}`}
+                onClick={() => handleVote('dislike')}
+              >
+                <ThumbsDown className="h-4 w-4" />
+              </Button>
+              <span className="text-xs text-gray-400">{dislikesCount}</span>
+            </div>
+          </div>
         </div>
       </div>
       

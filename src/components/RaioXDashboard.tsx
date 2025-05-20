@@ -26,6 +26,7 @@ import FamousInvestorsModule from "./modules/FamousInvestorsModule";
 import WelcomeBanner from "./WelcomeBanner";
 import InteligenciaModule from "./modules/InteligenciaModule";
 import { toast } from "@/hooks/use-toast";
+import FeedbackSection from "./FeedbackSection";
 
 interface RaioXDashboardProps {
   showPdfPreview?: boolean;
@@ -209,11 +210,24 @@ const RaioXDashboard = ({
           <TabsTrigger value="chat" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('chatTab')}</TabsTrigger>
         </TabsList>
 
-        {/* Tab 1: Visão Geral - Comprehensive overview of all 18 sections, reordered */}
+        {/* Tab 1: Visão Geral - Reordered to match requirements */}
         <TabsContent value="overview" className="space-y-6">
+          {/* Starting with Financial Overview */}
           <FinancialOverviewModule />
+          
+          {/* Followed by One Page Financial Plan */}
           <OnePageFinancialPlanModule />
+          
+          {/* Then Life Goals */}
           <LifeGoalsModule />
+          
+          {/* Moving MeuFuturoFinanceiro and WholeBanking to the middle */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <MeuFuturoFinanceiroModule />
+            <WholeBankingModule />
+          </div>
+          
+          <FamousInvestorsModule fullWidth />
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <AllocationModule />
@@ -238,13 +252,6 @@ const RaioXDashboard = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <BehavioralFinanceModule />
             <WrappedModule />
-          </div>
-          
-          <FamousInvestorsModule fullWidth />
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <MeuFuturoFinanceiroModule />
-            <WholeBankingModule />
           </div>
         </TabsContent>
         
@@ -274,12 +281,8 @@ const RaioXDashboard = ({
             <PersonalInsightsModule />
           </div>
           
-          {hasOpenFinance && (
-            <>
-              <OnePageFinancialPlanModule fullWidth />
-              <BehavioralFinanceModule />
-            </>
-          )}
+          <OnePageFinancialPlanModule fullWidth />
+          <BehavioralFinanceModule fullWidth />
         </TabsContent>
         
         {/* Tab 4: O que está acontecendo? - Market insights */}
@@ -291,11 +294,7 @@ const RaioXDashboard = ({
             <FamousInvestorsModule />
           </div>
           
-          {hasOpenFinance && (
-            <div className="grid grid-cols-1 gap-6">
-              <SocialComparisonModule />
-            </div>
-          )}
+          <SocialComparisonModule fullWidth />
         </TabsContent>
         
         {/* Tab 5: E meu futuro? - Future projections and planning */}
@@ -307,12 +306,8 @@ const RaioXDashboard = ({
             <InvestmentPlanningModule />
           </div>
           
-          {hasOpenFinance && (
-            <>
-              <WrappedModule fullWidth />
-              <WholeBankingModule />
-            </>
-          )}
+          <WrappedModule fullWidth />
+          <WholeBankingModule fullWidth />
         </TabsContent>
         
         {/* Tab 6: Fale com RM - Chat interface with voice button */}
@@ -320,11 +315,11 @@ const RaioXDashboard = ({
           <div className="relative mb-4">
             <Button
               variant="gradient"
-              className="absolute right-4 top-4 z-10 flex items-center gap-2"
+              className="absolute right-4 top-4 z-10 flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
               onClick={handleVoiceSearch}
             >
               <Mic className="h-5 w-5" />
-              Falar
+              Falar com RM
             </Button>
             <ChatInterface />
           </div>
