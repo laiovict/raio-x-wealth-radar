@@ -12,6 +12,7 @@ import {
   Wallet
 } from "lucide-react";
 import { useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface FinancialInsightsModuleProps {
   fullWidth?: boolean;
@@ -65,6 +66,30 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
     }).format(date);
   };
 
+  // Generate summary text for each insight if it doesn't exist
+  const generateSummary = (type: string, data: any): string => {
+    switch (type) {
+      case 'highestSpendingMonth':
+        return `Em ${data.month}, você gastou ${formatCurrency(data.amount)}, principalmente em ${data.categories[0]?.name || 'diversas categorias'}.`;
+      case 'wastedMoney':
+        return `Você poderia ter economizado aproximadamente ${formatCurrency(data.total)} em gastos desnecessários ou excessivos.`;
+      case 'topCategories':
+        return `Suas principais categorias de gastos são ${data.categories.slice(0, 2).map(c => c.name).join(', ')}, somando ${formatCurrency(data.total)}.`;
+      case 'negativeMonths': 
+        return `Você teve ${data.count} meses com saldo negativo, totalizando um déficit de ${formatCurrency(data.totalDeficit)}.`;
+      case 'investmentGrowth':
+        return `Seus investimentos cresceram ${data.annual}% este ano, com destaque para ${data.bestAsset?.name} (${data.bestAsset?.growth}%).`;
+      case 'potentialSavings':
+        return `Com pequenas mudanças em seus hábitos, você poderia economizar até ${formatCurrency(data.amount)} ao ano.`;
+      case 'bestInvestment':
+        return `Seu melhor investimento foi ${data.name}, com retorno de ${data.return}% em ${data.period}.`;
+      case 'retirementReadiness':
+        return `Com seu ritmo atual, você está a caminho de se aposentar em ${data.years} anos, precisando de ${formatCurrency(data.monthlyNeeded)} mensais.`;
+      default:
+        return "Dados adicionais disponíveis ao conectar mais fontes financeiras.";
+    }
+  };
+
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
       <CardHeader className="pb-2">
@@ -78,294 +103,304 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
         </div>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
-          {/* Highest Spending Month */}
-          {financialInsights.highestSpendingMonth && (
-            <div className="border border-amber-500/20 bg-gradient-to-br from-amber-800/10 to-amber-600/5 backdrop-blur-sm rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="bg-gradient-to-br from-amber-700 to-amber-900 p-2 rounded-full">
-                  <DollarSign className="w-5 h-5 text-amber-300" />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-amber-400 mb-1">
-                      Você viveu no limite?
-                    </h3>
-                    <span className="text-xs text-gray-400">Mai 19, 2025</span>
+        <ScrollArea className="h-[600px] pr-4">
+          <div className="space-y-6">
+            {/* Highest Spending Month */}
+            {financialInsights.highestSpendingMonth && (
+              <div className="border border-amber-500/20 bg-gradient-to-br from-amber-800/10 to-amber-600/5 backdrop-blur-sm rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-gradient-to-br from-amber-700 to-amber-900 p-2 rounded-full">
+                    <DollarSign className="w-5 h-5 text-amber-300" />
                   </div>
-                  <p className="text-sm text-gray-300 mb-3">
-                    {financialInsights.highestSpendingMonth.summary}
-                  </p>
-                  
-                  {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-amber-500 to-amber-300" 
-                      style={{ width: "40%" }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between mt-1 text-xs text-gray-400">
-                    <span>0</span>
-                    <span>40</span>
-                    <span>80</span>
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-amber-400 mb-1">
+                        Você viveu no limite?
+                      </h3>
+                      <span className="text-xs text-gray-400">Mai 19, 2025</span>
+                    </div>
+                    <p className="text-sm text-gray-300 mb-3">
+                      {financialInsights.highestSpendingMonth.summary || 
+                        generateSummary('highestSpendingMonth', financialInsights.highestSpendingMonth)}
+                    </p>
+                    
+                    {/* Progress bar */}
+                    <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-amber-500 to-amber-300" 
+                        style={{ width: "40%" }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between mt-1 text-xs text-gray-400">
+                      <span>0</span>
+                      <span>40</span>
+                      <span>80</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Wasted Money */}
-          {financialInsights.wastedMoney && (
-            <div className="border border-red-500/20 bg-gradient-to-br from-red-800/10 to-red-600/5 backdrop-blur-sm rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="bg-gradient-to-br from-red-700 to-red-900 p-2 rounded-full">
-                  <ArrowDown className="w-5 h-5 text-red-300" />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-red-400 mb-1">
-                      Dinheiro que escorreu pelo ralo
-                    </h3>
-                    <span className="text-xs text-gray-400">Mai 19, 2025</span>
+            {/* Wasted Money */}
+            {financialInsights.wastedMoney && (
+              <div className="border border-red-500/20 bg-gradient-to-br from-red-800/10 to-red-600/5 backdrop-blur-sm rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-gradient-to-br from-red-700 to-red-900 p-2 rounded-full">
+                    <ArrowDown className="w-5 h-5 text-red-300" />
                   </div>
-                  <p className="text-sm text-gray-300 mb-3">
-                    {financialInsights.wastedMoney.summary}
-                  </p>
-                  
-                  {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-red-500 to-red-300" 
-                      style={{ width: "40%" }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between mt-1 text-xs text-gray-400">
-                    <span>0</span>
-                    <span>40</span>
-                    <span>80</span>
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-red-400 mb-1">
+                        Dinheiro que escorreu pelo ralo
+                      </h3>
+                      <span className="text-xs text-gray-400">Mai 19, 2025</span>
+                    </div>
+                    <p className="text-sm text-gray-300 mb-3">
+                      {financialInsights.wastedMoney.summary || 
+                        generateSummary('wastedMoney', financialInsights.wastedMoney)}
+                    </p>
+                    
+                    {/* Progress bar */}
+                    <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-red-500 to-red-300" 
+                        style={{ width: "40%" }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between mt-1 text-xs text-gray-400">
+                      <span>0</span>
+                      <span>40</span>
+                      <span>80</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Top Categories */}
-          {financialInsights.topCategories && (
-            <div className="border border-blue-500/20 bg-gradient-to-br from-blue-800/10 to-blue-600/5 backdrop-blur-sm rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="bg-gradient-to-br from-blue-700 to-blue-900 p-2 rounded-full">
-                  <Wallet className="w-5 h-5 text-blue-300" />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-blue-400 mb-1">
-                      O que você mais comprou?
-                    </h3>
-                    <span className="text-xs text-gray-400">Mai 19, 2025</span>
+            {/* Top Categories */}
+            {financialInsights.topCategories && (
+              <div className="border border-blue-500/20 bg-gradient-to-br from-blue-800/10 to-blue-600/5 backdrop-blur-sm rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-gradient-to-br from-blue-700 to-blue-900 p-2 rounded-full">
+                    <Wallet className="w-5 h-5 text-blue-300" />
                   </div>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {financialInsights.topCategories.categories.map((category, index) => (
-                      <Badge key={index} className="bg-blue-900/50 text-blue-200 hover:bg-blue-800/50 border border-blue-500/30">
-                        {category}
-                      </Badge>
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-300 mb-3">
-                    {financialInsights.topCategories.summary}
-                  </p>
-                  
-                  {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-blue-500 to-blue-300" 
-                      style={{ width: "40%" }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between mt-1 text-xs text-gray-400">
-                    <span>0</span>
-                    <span>40</span>
-                    <span>80</span>
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-blue-400 mb-1">
+                        O que você mais comprou?
+                      </h3>
+                      <span className="text-xs text-gray-400">Mai 19, 2025</span>
+                    </div>
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {financialInsights.topCategories.categories.map((category, index) => (
+                        <Badge key={index} className="bg-blue-900/50 text-blue-200 hover:bg-blue-800/50 border border-blue-500/30">
+                          {category.name}
+                        </Badge>
+                      ))}
+                    </div>
+                    <p className="text-sm text-gray-300 mb-3">
+                      {financialInsights.topCategories.summary || 
+                        generateSummary('topCategories', financialInsights.topCategories)}
+                    </p>
+                    
+                    {/* Progress bar */}
+                    <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-blue-500 to-blue-300" 
+                        style={{ width: "40%" }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between mt-1 text-xs text-gray-400">
+                      <span>0</span>
+                      <span>40</span>
+                      <span>80</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Negative Months */}
-          {financialInsights.negativeMonths && (
-            <div className="border border-orange-500/20 bg-gradient-to-br from-orange-800/10 to-orange-600/5 backdrop-blur-sm rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="bg-gradient-to-br from-orange-700 to-orange-900 p-2 rounded-full">
-                  <Calendar className="w-5 h-5 text-orange-300" />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-orange-400 mb-1">
-                      E quando o dinheiro só... sumiu?
-                    </h3>
-                    <span className="text-xs text-gray-400">Mai 19, 2025</span>
+            {/* Negative Months */}
+            {financialInsights.negativeMonths && (
+              <div className="border border-orange-500/20 bg-gradient-to-br from-orange-800/10 to-orange-600/5 backdrop-blur-sm rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-gradient-to-br from-orange-700 to-orange-900 p-2 rounded-full">
+                    <Calendar className="w-5 h-5 text-orange-300" />
                   </div>
-                  <p className="text-sm text-gray-300 mb-3">
-                    {financialInsights.negativeMonths.summary}
-                  </p>
-                  
-                  {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-orange-500 to-orange-300" 
-                      style={{ width: "40%" }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between mt-1 text-xs text-gray-400">
-                    <span>0</span>
-                    <span>40</span>
-                    <span>80</span>
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-orange-400 mb-1">
+                        E quando o dinheiro só... sumiu?
+                      </h3>
+                      <span className="text-xs text-gray-400">Mai 19, 2025</span>
+                    </div>
+                    <p className="text-sm text-gray-300 mb-3">
+                      {financialInsights.negativeMonths.summary || 
+                        generateSummary('negativeMonths', financialInsights.negativeMonths)}
+                    </p>
+                    
+                    {/* Progress bar */}
+                    <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-orange-500 to-orange-300" 
+                        style={{ width: "40%" }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between mt-1 text-xs text-gray-400">
+                      <span>0</span>
+                      <span>40</span>
+                      <span>80</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Investment Growth */}
-          {financialInsights.investmentGrowth && (
-            <div className="border border-green-500/20 bg-gradient-to-br from-green-800/10 to-green-600/5 backdrop-blur-sm rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="bg-gradient-to-br from-green-700 to-green-900 p-2 rounded-full">
-                  <ArrowUp className="w-5 h-5 text-green-300" />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-green-400 mb-1">
-                      Mas teve coisa boa também
-                    </h3>
-                    <span className="text-xs text-gray-400">Mai 17, 2025</span>
+            {/* Investment Growth */}
+            {financialInsights.investmentGrowth && (
+              <div className="border border-green-500/20 bg-gradient-to-br from-green-800/10 to-green-600/5 backdrop-blur-sm rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-gradient-to-br from-green-700 to-green-900 p-2 rounded-full">
+                    <ArrowUp className="w-5 h-5 text-green-300" />
                   </div>
-                  <p className="text-sm text-gray-300 mb-3">
-                    {financialInsights.investmentGrowth.summary}
-                  </p>
-                  
-                  {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-green-500 to-green-300" 
-                      style={{ width: "40%" }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between mt-1 text-xs text-gray-400">
-                    <span>0</span>
-                    <span>40</span>
-                    <span>80</span>
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-green-400 mb-1">
+                        Mas teve coisa boa também
+                      </h3>
+                      <span className="text-xs text-gray-400">Mai 17, 2025</span>
+                    </div>
+                    <p className="text-sm text-gray-300 mb-3">
+                      {financialInsights.investmentGrowth.summary || 
+                        generateSummary('investmentGrowth', financialInsights.investmentGrowth)}
+                    </p>
+                    
+                    {/* Progress bar */}
+                    <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-green-500 to-green-300" 
+                        style={{ width: "40%" }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between mt-1 text-xs text-gray-400">
+                      <span>0</span>
+                      <span>40</span>
+                      <span>80</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Potential Savings */}
-          {financialInsights.potentialSavings && (
-            <div className="border border-indigo-500/20 bg-gradient-to-br from-indigo-800/10 to-indigo-600/5 backdrop-blur-sm rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="bg-gradient-to-br from-indigo-700 to-indigo-900 p-2 rounded-full">
-                  <PiggyBank className="w-5 h-5 text-indigo-300" />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-indigo-400 mb-1">
-                      E se você focasse de verdade?
-                    </h3>
-                    <span className="text-xs text-gray-400">Mai 17, 2025</span>
+            {/* Potential Savings */}
+            {financialInsights.potentialSavings && (
+              <div className="border border-indigo-500/20 bg-gradient-to-br from-indigo-800/10 to-indigo-600/5 backdrop-blur-sm rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-gradient-to-br from-indigo-700 to-indigo-900 p-2 rounded-full">
+                    <PiggyBank className="w-5 h-5 text-indigo-300" />
                   </div>
-                  <p className="text-sm text-gray-300 mb-3">
-                    {financialInsights.potentialSavings.summary}
-                  </p>
-                  
-                  {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-indigo-500 to-indigo-300" 
-                      style={{ width: "40%" }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between mt-1 text-xs text-gray-400">
-                    <span>0</span>
-                    <span>40</span>
-                    <span>80</span>
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-indigo-400 mb-1">
+                        E se você focasse de verdade?
+                      </h3>
+                      <span className="text-xs text-gray-400">Mai 17, 2025</span>
+                    </div>
+                    <p className="text-sm text-gray-300 mb-3">
+                      {financialInsights.potentialSavings.summary || 
+                        generateSummary('potentialSavings', financialInsights.potentialSavings)}
+                    </p>
+                    
+                    {/* Progress bar */}
+                    <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-indigo-500 to-indigo-300" 
+                        style={{ width: "40%" }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between mt-1 text-xs text-gray-400">
+                      <span>0</span>
+                      <span>40</span>
+                      <span>80</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Best Investment */}
-          {financialInsights.bestInvestment && (
-            <div className="border border-purple-500/20 bg-gradient-to-br from-purple-800/10 to-purple-600/5 backdrop-blur-sm rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="bg-gradient-to-br from-purple-700 to-purple-900 p-2 rounded-full">
-                  <Coins className="w-5 h-5 text-purple-300" />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-purple-400 mb-1">
-                      A hora que você brilhou
-                    </h3>
-                    <span className="text-xs text-gray-400">Mai 17, 2025</span>
+            {/* Best Investment */}
+            {financialInsights.bestInvestment && (
+              <div className="border border-purple-500/20 bg-gradient-to-br from-purple-800/10 to-purple-600/5 backdrop-blur-sm rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-gradient-to-br from-purple-700 to-purple-900 p-2 rounded-full">
+                    <Coins className="w-5 h-5 text-purple-300" />
                   </div>
-                  <p className="text-sm text-gray-300 mb-3">
-                    {financialInsights.bestInvestment.summary}
-                  </p>
-                  
-                  {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-purple-500 to-purple-300" 
-                      style={{ width: "40%" }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between mt-1 text-xs text-gray-400">
-                    <span>0</span>
-                    <span>40</span>
-                    <span>80</span>
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-purple-400 mb-1">
+                        A hora que você brilhou
+                      </h3>
+                      <span className="text-xs text-gray-400">Mai 17, 2025</span>
+                    </div>
+                    <p className="text-sm text-gray-300 mb-3">
+                      {financialInsights.bestInvestment.summary || 
+                        generateSummary('bestInvestment', financialInsights.bestInvestment)}
+                    </p>
+                    
+                    {/* Progress bar */}
+                    <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-purple-500 to-purple-300" 
+                        style={{ width: "40%" }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between mt-1 text-xs text-gray-400">
+                      <span>0</span>
+                      <span>40</span>
+                      <span>80</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Retirement Specific Insights */}
-          {financialInsights.retirementReadiness && (
-            <div className="border border-teal-500/20 bg-gradient-to-br from-teal-800/10 to-teal-600/5 backdrop-blur-sm rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <div className="bg-gradient-to-br from-teal-700 to-teal-900 p-2 rounded-full">
-                  <PiggyBank className="w-5 h-5 text-teal-300" />
-                </div>
-                <div>
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-medium text-teal-400 mb-1">
-                      Preparação para Aposentadoria
-                    </h3>
-                    <span className="text-xs text-gray-400">Mai 17, 2025</span>
+            {/* Retirement Specific Insights */}
+            {financialInsights.retirementReadiness && (
+              <div className="border border-teal-500/20 bg-gradient-to-br from-teal-800/10 to-teal-600/5 backdrop-blur-sm rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <div className="bg-gradient-to-br from-teal-700 to-teal-900 p-2 rounded-full">
+                    <PiggyBank className="w-5 h-5 text-teal-300" />
                   </div>
-                  <p className="text-sm text-gray-300 mb-3">
-                    {financialInsights.retirementReadiness.summary}
-                  </p>
-                  
-                  {/* Progress bar */}
-                  <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-teal-500 to-teal-300" 
-                      style={{ width: "40%" }}
-                    ></div>
-                  </div>
-                  <div className="flex justify-between mt-1 text-xs text-gray-400">
-                    <span>0</span>
-                    <span>40</span>
-                    <span>80</span>
+                  <div>
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium text-teal-400 mb-1">
+                        Preparação para Aposentadoria
+                      </h3>
+                      <span className="text-xs text-gray-400">Mai 17, 2025</span>
+                    </div>
+                    <p className="text-sm text-gray-300 mb-3">
+                      {financialInsights.retirementReadiness.summary || 
+                        generateSummary('retirementReadiness', financialInsights.retirementReadiness)}
+                    </p>
+                    
+                    {/* Progress bar */}
+                    <div className="w-full h-2 bg-gray-700/50 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-teal-500 to-teal-300" 
+                        style={{ width: "40%" }}
+                      ></div>
+                    </div>
+                    <div className="flex justify-between mt-1 text-xs text-gray-400">
+                      <span>0</span>
+                      <span>40</span>
+                      <span>80</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        </ScrollArea>
       </CardContent>
     </Card>
   );
