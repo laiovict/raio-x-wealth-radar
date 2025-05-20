@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,17 @@ const Index = () => {
     setTimeout(() => {
       setLoading(false);
     }, 3000);
+    
+    // Listen for custom event for OpenFinance activation
+    const handleOpenFinanceEvent = () => {
+      setShowPluggyModal(true);
+    };
+    
+    document.addEventListener('activate-openfinance', handleOpenFinanceEvent);
+    
+    return () => {
+      document.removeEventListener('activate-openfinance', handleOpenFinanceEvent);
+    };
   }, [navigate]);
 
   const handleClientSelect = (clientId: string) => {

@@ -260,19 +260,115 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
         {/* Insights List */}
         <div className="space-y-4">
           {!hasOpenFinance ? (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <AlertTriangle className="w-16 h-16 text-amber-400 mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Insights IA Disponíveis</h3>
-              <p className="text-gray-400 max-w-md mb-4">
-                Estamos mostrando insights básicos baseados em seus dados da XP. Para insights mais detalhados e personalizados, ative o OpenFinance.
-              </p>
-              <Button 
-                variant="outline" 
-                className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800"
-                onClick={handleActivateOpenFinance}
-              >
-                Ativar OpenFinance
-              </Button>
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-lg">Insights IA Básicos</h3>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="bg-white/5 hover:bg-white/10 border-blue-500/50"
+                  onClick={handleActivateOpenFinance}
+                >
+                  Ativar OpenFinance para mais insights
+                </Button>
+              </div>
+              
+              {/* Basic insights without OpenFinance */}
+              <div className="space-y-3">
+                <div className="border border-white/10 rounded-lg p-4 bg-white/5">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className="bg-blue-600">Novo</Badge>
+                        <Badge className={getCategoryColor('education')}>
+                          {getCategoryLabel('education')}
+                        </Badge>
+                      </div>
+                      <h3 className="text-white font-medium">Conheça as características de cada tipo de investimento</h3>
+                    </div>
+                    <span className="text-xs text-gray-400">Hoje</span>
+                  </div>
+                  <p className="mt-2 text-sm text-gray-300">
+                    Entender as características de cada tipo de investimento é essencial para tomar decisões informadas. 
+                    Explore a diferença entre renda fixa e variável.
+                  </p>
+                  <div className="mt-3 flex justify-end">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                      onClick={() => handleViewDetails('basic-1')}
+                    >
+                      Ver detalhes <ChevronRight className="ml-1 h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="border border-white/10 rounded-lg p-4 bg-white/5">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className={getCategoryColor('opportunity')}>
+                          {getCategoryLabel('opportunity')}
+                        </Badge>
+                        <Badge className={getPriorityColor('medium')}>
+                          Prioridade: {getPriorityLabel('medium')}
+                        </Badge>
+                      </div>
+                      <h3 className="text-white font-medium">Diversificação é chave para redução de risco</h3>
+                    </div>
+                    <span className="text-xs text-gray-400">2 dias atrás</span>
+                  </div>
+                  <p className="mt-2 text-sm text-gray-300">
+                    Sua carteira mostra concentração em poucos ativos. Considere diversificar 
+                    entre diferentes classes para reduzir o risco geral da sua carteira.
+                  </p>
+                  <div className="mt-3 flex justify-end">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                      onClick={() => handleViewDetails('basic-2')}
+                    >
+                      Ver detalhes <ChevronRight className="ml-1 h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                
+                <div className="border border-white/10 rounded-lg p-4 bg-white/5">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge className={getCategoryColor('goal')}>
+                          {getCategoryLabel('goal')}
+                        </Badge>
+                        <Badge className={getAgentColor('planner')}>
+                          <div className="flex items-center gap-1">
+                            {getAgentIcon('planner')}
+                            <span>{getAgentLabel('planner')}</span>
+                          </div>
+                        </Badge>
+                      </div>
+                      <h3 className="text-white font-medium">Defina objetivos financeiros claros</h3>
+                    </div>
+                    <span className="text-xs text-gray-400">5 dias atrás</span>
+                  </div>
+                  <p className="mt-2 text-sm text-gray-300">
+                    Estabelecer metas financeiras específicas ajuda a direcionar suas estratégias de investimento. 
+                    Defina prioridades como aposentadoria, educação ou compra de imóveis.
+                  </p>
+                  <div className="mt-3 flex justify-end">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                      onClick={() => handleViewDetails('basic-3')}
+                    >
+                      Ver detalhes <ChevronRight className="ml-1 h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           ) : isAIAnalysisLoading ? (
             <div className="flex flex-col items-center justify-center py-8">
