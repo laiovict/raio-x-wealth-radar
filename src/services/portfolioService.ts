@@ -22,7 +22,7 @@ export const getClientPortfolioSummary = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to indicate this is from Supabase
-    return data ? { ...data, dataSource: 'supabase' } : null;
+    return data ? { ...data, dataSource: 'supabase' as const } : null;
   } catch (error) {
     console.error("Error in portfolio summary fetch:", error);
     return null;
@@ -49,7 +49,7 @@ export const getClientFixedIncome = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to each item
-    return data ? data.map(item => ({ ...item, dataSource: 'supabase' })) : [];
+    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as const })) : [];
   } catch (error) {
     console.error("Error in fixed income fetch:", error);
     return [];
@@ -76,7 +76,7 @@ export const getClientInvestmentFunds = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to each item
-    return data ? data.map(item => ({ ...item, dataSource: 'supabase' })) : [];
+    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as const })) : [];
   } catch (error) {
     console.error("Error in investment funds fetch:", error);
     return [];
@@ -103,7 +103,7 @@ export const getClientRealEstate = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to each item
-    return data ? data.map(item => ({ ...item, dataSource: 'supabase' })) : [];
+    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as const })) : [];
   } catch (error) {
     console.error("Error in real estate fetch:", error);
     return [];
@@ -130,7 +130,7 @@ export const getClientStocks = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to each item
-    return data ? data.map(item => ({ ...item, dataSource: 'supabase' })) : [];
+    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as const })) : [];
   } catch (error) {
     console.error("Error in stocks fetch:", error);
     return [];
@@ -158,10 +158,9 @@ export const getClientProfitability = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to indicate this is from Supabase
-    return data ? { ...data, dataSource: 'supabase' } : null;
+    return data ? { ...data, dataSource: 'supabase' as const } : null;
   } catch (error) {
     console.error("Error in profitability fetch:", error);
     return null;
   }
 };
-

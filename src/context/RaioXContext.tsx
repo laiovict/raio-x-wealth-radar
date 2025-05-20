@@ -123,46 +123,46 @@ export interface WrappedData {
 }
 
 export interface FinancialInsightData {
-  highestSpendingMonth: {
+  highestSpendingMonth?: {
     month: string;
     amount: number;
     categories: Array<{name: string, amount: number}>;
     dataSource?: 'supabase' | 'synthetic';
   };
-  wastedMoney: {
+  wastedMoney?: {
     total: number;
     categories: Array<{name: string, amount: number}>;
     dataSource?: 'supabase' | 'synthetic';
   };
-  topCategories: {
+  topCategories?: {
     categories: Array<{name: string, amount: number, percentage: number}>;
     total: number;
     dataSource?: 'supabase' | 'synthetic';
   };
-  negativeMonths: {
+  negativeMonths?: {
     count: number;
     months: string[];
     totalDeficit: number;
     dataSource?: 'supabase' | 'synthetic';
   };
-  investmentGrowth: {
+  investmentGrowth?: {
     annual: number;
     total: number;
     bestAsset: { name: string, growth: number };
     dataSource?: 'supabase' | 'synthetic';
   };
-  potentialSavings: {
+  potentialSavings?: {
     amount: number;
     suggestions: string[];
     dataSource?: 'supabase' | 'synthetic';
   };
-  bestInvestment: {
+  bestInvestment?: {
     name: string;
     return: number;
     period: string;
     dataSource?: 'supabase' | 'synthetic';
   };
-  retirementReadiness: {
+  retirementReadiness?: {
     score: number;
     years: number;
     monthlyNeeded: number;
@@ -254,7 +254,6 @@ export interface RaioXData {
   wrapped: WrappedData;
   financialInsightData?: FinancialInsightData;
   summary?: string;
-  // Add portfolioSummary to RaioXData interface
   portfolioSummary?: PortfolioSummary;
   fixedIncome?: any[];
   investmentFunds?: any[];
@@ -618,14 +617,14 @@ export const RaioXProvider = ({
         const profitability = await getClientProfitability(selectedClient);
         
         // Update portfolio data with real values from Supabase
-        if (summary || fixedIncome.length || investmentFunds.length || realEstate.length || stocks.length) {
+        if (summary || fixedIncome.length || investmentFunds.length || realEstate.length || stocks.length || profitability) {
           setPortfolioData(prevData => ({
             ...prevData,
             portfolioSummary: summary,
-            fixedIncome,
-            investmentFunds,
-            realEstate,
-            stocks,
+            fixedIncome: fixedIncome || [],
+            investmentFunds: investmentFunds || [],
+            realEstate: realEstate || [],
+            stocks: stocks || [],
             profitability
           }));
         }

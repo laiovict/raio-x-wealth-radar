@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -87,7 +86,7 @@ interface FinancialInsightData {
 }
 
 // Data source tag component
-const DataSourceTag = ({ dataSource }: { dataSource: 'supabase' | 'synthetic' | undefined }) => {
+const DataSourceTag = ({ dataSource }: { dataSource?: 'supabase' | 'synthetic' }) => {
   if (!dataSource) return null;
   
   return (
@@ -113,40 +112,48 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
   
   // Get financial insights data or create a synthetic version if it doesn't exist
   const financialInsights: FinancialInsightData = data.financialInsightData 
-    ? { ...data.financialInsightData, dataSource: 'synthetic' } 
+    ? { ...data.financialInsightData } 
     : { dataSource: 'synthetic' };
-  
-  // Add dataSource tag to each insight if not already present
-  if (financialInsights.highestSpendingMonth && !financialInsights.highestSpendingMonth.dataSource) {
-    financialInsights.highestSpendingMonth.dataSource = 'synthetic';
-  }
-  
-  if (financialInsights.wastedMoney && !financialInsights.wastedMoney.dataSource) {
-    financialInsights.wastedMoney.dataSource = 'synthetic';
-  }
-  
-  if (financialInsights.topCategories && !financialInsights.topCategories.dataSource) {
-    financialInsights.topCategories.dataSource = 'synthetic';
-  }
-  
-  if (financialInsights.negativeMonths && !financialInsights.negativeMonths.dataSource) {
-    financialInsights.negativeMonths.dataSource = 'synthetic';
-  }
-  
-  if (financialInsights.investmentGrowth && !financialInsights.investmentGrowth.dataSource) {
-    financialInsights.investmentGrowth.dataSource = 'synthetic';
-  }
-  
-  if (financialInsights.potentialSavings && !financialInsights.potentialSavings.dataSource) {
-    financialInsights.potentialSavings.dataSource = 'synthetic';
-  }
-  
-  if (financialInsights.bestInvestment && !financialInsights.bestInvestment.dataSource) {
-    financialInsights.bestInvestment.dataSource = 'synthetic';
-  }
-  
-  if (financialInsights.retirementReadiness && !financialInsights.retirementReadiness.dataSource) {
-    financialInsights.retirementReadiness.dataSource = 'synthetic';
+
+  // Ensure we have defined structures for all properties
+  if (financialInsights) {
+    // Set default dataSource if not present
+    if (!financialInsights.dataSource) {
+      financialInsights.dataSource = 'synthetic';
+    }
+    
+    // Ensure all nested objects have dataSource
+    if (financialInsights.highestSpendingMonth && !financialInsights.highestSpendingMonth.dataSource) {
+      financialInsights.highestSpendingMonth.dataSource = 'synthetic';
+    }
+    
+    if (financialInsights.wastedMoney && !financialInsights.wastedMoney.dataSource) {
+      financialInsights.wastedMoney.dataSource = 'synthetic';
+    }
+    
+    if (financialInsights.topCategories && !financialInsights.topCategories.dataSource) {
+      financialInsights.topCategories.dataSource = 'synthetic';
+    }
+    
+    if (financialInsights.negativeMonths && !financialInsights.negativeMonths.dataSource) {
+      financialInsights.negativeMonths.dataSource = 'synthetic';
+    }
+    
+    if (financialInsights.investmentGrowth && !financialInsights.investmentGrowth.dataSource) {
+      financialInsights.investmentGrowth.dataSource = 'synthetic';
+    }
+    
+    if (financialInsights.potentialSavings && !financialInsights.potentialSavings.dataSource) {
+      financialInsights.potentialSavings.dataSource = 'synthetic';
+    }
+    
+    if (financialInsights.bestInvestment && !financialInsights.bestInvestment.dataSource) {
+      financialInsights.bestInvestment.dataSource = 'synthetic';
+    }
+    
+    if (financialInsights.retirementReadiness && !financialInsights.retirementReadiness.dataSource) {
+      financialInsights.retirementReadiness.dataSource = 'synthetic';
+    }
   }
   
   // Informações dos indicadores de fonte de dados
@@ -200,15 +207,15 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
   const generateSummary = (type: string, data: any): string => {
     switch (type) {
       case 'highestSpendingMonth':
-        return `Em ${data.month}, você gastou ${formatCurrency(data.amount)}, principalmente em ${data.categories[0]?.name || 'diversas categorias'}.`;
+        return `Em ${data.month}, você gastou ${formatCurrency(data.amount)}, principalmente em ${data.categories && data.categories[0]?.name || 'diversas categorias'}.`;
       case 'wastedMoney':
         return `Você poderia ter economizado aproximadamente ${formatCurrency(data.total)} em gastos desnecessários ou excessivos.`;
       case 'topCategories':
-        return `Suas principais categorias de gastos são ${data.categories.slice(0, 2).map(c => c.name).join(', ')}, somando ${formatCurrency(data.total)}.`;
+        return `Suas principais categorias de gastos são ${data.categories && data.categories.slice(0, 2).map(c => c.name).join(', ')} ou 'diversas categorias', somando ${formatCurrency(data.total)}.`;
       case 'negativeMonths': 
         return `Você teve ${data.count} meses com saldo negativo, totalizando um déficit de ${formatCurrency(data.totalDeficit)}.`;
       case 'investmentGrowth':
-        return `Seus investimentos cresceram ${data.annual}% este ano, com destaque para ${data.bestAsset?.name} (${data.bestAsset?.growth}%).`;
+        return `Seus investimentos cresceram ${data.annual}% este ano, com destaque para ${data.bestAsset?.name || 'seus melhores ativos'} (${data.bestAsset?.growth || 0}%).`;
       case 'potentialSavings':
         return `Com pequenas mudanças em seus hábitos, você poderia economizar até ${formatCurrency(data.amount)} ao ano.`;
       case 'bestInvestment':
@@ -348,7 +355,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                       <span className="text-xs text-gray-400">Mai 19, 2025</span>
                     </div>
                     <div className="flex flex-wrap gap-2 mb-2">
-                      {financialInsights.topCategories.categories.map((category, index) => (
+                      {financialInsights.topCategories.categories && financialInsights.topCategories.categories.map((category, index) => (
                         <Badge key={index} className="bg-blue-900/50 text-blue-200 hover:bg-blue-800/50 border border-blue-500/30">
                           {category.name}
                         </Badge>
