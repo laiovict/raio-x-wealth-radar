@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -153,17 +152,17 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
               />
               <div className="flex justify-between items-center text-xs text-gray-400">
                 <span>
-                  {`Atual: ${formatCurrency(String(goal.currentAmount))}`}
+                  {`Atual: ${formatCurrency(goal.currentAmount)}`}
                 </span>
                 <span>
-                  {`Meta: ${formatCurrency(String(goal.targetAmount))}`}
+                  {`Meta: ${formatCurrency(goal.targetAmount)}`}
                 </span>
               </div>
               {goal.adjustmentNeeded > 0 && (
                 <div className="mt-2 text-xs text-amber-400 flex items-center">
                   <ArrowUp className="h-3.5 w-3.5 mr-1" />
                   <span>
-                    {`Sugestão: Aumentar aportes em ${formatCurrency(String((goal.targetAmount * goal.adjustmentNeeded / 100) / 12))} mensais`}
+                    {`Sugestão: Aumentar aportes em ${formatCurrency((goal.targetAmount * goal.adjustmentNeeded / 100) / 12)} mensais`}
                   </span>
                 </div>
               )}

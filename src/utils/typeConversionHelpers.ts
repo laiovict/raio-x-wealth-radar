@@ -108,8 +108,7 @@ export const ensureNumber = (value: string | number | undefined | null): number 
  */
 export const ensureString = (value: string | number | undefined | null): string => {
   if (value === undefined || value === null) return 'N/A';
-  if (typeof value === 'number') return value.toString();
-  return value || 'N/A';
+  return String(value);
 };
 
 /**
