@@ -7,17 +7,80 @@ import { ArrowUp, AlertTriangle, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StreamingText from "@/components/StreamingText";
 import { useStreamingContent } from "@/hooks/use-streaming-content";
+import { useEffect, useState } from "react";
 
 interface LifeGoalsModuleProps {
   fullWidth?: boolean;
 }
 
+// Goal interface to ensure type safety
+interface Goal {
+  name: string;
+  timeframe: string;
+  progress: number;
+  currentAmount: number;
+  targetAmount: number;
+  adjustmentNeeded: number;
+  category: string;
+}
+
+interface LifeGoals {
+  goals: Goal[];
+  summary: string;
+}
+
 const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
   const { data, hasOpenFinance } = useRaioX();
-  const { isStreaming, isComplete } = useStreamingContent(false, 1500);
+  const [moduleLoaded, setModuleLoaded] = useState(false);
   
-  // Ensure lifeGoals exists with default values if not
-  const lifeGoals = data?.lifeGoals || { goals: [], summary: "" };
+  // Default goals in case data is missing
+  const defaultGoals: LifeGoals = {
+    goals: [
+      {
+        name: "Aposentadoria",
+        timeframe: "Longo Prazo",
+        progress: 45,
+        currentAmount: 360000,
+        targetAmount: 800000,
+        adjustmentNeeded: 10,
+        category: "investment"
+      },
+      {
+        name: "Reserva de Emergência",
+        timeframe: "Curto Prazo",
+        progress: 80,
+        currentAmount: 40000,
+        targetAmount: 50000,
+        adjustmentNeeded: 0,
+        category: "saving"
+      },
+      {
+        name: "Compra de Imóvel",
+        timeframe: "Médio Prazo",
+        progress: 25,
+        currentAmount: 75000,
+        targetAmount: 300000,
+        adjustmentNeeded: 15,
+        category: "property"
+      }
+    ],
+    summary: "Seus objetivos financeiros estão em bom progresso. A reserva de emergência está quase completa, mas os objetivos de longo prazo precisam de aportes consistentes."
+  };
+  
+  // Use data from context or fallback to default values
+  const lifeGoals: LifeGoals = data?.lifeGoals || defaultGoals;
+  
+  // Trigger streaming effect with a slight delay after component mount
+  const { isStreaming, isComplete } = useStreamingContent(false, 500, true, 5000);
+  
+  useEffect(() => {
+    // Small delay to ensure component is properly loaded
+    const timer = setTimeout(() => {
+      setModuleLoaded(true);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
   // Format currency
   const formatCurrency = (value: number) => {
@@ -54,56 +117,56 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
                     <div>
                       <div className="flex items-center">
                         <span className="text-md font-medium text-white">
-                          {isStreaming ? (
+                          {moduleLoaded && (
                             <StreamingText 
                               text={goal.name}
                               speed={30}
                               delay={300 + index * 200}
                             />
-                          ) : '...'}
+                          )}
                         </span>
                         <Badge className="ml-2 bg-blue-600/60">
-                          {isStreaming ? (
+                          {moduleLoaded && (
                             <StreamingText 
                               text={goal.timeframe}
                               speed={40}
                               delay={500 + index * 200}
                             />
-                          ) : '...'}
+                          )}
                         </Badge>
                       </div>
                     </div>
                     <div className="text-right">
                       <span className="text-sm font-medium">
                         <span className="text-white">
-                          {isStreaming ? (
+                          {moduleLoaded && (
                             <StreamingText 
                               text={`${goal.progress}%`}
                               speed={40}
                               delay={700 + index * 200}
                             />
-                          ) : '...'}
+                          )}
                         </span>
                         {goal.adjustmentNeeded > 0 && (
                           <Badge className="ml-2 bg-amber-600/60">
-                            {isStreaming ? (
+                            {moduleLoaded && (
                               <StreamingText 
                                 text={`+${goal.adjustmentNeeded}% necessário`}
                                 speed={30}
                                 delay={900 + index * 200}
                               />
-                            ) : '...'}
+                            )}
                           </Badge>
                         )}
                         {goal.adjustmentNeeded <= 0 && (
                           <Badge className="ml-2 bg-green-600/60">
-                            {isStreaming ? (
+                            {moduleLoaded && (
                               <StreamingText 
                                 text="No Caminho"
                                 speed={30}
                                 delay={900 + index * 200}
                               />
-                            ) : '...'}
+                            )}
                           </Badge>
                         )}
                       </span>
@@ -115,35 +178,35 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
                   />
                   <div className="flex justify-between items-center text-xs text-gray-400">
                     <span>
-                      {isStreaming ? (
+                      {moduleLoaded && (
                         <StreamingText 
                           text={`Atual: ${formatCurrency(goal.currentAmount)}`}
                           speed={30}
                           delay={1100 + index * 200}
                         />
-                      ) : '...'}
+                      )}
                     </span>
                     <span>
-                      {isStreaming ? (
+                      {moduleLoaded && (
                         <StreamingText 
                           text={`Meta: ${formatCurrency(goal.targetAmount)}`}
                           speed={30}
                           delay={1300 + index * 200}
                         />
-                      ) : '...'}
+                      )}
                     </span>
                   </div>
                   {goal.adjustmentNeeded > 0 && (
                     <div className="mt-2 text-xs text-amber-400 flex items-center">
                       <ArrowUp className="h-3.5 w-3.5 mr-1" />
                       <span>
-                        {isStreaming ? (
+                        {moduleLoaded && (
                           <StreamingText 
                             text={`Sugestão: Aumentar aportes em ${formatCurrency(goal.targetAmount * goal.adjustmentNeeded / 100 / 12)} mensais`}
                             speed={15}
                             delay={1500 + index * 200}
                           />
-                        ) : '...'}
+                        )}
                       </span>
                     </div>
                   )}
@@ -157,13 +220,13 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
               <div>
                 <h3 className="text-sm font-medium text-white mb-2">Metas adicionais disponíveis</h3>
                 <p className="text-xs text-gray-300 mb-2">
-                  {isStreaming ? (
+                  {moduleLoaded && (
                     <StreamingText 
                       text="Ative o OpenFinance para acessar todas as suas metas de vida e receber recomendações personalizadas para alcançá-las."
                       speed={15}
                       delay={1800}
                     />
-                  ) : '...'}
+                  )}
                 </p>
                 <Button 
                   variant="outline" 
@@ -196,56 +259,56 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
                 <div>
                   <div className="flex items-center">
                     <span className="text-md font-medium text-white">
-                      {isStreaming ? (
+                      {moduleLoaded && (
                         <StreamingText 
                           text={goal.name}
                           speed={30}
                           delay={300 + index * 200}
                         />
-                      ) : '...'}
+                      )}
                     </span>
                     <Badge className="ml-2 bg-blue-600/60">
-                      {isStreaming ? (
+                      {moduleLoaded && (
                         <StreamingText 
                           text={goal.timeframe}
                           speed={40}
                           delay={500 + index * 200}
                         />
-                      ) : '...'}
+                      )}
                     </Badge>
                   </div>
                 </div>
                 <div className="text-right">
                   <span className="text-sm font-medium">
                     <span className="text-white">
-                      {isStreaming ? (
+                      {moduleLoaded && (
                         <StreamingText 
                           text={`${goal.progress}%`}
                           speed={40}
                           delay={700 + index * 200}
                         />
-                      ) : '...'}
+                      )}
                     </span>
                     {goal.adjustmentNeeded > 0 && (
                       <Badge className="ml-2 bg-amber-600/60">
-                        {isStreaming ? (
+                        {moduleLoaded && (
                           <StreamingText 
                             text={`+${goal.adjustmentNeeded}% necessário`}
                             speed={30}
                             delay={900 + index * 200}
                           />
-                        ) : '...'}
+                        )}
                       </Badge>
                     )}
                     {goal.adjustmentNeeded <= 0 && (
                       <Badge className="ml-2 bg-green-600/60">
-                        {isStreaming ? (
+                        {moduleLoaded && (
                           <StreamingText 
                             text="No Caminho"
                             speed={30}
                             delay={900 + index * 200}
                           />
-                        ) : '...'}
+                        )}
                       </Badge>
                     )}
                   </span>
@@ -257,35 +320,35 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
               />
               <div className="flex justify-between items-center text-xs text-gray-400">
                 <span>
-                  {isStreaming ? (
+                  {moduleLoaded && (
                     <StreamingText 
                       text={`Atual: ${formatCurrency(goal.currentAmount)}`}
                       speed={30}
                       delay={1100 + index * 200}
                     />
-                  ) : '...'}
+                  )}
                 </span>
                 <span>
-                  {isStreaming ? (
+                  {moduleLoaded && (
                     <StreamingText 
                       text={`Meta: ${formatCurrency(goal.targetAmount)}`}
                       speed={30}
                       delay={1300 + index * 200}
                     />
-                  ) : '...'}
+                  )}
                 </span>
               </div>
               {goal.adjustmentNeeded > 0 && (
                 <div className="mt-2 text-xs text-amber-400 flex items-center">
                   <ArrowUp className="h-3.5 w-3.5 mr-1" />
                   <span>
-                    {isStreaming ? (
+                    {moduleLoaded && (
                       <StreamingText 
                         text={`Sugestão: Aumentar aportes em ${formatCurrency(goal.targetAmount * goal.adjustmentNeeded / 100 / 12)} mensais`}
                         speed={15}
                         delay={1500 + index * 200}
                       />
-                    ) : '...'}
+                    )}
                   </span>
                 </div>
               )}
@@ -294,13 +357,13 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
           
           <div className="bg-blue-900/20 p-4 rounded-lg border border-blue-900/30">
             <p className="text-sm text-gray-300">
-              {isStreaming ? (
+              {moduleLoaded && (
                 <StreamingText 
                   text={lifeGoals.summary}
                   speed={10}
                   delay={1800}
                 />
-              ) : '...'}
+              )}
             </p>
           </div>
         </div>

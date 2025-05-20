@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Mic, Search, Share2 } from "lucide-react";
@@ -180,45 +181,6 @@ const RaioXDashboard = ({
               <Search className="h-5 w-5" />
             </button>
           </div>
-        </div>
-        
-        <div className="mt-6 mb-2 flex gap-2 flex-wrap justify-center">
-          <button 
-            className={`px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all border ${activeTab === "overview" ? "bg-white/20 border-blue-400" : "border-white/10 bg-white/5"}`}
-            onClick={() => handleQuickNavClick("overview")}
-          >
-            {t('overviewTab')}
-          </button>
-          <button 
-            className={`px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all border ${activeTab === "status" ? "bg-white/20 border-blue-400" : "border-white/10 bg-white/5"}`}
-            onClick={() => handleQuickNavClick("status")}
-          >
-            {t('statusTab')}
-          </button>
-          <button 
-            className={`px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all border ${activeTab === "actions" ? "bg-white/20 border-blue-400" : "border-white/10 bg-white/5"}`}
-            onClick={() => handleQuickNavClick("actions")}
-          >
-            {t('planTab')}
-          </button>
-          <button 
-            className={`px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all border ${activeTab === "market" ? "bg-white/20 border-blue-400" : "border-white/10 bg-white/5"}`}
-            onClick={() => handleQuickNavClick("market")}
-          >
-            {t('aiTab')}
-          </button>
-          <button 
-            className={`px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all border ${activeTab === "future" ? "bg-white/20 border-blue-400" : "border-white/10 bg-white/5"}`}
-            onClick={() => handleQuickNavClick("future")}
-          >
-            {t('futureTab')}
-          </button>
-          <button 
-            className={`px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all border ${activeTab === "chat" ? "bg-white/20 border-blue-400" : "border-white/10 bg-white/5"}`}
-            onClick={() => handleQuickNavClick("chat")}
-          >
-            {t('chatTab')}
-          </button>
         </div>
       </div>
 
