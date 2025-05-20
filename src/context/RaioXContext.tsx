@@ -316,6 +316,7 @@ interface RaioXContextProps {
   clientSummary?: ClientSummary;
   totalDividends?: number;
   averageMonthlyDividends?: number;
+  stocks?: any[];
 }
 
 interface RaioXProviderProps {
@@ -645,7 +646,8 @@ const RaioXContext = createContext<RaioXContextProps>({
   dividendHistory: undefined,
   clientSummary: undefined,
   totalDividends: 0,
-  averageMonthlyDividends: 0
+  averageMonthlyDividends: 0,
+  stocks: []
 });
 
 export const RaioXProvider = ({ 
@@ -658,6 +660,7 @@ export const RaioXProvider = ({
   const [portfolioData, setPortfolioData] = useState<RaioXData>(defaultData);
   const [totalDividends, setTotalDividends] = useState<number>(0);
   const [averageMonthlyDividends, setAverageMonthlyDividends] = useState<number>(0);
+  const [stocks, setStocks] = useState<any[]>([]);
   
   // Function to refresh AI analysis
   const refreshAIAnalysis = () => {
@@ -682,6 +685,12 @@ export const RaioXProvider = ({
         const profitability = await getClientProfitability(selectedClient);
         const dividendHistory = await getClientDividendHistory(selectedClient);
         const clientSummary = await getClientSummary(selectedClient);
+        
+        // Store stocks for other components to use
+        if (stocks && stocks.length) {
+          setStocks(stocks);
+          console.log("Fetched stocks data:", stocks);
+        }
         
         // Calculate dividend totals
         if (dividendHistory && dividendHistory.length > 0) {
@@ -811,7 +820,8 @@ export const RaioXProvider = ({
         dividendHistory: portfolioData.dividendHistory,
         clientSummary: portfolioData.clientSummary,
         totalDividends,
-        averageMonthlyDividends
+        averageMonthlyDividends,
+        stocks
       }}
     >
       {children}

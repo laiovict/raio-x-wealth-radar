@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,7 +19,7 @@ interface ClientProfile {
 }
 
 const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModuleProps) => {
-  const { data } = useRaioX();
+  const { data, clientSummary } = useRaioX();
   const [clientProfile, setClientProfile] = useState<ClientProfile>({
     professionalProfile: "Médico oftalmologista com sociedade em três clínicas (Núcleo Oftalmológico em Valadares, Instituto de Olhos em Teófilo Otoni e Instituto de Olhos em Caratinga), com rotina de trabalho intenso de segunda a sábado. Formado em 2013 com participação recente nas sociedades (2 anos).",
     financialProfile: "Investidor desde 2017, com carteira diversificada entre XP, Clear e Avenue (USD 43 mil). Gastos mensais de R$ 25 mil representam pequena fração da renda combinada com a esposa (R$ 30-35 mil adicionais), permitindo alta capacidade de poupança (R$ 50-100 mil/mês).",
@@ -37,17 +36,21 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
   
   // Parse client summary from Supabase when available
   useEffect(() => {
-    if (data.clientSummary?.summary) {
+    if (clientSummary?.summary) {
       try {
+        console.log("Processing client summary:", clientSummary);
+        
         // Try to parse JSON if the summary is in JSON format
         let parsedSummary;
         try {
-          parsedSummary = JSON.parse(data.clientSummary.summary);
+          parsedSummary = JSON.parse(clientSummary.summary);
+          console.log("Successfully parsed JSON summary:", parsedSummary);
         } catch (e) {
+          console.log("Summary is not in JSON format, using as string", e);
           // If not JSON, use the summary as a simple string for the professional profile
           setClientProfile(prevProfile => ({
             ...prevProfile,
-            professionalProfile: data.clientSummary?.summary || prevProfile.professionalProfile,
+            professionalProfile: clientSummary?.summary || prevProfile.professionalProfile,
             dataSource: 'supabase'
           }));
           return;
@@ -55,6 +58,7 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
         
         // If we successfully parsed JSON, extract the sections
         if (parsedSummary && typeof parsedSummary === 'object') {
+          console.log("Setting profile from parsed JSON");
           setClientProfile({
             professionalProfile: parsedSummary.professionalProfile || parsedSummary.professional_profile || clientProfile.professionalProfile,
             financialProfile: parsedSummary.financialProfile || parsedSummary.financial_profile || clientProfile.financialProfile,
@@ -70,7 +74,7 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
         console.error("Error parsing client summary:", error);
       }
     }
-  }, [data.clientSummary]);
+  }, [clientSummary]);
   
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} h-full overflow-hidden border-none shadow-lg`}>

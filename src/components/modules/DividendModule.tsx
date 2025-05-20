@@ -25,7 +25,7 @@ const DividendModule = ({ fullWidth = false }: DividendModuleProps) => {
     : [];
   
   // Get chart data
-  const chartData = groupDividendsByMonth(dividendHistory);
+  const chartData = groupDividendsByMonth(dividendHistory || []);
 
   // Check if we have real data from Supabase
   const hasRealData = dividendHistory && dividendHistory.length > 0;
