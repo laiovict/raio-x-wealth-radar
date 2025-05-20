@@ -12,12 +12,12 @@ interface FinancialOverviewModuleProps {
 }
 
 // Extended financial summary type with our synthetic data properties
-interface EnhancedFinancialSummary extends FinancialSummary {
+interface EnhancedFinancialSummary extends Omit<FinancialSummary, 'topRisks'> {
   monthlyTrend?: string;
   savingsRateTrend?: string;
   topRisks?: {
     name: string;
-    severity: string;
+    severity: "high" | "medium" | "low";
     impact: string;
   }[];
 }
@@ -95,7 +95,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
       }
     }
     
-    // Create synthetic financial summary
+    // Create synthetic financial summary with all required properties from FinancialSummary
     return {
       netWorth,
       totalAssets,
@@ -106,6 +106,24 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
       savingsRate,
       monthlyTrend,
       savingsRateTrend,
+      // Required properties from the base FinancialSummary interface
+      investmentBalance: totalAssets * 0.85, // 85% of assets are investments
+      cashReserves: liquidAssets,
+      debtTotal: totalLiabilities,
+      riskProfile: "Moderado",
+      creditScore: 750,
+      allocationSummary: {
+        stocks: 30,
+        bonds: 40,
+        cash: 10,
+        realEstate: 10,
+        alternatives: 10
+      },
+      riskMetrics: [
+        { name: "Volatilidade", value: 45, color: "#4CAF50" },
+        { name: "Exposição a Renda Variável", value: 35, color: "#FFC107" },
+        { name: "Concentração", value: 25, color: "#2196F3" }
+      ],
       topRisks: [
         {
           name: "Concentração em Poucos Ativos",
