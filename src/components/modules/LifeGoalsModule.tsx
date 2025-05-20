@@ -6,9 +6,10 @@ import { ArrowUp, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
-import { formatCurrency, toNumber } from '@/utils/raioXUtils';
+import { formatCurrency } from '@/utils/typeConversionHelpers';
 import DataSourceTag from '@/components/common/DataSourceTag';
 import { DataSourceType } from '@/types/raioXTypes';
+import { toCompatibleDataSource } from '@/utils/dataSourceAdapter';
 
 interface LifeGoalsModuleProps {
   fullWidth?: boolean;
@@ -103,7 +104,7 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
       <CardHeader className="pb-2 flex flex-row justify-between items-center">
         <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
           Metas de Vida
-          <DataSourceIndicator source={lifeGoals.dataSource as 'supabase' | 'synthetic'} />
+          <DataSourceIndicator source={lifeGoals.dataSource} />
         </CardTitle>
         <Button variant="outline" size="sm" onClick={handleDownloadPdf} className="flex items-center gap-1">
           <Download className="h-4 w-4" /> PDF
@@ -122,7 +123,7 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
                     <Badge className="ml-2 bg-blue-600/60">
                       {goal.timeframe}
                     </Badge>
-                    <DataSourceIndicator source={goal.dataSource as 'supabase' | 'synthetic'} />
+                    <DataSourceIndicator source={goal.dataSource} />
                   </div>
                 </div>
                 <div className="text-right">
@@ -149,7 +150,7 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
               />
               <div className="flex justify-between items-center text-xs text-gray-400">
                 <span>
-                  {`Atual: ${formatCurrency(toNumber(goal.currentAmount))}`}
+                  {`Atual: ${formatCurrency(goal.currentAmount)}`}
                 </span>
                 <span>
                   {`Meta: ${formatCurrency(goal.targetAmount)}`}

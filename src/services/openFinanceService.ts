@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { mockFinancialInsightData } from '@/data/mockRaioXData';
-import { toNumber, toString } from '@/utils/typeConversionHelpers';
+import { toNumber, toString, formatCurrency } from '@/utils/typeConversionHelpers';
 
 /**
  * Get Open Finance accounts for a client
@@ -12,7 +12,7 @@ export const getClientOpenFinanceAccounts = async (clientId: number | null): Pro
   if (!clientId) return [];
   
   try {
-    // Use lowercase table name since table is lowercase in the database
+    // Use lowercase table name to match the actual database table name
     const { data: accounts, error } = await supabase
       .from('investorxopenfinanceaccount') 
       .select('*')
@@ -23,12 +23,13 @@ export const getClientOpenFinanceAccounts = async (clientId: number | null): Pro
       return [];
     }
     
-    // Fix the property access error by proper typing and null checks
+    // Map accounts to display names
     if (Array.isArray(accounts) && accounts.length > 0) {
       return accounts.map((account) => {
-        // Use account_id como display já que name não está disponível
         if (account && account.account_id) {
-          return `Conta ${account.account_id.substring(0, 8)}`;
+          // Create a display name from the account ID
+          const accountId = account.account_id.toString();
+          return `Conta ${accountId.substring(0, 8)}`;
         } else {
           return "Conta sem ID";
         }
@@ -51,13 +52,13 @@ export const getClientOpenFinanceInvestments = async (clientId: number | null): 
   if (!clientId) return [];
   
   try {
-    // Use mockData for investments if DB query fails
+    // Default mock data in case we can't fetch real data
     const mockData = [
       { name: "Tesouro Direto", type: "Renda Fixa", value: 15000, yield: "10.2%", dataSource: "synthetic" },
       { name: "Fundo de Investimento", type: "Multimercado", value: 25000, yield: "8.5%", dataSource: "synthetic" }
     ];
     
-    // Use lowercase table name since table is lowercase in the database
+    // Use lowercase table name to match the actual database table name
     const { data: accounts, error: accountError } = await supabase
       .from('investorxopenfinanceaccount') 
       .select('account_id')
@@ -70,8 +71,8 @@ export const getClientOpenFinanceInvestments = async (clientId: number | null): 
     
     // Extract account IDs, ensuring they are valid
     const accountIds = accounts
-      .map(a => a.account_id)
-      .filter(id => id !== null && id !== undefined);
+      .filter(a => a && a.account_id)
+      .map(a => a.account_id);
     
     if (accountIds.length === 0) {
       return mockData;
@@ -124,7 +125,7 @@ export const getClientOpenFinanceTransactions = async (clientId: number | null, 
   ];
   
   try {
-    // Use lowercase table name since table is lowercase in the database
+    // Use lowercase table name to match the actual database table name
     const { data: accounts, error: accountError } = await supabase
       .from('investorxopenfinanceaccount')
       .select('account_id')
@@ -137,8 +138,8 @@ export const getClientOpenFinanceTransactions = async (clientId: number | null, 
     
     // Extract account IDs, ensuring they are valid
     const accountIds = accounts
-      .map(a => a.account_id)
-      .filter(id => id !== null && id !== undefined);
+      .filter(a => a && a.account_id)
+      .map(a => a.account_id);
     
     if (accountIds.length === 0) {
       return mockData;

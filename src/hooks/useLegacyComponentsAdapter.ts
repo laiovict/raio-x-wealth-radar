@@ -13,18 +13,17 @@ import { DataSourceType } from '@/types/raioXTypes';
 export const useLegacyComponentAdapter = <T extends Record<string, any>>(
   dataObject: T | null | undefined
 ): T => {
-  const [adaptedData, setAdaptedData] = useState<T>(dataObject as T);
+  const [adaptedData, setAdaptedData] = useState<T>((dataObject || {}) as T);
   
   useEffect(() => {
     if (!dataObject) return;
     
     // Create a copy of the object
-    const adaptedObject = { ...dataObject };
+    const adaptedObject = { ...dataObject } as Record<string, any>;
     
     // Convert any DataSourceType properties
     Object.entries(adaptedObject).forEach(([key, value]) => {
       if (key === 'dataSource' && typeof value === 'string') {
-        // @ts-ignore - We'll fix this properly in the return statement
         adaptedObject[key] = toLimitedDataSource(value as DataSourceType);
       } else if (typeof value === 'object' && value !== null) {
         if (Array.isArray(value)) {

@@ -6,7 +6,7 @@ import {
 } from '@/services/portfolioService';
 
 import { defaultRaioXData } from '@/data/mockRaioXData';
-import { toNumber } from '@/utils/typeConversionHelpers';
+import { toNumber, ensureNumber } from '@/utils/typeConversionHelpers';
 import { removeDuplicateDividends } from '@/utils/portfolioHelpers';
 import { RaioXData } from '@/types/raioXTypes';
 import { useClientData } from '@/hooks/useClientData';
@@ -79,8 +79,8 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
           const totalDivs = calculateTotalDividends(dedupedDividendHistory);
           const avgMonthlyDivs = calculateMonthlyAverageDividends(dedupedDividendHistory);
           
-          setTotalDividends(totalDivs);
-          setAverageMonthlyDividends(avgMonthlyDivs);
+          setTotalDividends(ensureNumber(totalDivs));
+          setAverageMonthlyDividends(ensureNumber(avgMonthlyDivs));
           
           console.log("Dividend calculations:", {
             totalDividends: totalDivs,

@@ -52,6 +52,32 @@ export const toFormattableString = (value: string | number | undefined | null): 
 };
 
 /**
+ * Safely format a currency value, handling both string and number types
+ * 
+ * @param value The value to format as currency
+ * @returns Formatted currency string
+ */
+export const formatCurrency = (value: string | number | undefined | null): string => {
+  const num = toNumber(value);
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    maximumFractionDigits: 0,
+  }).format(num);
+};
+
+/**
+ * Safely format a percentage value, handling both string and number types
+ * 
+ * @param value The value to format as percentage
+ * @returns Formatted percentage string
+ */
+export const formatPercentage = (value: string | number | undefined | null): string => {
+  const num = toNumber(value);
+  return `${num.toFixed(2)}%`;
+};
+
+/**
  * Safely compare a value that could be string or number with a number
  * 
  * @param value The value to compare (could be string or number)

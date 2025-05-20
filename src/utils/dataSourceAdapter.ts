@@ -41,7 +41,7 @@ export const isRealData = (sourceType?: DataSourceType): boolean => {
 /**
  * Interface for objects with a dataSource property
  */
-interface WithDataSource {
+export interface WithDataSource {
   dataSource?: DataSourceType;
 }
 
@@ -60,4 +60,14 @@ export const adaptForLimitedComponents = <T extends WithDataSource>(obj: T): T &
  */
 export const adaptCollectionForLimitedComponents = <T extends WithDataSource>(collection: T[]): (T & {dataSource: 'synthetic' | 'supabase'})[] => {
   return collection.map(item => adaptForLimitedComponents(item));
+};
+
+/**
+ * Determine if a value is likely a "real" value (not missing/empty/zero)
+ */
+export const hasActualValue = (value: any): boolean => {
+  if (value === undefined || value === null) return false;
+  if (typeof value === 'string' && value.trim() === '') return false;
+  if (typeof value === 'number' && value === 0) return false;
+  return true;
 };
