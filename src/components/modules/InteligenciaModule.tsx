@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -252,10 +253,12 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
   };
 
   const recommendedActions = getRecommendedActions();
-  const { recommendations } = data;
+  
+  // Define a safe way to access recommendations
+  const recommendations = data?.recommendations || [];
   
   // Define insights here using data.financialInsightData instead of data.financialInsights
-  const insights = data.financialInsightData ? data.financialInsightData.insights : [
+  const insights = data.financialInsightData ? data.financialInsightData.insights || [] : [
     {
       id: "market-shift",
       title: "Mudança de cenário macroeconômico",
@@ -333,7 +336,7 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
       <CardContent className="p-0">
         <TabsContent value="actions" className="p-4 space-y-3 m-0">
           <div className="space-y-4">
-            {getRecommendedActions().map(action => (
+            {getRecommendedActions().map((action) => (
               <div 
                 key={action.id}
                 className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white/5 hover:bg-white/10 dark:hover:bg-gray-700/30 transition-colors cursor-pointer"
@@ -388,7 +391,8 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
           {/* We'll use financialInsightData instead of financialInsights */}
           {data.financialInsightData ? (
             <div className="space-y-4">
-              {data.financialInsightData.insights.map((insight: any, index: number) => (
+              {/* Add null check and default empty array */}
+              {(data.financialInsightData.insights || []).map((insight: any, index: number) => (
                 <div 
                   key={index}
                   className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white/5"
@@ -439,10 +443,10 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
         </TabsContent>
         
         <TabsContent value="recommendations" className="p-4 space-y-4 m-0">
-          {data.recommendations && data.recommendations.length > 0 ? (
+          {recommendations && recommendations.length > 0 ? (
             <div className="space-y-4">
-              {/* Use data.recommendations here */}
-              {data.recommendations.map((recommendation, index) => (
+              {/* Use data.recommendations with null check */}
+              {recommendations.map((recommendation, index) => (
                 <div 
                   key={index}
                   className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"

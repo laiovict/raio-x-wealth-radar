@@ -135,3 +135,18 @@ export const toNumber = (value: string | number, defaultValue: number = 0): numb
   const parsed = parseFloat(value);
   return isNaN(parsed) ? defaultValue : parsed;
 };
+
+/**
+ * Safely get a number value from possibly string or number input
+ * Used for type conversion in components
+ * @param value The value to convert to number
+ * @param defaultValue Default value if conversion fails
+ * @returns Number value
+ */
+export const ensureNumber = (value: string | number | undefined, defaultValue: number = 0): number => {
+  if (value === undefined || value === null) return defaultValue;
+  if (typeof value === 'number') return value;
+  
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? defaultValue : parsed;
+};

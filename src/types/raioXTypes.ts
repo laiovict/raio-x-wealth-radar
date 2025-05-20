@@ -8,7 +8,6 @@ export interface AIInsight {
   category: string;
   impact: 'high' | 'medium' | 'low';
   actions?: string[];
-  // Add missing properties
   agent?: string;
   priority?: 'high' | 'medium' | 'low';
   isNew?: boolean;
@@ -110,6 +109,12 @@ export interface Liquidity {
   difference: number;
   currentIdleMonths: number;
   recommendedMonths: number;
+  // Add missing properties
+  idealReserve?: number;
+  monthlyExpenses?: number;
+  idealMonths?: number;
+  summary?: string;
+  dataSource?: 'synthetic' | 'supabase';
 }
 
 // Complete Raio-X data structure for easy access to all client information
@@ -128,7 +133,6 @@ export interface RaioXData {
   financialPlans?: any[];
   financialInsightData?: any;
   openFinanceData?: OpenFinanceData;
-  // Add missing properties
   allocation?: Allocation;
   liquidity?: Liquidity;
   projection?: any;
@@ -136,6 +140,9 @@ export interface RaioXData {
   sentiment?: any;
   clientAge?: number;
   financialSummary?: FinancialSummary;
+  summary?: any; // Added for RecommendationsModule
+  socialComparison?: any; // Added for SocialComparisonModule
+  wrapped?: any; // Added for WrappedModule
 }
 
 // Props for the Raio-X context provider
