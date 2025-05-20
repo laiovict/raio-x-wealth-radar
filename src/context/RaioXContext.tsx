@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { clientData } from '@/data/clientData';
 import { supabase } from "@/integrations/supabase/client";
+import { getClientPortfolioSummary, getClientFixedIncome, getClientInvestmentFunds, getClientRealEstate, getClientStocks, getClientProfitability } from '@/services/portfolioService';
 
 // Define interfaces for our data structures
 export interface RiskItem {
@@ -151,6 +152,30 @@ export interface FinancialInsightData {
   };
 }
 
+// Add portfolioSummary type for the database response
+export interface PortfolioSummary {
+  investor_account_on_brokerage_house: number;
+  total_portfolio_value: string;
+  fixed_income_value: number;
+  fixed_income_representation: number;
+  stocks_value: string;
+  stocks_representation: string;
+  real_estate_value: number;
+  real_estate_representation: number;
+  investment_fund_value: number;
+  investment_fund_representation: number;
+  treasure_value: string;
+  treasure_representation: string;
+  investment_international_value: string;
+  investment_international_representation: string;
+  total_balance: string;
+  total_balance_representation: string;
+  private_pension_value?: number;
+  private_pension_representation?: number;
+  coe_value?: string;
+  coe_representation?: string;
+}
+
 export interface RaioXData {
   clientName: string;
   clientAge: number;
@@ -205,6 +230,13 @@ export interface RaioXData {
   wrapped: WrappedData;
   financialInsightData?: FinancialInsightData;
   summary?: string;
+  // Add portfolioSummary to RaioXData interface
+  portfolioSummary?: PortfolioSummary;
+  fixedIncome?: any[];
+  investmentFunds?: any[];
+  realEstate?: any[];
+  stocks?: any[];
+  profitability?: any;
 }
 
 interface RaioXContextProps {
@@ -411,98 +443,96 @@ const sampleAIInsights: AIInsight[] = [
   }
 ];
 
-// Update the default context with the new properties
-const defaultContext: RaioXContextProps = {
-  data: {
-    clientName: "Cliente Padrão",
-    clientAge: 35,
-    financialSummary: clientData.financialSummary,
-    financialInsights: clientData.financialInsights,
-    recommendedActions: clientData.recommendedActions,
-    assetAllocation: {
-      equities: 30,
-      fixedIncome: 40,
-      alternatives: 10,
-      cash: 15,
-      realEstate: 5
-    },
-    lifeGoals: {
-      goals: [
-        {
-          name: "Aposentadoria",
-          progress: 35,
-          currentAmount: 350000,
-          targetAmount: 1000000,
-          timeframe: "Longo prazo",
-          adjustmentNeeded: 15,
-          category: "investment"
-        },
-        {
-          name: "Casa própria",
-          progress: 60,
-          currentAmount: 300000,
-          targetAmount: 500000,
-          timeframe: "Médio prazo",
-          adjustmentNeeded: 0,
-          category: "real estate"
-        }
-      ],
-      summary: "Você está no caminho para alcançar a maioria das suas metas, mas pode precisar aumentar suas contribuições para aposentadoria."
-    },
-    liquidity: {
-      currentIdle: 30000,
-      idealReserve: 60000,
-      monthlyExpenses: 10000,
-      idealMonths: 6,
-      summary: "Sua reserva de emergência cobre 3 meses de despesas, recomendamos aumentar para 6 meses."
-    },
-    projection: {
-      currentTotal: 850000,
-      monthlyContribution: 5000,
-      scenarios: {
-        base: {
-          "1 ano": 950000,
-          "3 anos": 1200000,
-          "5 anos": 1500000
-        },
-        stress: {
-          "1 ano": 900000,
-          "3 anos": 1100000,
-          "5 anos": 1350000
-        }
-      }
-    },
-    recommendations: [
+// Default data with all required properties
+const defaultData: RaioXData = {
+  clientName: "Cliente Padrão",
+  clientAge: 35,
+  financialSummary: clientData.financialSummary,
+  financialInsights: clientData.financialInsights,
+  recommendedActions: clientData.recommendedActions,
+  assetAllocation: {
+    equities: 30,
+    fixedIncome: 40,
+    alternatives: 10,
+    cash: 15,
+    realEstate: 5
+  },
+  lifeGoals: {
+    goals: [
       {
-        action: "Diversificar portfólio internacional",
-        description: "Adicionar ETFs globais para reduzir a concentração no mercado doméstico",
-        urgency: "Médio",
-        impact: "Alto"
+        name: "Aposentadoria",
+        progress: 35,
+        currentAmount: 350000,
+        targetAmount: 1000000,
+        timeframe: "Longo prazo",
+        adjustmentNeeded: 15,
+        category: "investment"
       },
       {
-        action: "Aumentar reserva de emergência",
-        description: "Atingir o equivalente a 6 meses de despesas em ativos de alta liquidez",
-        urgency: "Alto",
-        impact: "Médio"
+        name: "Casa própria",
+        progress: 60,
+        currentAmount: 300000,
+        targetAmount: 500000,
+        timeframe: "Médio prazo",
+        adjustmentNeeded: 0,
+        category: "real estate"
       }
     ],
-    sentiment: mockSentimentData,
-    socialComparison: mockSocialComparison,
-    allocation: mockAllocationData,
-    wrapped: mockWrappedData,
-    financialInsightData: mockFinancialInsightData,
-    openFinanceMonths: 0,
-    hasOpenFinance: false,
-    summary: "Seu portfólio está bem diversificado, mas poderia se beneficiar de maior exposição internacional. Sua saúde financeira está em ótimo estado, com fluxo de caixa positivo e bons índices de poupança."
+    summary: "Você está no caminho para alcançar a maioria das suas metas, mas pode precisar aumentar suas contribuições para aposentadoria."
   },
+  liquidity: {
+    currentIdle: 30000,
+    idealReserve: 60000,
+    monthlyExpenses: 10000,
+    idealMonths: 6,
+    summary: "Sua reserva de emergência cobre 3 meses de despesas, recomendamos aumentar para 6 meses."
+  },
+  projection: {
+    currentTotal: 850000,
+    monthlyContribution: 5000,
+    scenarios: {
+      base: {
+        "1 ano": 950000,
+        "3 anos": 1200000,
+        "5 anos": 1500000
+      },
+      stress: {
+        "1 ano": 900000,
+        "3 anos": 1100000,
+        "5 anos": 1350000
+      }
+    }
+  },
+  recommendations: [
+    {
+      action: "Diversificar portfólio internacional",
+      description: "Adicionar ETFs globais para reduzir a concentração no mercado doméstico",
+      urgency: "Médio",
+      impact: "Alto"
+    },
+    {
+      action: "Aumentar reserva de emergência",
+      description: "Atingir o equivalente a 6 meses de despesas em ativos de alta liquidez",
+      urgency: "Alto",
+      impact: "Médio"
+    }
+  ],
+  sentiment: mockSentimentData,
+  socialComparison: mockSocialComparison,
+  allocation: mockAllocationData,
+  wrapped: mockWrappedData,
+  financialInsightData: mockFinancialInsightData,
+  openFinanceMonths: 0,
   hasOpenFinance: false,
-  selectedClient: null,
-  refreshAIAnalysis: () => {},
-  isAIAnalysisLoading: false,
-  aiInsights: sampleAIInsights
+  summary: "Seu portfólio está bem diversificado, mas poderia se beneficiar de maior exposição internacional. Sua saúde financeira está em ótimo estado, com fluxo de caixa positivo e bons índices de poupança."
 };
 
-const RaioXContext = createContext<RaioXContextProps>(defaultContext);
+const RaioXContext = createContext<RaioXContextProps>({
+  data: defaultData,
+  hasOpenFinance: false,
+  selectedClient: null,
+  aiInsights: sampleAIInsights
+});
 
 export const RaioXProvider = ({ 
   children, 
@@ -511,105 +541,117 @@ export const RaioXProvider = ({
 }: RaioXProviderProps) => {
   const [isAIAnalysisLoading, setIsAIAnalysisLoading] = useState(false);
   const [financialSummary, setFinancialSummary] = useState<FinancialSummary | null>(null);
-  const [clientData, setClientData] = useState<any | null>(null);
+  const [portfolioData, setPortfolioData] = useState<RaioXData>(defaultData);
+  
+  // Function to refresh AI analysis
+  const refreshAIAnalysis = () => {
+    setIsAIAnalysisLoading(true);
+    setTimeout(() => {
+      setIsAIAnalysisLoading(false);
+    }, 1500);
+  };
   
   // Fetch real data when the selectedClient changes
   useEffect(() => {
-    if (selectedClient) {
-      // We'll import and use the data retrieval methods here
-      const fetchClientData = async () => {
-        try {
-          // Import portfolio service dynamically to avoid circular dependencies
-          const portfolioService = await import('@/services/portfolioService');
-          
-          // Fetch the client's portfolio summary
-          const summary = await portfolioService.getClientPortfolioSummary(selectedClient);
-          
-          // Store the raw data
-          setClientData(summary);
-          
-          // More data can be fetched and processed here as needed
-        } catch (error) {
-          console.error("Error fetching client data:", error);
-        }
-      };
+    const fetchClientData = async () => {
+      if (!selectedClient) return;
       
-      fetchClientData();
-    }
+      try {
+        // Fetch the client's portfolio data
+        const summary = await getClientPortfolioSummary(selectedClient);
+        const fixedIncome = await getClientFixedIncome(selectedClient);
+        const investmentFunds = await getClientInvestmentFunds(selectedClient);
+        const realEstate = await getClientRealEstate(selectedClient);
+        const stocks = await getClientStocks(selectedClient);
+        const profitability = await getClientProfitability(selectedClient);
+        
+        // Update portfolio data with real values from Supabase
+        if (summary || fixedIncome.length || investmentFunds.length || realEstate.length || stocks.length) {
+          setPortfolioData(prevData => ({
+            ...prevData,
+            portfolioSummary: summary,
+            fixedIncome,
+            investmentFunds,
+            realEstate,
+            stocks,
+            profitability
+          }));
+        }
+        
+        // Generate financial summary based on real data if available
+        if (summary) {
+          generateFinancialSummary(summary);
+        }
+      } catch (error) {
+        console.error("Error fetching client data:", error);
+      }
+    };
+    
+    fetchClientData();
   }, [selectedClient]);
   
   // Generate financial summary based on real data if available
-  useEffect(() => {
-    if (clientData) {
-      const generateFinancialSummary = () => {
-        // Convert client data to financial summary format
-        const summary: FinancialSummary = {
-          netWorth: parseFloat(clientData.total_portfolio_value || "0"),
-          totalAssets: parseFloat(clientData.total_portfolio_value || "0"),
-          totalLiabilities: 0, // Not provided in the data, could be fetched separately
-          liquidAssets: clientData.fixed_income_value || 0,
-          monthlyIncome: 0, // Not provided in the data, could be fetched separately
-          monthlyExpenses: 0, // Not provided in the data, could be fetched separately
-          savingsRate: 0, // Calculate if both income and expenses are available
-          investmentBalance: parseFloat(clientData.total_portfolio_value || "0"),
-          cashReserves: clientData.fixed_income_value || 0,
-          debtTotal: 0, // Not provided in the data
-          riskProfile: "Moderado", // Default value, could be determined based on allocation
-          creditScore: 750, // Default value, not provided in the data
-          allocationSummary: {
-            stocks: clientData.stocks_representation ? parseFloat(clientData.stocks_representation) : 0,
-            bonds: clientData.fixed_income_representation || 0,
-            cash: 10, // Estimate
-            realEstate: clientData.real_estate_representation || 0,
-            alternatives: clientData.investment_fund_representation || 0
-          },
-          riskMetrics: [
-            { name: "Volatilidade", value: 45, color: "#4CAF50" },
-            { name: "Exposição a Renda Variável", value: 35, color: "#FFC107" },
-            { name: "Concentração", value: 25, color: "#2196F3" }
-          ],
-          topRisks: [
-            {
-              name: "Concentração em Poucos Ativos",
-              severity: "high",
-              impact: "68% do patrimônio em apenas 4 ativos"
-            },
-            {
-              name: "Baixa Reserva de Emergência",
-              severity: "medium",
-              impact: "Cobertura de 3.5 meses de despesas"
-            },
-            {
-              name: "Exposição Cambial",
-              severity: "medium",
-              impact: "30% do patrimônio sem proteção cambial"
-            }
-          ]
-        };
-        
-        setFinancialSummary(summary);
-      };
-      
-      generateFinancialSummary();
-    }
-  }, [clientData]);
-  
-  // Prepare data to share with components
-  const dataWithRealClientInfo = {
-    ...data,
-    // Use real data if available, otherwise use synthetic data
-    ...clientData && { portfolioSummary: clientData }
+  const generateFinancialSummary = (clientData: PortfolioSummary) => {
+    // Convert client data to financial summary format
+    const totalPortfolioValue = parseFloat(clientData.total_portfolio_value || "0");
+    
+    const summary: FinancialSummary = {
+      netWorth: totalPortfolioValue,
+      totalAssets: totalPortfolioValue,
+      totalLiabilities: 0, // Not provided in the data, could be fetched separately
+      liquidAssets: clientData.fixed_income_value || 0,
+      monthlyIncome: totalPortfolioValue * 0.005, // Estimate monthly income as 0.5% of portfolio
+      monthlyExpenses: totalPortfolioValue * 0.003, // Estimate monthly expenses as 0.3% of portfolio
+      savingsRate: 40, // Estimate savings rate
+      investmentBalance: totalPortfolioValue,
+      cashReserves: clientData.fixed_income_value || 0,
+      debtTotal: 0, // Not provided in the data
+      riskProfile: "Moderado", // Default value, could be determined based on allocation
+      creditScore: 750, // Default value, not provided in the data
+      allocationSummary: {
+        stocks: parseFloat(clientData.stocks_representation || "0"),
+        bonds: clientData.fixed_income_representation || 0,
+        cash: 10, // Estimate
+        realEstate: clientData.real_estate_representation || 0,
+        alternatives: clientData.investment_fund_representation || 0
+      },
+      riskMetrics: [
+        { name: "Volatilidade", value: 45, color: "#4CAF50" },
+        { name: "Exposição a Renda Variável", value: 35, color: "#FFC107" },
+        { name: "Concentração", value: 25, color: "#2196F3" }
+      ],
+      topRisks: [
+        {
+          name: "Concentração em Poucos Ativos",
+          severity: "high",
+          impact: "68% do patrimônio em apenas 4 ativos"
+        },
+        {
+          name: "Baixa Reserva de Emergência",
+          severity: "medium",
+          impact: `Cobertura de ${(clientData.fixed_income_value / (totalPortfolioValue * 0.003)).toFixed(1)} meses de despesas`
+        },
+        {
+          name: "Exposição Cambial",
+          severity: "medium",
+          impact: "30% do patrimônio sem proteção cambial"
+        }
+      ]
+    };
+    
+    setFinancialSummary(summary);
   };
   
   return (
     <RaioXContext.Provider
       value={{
         hasOpenFinance,
+        data: portfolioData,
+        selectedClient,
         financialSummary,
         isAIAnalysisLoading,
         refreshAIAnalysis,
-        data: dataWithRealClientInfo,
-        selectedClient
+        aiInsights: sampleAIInsights
       }}
     >
       {children}

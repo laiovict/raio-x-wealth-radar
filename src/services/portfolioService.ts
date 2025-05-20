@@ -14,7 +14,7 @@ export const getClientPortfolioSummary = async (clientId: number | null) => {
       .from('investor_portfolio_summary')
       .select('*')
       .eq('investor_account_on_brokerage_house', clientId)
-      .single();
+      .maybeSingle();
     
     if (error) {
       console.error("Error fetching portfolio summary:", error);
@@ -145,7 +145,7 @@ export const getClientProfitability = async (clientId: number | null) => {
       .from('profitability_ytd')
       .select('*')
       .eq('investor_account_on_brokerage_house', clientId)
-      .single();
+      .maybeSingle();
     
     if (error) {
       console.error("Error fetching profitability:", error);
