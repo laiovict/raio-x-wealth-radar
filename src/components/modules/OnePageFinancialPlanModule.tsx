@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -103,8 +102,12 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
     let stocksPercentage = 25;
     let fundsValue = 16250;
     let fundsPercentage = 5;
-    let alternativesValue = 16250;
-    let alternativesPercentage = 5;
+    let fiisValue = 8125;
+    let fiisPercentage = 2.5;
+    let internationalValue = 8125; 
+    let internationalPercentage = 2.5;
+    let alternativesValue = 0;
+    let alternativesPercentage = 0;
     let ytdReturn = 7.8;
     let benchmarkReturn = 8.5;
 
@@ -124,13 +127,18 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
       fundsValue = portfolioSummary.investment_fund_value || 0;
       fundsPercentage = portfolioSummary.investment_fund_representation || 0;
       
-      // Alternatives - sum of real estate and international investments
-      const realEstateValue = portfolioSummary.real_estate_value || 0;
-      const internationalValue = parseFloat(portfolioSummary.investment_international_value || "0");
+      // Real Estate Funds (FIIs) as separate category
+      fiisValue = portfolioSummary.real_estate_value || 0;
+      fiisPercentage = portfolioSummary.real_estate_representation || 0;
       
-      alternativesValue = realEstateValue + internationalValue;
-      alternativesPercentage = portfolioSummary.real_estate_representation +
-                              parseFloat(portfolioSummary.investment_international_representation || "0");
+      // International investments as separate category
+      internationalValue = parseFloat(portfolioSummary.investment_international_value || "0");
+      internationalPercentage = parseFloat(portfolioSummary.investment_international_representation || "0");
+      
+      // Alternatives - now excluding real estate and international
+      // Here alternatives could include other asset types not explicitly categorized
+      alternativesValue = 0; // Or calculate from other alternative assets if available
+      alternativesPercentage = 0;
     }
 
     // If we have profitability data, use it
@@ -147,6 +155,10 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
       stocksPercentage,
       fundsValue,
       fundsPercentage,
+      fiisValue,
+      fiisPercentage,
+      internationalValue,
+      internationalPercentage,
       alternativesValue,
       alternativesPercentage,
       ytdReturn,
@@ -219,6 +231,8 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
       { name: "renda fixa", percentage: investmentData.fixedIncomePercentage },
       { name: "renda variável", percentage: investmentData.stocksPercentage },
       { name: "fundos de investimento", percentage: investmentData.fundsPercentage },
+      { name: "FIIs", percentage: investmentData.fiisPercentage },
+      { name: "internacional", percentage: investmentData.internationalPercentage },
       { name: "alternativos", percentage: investmentData.alternativesPercentage }
     ];
     
@@ -260,7 +274,9 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
           { label: "Renda fixa", value: `${formatCurrency(investmentData.fixedIncomeValue)} (${Math.round(investmentData.fixedIncomePercentage)}%)` },
           { label: "Renda variável", value: `${formatCurrency(investmentData.stocksValue)} (${Math.round(investmentData.stocksPercentage)}%)` },
           { label: "Fundos de Investimento", value: `${formatCurrency(investmentData.fundsValue)} (${Math.round(investmentData.fundsPercentage)}%)` },
-          { label: "Alternativos", value: `${formatCurrency(investmentData.alternativesValue)} (${Math.round(investmentData.alternativesPercentage)}%)` },
+          { label: "FIIs", value: `${formatCurrency(investmentData.fiisValue)} (${Math.round(investmentData.fiisPercentage)}%)` },
+          { label: "Internacional", value: `${formatCurrency(investmentData.internationalValue)} (${Math.round(investmentData.internationalPercentage)}%)` },
+          ...(investmentData.alternativesPercentage > 0 ? [{ label: "Alternativos", value: `${formatCurrency(investmentData.alternativesValue)} (${Math.round(investmentData.alternativesPercentage)}%)` }] : []),
           { label: "Rentabilidade YTD", value: `${investmentData.ytdReturn.toFixed(1)}% (vs. benchmark ${investmentData.benchmarkReturn}%)` }
         ],
         actions: [

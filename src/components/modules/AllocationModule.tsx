@@ -8,7 +8,7 @@ interface AllocationModuleProps {
   fullWidth?: boolean;
 }
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#9467bd'];
 
 const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
   const { data, selectedClient } = useRaioX();
@@ -21,7 +21,8 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
       "Caixa": 10.0,
       "Internacional": 0.0,
       "FIIs": 0.0,
-      "Previdência": 0.0
+      "Previdência": 0.0,
+      "Alternativos": 0.0
     },
     recommended: {
       "Renda Fixa": 30.0,
@@ -30,7 +31,8 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
       "Caixa": 5.0,
       "Internacional": 15.0,
       "FIIs": 10.0,
-      "Previdência": 5.0
+      "Previdência": 5.0,
+      "Alternativos": 0.0
     },
     optimizationGain: 2.4
   });
@@ -51,7 +53,8 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
             "FIIs": summary.real_estate_representation || 0,
             "Internacional": summary.investment_international_representation ? parseFloat(summary.investment_international_representation) : 0,
             "Caixa": 5.0, // Estimate or could be calculated from another source
-            "Previdência": summary.private_pension_representation || 0
+            "Previdência": summary.private_pension_representation || 0,
+            "Alternativos": 0.0 // Setting this to 0 since we're now separating FIIs and International
           };
           
           // Create client-specific recommended allocation based on current allocation
@@ -105,7 +108,8 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
                 "Caixa": 5.0,
                 "Internacional": 10.0,
                 "FIIs": 5.0,
-                "Previdência": 0.0
+                "Previdência": 0.0,
+                "Alternativos": 0.0
               },
               recommended: {
                 "Renda Fixa": 25.0,
@@ -114,7 +118,8 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
                 "Caixa": 5.0,
                 "Internacional": 15.0,
                 "FIIs": 7.0,
-                "Previdência": 3.0
+                "Previdência": 3.0,
+                "Alternativos": 0.0
               },
               optimizationGain: 3.2
             });
@@ -231,7 +236,7 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
             <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg">
               <p className="text-sm text-gray-700 dark:text-gray-200">
                 {allocationData.optimizationGain > 3 ? 
-                  `Sua carteira mostra um bom equilíbrio entre renda fixa (${allocationData.current["Renda Fixa"]}%) e renda variável (${allocationData.current["Ações BR"]}%), mas poderia se beneficiar de maior diversificação internacional. Recomendamos aumentar sua exposição internacional para ${allocationData.recommended["Internacional"]}% para melhor proteção contra volatilidade do mercado local.` :
+                  `Sua carteira mostra um bom equilíbrio entre renda fixa (${allocationData.current["Renda Fixa"]}%) e renda variável (${allocationData.current["Ações BR"]}%), mas poderia se beneficiar de maior diversificação internacional. Recomendamos aumentar sua exposição internacional para ${allocationData.recommended["Internacional"]}% e FIIs para ${allocationData.recommended["FIIs"]}% para melhor proteção contra volatilidade do mercado local.` :
                   `Atualmente sua carteira está concentrada em renda fixa (${allocationData.current["Renda Fixa"]}%) e ações brasileiras (${allocationData.current["Ações BR"]}%), o que reflete seu perfil moderado. Recomendamos diversificar com ${allocationData.recommended["Internacional"]}% em internacional e ${allocationData.recommended["FIIs"]}% em FIIs para melhor equilíbrio entre segurança e crescimento.`
                 }
               </p>
