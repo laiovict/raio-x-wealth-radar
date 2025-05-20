@@ -1,4 +1,5 @@
 
+import React from "react";
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,7 +11,7 @@ interface InvestmentPlanningModuleProps {
 }
 
 const InvestmentPlanningModule = ({ fullWidth = false }: InvestmentPlanningModuleProps) => {
-  const { hasOpenFinance, isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
+  const { data, hasOpenFinance, isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
 
   // Function to handle OpenFinance activation button click
   const handleActivateOpenFinance = () => {
@@ -21,24 +22,25 @@ const InvestmentPlanningModule = ({ fullWidth = false }: InvestmentPlanningModul
   // Sample data for investment planning
   const investmentPlan = {
     targetAmount: 2500000,
-    currentAmount: 850000,
+    currentAmount: data.portfolioSummary ? parseFloat(data.portfolioSummary.total_portfolio_value || "850000") : 850000,
     monthlyContribution: 5000,
     recommendedContribution: 7500,
     yearsToGoal: 15,
     expectedReturn: 8.5,
     riskProfile: "Moderado",
     assetAllocation: [
-      { class: "Renda Fixa", current: 60, recommended: 45, color: "from-blue-500 to-blue-600" },
-      { class: "Renda Variável (BR)", current: 25, recommended: 20, color: "from-green-500 to-green-600" },
-      { class: "Renda Variável (Int.)", current: 10, recommended: 20, color: "from-purple-500 to-purple-600" },
-      { class: "Alternativos", current: 5, recommended: 15, color: "from-amber-500 to-amber-600" },
+      { class: "Renda Fixa", current: data.portfolioSummary ? data.portfolioSummary.fixed_income_representation || 60 : 60, recommended: 45, color: "from-blue-500 to-blue-600" },
+      { class: "Renda Variável (BR)", current: data.portfolioSummary ? parseFloat(data.portfolioSummary.stocks_representation || "25") : 25, recommended: 20, color: "from-green-500 to-green-600" },
+      { class: "Renda Variável (Int.)", current: data.portfolioSummary ? parseFloat(data.portfolioSummary.investment_international_representation || "10") : 10, recommended: 20, color: "from-purple-500 to-purple-600" },
+      { class: "Alternativos", current: data.portfolioSummary ? data.portfolioSummary.investment_fund_representation || 5 : 5, recommended: 15, color: "from-amber-500 to-amber-600" },
     ],
     recommendations: [
       "Aumentar contribuição mensal para R$ 7.500",
       "Diversificar carteira com mais exposição internacional",
       "Reduzir concentração em renda fixa para melhorar retorno esperado",
       "Considerar investimentos alternativos para diversificação"
-    ]
+    ],
+    dataSource: data.portfolioSummary ? 'supabase' : 'synthetic' as 'supabase' | 'synthetic'
   };
 
   // Format currency
@@ -53,7 +55,28 @@ const InvestmentPlanningModule = ({ fullWidth = false }: InvestmentPlanningModul
   // Calculate goal progress
   const goalProgress = Math.round((investmentPlan.currentAmount / investmentPlan.targetAmount) * 100);
 
-  if (!hasOpenFinance) {
+  // Modified condition to show content even without OpenFinance
+  const showContent = isAIAnalysisLoading ? false : true;
+
+  if (isAIAnalysisLoading) {
+    return (
+      <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+            Planejamento de Investimentos
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-8">
+            <RefreshCw className="w-12 h-12 text-blue-500 animate-spin mb-4" />
+            <p className="text-gray-400">Calculando seu plano de investimentos...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!showContent) {
     return (
       <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
         <CardHeader className="pb-2">
@@ -81,30 +104,17 @@ const InvestmentPlanningModule = ({ fullWidth = false }: InvestmentPlanningModul
     );
   }
 
-  if (isAIAnalysisLoading) {
-    return (
-      <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-            Planejamento de Investimentos
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-8">
-            <RefreshCw className="w-12 h-12 text-blue-500 animate-spin mb-4" />
-            <p className="text-gray-400">Calculando seu plano de investimentos...</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
             Planejamento de Investimentos
+            {investmentPlan.dataSource === 'supabase' && (
+              <span className="ml-1 text-green-400">
+                <span className="inline-block h-3 w-3">✓</span>
+              </span>
+            )}
           </CardTitle>
           <Button variant="ghost" size="sm" onClick={refreshAIAnalysis} className="flex items-center gap-2">
             <RefreshCw className="h-4 w-4" />

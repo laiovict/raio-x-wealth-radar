@@ -1,8 +1,8 @@
 
+import React, { useEffect, useState } from "react";
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Wine, Wallet, Plane, Home, Briefcase, Heart, ShieldCheck, Target, TrendingUp, AlertTriangle, Calendar, MapPin, Car, Award, PiggyBank } from "lucide-react";
-import { useEffect, useState } from "react";
 
 interface PersonalInsightsModuleProps {
   fullWidth?: boolean;

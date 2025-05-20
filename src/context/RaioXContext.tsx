@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { clientData } from '@/data/clientData';
 import { supabase } from "@/integrations/supabase/client";
 import { 
@@ -311,6 +312,8 @@ interface RaioXContextProps {
   profitability?: any;
   dividendHistory?: DividendHistory[];
   clientSummary?: ClientSummary;
+  totalDividends?: number;
+  averageMonthlyDividends?: number;
 }
 
 interface RaioXProviderProps {
@@ -430,7 +433,7 @@ const mockFinancialInsightData: FinancialInsightData = {
   investmentGrowth: {
     annual: 11.2,
     total: 65000,
-    bestAsset: {name: "Fundo Imobiliário XP", growth: 14.8},
+    bestAsset: { name: "Fundo Imobiliário XP", growth: 14.8},
     dataSource: 'synthetic' as const
   },
   potentialSavings: {
@@ -638,7 +641,9 @@ const RaioXContext = createContext<RaioXContextProps>({
   portfolioSummary: undefined,
   profitability: undefined,
   dividendHistory: undefined,
-  clientSummary: undefined
+  clientSummary: undefined,
+  totalDividends: 0,
+  averageMonthlyDividends: 0
 });
 
 export const RaioXProvider = ({ 
@@ -649,6 +654,8 @@ export const RaioXProvider = ({
   const [isAIAnalysisLoading, setIsAIAnalysisLoading] = useState(false);
   const [financialSummary, setFinancialSummary] = useState<FinancialSummary | null>(null);
   const [portfolioData, setPortfolioData] = useState<RaioXData>(defaultData);
+  const [totalDividends, setTotalDividends] = useState<number>(0);
+  const [averageMonthlyDividends, setAverageMonthlyDividends] = useState<number>(0);
   
   // Function to refresh AI analysis
   const refreshAIAnalysis = () => {
@@ -673,6 +680,17 @@ export const RaioXProvider = ({
         const profitability = await getClientProfitability(selectedClient);
         const dividendHistory = await getClientDividendHistory(selectedClient);
         const clientSummary = await getClientSummary(selectedClient);
+        
+        // Calculate dividend totals
+        if (dividendHistory && dividendHistory.length > 0) {
+          import('@/services/portfolioService').then(({ calculateTotalDividends, calculateMonthlyAverageDividends }) => {
+            const totalDivs = calculateTotalDividends(dividendHistory);
+            const avgMonthlyDivs = calculateMonthlyAverageDividends(dividendHistory);
+            
+            setTotalDividends(totalDivs);
+            setAverageMonthlyDividends(avgMonthlyDivs);
+          });
+        }
         
         // Update portfolio data with real values from Supabase
         if (summary || fixedIncome.length || investmentFunds.length || realEstate.length || stocks.length || profitability || dividendHistory.length || clientSummary) {
@@ -701,7 +719,7 @@ export const RaioXProvider = ({
         
         // Generate financial summary based on real data if available
         if (summary) {
-          generateFinancialSummary(summary);
+          generateFinancialSummary(summary, dividendHistory);
         }
       } catch (error) {
         console.error("Error fetching client data:", error);
@@ -712,56 +730,66 @@ export const RaioXProvider = ({
   }, [selectedClient]);
   
   // Generate financial summary based on real data if available
-  const generateFinancialSummary = (clientData: PortfolioSummary) => {
-    // Convert client data to financial summary format
-    const totalPortfolioValue = parseFloat(clientData.total_portfolio_value || "0");
-    
-    const summary: FinancialSummary = {
-      netWorth: totalPortfolioValue,
-      totalAssets: totalPortfolioValue,
-      totalLiabilities: 0, // Not provided in the data, could be fetched separately
-      liquidAssets: clientData.fixed_income_value || 0,
-      monthlyIncome: totalPortfolioValue * 0.005, // Estimate monthly income as 0.5% of portfolio
-      monthlyExpenses: totalPortfolioValue * 0.003, // Estimate monthly expenses as 0.3% of portfolio
-      savingsRate: 40, // Estimate savings rate
-      investmentBalance: totalPortfolioValue,
-      cashReserves: clientData.fixed_income_value || 0,
-      debtTotal: 0, // Not provided in the data
-      riskProfile: "Moderado", // Default value, could be determined based on allocation
-      creditScore: 750, // Default value, not provided in the data
-      allocationSummary: {
-        stocks: parseFloat(clientData.stocks_representation || "0"),
-        bonds: clientData.fixed_income_representation || 0,
-        cash: 10, // Estimate
-        realEstate: clientData.real_estate_representation || 0,
-        alternatives: clientData.investment_fund_representation || 0
-      },
-      riskMetrics: [
-        { name: "Volatilidade", value: 45, color: "#4CAF50" },
-        { name: "Exposição a Renda Variável", value: 35, color: "#FFC107" },
-        { name: "Concentração", value: 25, color: "#2196F3" }
-      ],
-      topRisks: [
-        {
-          name: "Concentração em Poucos Ativos",
-          severity: "high",
-          impact: "68% do patrimônio em apenas 4 ativos"
+  const generateFinancialSummary = (clientData: PortfolioSummary, dividendHistory?: DividendHistory[]) => {
+    // Import the dividend calculation functions
+    import('@/services/portfolioService').then(({ calculateTotalDividends, calculateMonthlyAverageDividends }) => {
+      // Convert client data to financial summary format
+      const totalPortfolioValue = parseFloat(clientData.total_portfolio_value || "0");
+      
+      // Calculate dividends if we have dividend history
+      const divTotal = dividendHistory && dividendHistory.length ? calculateTotalDividends(dividendHistory) : 0;
+      const divMonthly = dividendHistory && dividendHistory.length ? calculateMonthlyAverageDividends(dividendHistory) : 0;
+      
+      setTotalDividends(divTotal);
+      setAverageMonthlyDividends(divMonthly);
+      
+      const summary: FinancialSummary = {
+        netWorth: totalPortfolioValue,
+        totalAssets: totalPortfolioValue,
+        totalLiabilities: 0, // Not provided in the data, could be fetched separately
+        liquidAssets: clientData.fixed_income_value || 0,
+        monthlyIncome: divMonthly > 0 ? divMonthly : totalPortfolioValue * 0.005, // Use dividend data if available
+        monthlyExpenses: totalPortfolioValue * 0.003, // Estimate monthly expenses as 0.3% of portfolio
+        savingsRate: 40, // Estimate savings rate
+        investmentBalance: totalPortfolioValue,
+        cashReserves: clientData.fixed_income_value || 0,
+        debtTotal: 0, // Not provided in the data
+        riskProfile: "Moderado", // Default value, could be determined based on allocation
+        creditScore: 750, // Default value, not provided in the data
+        allocationSummary: {
+          stocks: parseFloat(clientData.stocks_representation || "0"),
+          bonds: clientData.fixed_income_representation || 0,
+          cash: 10, // Estimate
+          realEstate: clientData.real_estate_representation || 0,
+          alternatives: clientData.investment_fund_representation || 0
         },
-        {
-          name: "Baixa Reserva de Emergência",
-          severity: "medium",
-          impact: `Cobertura de ${(clientData.fixed_income_value / (totalPortfolioValue * 0.003)).toFixed(1)} meses de despesas`
-        },
-        {
-          name: "Exposição Cambial",
-          severity: "medium",
-          impact: "30% do patrimônio sem proteção cambial"
-        }
-      ],
-      dataSource: 'supabase' as const // Mark this as real data from Supabase
-    };
-    
-    setFinancialSummary(summary);
+        riskMetrics: [
+          { name: "Volatilidade", value: 45, color: "#4CAF50" },
+          { name: "Exposição a Renda Variável", value: 35, color: "#FFC107" },
+          { name: "Concentração", value: 25, color: "#2196F3" }
+        ],
+        topRisks: [
+          {
+            name: "Concentração em Poucos Ativos",
+            severity: "high",
+            impact: "68% do patrimônio em apenas 4 ativos"
+          },
+          {
+            name: "Baixa Reserva de Emergência",
+            severity: "medium",
+            impact: `Cobertura de ${(clientData.fixed_income_value / (totalPortfolioValue * 0.003)).toFixed(1)} meses de despesas`
+          },
+          {
+            name: "Exposição Cambial",
+            severity: "medium",
+            impact: "30% do patrimônio sem proteção cambial"
+          }
+        ],
+        dataSource: 'supabase' as const // Mark this as real data from Supabase
+      };
+      
+      setFinancialSummary(summary);
+    });
   };
   
   return (
@@ -777,7 +805,9 @@ export const RaioXProvider = ({
         portfolioSummary: portfolioData.portfolioSummary,
         profitability: portfolioData.profitability,
         dividendHistory: portfolioData.dividendHistory,
-        clientSummary: portfolioData.clientSummary
+        clientSummary: portfolioData.clientSummary,
+        totalDividends,
+        averageMonthlyDividends
       }}
     >
       {children}
