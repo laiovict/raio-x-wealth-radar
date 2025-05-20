@@ -133,7 +133,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
       if (!insights.investmentGrowth) {
         insights.investmentGrowth = {
           annual: profitability?.ytd || 7.5,
-          total: portfolioSummary?.total_portfolio_value ? parseFloat(portfolioSummary.total_portfolio_value) * 0.075 : 24375,
+          total: toNumber(portfolioSummary?.total_portfolio_value) * 0.075,
           bestAsset: { name: "PETR4", growth: 12.3 },
           dataSource: 'xp'
         };
@@ -141,7 +141,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
       
       // Calculate total dividends for insights
       const totalDividendAmount = dividendHistory.reduce((total, div) => {
-        const value = parseFloat(div.value.replace(/[^\d,-]/g, '').replace(',', '.'));
+        const value = parseFloat(String(div.value).replace(/[^\d,-]/g, '').replace(',', '.'));
         return total + (isNaN(value) ? 0 : value);
       }, 0);
       
@@ -193,23 +193,23 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
   const generateSummary = (type: string, data: any): string => {
     switch (type) {
       case 'highestSpendingMonth':
-        return `Em ${data.month}, você gastou ${formatCurrency(data.amount)}, principalmente em ${data.categories && data.categories[0]?.name || 'diversas categorias'}.`;
+        return `Em ${data.month}, você gastou ${formatCurrency(String(data.amount))}, principalmente em ${data.categories && data.categories[0]?.name || 'diversas categorias'}.`;
       case 'wastedMoney':
-        return `Você poderia ter economizado aproximadamente ${formatCurrency(data.total)} em gastos desnecessários ou excessivos.`;
+        return `Você poderia ter economizado aproximadamente ${formatCurrency(String(data.total))} em gastos desnecessários ou excessivos.`;
       case 'topCategories':
-        return `Suas principais categorias de gastos são ${data.categories && data.categories.slice(0, 2).map((c: any) => c.name).join(', ')} ou 'diversas categorias', somando ${formatCurrency(data.total)}.`;
+        return `Suas principais categorias de gastos são ${data.categories && data.categories.slice(0, 2).map((c: any) => c.name).join(', ')} ou 'diversas categorias', somando ${formatCurrency(String(data.total))}.`;
       case 'negativeMonths': 
-        return `Você teve ${data.count} meses com saldo negativo, totalizando um déficit de ${formatCurrency(data.totalDeficit)}.`;
+        return `Você teve ${data.count} meses com saldo negativo, totalizando um déficit de ${formatCurrency(String(data.totalDeficit))}.`;
       case 'investmentGrowth':
         return `Seus investimentos cresceram ${data.annual}% este ano, com destaque para ${data.bestAsset?.name || 'seus melhores ativos'} (${data.bestAsset?.growth || 0}%).`;
       case 'potentialSavings':
-        return `Com pequenas mudanças em seus hábitos, você poderia economizar até ${formatCurrency(data.amount)} ao ano.`;
+        return `Com pequenas mudanças em seus hábitos, você poderia economizar até ${formatCurrency(String(data.amount))} ao ano.`;
       case 'bestInvestment':
         return `Seu melhor investimento foi ${data.name}, com retorno de ${data.return}% em ${data.period}.`;
       case 'retirementReadiness':
-        return `Com seu ritmo atual, você está a caminho de se aposentar em ${data.years} anos, precisando de ${formatCurrency(data.monthlyNeeded)} mensais.`;
+        return `Com seu ritmo atual, você está a caminho de se aposentar em ${data.years} anos, precisando de ${formatCurrency(String(data.monthlyNeeded))} mensais.`;
       case 'recurringExpenses':
-        return `Você tem ${data.items?.length || 0} despesas recorrentes totalizando ${formatCurrency(data.total)} por mês.`;
+        return `Você tem ${data.items?.length || 0} despesas recorrentes totalizando ${formatCurrency(String(data.total))} por mês.`;
       default:
         return "Dados adicionais disponíveis ao conectar mais fontes financeiras.";
     }

@@ -1,3 +1,4 @@
+
 import { 
   SentimentData, 
   SocialComparisonData, 
@@ -120,6 +121,7 @@ export const mockSocialComparison: SocialComparisonData = {
   percentileRank: 75,
   returnVsPeers: 3.2,
   diversificationScore: 82,
+  overallScore: 78, // Added this property to match the interface
   summary: "Seu desempenho está superior a 75% dos investidores com perfil similar ao seu. Sua estratégia de diversificação está contribuindo positivamente para resultados acima da média.",
   dataSource: 'synthetic'
 };
@@ -236,11 +238,9 @@ export const defaultRaioXData: RaioXData = {
     ...(clientData.financialSummary || {}), 
     dataSource: 'synthetic' 
   },
-  financialInsightData: (clientData.financialInsights || []).map(insight => ({ 
-    ...insight, 
-    dataSource: 'synthetic' 
-  })),
-  recommendedActions: (clientData.recommendedActions || []).map(action => ({ 
+  financialInsightData: mockFinancialInsightData,
+  // Fixed: renamed recommendedActions to recommendations
+  recommendations: (clientData.recommendedActions || []).map(action => ({ 
     ...action, 
     dataSource: 'synthetic' 
   })),
@@ -327,7 +327,7 @@ export const defaultRaioXData: RaioXData = {
   socialComparison: mockSocialComparison,
   allocation: mockAllocationData,
   wrapped: mockWrappedData,
-  financialInsightData: mockFinancialInsightData,
+  // Removed duplicate financialInsightData property
   openFinanceMonths: 0,
   hasOpenFinance: false,
   summary: "Seu portfólio está bem diversificado, mas poderia se beneficiar de maior exposição internacional. Sua saúde financeira está em ótimo estado, com fluxo de caixa positivo e bons índices de poupança.",

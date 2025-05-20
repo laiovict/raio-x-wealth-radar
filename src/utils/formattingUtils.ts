@@ -1,44 +1,69 @@
 
-import { toNumber } from '@/utils/typeConversionHelpers';
+/**
+ * Formatting utilities for consistent display across the application
+ */
 
 /**
- * Format a currency value
- * @param value Number or string to format
- * @param minimumFractionDigits Minimum fraction digits (default 0)
- * @param maximumFractionDigits Maximum fraction digits (default 0)
+ * Format a value as currency (BRL)
+ * @param value The value to format
  * @returns Formatted currency string
  */
-export const formatCurrency = (value: number | string, minimumFractionDigits = 0, maximumFractionDigits = 0): string => {
-  const numValue = toNumber(value);
+export const formatCurrency = (value: string | number): string => {
+  // Convert to number first
+  let numValue: number;
   
+  if (typeof value === 'string') {
+    // Remove currency symbols and formatting
+    const cleaned = value.replace(/[^\d,-]/g, '').replace(',', '.');
+    numValue = parseFloat(cleaned);
+  } else {
+    numValue = value;
+  }
+
+  // Return formatted value
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-    minimumFractionDigits,
-    maximumFractionDigits
-  }).format(numValue);
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(isNaN(numValue) ? 0 : numValue);
 };
 
 /**
- * Format a percentage value
- * @param value Number to format
- * @param minimumFractionDigits Minimum fraction digits (default 1)
- * @param maximumFractionDigits Maximum fraction digits (default 1)
+ * Format a value as a percentage
+ * @param value The value to format
+ * @param decimals Number of decimal places
  * @returns Formatted percentage string
  */
-export const formatPercentage = (value: number, minimumFractionDigits = 1, maximumFractionDigits = 1): string => {
-  return `${value.toFixed(minimumFractionDigits)}%`;
+export const formatPercentage = (value: string | number, decimals = 2): string => {
+  // Convert to number first
+  let numValue: number;
+  
+  if (typeof value === 'string') {
+    // Remove percentage symbols and formatting
+    const cleaned = value.replace(/[^\d,-]/g, '').replace(',', '.');
+    numValue = parseFloat(cleaned);
+  } else {
+    numValue = value;
+  }
+
+  // Return formatted value
+  return `${(isNaN(numValue) ? 0 : numValue).toFixed(decimals)}%`;
 };
 
 /**
- * Format a date value
- * @param date Date to format
- * @param options Intl.DateTimeFormatOptions
+ * Format a date in Brazilian style
+ * @param date The date to format
  * @returns Formatted date string
  */
-export const formatDate = (date: Date | string, options?: Intl.DateTimeFormatOptions): string => {
+export const formatDate = (date: Date | string): string => {
+  if (!date) return '';
+
   const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return dateObj.toLocaleDateString('pt-BR', options || {
+  
+  if (isNaN(dateObj.getTime())) return '';
+
+  return dateObj.toLocaleDateString('pt-BR', {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric'
@@ -46,17 +71,70 @@ export const formatDate = (date: Date | string, options?: Intl.DateTimeFormatOpt
 };
 
 /**
- * Format a number value
- * @param value Number to format
- * @param minimumFractionDigits Minimum fraction digits (default 0)
- * @param maximumFractionDigits Maximum fraction digits (default 0)
+ * Format a date in a shorter format (day and month)
+ * @param date The date to format
+ * @returns Formatted date string
+ */
+export const formatShortDate = (date: Date | string): string => {
+  if (!date) return '';
+
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  
+  if (isNaN(dateObj.getTime())) return '';
+
+  return dateObj.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit'
+  });
+};
+
+/**
+ * Format a value as a number with thousands separators
+ * @param value The value to format
+ * @param decimals Number of decimal places
  * @returns Formatted number string
  */
-export const formatNumber = (value: number | string, minimumFractionDigits = 0, maximumFractionDigits = 0): string => {
-  const numValue = toNumber(value);
+export const formatNumber = (value: string | number, decimals = 0): string => {
+  // Convert to number first
+  let numValue: number;
   
+  if (typeof value === 'string') {
+    // Remove formatting
+    const cleaned = value.replace(/[^\d,-]/g, '').replace(',', '.');
+    numValue = parseFloat(cleaned);
+  } else {
+    numValue = value;
+  }
+
+  // Return formatted value
   return new Intl.NumberFormat('pt-BR', {
-    minimumFractionDigits,
-    maximumFractionDigits
-  }).format(numValue);
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  }).format(isNaN(numValue) ? 0 : numValue);
+};
+
+/**
+ * Truncate a string if it exceeds a certain length
+ * @param text The text to truncate
+ * @param maxLength Maximum length before truncation
+ * @returns Truncated string
+ */
+export const truncateText = (text: string, maxLength: number): string => {
+  if (!text) return '';
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + '...';
+};
+
+/**
+ * Format a name (capitalize first letter of each word)
+ * @param name The name to format
+ * @returns Formatted name
+ */
+export const formatName = (name: string): string => {
+  if (!name) return '';
+  return name
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 };

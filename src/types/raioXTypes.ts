@@ -1,3 +1,4 @@
+
 // Define the AIInsight type for Raio-X insights
 export interface AIInsight {
   id: string;
@@ -63,14 +64,14 @@ export interface ClientSummary {
 // Define the FinancialSummary type for consolidated summary data
 export interface FinancialSummary {
   totalAssets: number;
-  fixedIncomePercent: number;
-  variableIncomePercent: number;
-  realEstatePercent: number;
-  otherPercent: number;
-  monthlyDividends: number;
-  annualDividends: number;
-  dividendYield: number;
-  profitability: {
+  fixedIncomePercent?: number;
+  variableIncomePercent?: number;
+  realEstatePercent?: number;
+  otherPercent?: number;
+  monthlyDividends?: number;
+  annualDividends?: number;
+  dividendYield?: number;
+  profitability?: {
     ytd: number;
     sixMonths: number;
     twelveMonths: number;
@@ -274,6 +275,8 @@ export interface RaioXData {
   summary?: any; // Added for RecommendationsModule
   socialComparison?: SocialComparisonData; // Added for SocialComparisonModule
   wrapped?: WrappedData; // Added for WrappedModule
+  openFinanceMonths?: number;
+  hasOpenFinance?: boolean;
 }
 
 // Props for the Raio-X context provider

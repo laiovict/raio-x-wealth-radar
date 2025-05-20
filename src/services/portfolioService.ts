@@ -1,9 +1,11 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { parseValueToNumber } from "@/components/modules/dividends/dividendUtils";
 import { toNumber, toString } from '@/utils/typeConversionHelpers';
+import { DividendHistory, FinancialSummary, DataSourceType } from '@/types/raioXTypes';
 
 // Define the data source type
-export type DataSource = 'synthetic' | 'supabase';
+export type DataSource = DataSourceType;
 
 /**
  * Fetches client portfolio summary from the database
@@ -26,7 +28,7 @@ export const getClientPortfolioSummary = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to indicate this is from Supabase
-    return data ? { ...data, dataSource: 'supabase' as DataSource } : null;
+    return data ? { ...data, dataSource: 'supabase' as DataSourceType } : null;
   } catch (error) {
     console.error("Error in portfolio summary fetch:", error);
     return null;
@@ -53,7 +55,7 @@ export const getClientFixedIncome = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to each item
-    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as DataSource })) : [];
+    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as DataSourceType })) : [];
   } catch (error) {
     console.error("Error in fixed income fetch:", error);
     return [];
@@ -80,7 +82,7 @@ export const getClientInvestmentFunds = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to each item
-    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as DataSource })) : [];
+    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as DataSourceType })) : [];
   } catch (error) {
     console.error("Error in investment funds fetch:", error);
     return [];
@@ -490,11 +492,11 @@ export const generateFinancialSummary = (
   dividendHistory: DividendHistory[] | undefined
 ): FinancialSummary => {
   // Calculate monthly income and expenses
-  const monthlyIncome = calculateTotalDividends(dividendHistory);
+  const monthlyIncome = calculateTotalDividends(dividendHistory || []);
   const monthlyExpenses = calculateTotalDividends(portfolioSummary?.monthly_expenses || []);
   
   // Calculate savings rate
-  const savingsRate = (monthlyIncome - monthlyExpenses) / monthlyIncome;
+  const savingsRate = monthlyIncome > 0 ? (monthlyIncome - monthlyExpenses) / monthlyIncome : 0;
   
   // Convert values where needed using our utility functions
   return {

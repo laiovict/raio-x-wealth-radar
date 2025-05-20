@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend } from "recharts";
 import { useMobileBreakpoint } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
-import { toNumber, fixAllocationDefaults } from "@/utils/typeConversionHelpers";
+import { toNumber } from "@/utils/typeConversionHelpers";
+import { DataSourceType } from "@/types/raioXTypes";
 
 interface AllocationModuleProps {
   fullWidth?: boolean;
@@ -39,7 +40,7 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
       "Alternativos": 0.0
     },
     optimizationGain: 2.4,
-    dataSource: 'synthetic' as DataSource
+    dataSource: 'synthetic' as DataSourceType
   });
 
   useEffect(() => {
@@ -47,16 +48,16 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
     if (data.portfolioSummary) {
       try {
         const summary = data.portfolioSummary;
-        const total = toNumber(summary.total_portfolio_value, 0);
+        const total = toNumber(summary.total_portfolio_value);
         
         if (total > 0) {
           // Create allocation data based on real portfolio values
           const currentAllocation = {
             "Renda Fixa": summary.fixed_income_representation || 0,
-            "Ações BR": toNumber(summary.stocks_representation, 0),
+            "Ações BR": toNumber(summary.stocks_representation),
             "Fundos": summary.investment_fund_representation || 0,
             "FIIs": summary.real_estate_representation || 0,
-            "Internacional": toNumber(summary.investment_international_representation, 0),
+            "Internacional": toNumber(summary.investment_international_representation),
             "Caixa": 5.0, // Estimate or could be calculated from another source
             "Previdência": summary.private_pension_representation || 0,
             "Alternativos": 0.0 // Now this is a separate category
@@ -94,7 +95,7 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
             current: currentAllocation,
             recommended: recommendedAllocation,
             optimizationGain,
-            dataSource: 'supabase' as DataSource
+            dataSource: 'supabase' as DataSourceType
           });
         }
       } catch (error) {
@@ -128,7 +129,7 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
                 "Alternativos": 0.0
               },
               optimizationGain: 3.2,
-              dataSource: 'synthetic' as const
+              dataSource: 'synthetic' as DataSourceType
             });
             break;
           // Add more client-specific allocations as needed
