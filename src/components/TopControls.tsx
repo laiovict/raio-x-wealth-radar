@@ -1,8 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from "@/components/ui/button";
-import { Calendar, Banknote, Shield } from "lucide-react";
+import { Calendar, Shield } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import CalendlyWidget from './CalendlyWidget';
 
 interface TopControlsProps {
   isAdvisor: boolean;
@@ -11,9 +12,10 @@ interface TopControlsProps {
 }
 
 const TopControls = ({ isAdvisor, onOpenFinanceToggle, hasOpenFinance = false }: TopControlsProps) => {
+  const [isCalendlyOpen, setIsCalendlyOpen] = useState(false);
+  
   const handleCalendlyClick = () => {
-    // Open Calendly in a new tab
-    window.open('https://calendly.com/your-advisor', '_blank');
+    setIsCalendlyOpen(true);
   };
 
   return (
@@ -41,17 +43,13 @@ const TopControls = ({ isAdvisor, onOpenFinanceToggle, hasOpenFinance = false }:
         onClick={handleCalendlyClick}
       >
         <Calendar className="h-4 w-4" />
-        <span>Agendar com Assessor</span>
+        <span>Agendar Consultoria Humana</span>
       </Button>
       
-      <Button
-        variant="outline"
-        size="sm"
-        className="bg-white/5 border border-white/10 hover:bg-white/10 text-green-300 flex gap-2 rounded-full px-4"
-      >
-        <Banknote className="h-4 w-4" />
-        <span>Simulador de Investimentos</span>
-      </Button>
+      <CalendlyWidget 
+        isOpen={isCalendlyOpen} 
+        onClose={() => setIsCalendlyOpen(false)} 
+      />
     </div>
   );
 };
