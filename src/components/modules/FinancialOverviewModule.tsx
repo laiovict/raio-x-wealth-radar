@@ -36,16 +36,36 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
     }).format(value);
   };
 
-  // Enhanced synthetic data based on client profiles
+  // Get client portfolio summary from real data if available
+  const getPortfolioSummary = () => {
+    if (data.portfolioSummary) {
+      return {
+        totalPortfolioValue: parseFloat(data.portfolioSummary.total_portfolio_value || "0"),
+        fixedIncomeValue: data.portfolioSummary.fixed_income_value || 0,
+        stocksValue: parseFloat(data.portfolioSummary.stocks_value || "0"),
+        realEstateValue: data.portfolioSummary.real_estate_value || 0,
+        investmentFundValue: data.portfolioSummary.investment_fund_value || 0,
+        treasureValue: parseFloat(data.portfolioSummary.treasure_value || "0"),
+        investmentInternationalValue: parseFloat(data.portfolioSummary.investment_international_value || "0")
+      };
+    }
+    
+    return null;
+  };
+
+  // Enhanced synthetic data based on client profiles, fallback if real data isn't available
   const getSyntheticData = (): EnhancedFinancialSummary => {
+    // Get real portfolio summary if available
+    const portfolioSummary = getPortfolioSummary();
+    
     // Default synthetic values
-    let netWorth = 1250000;
-    let totalAssets = 1450000;
-    let totalLiabilities = 200000;
-    let liquidAssets = 210000;
-    let monthlyIncome = 42000;
-    let monthlyExpenses = 28000;
-    let savingsRate = 33.3;
+    let netWorth = portfolioSummary?.totalPortfolioValue || 1250000;
+    let totalAssets = portfolioSummary?.totalPortfolioValue || 1450000;
+    let totalLiabilities = 200000; // Not provided in portfolio summary
+    let liquidAssets = portfolioSummary?.fixedIncomeValue || 210000;
+    let monthlyIncome = 42000; // Not provided in portfolio summary
+    let monthlyExpenses = 28000; // Not provided in portfolio summary
+    let savingsRate = 33.3; // Calculated if both income and expenses are available
     let monthlyTrend = "+4.3%";
     let savingsRateTrend = "+2.1%";
     
@@ -54,10 +74,12 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
       switch (selectedClient) {
         // Laio Santos (240275) - High net worth client
         case 240275:
-          netWorth = 4800000;
-          totalAssets = 5300000;
-          totalLiabilities = 500000;
-          liquidAssets = 780000;
+          if (!portfolioSummary) {
+            netWorth = 4800000;
+            totalAssets = 5300000;
+            totalLiabilities = 500000;
+            liquidAssets = 780000;
+          }
           monthlyIncome = 95000;
           monthlyExpenses = 48000;
           savingsRate = 49.5;
@@ -67,10 +89,12 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
           
         // Ana Oliveira (316982) - Aggressive profile
         case 316982:
-          netWorth = 1850000;
-          totalAssets = 2200000;
-          totalLiabilities = 350000;
-          liquidAssets = 140000;
+          if (!portfolioSummary) {
+            netWorth = 1850000;
+            totalAssets = 2200000;
+            totalLiabilities = 350000;
+            liquidAssets = 140000;
+          }
           monthlyIncome = 38000;
           monthlyExpenses = 29000;
           savingsRate = 23.7;
@@ -80,10 +104,12 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
           
         // Marcos Santos (327272) - Conservative profile
         case 327272:
-          netWorth = 980000;
-          totalAssets = 995000;
-          totalLiabilities = 15000;
-          liquidAssets = 420000;
+          if (!portfolioSummary) {
+            netWorth = 980000;
+            totalAssets = 995000;
+            totalLiabilities = 15000;
+            liquidAssets = 420000;
+          }
           monthlyIncome = 26000;
           monthlyExpenses = 19500;
           savingsRate = 25.0;
@@ -114,11 +140,11 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
       riskProfile: "Moderado",
       creditScore: 750,
       allocationSummary: {
-        stocks: 30,
-        bonds: 40,
+        stocks: portfolioSummary ? parseFloat(data.portfolioSummary.stocks_representation || "0") : 30,
+        bonds: portfolioSummary ? data.portfolioSummary.fixed_income_representation || 0 : 40,
         cash: 10,
-        realEstate: 10,
-        alternatives: 10
+        realEstate: portfolioSummary ? data.portfolioSummary.real_estate_representation || 0 : 10,
+        alternatives: portfolioSummary ? data.portfolioSummary.investment_fund_representation || 0 : 10
       },
       riskMetrics: [
         { name: "Volatilidade", value: 45, color: "#4CAF50" },
@@ -171,7 +197,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
     return result;
   };
   
-  // Use synthetic data when financial summary is missing
+  // Use real data when financial summary is available, otherwise use synthetic data
   const finData = hasOpenFinance 
     ? financialSummary || getSyntheticData() 
     : getSyntheticData();
@@ -505,7 +531,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
               <div className="text-sm text-gray-400 mb-1">Liquidez Imediata</div>
               <div className="text-xl font-bold text-white">{formatCurrency(finData.liquidAssets)}</div>
               <div className="flex items-center text-xs text-amber-400 mt-1">
-                <span>Cobertura de {(finData.liquidAssets / finData.monthlyExpenses).toFixed(1)} meses</span>
+                <span>Cobertura de ${(finData.liquidAssets / finData.monthlyExpenses).toFixed(1)} meses</span>
               </div>
             </div>
             <div className="p-4 rounded-lg bg-gradient-to-br from-indigo-900/40 to-indigo-800/20">

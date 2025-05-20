@@ -10,13 +10,8 @@ interface WelcomeBannerProps {
   selectedClient: number | null;
 }
 
-interface ClientInfo {
-  name: string;
-  cpf?: string;
-}
-
 // Enhanced client data with more personalized names
-const clientData: Record<string, ClientInfo> = {
+const clientData: Record<string, { name: string; cpf?: string }> = {
   // Known clients with their info
   "240275": { name: "Laio Santos", cpf: "13701356705" },
   // Add more examples with real names for better personalization
@@ -67,13 +62,9 @@ const WelcomeBanner = ({ selectedClient }: WelcomeBannerProps) => {
         }
         
         // Here we would normally extract client name from data
-        // For now, we'll use a placeholder with a randomized name
-        const randomNames = [
-          "Alexandre", "Beatriz", "Carlos", "Daniela", 
-          "Eduardo", "Flávia", "Gabriel", "Helena"
-        ];
-        const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
-        setClientName(`${randomName}`);
+        // Since the actual client name might not be in the database,
+        // we'll use the predefined names or a placeholder
+        setClientName(`Cliente ${clientId}`);
         
       } catch (error) {
         console.error("Error in client data fetch:", error);
