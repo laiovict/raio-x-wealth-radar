@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -55,48 +54,57 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
   };
 
   // Function to handle recommendation execution
-  const handleExecute = (index: number) => {
-    console.log(`Executing recommendation at index: ${index}`);
-    // In a real implementation, this would execute the recommendation
+  const handleExecute = (recommendation: any) => {
+    // Create a message to send to the chat
+    const messageText = `Nicolas, preciso executar a recomendação: ${recommendation.action}. ${recommendation.description}`;
+    
+    // Create custom event to pre-load message in the chat
+    const event = new CustomEvent('load-chat-message', { 
+      detail: { message: messageText }
+    });
+    document.dispatchEvent(event);
+    
+    // Navigate to chat tab
+    const tabsEvent = new CustomEvent('navigate-to-tab', {
+      detail: { tabId: 'chat' }
+    });
+    document.dispatchEvent(tabsEvent);
   };
 
-  const getUrgencyColor = (urgency: string) => {
-    switch (urgency.toLowerCase()) {
-      case "alto":
-        return "bg-red-900/40 text-red-300 border-red-700/30";
-      case "médio":
-        return "bg-amber-900/40 text-amber-300 border-amber-700/30";
-      case "baixo":
-        return "bg-green-900/40 text-green-300 border-green-700/30";
-      default:
-        return "bg-gray-800 text-gray-300 border-gray-700";
-    }
+  // Function to handle action button click (for recommended actions tab)
+  const handleActionClick = (action: any) => {
+    // Create a message to send to the chat
+    const messageText = `Nicolas, preciso implementar a ação: ${action.title}. ${action.description}`;
+    
+    // Create custom event to pre-load message in the chat
+    const event = new CustomEvent('load-chat-message', { 
+      detail: { message: messageText }
+    });
+    document.dispatchEvent(event);
+    
+    // Navigate to chat tab
+    const tabsEvent = new CustomEvent('navigate-to-tab', {
+      detail: { tabId: 'chat' }
+    });
+    document.dispatchEvent(tabsEvent);
   };
 
-  const getUrgencyIcon = (urgency: string) => {
-    switch (urgency.toLowerCase()) {
-      case "alto":
-        return <AlertTriangle className="h-4 w-4 text-red-400" />;
-      case "médio":
-        return <Clock className="h-4 w-4 text-amber-400" />;
-      case "baixo":
-        return <CheckCircle className="h-4 w-4 text-green-400" />;
-      default:
-        return null;
-    }
-  };
-
-  const getImpactColor = (impact: string) => {
-    switch (impact.toLowerCase()) {
-      case "alto":
-        return "bg-blue-900/40 text-blue-300 border-blue-700/30";
-      case "médio":
-        return "bg-indigo-900/40 text-indigo-300 border-indigo-700/30";
-      case "baixo":
-        return "bg-violet-900/40 text-violet-300 border-violet-700/30";
-      default:
-        return "bg-gray-800 text-gray-300 border-gray-700";
-    }
+  // Function to handle insight click
+  const handleInsightClick = (insight: any) => {
+    // Create a message to send to the chat
+    const messageText = `Nicolas, preciso saber mais sobre o insight: ${insight.title}. ${insight.description}`;
+    
+    // Create custom event to pre-load message in the chat
+    const event = new CustomEvent('load-chat-message', { 
+      detail: { message: messageText }
+    });
+    document.dispatchEvent(event);
+    
+    // Navigate to chat tab
+    const tabsEvent = new CustomEvent('navigate-to-tab', {
+      detail: { tabId: 'chat' }
+    });
+    document.dispatchEvent(tabsEvent);
   };
 
   // Get client-specific recommended actions
@@ -348,6 +356,7 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
                           variant="outline" 
                           size="sm"
                           className="bg-indigo-900/30 text-indigo-300 border-indigo-700/50 hover:bg-indigo-800/50"
+                          onClick={() => handleActionClick(action)}
                         >
                           {action.buttonText} <ArrowRight className="ml-2 h-4 w-4" />
                         </Button>
@@ -393,7 +402,7 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
                             variant="outline" 
                             size="sm" 
                             className="bg-indigo-900/30 text-indigo-300 border-indigo-700/50 hover:bg-indigo-800/50"
-                            onClick={() => handleExecute(index)}
+                            onClick={() => handleExecute(recommendation)}
                           >
                             Executar <ArrowRight className="ml-2 h-4 w-4" />
                           </Button>
@@ -434,6 +443,7 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
                           variant="ghost" 
                           size="sm" 
                           className="text-indigo-400 hover:text-indigo-300 hover:bg-indigo-900/20"
+                          onClick={() => handleInsightClick(insight)}
                         >
                           Saiba mais <ArrowRight className="ml-1 h-3 w-3" />
                         </Button>

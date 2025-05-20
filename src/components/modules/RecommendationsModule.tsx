@@ -17,10 +17,22 @@ const RecommendationsModule = ({ fullWidth = false }: RecommendationsModuleProps
   const isMobile = useMobileBreakpoint();
   const { t } = useLanguage();
 
-  // Function to handle recommendation execution
-  const handleExecute = (index: number) => {
-    console.log(`Executing recommendation at index: ${index}`);
-    // In a real implementation, this would execute the recommendation
+  // Function to handle recommendation execution by sending a message to the chat
+  const handleExecute = (recommendation: any) => {
+    // Create a message to send to the chat
+    const messageText = `Nicolas, preciso executar a recomendação: ${recommendation.action}. ${recommendation.description}`;
+    
+    // Create custom event to pre-load message in the chat
+    const event = new CustomEvent('load-chat-message', { 
+      detail: { message: messageText }
+    });
+    document.dispatchEvent(event);
+    
+    // Navigate to chat tab
+    const tabsEvent = new CustomEvent('navigate-to-tab', {
+      detail: { tabId: 'chat' }
+    });
+    document.dispatchEvent(tabsEvent);
   };
 
   // Function to handle OpenFinance activation button click
@@ -107,7 +119,7 @@ const RecommendationsModule = ({ fullWidth = false }: RecommendationsModuleProps
                     variant="outline" 
                     size="sm" 
                     className="bg-white dark:bg-transparent hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-900/30 dark:hover:text-blue-300 transition-colors text-gray-700 dark:text-gray-200"
-                    onClick={() => handleExecute(index)}
+                    onClick={() => handleExecute(recommendation)}
                   >
                     {t('executeButton')} <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>

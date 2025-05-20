@@ -37,36 +37,19 @@ const RecommendedActionsModule = ({ fullWidth = false }) => {
   // Handle action button click
   const handleActionClick = (action: RecommendedAction) => {
     // If we have a custom chat message, redirect to chat with that message
-    if (action.chatMessage) {
-      // Create custom event to pre-load message in the chat
-      const event = new CustomEvent('load-chat-message', { 
-        detail: { message: action.chatMessage }
-      });
-      document.dispatchEvent(event);
-      
-      // Navigate to chat tab
-      const tabsEvent = new CustomEvent('navigate-to-tab', {
-        detail: { tabId: 'chat' }
-      });
-      document.dispatchEvent(tabsEvent);
-    } else if (action.buttonLink) {
-      // Otherwise use the original link
-      if (action.buttonLink.startsWith('#')) {
-        // Handle internal links
-        if (action.buttonLink === '#chat') {
-          const tabsEvent = new CustomEvent('navigate-to-tab', {
-            detail: { tabId: 'chat' }
-          });
-          document.dispatchEvent(tabsEvent);
-        } else {
-          // For other anchor links
-          document.querySelector(action.buttonLink)?.scrollIntoView({ behavior: 'smooth' });
-        }
-      } else {
-        // External links
-        window.open(action.buttonLink, '_blank');
-      }
-    }
+    const messageText = action.chatMessage || `Nicolas, preciso implementar a ação: ${action.title}. ${action.description}`;
+    
+    // Create custom event to pre-load message in the chat
+    const event = new CustomEvent('load-chat-message', { 
+      detail: { message: messageText }
+    });
+    document.dispatchEvent(event);
+    
+    // Navigate to chat tab
+    const tabsEvent = new CustomEvent('navigate-to-tab', {
+      detail: { tabId: 'chat' }
+    });
+    document.dispatchEvent(tabsEvent);
   };
 
   // Sample recommended actions - these would come from data or API in a real app
