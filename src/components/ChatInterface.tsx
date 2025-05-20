@@ -42,11 +42,11 @@ const ChatInterface = () => {
     const clientContext = {
       name: data.clientName || "Cliente",
       portfolio: {
-        totalValue: data.portfolioValue || "desconhecido",
-        allocation: data.assetAllocation || {},
-        liquidity: data.liquidityReserve || "desconhecido",
+        totalValue: data.allocation?.current?.total || "desconhecido",
+        allocation: data.allocation?.current || {},
+        liquidity: data.liquidity?.currentIdle || "desconhecido",
       },
-      goals: data.lifeGoals || [],
+      goals: data.lifeGoals || { goals: [], summary: "" },
       hasOpenFinance: hasOpenFinance,
     };
     
@@ -60,8 +60,9 @@ const ChatInterface = () => {
     }
     
     if (userMessage.toLowerCase().includes("objetivo") || userMessage.toLowerCase().includes("meta")) {
-      if (clientContext.goals.length > 0) {
-        return `Você possui ${clientContext.goals.length} objetivos financeiros registrados. Gostaria de discutir algum específico?`;
+      const goals = Array.isArray(clientContext.goals) ? clientContext.goals : clientContext.goals.goals;
+      if (goals && goals.length > 0) {
+        return `Você possui ${goals.length} objetivos financeiros registrados. Gostaria de discutir algum específico?`;
       } else {
         return "Não vejo objetivos financeiros registrados. Gostaria de definir alguns para orientar seu planejamento financeiro?";
       }
@@ -76,8 +77,9 @@ const ChatInterface = () => {
     }
     
     // Default responses based on portfolio data
+    const portfolioValue = clientContext.portfolio.totalValue;
     const responses = [
-      `Analisando seu portfólio atual de R$ ${clientContext.portfolio.totalValue}, posso ajudar a identificar oportunidades para otimização de acordo com seus objetivos.`,
+      `Analisando seu portfólio atual de R$ ${portfolioValue}, posso ajudar a identificar oportunidades para otimização de acordo com seus objetivos.`,
       `Com base no seu perfil financeiro, posso sugerir estratégias que equilibrem risco e retorno para seu patrimônio atual.`,
       `Considerando sua alocação atual, há espaço para diversificação que pode melhorar o desempenho do seu portfólio.`,
       `Vamos revisar juntos seus objetivos financeiros para garantir que sua estratégia de investimento esteja alinhada com suas metas de curto e longo prazo.`
