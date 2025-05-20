@@ -24,10 +24,11 @@ const App = () => {
     setIsLoading(false);
   }, []);
 
-  // Protected route component that checks if user is an advisor
-  const ProtectedApiDocsRoute = () => {
+  // Updated the protected route component to allow all users to access API docs
+  const ApiDocsRoute = () => {
     if (isLoading) return null;
-    return userRole === "advisor" ? <ApiDocs /> : <Navigate to="/" replace />;
+    // Removed role restriction, allowing all users to access API docs
+    return <ApiDocs />;
   };
 
   return (
@@ -40,7 +41,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
-              <Route path="/api-docs" element={<ProtectedApiDocsRoute />} />
+              <Route path="/api-docs" element={<ApiDocsRoute />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
