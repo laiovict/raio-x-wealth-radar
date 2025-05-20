@@ -6,7 +6,8 @@ import {
   WrappedData, 
   FinancialInsightData, 
   AIInsight,
-  RaioXData
+  RaioXData,
+  DataSourceType
 } from '@/types/raioXTypes';
 import { clientData } from '@/data/clientData';
 
@@ -21,6 +22,8 @@ export const sampleAIInsights: AIInsight[] = [
     timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
     agent: "investor",
     isSynthetic: false,
+    type: "opportunity",
+    impact: "medium",
     dataSource: 'synthetic'
   },
   {
@@ -33,6 +36,8 @@ export const sampleAIInsights: AIInsight[] = [
     timestamp: new Date(),
     agent: "planner",
     isSynthetic: false,
+    type: "risk",
+    impact: "high",
     dataSource: 'synthetic'
   },
   {
@@ -44,6 +49,8 @@ export const sampleAIInsights: AIInsight[] = [
     timestamp: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 14 days ago
     agent: "planner",
     isSynthetic: true,
+    type: "insight",
+    impact: "low",
     dataSource: 'synthetic'
   },
   {
@@ -55,6 +62,8 @@ export const sampleAIInsights: AIInsight[] = [
     timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
     agent: "investor",
     isSynthetic: false,
+    type: "opportunity",
+    impact: "medium",
     dataSource: 'synthetic'
   },
   {
@@ -66,6 +75,8 @@ export const sampleAIInsights: AIInsight[] = [
     timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
     agent: "planner",
     isSynthetic: true,
+    type: "risk",
+    impact: "high",
     dataSource: 'synthetic'
   },
   {
@@ -77,6 +88,8 @@ export const sampleAIInsights: AIInsight[] = [
     timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
     agent: "credit",
     isSynthetic: false,
+    type: "opportunity",
+    impact: "medium",
     dataSource: 'synthetic'
   }
 ];
@@ -118,9 +131,6 @@ export const mockAllocationData: AllocationData = {
     "Ações BR": 25.0,
     "Fundos": 20.0,
     "Caixa": 10.0,
-    "Internacional": 0.0,
-    "FIIs": 0.0,
-    "Previdência": 0.0
   },
   recommended: {
     "Renda Fixa": 30.0,
@@ -270,6 +280,10 @@ export const defaultRaioXData: RaioXData = {
   },
   liquidity: {
     currentIdle: 30000,
+    recommended: 60000,
+    difference: -30000,
+    currentIdleMonths: 3,
+    recommendedMonths: 6,
     idealReserve: 60000,
     monthlyExpenses: 10000,
     idealMonths: 6,
@@ -316,5 +330,10 @@ export const defaultRaioXData: RaioXData = {
   financialInsightData: mockFinancialInsightData,
   openFinanceMonths: 0,
   hasOpenFinance: false,
-  summary: "Seu portfólio está bem diversificado, mas poderia se beneficiar de maior exposição internacional. Sua saúde financeira está em ótimo estado, com fluxo de caixa positivo e bons índices de poupança."
+  summary: "Seu portfólio está bem diversificado, mas poderia se beneficiar de maior exposição internacional. Sua saúde financeira está em ótimo estado, com fluxo de caixa positivo e bons índices de poupança.",
+  fixedIncome: [],
+  investmentFunds: [],
+  realEstate: [],
+  stocks: [],
+  dividendHistory: []
 };

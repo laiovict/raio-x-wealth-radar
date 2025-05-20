@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -13,20 +12,19 @@ import {
   PiggyBank,
   Wallet
 } from "lucide-react";
+import { Globe } from "@/components/common/icons";
 import { useState, useMemo } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatCurrency, formatDate } from "@/utils/formattingUtils";
-
-interface FinancialInsightsModuleProps {
-  fullWidth?: boolean;
-}
+import DataSourceTag from "@/components/common/DataSourceTag";
+import { DataSourceType } from "@/types/raioXTypes";
+import { toNumber } from "@/utils/typeConversionHelpers";
 
 // Define more specific types for each insight type
 interface BaseInsight {
   summary?: string; // Make summary optional across all insight types
-  dataSource?: 'supabase' | 'synthetic'; // Add dataSource field to track where data comes from
+  dataSource?: DataSourceType; // Add dataSource field to track where data comes from
 }
 
 interface HighestSpendingMonth extends BaseInsight {
@@ -96,28 +94,8 @@ interface FinancialInsightData {
   bestInvestment?: BestInvestment;
   retirementReadiness?: RetirementReadiness;
   recurringExpenses?: RecurringExpenses;
-  dataSource?: 'supabase' | 'synthetic';
+  dataSource?: DataSourceType;
 }
-
-// Data source tag component
-const DataSourceTag = ({ dataSource }: { dataSource?: 'supabase' | 'synthetic' }) => {
-  if (!dataSource) return null;
-  
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span className={`ml-1 ${dataSource === 'supabase' ? 'text-green-400' : 'text-amber-400'}`}>
-            {dataSource === 'supabase' ? <CheckCircle className="inline-block h-3 w-3" /> : '*'}
-          </span>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{dataSource === 'supabase' ? 'Dado real do Supabase' : 'Dado sintético'}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-};
 
 const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleProps) => {
   const { 
@@ -152,7 +130,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
           annual: profitability?.ytd || 7.5,
           total: portfolioSummary?.total_portfolio_value ? parseFloat(portfolioSummary.total_portfolio_value) * 0.075 : 24375,
           bestAsset: { name: "PETR4", growth: 12.3 },
-          dataSource: 'supabase'
+          dataSource: 'xp'
         };
       }
       
@@ -168,7 +146,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
           name: dividendHistory[0]?.asset || "ITSA4",
           return: profitability?.ytd ? profitability.ytd * 1.2 : 9.0,
           period: "YTD",
-          dataSource: 'supabase'
+          dataSource: 'xp'
         };
       }
     }
@@ -178,7 +156,8 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
 
   // Informações dos indicadores de fonte de dados
   const dataSourceInfo = {
-    supabase: "Dados provenientes do Supabase, representando informações reais do cliente.",
+    xp: "Dados provenientes da XP Investimentos, representando informações reais do cliente.",
+    openfinance: "Dados obtidos via Open Finance, refletindo informações de outras instituições financeiras.",
     synthetic: "Dados sintéticos gerados para demonstração, não representam valores reais do cliente."
   };
   
@@ -257,15 +236,22 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
           <div className="mt-2 p-2 bg-gray-800/50 rounded-md text-xs">
             <div className="flex items-center mb-1">
               <CheckCircle className="h-3 w-3 text-green-400 mr-1" />
-              <span>{dataSourceInfo.supabase}</span>
+              <span>Dados XP Investimentos</span>
+            </div>
+            <div className="flex items-center mb-1">
+              <span className="text-blue-400 mr-1 inline-flex items-center">
+                <Globe className="h-3 w-3" />
+              </span>
+              <span>Dados Open Finance</span>
             </div>
             <div className="flex items-center">
               <span className="text-amber-400 mr-1">*</span>
-              <span>{dataSourceInfo.synthetic}</span>
+              <span>Dados sintéticos para demonstração</span>
             </div>
           </div>
         )}
       </CardHeader>
+      
       <CardContent>
         <ScrollArea className="h-[600px] pr-4">
           <div className="space-y-6">
@@ -280,7 +266,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-amber-400 mb-1">
                         Você viveu no limite?
-                        <DataSourceTag dataSource={financialInsights.highestSpendingMonth.dataSource} />
+                        <DataSourceTag source={financialInsights.highestSpendingMonth.dataSource as DataSourceType} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 19, 2025</span>
                     </div>
@@ -317,7 +303,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-red-400 mb-1">
                         Dinheiro que escorreu pelo ralo
-                        <DataSourceTag dataSource={financialInsights.wastedMoney.dataSource} />
+                        <DataSourceTag source={financialInsights.wastedMoney.dataSource as DataSourceType} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 19, 2025</span>
                     </div>
@@ -354,7 +340,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-blue-400 mb-1">
                         O que você mais comprou?
-                        <DataSourceTag dataSource={financialInsights.topCategories.dataSource} />
+                        <DataSourceTag source={financialInsights.topCategories.dataSource as DataSourceType} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 19, 2025</span>
                     </div>
@@ -398,7 +384,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-orange-400 mb-1">
                         E quando o dinheiro só... sumiu?
-                        <DataSourceTag dataSource={financialInsights.negativeMonths.dataSource} />
+                        <DataSourceTag source={financialInsights.negativeMonths.dataSource as DataSourceType} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 19, 2025</span>
                     </div>
@@ -435,7 +421,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-purple-400 mb-1">
                         Despesas Recorrentes
-                        <DataSourceTag dataSource={financialInsights.recurringExpenses.dataSource} />
+                        <DataSourceTag source={financialInsights.recurringExpenses.dataSource as DataSourceType} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 19, 2025</span>
                     </div>
@@ -481,7 +467,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-green-400 mb-1">
                         Mas teve coisa boa também
-                        <DataSourceTag dataSource={financialInsights.investmentGrowth.dataSource} />
+                        <DataSourceTag source={financialInsights.investmentGrowth.dataSource as DataSourceType} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 17, 2025</span>
                     </div>
@@ -518,7 +504,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-indigo-400 mb-1">
                         E se você focasse de verdade?
-                        <DataSourceTag dataSource={financialInsights.potentialSavings.dataSource} />
+                        <DataSourceTag source={financialInsights.potentialSavings.dataSource as DataSourceType} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 17, 2025</span>
                     </div>
@@ -556,7 +542,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-purple-400 mb-1">
                         A hora que você brilhou
-                        <DataSourceTag dataSource={financialInsights.bestInvestment.dataSource} />
+                        <DataSourceTag source={financialInsights.bestInvestment.dataSource as DataSourceType} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 17, 2025</span>
                     </div>
@@ -593,7 +579,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-teal-400 mb-1">
                         Preparação para Aposentadoria
-                        <DataSourceTag dataSource={financialInsights.retirementReadiness.dataSource} />
+                        <DataSourceTag source={financialInsights.retirementReadiness.dataSource as DataSourceType} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 17, 2025</span>
                     </div>

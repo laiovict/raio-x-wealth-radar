@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { AlertTriangle, RefreshCw, Clock, ChevronDown, ChevronUp, ArrowRight, ChevronRight, Shield, TrendingUp } from "lucide-react";
 import { useState, useMemo } from "react";
 import { formatCurrency, formatDate } from "@/utils/raioXUtils";
+import { toNumber } from '@/utils/typeConversionHelpers';
+import DataSourceTag from '@/components/common/DataSourceTag';
+import { DataSourceType } from '@/types/raioXTypes';
 
 interface OnePageFinancialPlanModuleProps {
   fullWidth?: boolean;
@@ -70,7 +73,7 @@ const Users = (props: any) => (
 );
 
 const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanModuleProps) => {
-  const { isAIAnalysisLoading, refreshAIAnalysis, portfolioSummary, profitability, clientSummary } = useRaioX();
+  const { isAIAnalysisLoading, refreshAIAnalysis, portfolioSummary, profitability, clientSummary, financialSummary } = useRaioX();
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     "cashFlow": true,
     "investments": false,
@@ -341,6 +344,15 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
       }
     ]
   };
+
+  // Fix variable assignments
+  const totalAssets = toNumber(financialSummary?.totalAssets);
+  const totalLiabilities = toNumber(financialSummary?.totalLiabilities);
+  const netWorth = totalAssets - totalLiabilities;
+
+  const monthlyIncome = toNumber(financialSummary?.monthlyIncome);
+  const monthlyExpenses = toNumber(financialSummary?.monthlyExpenses);
+  const monthlySavings = monthlyIncome - monthlyExpenses;
 
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>

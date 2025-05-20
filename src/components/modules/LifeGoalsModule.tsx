@@ -6,21 +6,18 @@ import { ArrowUp, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
-import { formatCurrency } from "@/utils/raioXUtils";
+import { formatCurrency, toNumber } from '@/utils/raioXUtils';
+import DataSourceTag from '@/components/common/DataSourceTag';
+import { DataSourceType } from '@/types/raioXTypes';
 
 interface LifeGoalsModuleProps {
   fullWidth?: boolean;
 }
 
 // Data source indicator component
-const DataSourceIndicator = ({ source }: { source?: 'supabase' | 'synthetic' }) => {
+const DataSourceIndicator = ({ source }: { source?: DataSourceType }) => {
   if (!source) return null;
-  
-  return (
-    <span className={`ml-1 ${source === 'supabase' ? 'text-green-400' : 'text-amber-400'}`}>
-      {source === 'supabase' ? <span className="inline-block h-3 w-3">✓</span> : '*'}
-    </span>
-  );
+  return <DataSourceTag source={source} />;
 };
 
 const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
@@ -152,7 +149,7 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
               />
               <div className="flex justify-between items-center text-xs text-gray-400">
                 <span>
-                  {`Atual: ${formatCurrency(goal.currentAmount)}`}
+                  {`Atual: ${formatCurrency(toNumber(goal.currentAmount))}`}
                 </span>
                 <span>
                   {`Meta: ${formatCurrency(goal.targetAmount)}`}

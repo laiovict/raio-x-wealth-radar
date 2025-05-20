@@ -1,6 +1,6 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { parseValueToNumber } from "@/components/modules/dividends/dividendUtils";
+import { toNumber, toString } from '@/utils/typeConversionHelpers';
 
 // Define the data source type
 export type DataSource = 'synthetic' | 'supabase';
@@ -477,4 +477,48 @@ export const generateConsolidatedFinancialReport = async (clientId: number | nul
     hasOpenFinanceData,
     dataSource: 'supabase' as DataSource
   };
+};
+
+/**
+ * Generate a financial summary
+ * @param portfolioSummary Portfolio summary from XP
+ * @param dividendHistory Array of dividend history items
+ * @returns Financial summary
+ */
+export const generateFinancialSummary = (
+  portfolioSummary: any,
+  dividendHistory: DividendHistory[] | undefined
+): FinancialSummary => {
+  // Calculate monthly income and expenses
+  const monthlyIncome = calculateTotalDividends(dividendHistory);
+  const monthlyExpenses = calculateTotalDividends(portfolioSummary?.monthly_expenses || []);
+  
+  // Calculate savings rate
+  const savingsRate = (monthlyIncome - monthlyExpenses) / monthlyIncome;
+  
+  // Convert values where needed using our utility functions
+  return {
+    totalAssets: toNumber(portfolioSummary?.total_portfolio_value),
+    monthlyIncome: toNumber(monthlyIncome),
+    monthlyExpenses: toNumber(monthlyExpenses),
+    savingsRate: toNumber(savingsRate),
+    netWorth: toNumber(portfolioSummary?.total_portfolio_value) * 0.8, // Net worth = assets - debts (approximation)
+    investmentBalance: toNumber(portfolioSummary?.total_portfolio_value) * 0.9, // Approximate investment balance
+    cashReserves: toNumber(portfolioSummary?.total_portfolio_value) * 0.1, // Approximate cash reserves
+    debtTotal: toNumber(portfolioSummary?.total_portfolio_value) * 0.2, // Approximate debt (placeholder)
+    totalLiabilities: toNumber(portfolioSummary?.total_portfolio_value) * 0.2, // Same as debt total
+    liquidAssets: toNumber(portfolioSummary?.total_portfolio_value) * 0.3, // Approximate liquid assets
+    
+    dataSource: portfolioSummary?.dataSource || 'synthetic',
+  };
+};
+
+/**
+ * Format a value to a currency string
+ * @param value The value to format
+ * @returns The formatted currency string
+ */
+const formatValue = (value: any): string => {
+  if (!value) return "R$ 0,00";
+  return toString(value);
 };

@@ -24,6 +24,9 @@ import {
   CarouselPrevious 
 } from "@/components/ui/carousel";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { toNumber } from '@/utils/typeConversionHelpers';
+import DataSourceTag from '@/components/common/DataSourceTag';
+import { DataSourceType } from '@/types/raioXTypes';
 
 interface WrappedModuleProps {
   fullWidth?: boolean;
@@ -367,13 +370,9 @@ const WrappedModule = ({ fullWidth = false }: WrappedModuleProps) => {
             <div className="rounded-lg bg-purple-600/50 p-2">
               <Award className="h-5 w-5 text-purple-100" />
             </div>
-            <CardTitle className="text-xl text-white">
-              Retrospectiva Financeira 2025
-              {wrappedData.dataSource === 'supabase' && (
-                <span className="ml-1 text-green-400">
-                  <span className="inline-block h-3 w-3">✓</span>
-                </span>
-              )}
+            <CardTitle className="text-xl bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent flex items-center">
+              Seu Ano em Investimentos
+              <DataSourceTag source={wrapped?.dataSource as DataSourceType} />
             </CardTitle>
           </div>
           <span className="text-xs px-3 py-1 bg-purple-700/50 rounded-full text-purple-200 border border-purple-500/30">
@@ -451,7 +450,7 @@ const WrappedModule = ({ fullWidth = false }: WrappedModuleProps) => {
                   <div className="flex items-center justify-between bg-emerald-900/40 p-3 rounded-lg border border-emerald-700/30">
                     <div>
                       <p className="text-sm text-emerald-300">Maior Aporte</p>
-                      <p className="text-xl font-bold text-white">{formatCurrency(wrappedData.biggestContribution.amount)}</p>
+                      <span className="text-2xl font-bold">{formatCurrency(toNumber(wrapped?.biggestContribution?.amount))}</span>
                     </div>
                     <p className="text-emerald-200 text-sm">{formatDate(wrappedData.biggestContribution.date)}</p>
                   </div>

@@ -1,260 +1,175 @@
-
-import React from "react";
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { RefreshCw, ArrowRight, ChevronRight } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
-import { formatCurrency } from "@/utils/raioXUtils";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { formatCurrency, formatPercentage } from "@/utils/formattingUtils";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { BarChart, PieChart } from "lucide-react";
+import { toNumber } from '@/utils/typeConversionHelpers';
+import DataSourceTag from '@/components/common/DataSourceTag';
+import { DataSourceType } from '@/types/raioXTypes';
 
 interface InvestmentPlanningModuleProps {
   fullWidth?: boolean;
 }
 
-// Data source indicator component
-const DataSourceIndicator = ({ source }: { source?: 'supabase' | 'synthetic' }) => {
-  if (!source) return null;
-  
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span className={`ml-1 ${source === 'supabase' ? 'text-green-400' : 'text-amber-400'}`}>
-            {source === 'supabase' ? <span className="inline-block h-3 w-3">✓</span> : '*'}
-          </span>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>{source === 'supabase' ? 'Dados reais' : 'Dados estimados'}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-};
-
 const InvestmentPlanningModule = ({ fullWidth = false }: InvestmentPlanningModuleProps) => {
-  const { data, isAIAnalysisLoading, refreshAIAnalysis, portfolioSummary } = useRaioX();
+  const { data } = useRaioX();
 
-  // Sample data for investment planning - will use Supabase data when available
-  const investmentPlan = React.useMemo(() => {
-    // Default values
-    let targetAmount = 2500000;
-    let currentAmount = portfolioSummary ? parseFloat(portfolioSummary.total_portfolio_value || "850000") : 850000;
-    let monthlyContribution = 5000;
-    let recommendedContribution = 7500;
-    let yearsToGoal = 15;
-    let expectedReturn = 8.5;
-    let riskProfile = "Moderado";
-    let assetAllocation = [
-      { class: "Renda Fixa", current: portfolioSummary ? portfolioSummary.fixed_income_representation || 60 : 60, recommended: 45, color: "from-blue-500 to-blue-600" },
-      { class: "Renda Variável (BR)", current: portfolioSummary ? parseFloat(portfolioSummary.stocks_representation || "25") : 25, recommended: 20, color: "from-green-500 to-green-600" },
-      { class: "Renda Variável (Int.)", current: portfolioSummary ? parseFloat(portfolioSummary.investment_international_representation || "10") : 10, recommended: 20, color: "from-purple-500 to-purple-600" },
-      { class: "Alternativos", current: portfolioSummary ? portfolioSummary.investment_fund_representation || 5 : 5, recommended: 15, color: "from-amber-500 to-amber-600" },
-    ];
-    let recommendations = [
-      "Aumentar contribuição mensal para R$ 7.500",
-      "Diversificar carteira com mais exposição internacional",
-      "Reduzir concentração em renda fixa para melhorar retorno esperado",
-      "Considerar investimentos alternativos para diversificação"
-    ];
-    let dataSource = portfolioSummary ? 'supabase' : 'synthetic' as 'supabase' | 'synthetic';
-    
-    // Calculate goal progress
-    let goalProgress = Math.round((currentAmount / targetAmount) * 100);
-    
-    return {
-      targetAmount,
-      currentAmount,
-      monthlyContribution,
-      recommendedContribution,
-      yearsToGoal,
-      expectedReturn,
-      riskProfile,
-      assetAllocation,
-      recommendations,
-      dataSource,
-      goalProgress
-    };
-  }, [portfolioSummary]);
-
-  if (isAIAnalysisLoading) {
-    return (
-      <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-            Planejamento de Investimentos
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-8">
-            <RefreshCw className="w-12 h-12 text-blue-500 animate-spin mb-4" />
-            <p className="text-gray-400">Calculando seu plano de investimentos...</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  const recommendations = [
+    {
+      asset: "Tesouro Selic 2029",
+      currentAllocation: "R$ 25.000",
+      recommendedAllocation: "R$ 15.000",
+      reason: "Reduzir exposição a longo prazo",
+    },
+    {
+      asset: "CDB Banco XP 130% CDI",
+      currentAllocation: "R$ 15.000",
+      recommendedAllocation: "R$ 20.000",
+      reason: "Aproveitar taxas de juros mais altas",
+    },
+    {
+      asset: "Fundo Multimercado",
+      currentAllocation: "R$ 10.000",
+      recommendedAllocation: "R$ 15.000",
+      reason: "Diversificar para ativos de maior retorno",
+    },
+  ];
 
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
       <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-            Planejamento de Investimentos
-            <DataSourceIndicator source={investmentPlan.dataSource} />
-          </CardTitle>
-          <Button variant="ghost" size="sm" onClick={refreshAIAnalysis} className="flex items-center gap-2">
-            <RefreshCw className="h-4 w-4" />
-            <span className="hidden md:inline">Atualizar</span>
-          </Button>
-        </div>
+        <CardTitle className="text-xl text-blue-800 dark:text-blue-200 flex items-center">
+          Planejamento de Investimentos
+          <DataSourceTag source={data.allocation?.dataSource as DataSourceType} />
+        </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Goal Progress Section */}
-          <div className="space-y-4">
-            <div className="bg-white/5 p-4 rounded-lg">
-              <h3 className="text-lg font-medium text-white mb-2">Meta de Investimentos</h3>
-              <div className="flex justify-between mb-2">
-                <span className="text-gray-400">Progresso:</span>
-                <span className="text-blue-400">{investmentPlan.goalProgress}% completo</span>
-              </div>
-              <Progress value={investmentPlan.goalProgress} className="h-2 mb-4" />
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-400">Atual: {formatCurrency(investmentPlan.currentAmount)}</span>
-                <span className="text-gray-400">Meta: {formatCurrency(investmentPlan.targetAmount)}</span>
-              </div>
-              
-              <div className="mt-4 space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Aporte mensal atual:</span>
-                  <span className="text-white font-medium">{formatCurrency(investmentPlan.monthlyContribution)}</span>
+        <ScrollArea className="h-[600px] pr-4">
+          <div className="space-y-6">
+            {/* Asset Allocation Chart */}
+            <div className="border border-blue-500/20 bg-gradient-to-br from-blue-800/10 to-blue-600/5 backdrop-blur-sm rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <div className="bg-gradient-to-br from-blue-700 to-blue-900 p-2 rounded-full">
+                  <PieChart className="w-5 h-5 text-blue-300" />
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Aporte recomendado:</span>
-                  <span className="text-green-400 font-medium">{formatCurrency(investmentPlan.recommendedContribution)}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Anos para atingir:</span>
-                  <span className="text-white font-medium">{investmentPlan.yearsToGoal} anos</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Retorno esperado:</span>
-                  <span className="text-white font-medium">{investmentPlan.expectedReturn}% a.a.</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-400">Perfil de risco:</span>
-                  <span className="text-white font-medium">{investmentPlan.riskProfile}</span>
+                <div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-blue-400 mb-1">
+                      Alocação de Ativos
+                    </h3>
+                    <Badge className="bg-blue-900/50 text-blue-200 hover:bg-blue-800/50 border border-blue-500/30">
+                      {formatPercentage(78)}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-gray-300 mb-3">
+                    Sua alocação de ativos atual, comparada com a recomendada.
+                  </p>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    <Badge className="bg-blue-900/50 text-blue-200 hover:bg-blue-800/50 border border-blue-500/30">
+                      Renda Fixa
+                    </Badge>
+                    <Badge className="bg-blue-900/50 text-blue-200 hover:bg-blue-800/50 border border-blue-500/30">
+                      Ações
+                    </Badge>
+                    <Badge className="bg-blue-900/50 text-blue-200 hover:bg-blue-800/50 border border-blue-500/30">
+                      Fundos
+                    </Badge>
+                  </div>
                 </div>
               </div>
             </div>
-            
-            <div className="bg-white/5 p-4 rounded-lg">
-              <h3 className="text-lg font-medium text-white mb-4">Recomendações</h3>
-              <ul className="space-y-2">
-                {investmentPlan.recommendations.map((recommendation, index) => (
-                  <li key={index} className="flex items-start">
-                    <ChevronRight className="h-5 w-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-300">{recommendation}</span>
-                  </li>
-                ))}
-              </ul>
+
+            {/* Investment Recommendations */}
+            <div className="border border-green-500/20 bg-gradient-to-br from-green-800/10 to-green-600/5 backdrop-blur-sm rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <div className="bg-gradient-to-br from-green-700 to-green-900 p-2 rounded-full">
+                  <BarChart className="w-5 h-5 text-green-300" />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-green-400 mb-1">
+                      Recomendações de Investimento
+                    </h3>
+                    <Badge className="bg-green-900/50 text-green-200 hover:bg-green-800/50 border border-green-500/30">
+                      {recommendations.length}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-gray-300 mb-3">
+                    Sugestões para otimizar sua carteira.
+                  </p>
+                  <div className="space-y-4">
+                    {recommendations.map((recommendation, index) => (
+                      <div
+                        key={index}
+                        className="p-3 bg-green-900/20 rounded-md"
+                      >
+                        <div className="flex justify-between items-center">
+                          <div className="text-sm font-medium text-green-200">
+                            {recommendation.asset}
+                          </div>
+                          <div className="text-green-300 font-medium">
+                            {recommendation.reason}
+                          </div>
+                        </div>
+                        <div className="flex justify-between items-center mt-2">
+                          <div className="text-xs text-gray-400">
+                            Alocação Atual:{" "}
+                            <div className="text-base font-medium">{formatCurrency(toNumber(recommendation.currentAllocation))}</div>
+                          </div>
+                          <div className="text-xs text-gray-400">
+                            Alocação Recomendada:{" "}
+                            <div className="text-base font-medium">{formatCurrency(toNumber(recommendation.recommendedAllocation))}</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-          
-          {/* Asset Allocation Section */}
-          <div className="space-y-4">
-            <div className="bg-white/5 p-4 rounded-lg">
-              <h3 className="text-lg font-medium text-white mb-4">Alocação de Ativos</h3>
-              
-              <div className="space-y-4">
-                <h4 className="text-sm font-medium text-gray-400">Alocação Atual</h4>
-                <div className="flex gap-1 mb-4">
-                  {investmentPlan.assetAllocation.map((asset, index) => (
-                    <div 
-                      key={`current-${index}`}
-                      className="h-8" 
-                      style={{width: `${asset.current}%`}} 
-                    >
-                      <div className={`h-full w-full bg-gradient-to-r ${asset.color} rounded-sm`}></div>
-                    </div>
-                  ))}
+
+            {/* Risk Analysis */}
+            <div className="border border-red-500/20 bg-gradient-to-br from-red-800/10 to-red-600/5 backdrop-blur-sm rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <div className="bg-gradient-to-br from-red-700 to-red-900 p-2 rounded-full">
+                  <BarChart className="w-5 h-5 text-red-300" />
                 </div>
-                
-                <h4 className="text-sm font-medium text-gray-400">Alocação Recomendada</h4>
-                <div className="flex gap-1 mb-2">
-                  {investmentPlan.assetAllocation.map((asset, index) => (
-                    <div 
-                      key={`recommended-${index}`}
-                      className="h-8" 
-                      style={{width: `${asset.recommended}%`}}
-                    >
-                      <div className={`h-full w-full bg-gradient-to-r ${asset.color} rounded-sm`}></div>
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                  {investmentPlan.assetAllocation.map((asset, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <div className={`h-3 w-3 rounded-full bg-gradient-to-r ${asset.color}`}></div>
-                      <div className="flex-1 flex justify-between">
-                        <span className="text-xs text-gray-400">{asset.class}</span>
-                        <span className="text-xs text-white">
-                          {asset.current}% → {asset.recommended}%
-                        </span>
+                <div>
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-medium text-red-400 mb-1">
+                      Análise de Risco
+                    </h3>
+                    <Badge className="bg-red-900/50 text-red-200 hover:bg-red-800/50 border border-red-500/30">
+                      Alto
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-gray-300 mb-3">
+                    Identificação de riscos e oportunidades na sua carteira.
+                  </p>
+                  <div className="space-y-4">
+                    <div className="p-3 bg-red-900/20 rounded-md">
+                      <div className="text-sm font-medium text-red-200">
+                        Concentração em um único ativo
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        Reduza a exposição para diminuir riscos.
                       </div>
                     </div>
-                  ))}
+                    <div className="p-3 bg-red-900/20 rounded-md">
+                      <div className="text-sm font-medium text-red-200">
+                        Falta de diversificação internacional
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        Explore mercados globais para equilibrar a carteira.
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-            
-            <div className="bg-white/5 p-4 rounded-lg">
-              <h3 className="text-lg font-medium text-white mb-3">Próximos Passos</h3>
-              <div className="space-y-3">
-                <Button
-                  variant="outline" 
-                  size="sm"
-                  className="w-full justify-start text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
-                  onClick={() => console.log("Adjust monthly contribution")}
-                >
-                  <ArrowRight className="h-4 w-4 mr-2" />
-                  Ajustar contribuição mensal
-                </Button>
-                
-                <Button
-                  variant="outline" 
-                  size="sm"
-                  className="w-full justify-start text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
-                  onClick={() => console.log("Rebalance portfolio")}
-                >
-                  <ArrowRight className="h-4 w-4 mr-2" />
-                  Rebalancear carteira
-                </Button>
-                
-                <Button
-                  variant="outline" 
-                  size="sm"
-                  className="w-full justify-start text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
-                  onClick={() => console.log("Update investment plan")}
-                >
-                  <ArrowRight className="h-4 w-4 mr-2" />
-                  Atualizar plano de investimentos
-                </Button>
-              </div>
-            </div>
           </div>
-        </div>
-        
-        <div className="mt-6 flex justify-center">
-          <Button
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
-            onClick={() => console.log("View detailed investment plan")}
-          >
-            Ver Plano Detalhado <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </div>
+        </ScrollArea>
       </CardContent>
     </Card>
   );

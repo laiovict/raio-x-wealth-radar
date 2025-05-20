@@ -13,8 +13,11 @@ export interface AIInsight {
   isNew?: boolean;
   isSynthetic?: boolean;
   timestamp: Date;
-  dataSource?: 'synthetic' | 'supabase';
+  dataSource?: DataSourceType;
 }
+
+// Define the DataSourceType for source tagging
+export type DataSourceType = 'xp' | 'openfinance' | 'synthetic';
 
 // Define the PortfolioSummary type
 export interface PortfolioSummary {
@@ -30,7 +33,7 @@ export interface PortfolioSummary {
   private_pension_value: number;
   private_pension_representation: number;
   total_portfolio_value: string | number;
-  dataSource?: 'synthetic' | 'supabase';
+  dataSource?: DataSourceType;
   [key: string]: any; // Allow other properties
 }
 
@@ -43,7 +46,7 @@ export interface DividendHistory {
   value: string;
   payment_date: string;
   asset: string;
-  dataSource?: 'synthetic' | 'supabase';
+  dataSource?: DataSourceType;
   [key: string]: any; // Allow other properties
 }
 
@@ -54,7 +57,7 @@ export interface ClientSummary {
   investor_name: string;
   summary: string;
   tags?: string;
-  dataSource?: 'synthetic' | 'supabase';
+  dataSource?: DataSourceType;
   [key: string]: any; // Allow other properties
 }
 
@@ -73,8 +76,8 @@ export interface FinancialSummary {
     sixMonths: number;
     twelveMonths: number;
   };
-  dataSource?: 'synthetic' | 'supabase';
-  // Add missing properties needed for FinancialOverviewModule
+  dataSource?: DataSourceType;
+  // Additional properties needed for FinancialOverviewModule
   netWorth?: number;
   monthlyIncome?: number;
   monthlyExpenses?: number;
@@ -119,7 +122,7 @@ export interface Allocation {
   };
   optimizationGain?: number;
   summary?: string;
-  dataSource?: 'synthetic' | 'supabase';
+  dataSource?: DataSourceType;
 }
 
 // Define the Liquidity type
@@ -134,17 +137,17 @@ export interface Liquidity {
   monthlyExpenses?: number;
   idealMonths?: number;
   summary?: string;
-  dataSource?: 'synthetic' | 'supabase';
+  dataSource?: DataSourceType;
 }
 
-// Define additional types required by mock data
+// Define SentimentData type
 export interface SentimentData {
   assets?: Array<{
     ticker: string;
     sentiment: number;
     impact: number;
     recentNews: string;
-    dataSource?: 'synthetic' | 'supabase';
+    dataSource?: DataSourceType;
   }>;
   summary?: string;
   overallScore?: number;
@@ -153,22 +156,25 @@ export interface SentimentData {
     planning: number;
     protection: number;
   };
-  dataSource?: 'synthetic' | 'supabase';
+  dataSource?: DataSourceType;
 }
 
+// Define SocialComparisonData
 export interface SocialComparisonData {
   peerGroup?: string;
   percentileRank?: number;
   returnVsPeers?: number;
   diversificationScore?: number;
   summary?: string;
-  dataSource?: 'synthetic' | 'supabase';
+  dataSource?: DataSourceType;
 }
 
+// Define AllocationData
 export interface AllocationData extends Allocation {
   // Additional properties specific to allocation data
 }
 
+// Define WrappedData
 export interface WrappedData {
   biggestContribution?: {
     amount: number;
@@ -184,57 +190,58 @@ export interface WrappedData {
     return: number;
   };
   summary?: string;
-  dataSource?: 'synthetic' | 'supabase';
+  dataSource?: DataSourceType;
 }
 
+// Define FinancialInsightData
 export interface FinancialInsightData {
   highestSpendingMonth?: {
     month: string;
     amount: number;
     categories: {name: string; amount: number}[];
-    dataSource?: 'synthetic' | 'supabase';
+    dataSource?: DataSourceType;
   };
   wastedMoney?: {
     total: number;
     categories: {name: string; amount: number}[];
-    dataSource?: 'synthetic' | 'supabase';
+    dataSource?: DataSourceType;
   };
   topCategories?: {
     categories: {name: string; amount: number; percentage: number}[];
     total: number;
-    dataSource?: 'synthetic' | 'supabase';
+    dataSource?: DataSourceType;
   };
   negativeMonths?: {
     count: number;
     months: string[];
     totalDeficit: number;
-    dataSource?: 'synthetic' | 'supabase';
+    dataSource?: DataSourceType;
   };
   investmentGrowth?: {
     annual: number;
     total: number;
     bestAsset: {name: string; growth: number};
-    dataSource?: 'synthetic' | 'supabase';
+    dataSource?: DataSourceType;
   };
   potentialSavings?: {
     amount: number;
     suggestions: string[];
-    dataSource?: 'synthetic' | 'supabase';
+    dataSource?: DataSourceType;
   };
   bestInvestment?: {
     name: string;
     return: number;
     period: string;
-    dataSource?: 'synthetic' | 'supabase';
+    dataSource?: DataSourceType;
   };
   retirementReadiness?: {
     score: number;
     years: number;
     monthlyNeeded: number;
-    dataSource?: 'synthetic' | 'supabase';
+    dataSource?: DataSourceType;
   };
   insights?: any[];
-  dataSource?: 'synthetic' | 'supabase';
+  dataSource?: DataSourceType;
 }
 
 // Complete Raio-X data structure for easy access to all client information
@@ -249,7 +256,11 @@ export interface RaioXData {
   profitability?: any;
   dividendHistory: DividendHistory[];
   lifeEvents?: any[];
-  lifeGoals?: any[];
+  lifeGoals?: {
+    goals?: any[];
+    summary?: string;
+    dataSource?: DataSourceType;
+  };
   financialPlans?: any[];
   financialInsightData?: FinancialInsightData;
   openFinanceData?: OpenFinanceData;
