@@ -9,6 +9,9 @@ interface AllocationModuleProps {
   fullWidth?: boolean;
 }
 
+// Define type for dataSource
+type DataSource = 'synthetic' | 'supabase';
+
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658', '#9467bd'];
 
 const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
@@ -36,7 +39,7 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
       "Alternativos": 0.0
     },
     optimizationGain: 2.4,
-    dataSource: 'synthetic' as const
+    dataSource: 'synthetic' as DataSource
   });
 
   useEffect(() => {
@@ -93,7 +96,7 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
             current: currentAllocation,
             recommended: recommendedAllocation,
             optimizationGain,
-            dataSource: 'supabase' as const
+            dataSource: 'supabase' as DataSource
           });
         }
       } catch (error) {

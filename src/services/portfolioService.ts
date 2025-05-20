@@ -1,5 +1,7 @@
-
 import { supabase } from "@/integrations/supabase/client";
+
+// Define the data source type
+type DataSource = 'synthetic' | 'supabase';
 
 /**
  * Fetches client portfolio summary from the database
@@ -22,7 +24,7 @@ export const getClientPortfolioSummary = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to indicate this is from Supabase
-    return data ? { ...data, dataSource: 'supabase' as const } : null;
+    return data ? { ...data, dataSource: 'supabase' as DataSource } : null;
   } catch (error) {
     console.error("Error in portfolio summary fetch:", error);
     return null;
@@ -49,7 +51,7 @@ export const getClientFixedIncome = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to each item
-    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as const })) : [];
+    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as DataSource })) : [];
   } catch (error) {
     console.error("Error in fixed income fetch:", error);
     return [];
@@ -76,7 +78,7 @@ export const getClientInvestmentFunds = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to each item
-    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as const })) : [];
+    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as DataSource })) : [];
   } catch (error) {
     console.error("Error in investment funds fetch:", error);
     return [];
@@ -103,7 +105,7 @@ export const getClientRealEstate = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to each item
-    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as const })) : [];
+    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as DataSource })) : [];
   } catch (error) {
     console.error("Error in real estate fetch:", error);
     return [];
@@ -130,7 +132,7 @@ export const getClientStocks = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to each item
-    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as const })) : [];
+    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as DataSource })) : [];
   } catch (error) {
     console.error("Error in stocks fetch:", error);
     return [];
@@ -158,7 +160,7 @@ export const getClientProfitability = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to indicate this is from Supabase
-    return data ? { ...data, dataSource: 'supabase' as const } : null;
+    return data ? { ...data, dataSource: 'supabase' as DataSource } : null;
   } catch (error) {
     console.error("Error in profitability fetch:", error);
     return null;
@@ -186,7 +188,7 @@ export const getClientDividendHistory = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to each item
-    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as const })) : [];
+    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as DataSource })) : [];
   } catch (error) {
     console.error("Error in dividend history fetch:", error);
     return [];
@@ -214,7 +216,7 @@ export const getClientSummary = async (clientId: number | null) => {
     }
     
     // Add dataSource metadata to indicate this is from Supabase
-    return data ? { ...data, dataSource: 'supabase' as const } : null;
+    return data ? { ...data, dataSource: 'supabase' as DataSource } : null;
   } catch (error) {
     console.error("Error in client summary fetch:", error);
     return null;

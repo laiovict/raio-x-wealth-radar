@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -16,7 +15,7 @@ import {
   Music,
   Play
 } from "lucide-react";
-import { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useRef } from "react";
 import { 
   Carousel, 
   CarouselContent, 
@@ -29,6 +28,9 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 interface WrappedModuleProps {
   fullWidth?: boolean;
 }
+
+// Define type for dataSource
+type DataSource = 'synthetic' | 'supabase';
 
 // Songs with embedded preview URLs
 const INVESTMENT_SONGS = [
@@ -92,7 +94,7 @@ const WrappedModule = ({ fullWidth = false }: WrappedModuleProps) => {
   const { data, selectedClient } = useRaioX();
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioUrl, setAudioUrl] = useState("");
-  const audioRef = React.useRef<HTMLAudioElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   
   // Generate wrapped data based on real Supabase data
   const wrappedData = useMemo(() => {
@@ -112,7 +114,7 @@ const WrappedModule = ({ fullWidth = false }: WrappedModuleProps) => {
         return: 32.4
       },
       summary: "2025 foi um ano positivo para sua carteira, com destaque para as ações do setor industrial. Seu padrão de aportes consistentes contribuiu para o bom desempenho, apesar da volatilidade no 2º trimestre.",
-      dataSource: 'synthetic' as const
+      dataSource: 'synthetic' as DataSource
     };
     
     // If we have dividend history from Supabase, use it to enhance wrapped data
@@ -199,7 +201,7 @@ const WrappedModule = ({ fullWidth = false }: WrappedModuleProps) => {
             return: highestReturn > 0 ? highestReturn : 15.3
           },
           summary,
-          dataSource: 'supabase' as const
+          dataSource: 'supabase' as DataSource
         };
       } catch (error) {
         console.error("Error calculating wrapped data:", error);
@@ -314,7 +316,7 @@ const WrappedModule = ({ fullWidth = false }: WrappedModuleProps) => {
         mostActiveDay: getActiveDay(),
         investorCompatibility: `${investorComparison.name} (${investorComparison.compatibility})`,
         investorStyle: investorComparison.style,
-        dataSource: data.portfolioSummary ? 'supabase' : 'synthetic'
+        dataSource: data.portfolioSummary ? 'supabase' as DataSource : 'synthetic' as DataSource
       };
     }
 
