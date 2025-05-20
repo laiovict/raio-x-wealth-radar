@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search } from "lucide-react";
@@ -42,7 +43,7 @@ const RaioXDashboard = ({
 }: RaioXDashboardProps) => {
   const { data, hasOpenFinance, selectedClient } = useRaioX();
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("status");
+  const [activeTab, setActiveTab] = useState("overview");
   const { t } = useLanguage();
 
   useEffect(() => {
@@ -96,8 +97,8 @@ const RaioXDashboard = ({
         
         <div className="mt-6 mb-2 flex gap-2 flex-wrap justify-center">
           <button 
-            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "status" ? "bg-white/20 border-blue-400" : ""}`}
-            onClick={() => handleQuickNavClick("status")}
+            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "overview" ? "bg-white/20 border-blue-400" : ""}`}
+            onClick={() => handleQuickNavClick("overview")}
           >
             {t('overviewTab')}
           </button>
@@ -130,21 +131,33 @@ const RaioXDashboard = ({
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-5 scrollbar-none">
-          <TabsTrigger value="status" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('overviewTab')}</TabsTrigger>
+          <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Visão Geral</TabsTrigger>
           <TabsTrigger value="actions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('planTab')}</TabsTrigger>
           <TabsTrigger value="market" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('aiTab')}</TabsTrigger>
           <TabsTrigger value="future" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('futureTab')}</TabsTrigger>
           <TabsTrigger value="chat" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('chatTab')}</TabsTrigger>
         </TabsList>
 
-        {/* Tab 1: Como estou? - Current financial state overview */}
-        <TabsContent value="status" className="space-y-6">
+        {/* Tab 1: Visão Geral - Overview of all important information */}
+        <TabsContent value="overview" className="space-y-6">
           <FinancialOverviewModule />
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <AllocationModule />
             <LiquidityReserveModule />
           </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <LifeGoalsModule />
+            <RecommendedActionsModule />
+          </div>
+          
+          {hasOpenFinance && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <SentimentInsightsModule />
+              <FutureProjectionModule />
+            </div>
+          )}
         </TabsContent>
         
         {/* Tab 2: O que preciso mudar? - Recommendations and actions */}
