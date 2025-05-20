@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -8,21 +9,24 @@ import {
   CarouselPrevious 
 } from "@/components/ui/carousel";
 import { useLanguage } from "@/context/LanguageContext";
-import { ThumbsUp, ThumbsDown } from "lucide-react";
-import { useState } from "react";
+import { ThumbsUp, ThumbsDown, Sparkles, Brain } from "lucide-react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
+import { useStreamingContent } from "@/hooks/use-streaming-content";
 
 interface FamousInvestorsModuleProps {
   fullWidth?: boolean;
 }
 
 const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps) => {
-  const { data } = useRaioX();
+  const { data, selectedClient } = useRaioX();
   const { t } = useLanguage();
   const [likesCount, setLikesCount] = useState(0);
   const [dislikesCount, setDislikesCount] = useState(0);
   const [userVoted, setUserVoted] = useState<'like' | 'dislike' | null>(null);
+  const { isStreaming, isComplete } = useStreamingContent(false, 300, true, 1500);
 
   // Handle like/dislike votes
   const handleVote = (type: 'like' | 'dislike') => {
@@ -46,8 +50,8 @@ const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps
           setLikesCount(prev => prev - 1);
           setDislikesCount(prev => prev + 1);
         } else {
-          setLikesCount(prev => prev - 1);
-          setDislikesCount(prev => prev + 1);
+          setLikesCount(prev => prev + 1);
+          setDislikesCount(prev => prev - 1);
         }
       } else {
         // First vote
@@ -65,12 +69,28 @@ const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps
     }
   };
 
+  // Get client age from context or use default
+  const getClientAge = () => {
+    if (selectedClient === 240275) {
+      return 34;
+    } else if (selectedClient === 12345678) {
+      return 42;
+    }
+    return 38; // Default age
+  };
+
+  const clientAge = getClientAge();
+  const clientName = selectedClient === 240275 ? "Laio" : "Cliente";
+
   // Exemplo de dados de investidores famosos
   const investors = [
     {
       name: "Warren Buffett",
       quote: "Seja ganancioso quando outros estão com medo, e tenha medo quando outros estão gananciosos.",
       strategy: "Investimento em valor, empresas com vantagens competitivas duradouras",
+      personalizedAdvice: isStreaming ? 
+        "Gerando conselho personalizado..." : 
+        `Na sua idade (${clientAge} anos), Warren Buffett se concentrava em empresas com forte geração de fluxo de caixa. Ele provavelmente recomendaria que você mantenha uma posição significativa em negócios com vantagens competitivas duradouras, mesmo que o mercado esteja volátil. Com base no seu perfil, ele sugeriria considerar empresas como a XP Inc. que têm modelos de negócios robustos e fluxos de caixa previsíveis, pois não é nem muito cedo nem muito tarde para investimentos de qualidade.`,
       bg: "from-blue-600/20 to-blue-900/30",
       accent: "bg-blue-400/20",
       pattern: "radial-gradient(circle at 30% 40%, rgba(56, 189, 248, 0.1) 0%, transparent 40%), radial-gradient(circle at 80% 10%, rgba(14, 165, 233, 0.2) 0%, transparent 30%)",
@@ -79,6 +99,9 @@ const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps
       name: "Ray Dalio",
       quote: "O dinheiro é só uma ferramenta para ajudar você a conseguir o que quer, não é o objetivo em si.",
       strategy: "Diversificação global, alocação em todas as condições de mercado",
+      personalizedAdvice: isStreaming ? 
+        "Gerando conselho personalizado..." : 
+        `Para uma pessoa de ${clientAge} anos como você, Ray Dalio recomendaria diversificação em todas as classes de ativos. Considerando seu momento de vida e o atual cenário econômico brasileiro, ele sugeriria manter aproximadamente 50% em ativos globais para proteção contra incertezas locais. Ele destacaria a importância de incluir ouro e TIPS (títulos protegidos contra inflação) como proteção contra cenários extremos, especialmente com as tensões geopolíticas atuais.`,
       bg: "from-emerald-600/20 to-emerald-900/30",
       accent: "bg-emerald-400/20",
       pattern: "radial-gradient(circle at 70% 60%, rgba(16, 185, 129, 0.1) 0%, transparent 50%), radial-gradient(circle at 20% 30%, rgba(5, 150, 105, 0.2) 0%, transparent 40%)",
@@ -87,6 +110,9 @@ const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps
       name: "Benjamin Graham",
       quote: "No curto prazo, o mercado é uma máquina de votação, mas no longo prazo, é uma máquina de pesagem.",
       strategy: "Margem de segurança, análise fundamental detalhada",
+      personalizedAdvice: isStreaming ? 
+        "Gerando conselho personalizado..." : 
+        `Benjamin Graham diria que aos ${clientAge} anos, você está em um ponto ideal para aplicar seus princípios de margem de segurança. Ele sugeriria que, nesta fase de consolidação financeira, você deveria buscar ações negociadas abaixo do valor patrimonial, especialmente em setores tradicionais que estão fora de moda no atual ciclo de mercado. Para seu caso específico, ele recomendaria manter uma proporção de 60/40 entre ações e títulos de renda fixa, ajustando essa proporção conforme as oportunidades de valor aparecem.`,
       bg: "from-amber-600/20 to-amber-900/30",
       accent: "bg-amber-400/20",
       pattern: "radial-gradient(circle at 60% 20%, rgba(251, 191, 36, 0.15) 0%, transparent 40%), radial-gradient(circle at 30% 70%, rgba(245, 158, 11, 0.1) 0%, transparent 30%)",
@@ -95,6 +121,9 @@ const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps
       name: "Peter Lynch",
       quote: "Invista no que você conhece.",
       strategy: "Crescimento a preço razoável, vantagens competitivas claras",
+      personalizedAdvice: isStreaming ? 
+        "Gerando conselho personalizado..." : 
+        `Peter Lynch aconselharia você, aos ${clientAge} anos, a investir em setores que você conhece profissionalmente ou como consumidor. Considerando sua experiência e fase de vida, ele recomendaria buscar empresas com crescimento anual de 15-20% que ainda não foram descobertas pelo mercado. Lynch destacaria que com seus conhecimentos específicos e experiência, você tem vantagens que Wall Street não possui. Para seu perfil, ele provavelmente sugeriria dedicar 25% do portfólio a empresas menores em setores que você entende profundamente.`,
       bg: "from-purple-600/20 to-purple-900/30",
       accent: "bg-purple-400/20",
       pattern: "radial-gradient(circle at 40% 50%, rgba(168, 85, 247, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(147, 51, 234, 0.2) 0%, transparent 30%)",
@@ -103,6 +132,9 @@ const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps
       name: "Howard Marks",
       quote: "As coisas mais perigosas são aquelas em que os riscos não são visíveis.",
       strategy: "Contrário, ciclos de mercado, psicologia do investidor",
+      personalizedAdvice: isStreaming ? 
+        "Gerando conselho personalizado..." : 
+        `Howard Marks observaria que aos ${clientAge} anos, você tem experiência suficiente para reconhecer padrões de mercado, mas também tempo para se recuperar de erros. Ele aconselharia aproveitar o atual momento de otimismo excessivo no setor de tecnologia para adotar uma postura contrária e cautelosa. Especificamente para alguém com seu perfil e objetivos financeiros, ele recomendaria aumentar gradualmente posições em setores cíclicos atualmente impopulares, mantendo liquidez para oportunidades que surgirão quando o sentimento de mercado inevitavelmente mudar.`,
       bg: "from-red-600/20 to-red-900/30",
       accent: "bg-red-400/20",
       pattern: "radial-gradient(circle at 20% 40%, rgba(248, 113, 113, 0.1) 0%, transparent 40%), radial-gradient(circle at 70% 60%, rgba(239, 68, 68, 0.15) 0%, transparent 30%)",
@@ -113,7 +145,12 @@ const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps
     <Card className={`bg-gradient-to-br from-slate-900 to-slate-800 border border-white/5 shadow-xl overflow-hidden ${fullWidth ? "col-span-full" : ""}`}>
       <CardHeader className="bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border-b border-white/10">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-xl font-bold text-white">{t('famousInvestorsTitle')}</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-xl font-bold text-white">{t('famousInvestorsTitle')}</CardTitle>
+            <Badge className="bg-blue-600/50 text-blue-100 border-blue-500/30 flex gap-1 items-center">
+              <Sparkles className="h-3 w-3" /> GenAI
+            </Badge>
+          </div>
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1">
               <Button 
@@ -161,7 +198,7 @@ const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps
                     
                     {/* Content - Removed photos section and adjusted layout */}
                     <div className={`relative z-10 p-8 h-full backdrop-blur-sm rounded-xl ${investor.bg} bg-opacity-30`}>
-                      <div className="mb-6">
+                      <div className="mb-4">
                         <h3 className="text-2xl font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent mb-3">
                           {investor.name}
                         </h3>
@@ -173,6 +210,17 @@ const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps
                       <div className={`${investor.accent} backdrop-blur-md rounded-lg p-5 border border-white/10 shadow-inner`}>
                         <h4 className="text-lg font-medium text-white/90 mb-2">Estratégia de Investimento:</h4>
                         <p className="text-white/80 leading-relaxed">{investor.strategy}</p>
+                      </div>
+                      
+                      <div className="mt-6">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Brain className="h-5 w-5 text-blue-300" />
+                          <h4 className="text-lg font-medium text-white/90">Conselho Personalizado:</h4>
+                          {isStreaming && <Badge className="animate-pulse bg-blue-600/50 text-blue-100 border-blue-500/30">Gerando</Badge>}
+                        </div>
+                        <div className={`bg-slate-800/70 border border-white/10 p-4 rounded-lg text-white/80 ${isStreaming ? 'animate-pulse' : ''}`}>
+                          <p className="leading-relaxed">{investor.personalizedAdvice}</p>
+                        </div>
                       </div>
                       
                       <div className="mt-6 text-center">

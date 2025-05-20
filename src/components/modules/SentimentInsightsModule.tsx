@@ -20,7 +20,10 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
 
   useEffect(() => {
     // Set loaded state immediately to avoid streaming issues
-    setIsLoaded(true);
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 300);
+    return () => clearTimeout(timer);
   }, []);
 
   const getSentimentColor = (score: number) => {
@@ -75,47 +78,57 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
         </Button>
       </CardHeader>
       <CardContent className="pt-5 bg-white dark:bg-slate-900">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {sentiment.assets.slice(0, 2).map((asset, index) => (
-            <div 
-              key={index} 
-              className={`${getSentimentBg(asset.sentiment)} p-4 rounded-lg shadow-sm border transition-all hover:shadow-md hover:translate-y-[-2px]`}
-            >
-              <div className="flex justify-between items-center mb-2">
-                <div className="flex items-center">
-                  <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {asset.ticker}
-                  </span>
-                  <Badge className="ml-2 px-2" variant="outline">
-                    <span className={getSentimentColor(asset.sentiment)}>
-                      {`${asset.sentiment}/100`}
+        {isLoaded ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {sentiment.assets.slice(0, 2).map((asset, index) => (
+                <div 
+                  key={index} 
+                  className={`${getSentimentBg(asset.sentiment)} p-4 rounded-lg shadow-sm border transition-all hover:shadow-md hover:translate-y-[-2px]`}
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center">
+                      <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                        {asset.ticker}
+                      </span>
+                      <Badge className="ml-2 px-2" variant="outline">
+                        <span className={getSentimentColor(asset.sentiment)}>
+                          {`${asset.sentiment}/100`}
+                        </span>
+                      </Badge>
+                    </div>
+                    <span className={`flex items-center font-medium ${getImpactColor(asset.impact)}`}>
+                      {asset.impact > 0 ? (
+                        <TrendingUp className="h-4 w-4 mr-1" />
+                      ) : (
+                        <TrendingDown className="h-4 w-4 mr-1" />
+                      )}
+                      {`${getImpactPrefix(asset.impact)}${asset.impact}%`}
                     </span>
-                  </Badge>
+                  </div>
+                  <div className="flex items-start mt-2">
+                    <Newspaper className="h-4 w-4 mr-2 mt-1 flex-shrink-0 text-gray-500 dark:text-gray-400" />
+                    <p className="text-gray-800 dark:text-gray-100 text-sm">
+                      {asset.recentNews}
+                    </p>
+                  </div>
                 </div>
-                <span className={`flex items-center font-medium ${getImpactColor(asset.impact)}`}>
-                  {asset.impact > 0 ? (
-                    <TrendingUp className="h-4 w-4 mr-1" />
-                  ) : (
-                    <TrendingDown className="h-4 w-4 mr-1" />
-                  )}
-                  {`${getImpactPrefix(asset.impact)}${asset.impact}%`}
-                </span>
-              </div>
-              <div className="flex items-start mt-2">
-                <Newspaper className="h-4 w-4 mr-2 mt-1 flex-shrink-0 text-gray-500 dark:text-gray-400" />
-                <p className="text-gray-800 dark:text-gray-100 text-sm">
-                  {asset.recentNews}
-                </p>
-              </div>
+              ))}
             </div>
-          ))}
-        </div>
-        
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 p-4 rounded-lg border border-blue-100 dark:border-blue-800/50 mt-4">
-          <p className="text-gray-800 dark:text-gray-100">
-            {sentiment.summary}
-          </p>
-        </div>
+            
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 p-4 rounded-lg border border-blue-100 dark:border-blue-800/50 mt-4">
+              <p className="text-gray-800 dark:text-gray-100">
+                {sentiment.summary}
+              </p>
+            </div>
+          </>
+        ) : (
+          <div className="space-y-4">
+            <div className="h-32 bg-gray-200 animate-pulse dark:bg-gray-800/40 rounded-lg"></div>
+            <div className="h-32 bg-gray-200 animate-pulse dark:bg-gray-800/40 rounded-lg"></div>
+            <div className="h-16 bg-gray-200 animate-pulse dark:bg-gray-800/40 rounded-lg"></div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

@@ -230,7 +230,8 @@ const Index = () => {
               </Button>
             )}
             
-            {userRole === "advisor" ? (
+            {/* Show PDF export for both advisor and client */}
+            {selectedClient && (
               <Button
                 variant="outline"
                 className="border-white/10 text-white hover:bg-white/10 rounded-full text-sm font-normal px-5"
@@ -238,7 +239,7 @@ const Index = () => {
               >
                 Exportar PDF
               </Button>
-            ) : null}
+            )}
             
             <Button 
               variant="ghost" 
