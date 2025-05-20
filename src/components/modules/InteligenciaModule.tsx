@@ -194,7 +194,9 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
 
   const recommendedActions = getRecommendedActions();
   const { recommendations } = data;
-  const insights = data.insights || [
+  
+  // Define insights here using data.financialInsights instead of data.insights
+  const insights = data.financialInsights || [
     {
       id: "market-shift",
       title: "Mudança de cenário macroeconômico",
@@ -374,12 +376,14 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
               {insights.map((insight) => (
                 <div 
                   key={insight.id} 
-                  className={`bg-gray-800/40 rounded-lg p-4 ${getImportanceClass(insight.importance)} hover:bg-gray-800/60 transition-colors`}
+                  className={`bg-gray-800/40 rounded-lg p-4 ${getImportanceClass(insight.importance || 'medium')} hover:bg-gray-800/60 transition-colors`}
                 >
                   <div className="flex justify-between items-start">
                     <h3 className="font-medium text-white mb-2">{insight.title}</h3>
                     <Badge className="bg-gray-700 text-gray-300">
-                      {new Date(insight.date).toLocaleDateString('pt-BR', {day: '2-digit', month: 'short'})}
+                      {insight.date ? new Date(insight.date).toLocaleDateString('pt-BR', {day: '2-digit', month: 'short'}) : 
+                       insight.timestamp ? new Date(insight.timestamp).toLocaleDateString('pt-BR', {day: '2-digit', month: 'short'}) :
+                       new Date().toLocaleDateString('pt-BR', {day: '2-digit', month: 'short'})}
                     </Badge>
                   </div>
                   <p className="text-sm text-gray-400 mb-3">{insight.description}</p>
