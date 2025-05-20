@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface LanguageContextProps {
@@ -35,29 +36,23 @@ const translations = {
     emotionalInvestingRecLaio: "Create a well-thought-out investment plan and stick to it.",
     recommendation: "Recommendation",
     exportPdf: "Export PDF",
-    overviewTab: "How am I?",
-    planTab: "What should I change?",
-    futureTab: "What about my future?",
-    aiTab: "What's happening?",
-    chatTab: "Talk to RM",
     quickAi: "AI Insights",
     myGoals: "My Goals",
     planning: "Planning",
     quickInsights: "Insights",
     chatWithRM: "Chat with RM",
-    overviewTab: "Como estou?",
-    planTab: "O que preciso mudar?",
-    futureTab: "E meu futuro?",
-    aiTab: "O que está acontecendo?",
-    chatTab: "Fale com RM",
+    overviewTab: "How am I?",
+    planTab: "What should I change?",
+    futureTab: "What about my future?",
+    aiTab: "What's happening?",
+    chatTab: "Talk to RM",
     planningTab: "Planning",
     investmentsTab: "Investments",
     goalsTab: "Goals",
     insightsTab: "Insights",
     socialTab: "Social",
     bankingTab: "Banking",
-    chatTab: "Chat",
-    behaviorTab: "Behavior",
+    behaviorTab: "Behavior"
   },
   pt: {
     welcomeMessage: "Bem-vindo",
@@ -81,28 +76,23 @@ const translations = {
     emotionalInvestingRecLaio: "Crie um plano de investimento bem pensado e siga-o.",
     recommendation: "Recomendação",
     exportPdf: "Exportar PDF",
-    overviewTab: "Como estou?",
-    planTab: "O que preciso mudar?",
-    futureTab: "E meu futuro?",
-    aiTab: "O que está acontecendo?",
-    chatTab: "Fale com RM",
     quickAi: "Insights de IA",
     myGoals: "Minhas Metas",
     planning: "Planejamento",
     quickInsights: "Insights",
     chatWithRM: "Falar com RM",
-    overviewTab: "Visão Geral",
-    planTab: "Plano",
-    futureTab: "Futuro",
-    aiTab: "IA",
+    overviewTab: "Como estou?",
+    planTab: "O que preciso mudar?",
+    futureTab: "E meu futuro?",
+    aiTab: "O que está acontecendo?",
+    chatTab: "Fale com RM",
     planningTab: "Planejamento",
     investmentsTab: "Investimentos",
     goalsTab: "Metas",
     insightsTab: "Insights",
     socialTab: "Social",
     bankingTab: "Bancos",
-    chatTab: "Chat",
-    behaviorTab: "Comportamento",
+    behaviorTab: "Comportamento"
   },
 };
 
@@ -114,7 +104,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   }, [language]);
 
   const t = (key: string): string => {
-    return translations[language as keyof typeof translations][key] || key;
+    return translations[language as keyof typeof translations][key as keyof (typeof translations)["en"]] || key;
   };
 
   return (
