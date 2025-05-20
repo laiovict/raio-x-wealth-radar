@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Mic, Search, Share2, Download } from "lucide-react";
@@ -25,6 +24,7 @@ import BehavioralFinanceModule from "./modules/BehavioralFinanceModule";
 import FamousInvestorsModule from "./modules/FamousInvestorsModule";
 import WelcomeBanner from "./WelcomeBanner";
 import InteligenciaModule from "./modules/InteligenciaModule";
+import DividendModule from "./modules/DividendModule";
 import { toast } from "@/hooks/use-toast";
 import FeedbackSection from "./FeedbackSection";
 import ClientFeedbackSection from "./ClientFeedbackSection";
@@ -292,6 +292,12 @@ const RaioXDashboard = ({
             <FeedbackSection sectionId="financial-plan" />
           </div>
           
+          {/* Add dividend module here */}
+          <div>
+            <DividendModule fullWidth />
+            <FeedbackSection sectionId="dividends" />
+          </div>
+          
           {/* Then Life Goals */}
           <div>
             <LifeGoalsModule />
@@ -380,6 +386,11 @@ const RaioXDashboard = ({
           <div>
             <FinancialOverviewModule fullWidth />
             <FeedbackSection sectionId="status-financial-overview" />
+          </div>
+          
+          <div>
+            <DividendModule fullWidth />
+            <FeedbackSection sectionId="status-dividends" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
