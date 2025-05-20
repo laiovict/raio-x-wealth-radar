@@ -65,6 +65,13 @@ const RaioXDashboard = ({
     setActiveTab(tabId);
   };
 
+  // Extract the first name from data.clientName
+  const getClientFirstName = () => {
+    if (!data.clientName) return "";
+    // Split by space and take the first part as the first name
+    return data.clientName.split(" ")[0];
+  };
+
   if (showPdfPreview) {
     return (
       <PdfPreview 
@@ -81,7 +88,7 @@ const RaioXDashboard = ({
     <div className="space-y-6 pb-16 min-h-screen max-h-full">
       <div className="flex flex-col items-center justify-center mb-8">
         <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-300 to-indigo-400 bg-clip-text text-transparent mb-2">
-          {t('welcomeMessage')} {data.clientName}!
+          {t('welcomeMessage')} {getClientFirstName()}!
         </h2>
         
         <div className="w-full max-w-md relative">

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -41,7 +42,6 @@ const WelcomeBanner = ({ selectedClient }: WelcomeBannerProps) => {
         }
         
         // If not in predefined data, try to fetch from database
-        // This is a placeholder for now since we don't have the exact table structure
         const { data, error } = await supabase
           .from('investor_portfolio_summary')
           .select('*')
@@ -67,6 +67,12 @@ const WelcomeBanner = ({ selectedClient }: WelcomeBannerProps) => {
     fetchClientInfo();
   }, [selectedClient]);
   
+  // Extract the first name from clientName
+  const getFirstName = () => {
+    if (!clientName) return "";
+    return clientName.split(" ")[0];
+  };
+  
   if (!selectedClient || !clientName) return null;
   
   return (
@@ -74,7 +80,7 @@ const WelcomeBanner = ({ selectedClient }: WelcomeBannerProps) => {
       <div className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-light text-white">
-            Bem-vindo, <span className="font-semibold">{clientName}</span>
+            Bem-vindo, <span className="font-semibold">{getFirstName()}</span>
           </h2>
           <p className="text-blue-200/70">
             {t('welcomeMessagePortfolio')}
