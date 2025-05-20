@@ -78,10 +78,11 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ message = "Carregando..."
 
     // Após 2 segundos, começar a mostrar as mensagens dos agentes
     setTimeout(() => {
-      // Simulação de progresso de carregamento
+      // Simulação de progresso de carregamento - aumentado para 7 segundos
+      // Ajustamos a velocidade para completar em aproximadamente 7 segundos
       const progressInterval = setInterval(() => {
         setLoadingProgress(prev => {
-          const newProgress = prev + Math.random() * 5;
+          const newProgress = prev + Math.random() * 2; // Velocidade reduzida para estender o tempo total
           return newProgress >= 100 ? 100 : newProgress;
         });
       }, 300);

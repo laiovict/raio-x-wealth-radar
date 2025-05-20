@@ -97,8 +97,7 @@ const Auth = () => {
             Bem-vindo
           </h1>
           <p className="text-2xl text-gray-400 font-extralight">
-            a retrospectiva do mês<br />
-            de {getCurrentMonth()}
+            ao seu raio-x financeiro
           </p>
         </div>
         
