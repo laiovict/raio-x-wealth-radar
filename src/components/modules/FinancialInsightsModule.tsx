@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +13,7 @@ import {
   PiggyBank,
   Wallet
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -112,8 +113,11 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
   const [showDataSourceInfo, setShowDataSourceInfo] = useState(false);
   
   // Enhance financial insights with real data when available
-  const financialInsights = React.useMemo(() => {
-    const insights = data.financialInsightData ? { ...data.financialInsightData } : { dataSource: 'synthetic' };
+  const financialInsights: FinancialInsightData = useMemo(() => {
+    // Start with existing insights data or create a new empty object with the correct type
+    const insights: FinancialInsightData = data.financialInsightData ? 
+      { ...data.financialInsightData } : 
+      { dataSource: 'synthetic' };
     
     // If we have portfolio and dividend data, use it to enhance insights
     if (portfolioSummary && dividendHistory) {
@@ -176,24 +180,6 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
     );
   }
 
-  // Format currency
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
-  // Format date
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    }).format(date);
-  };
-
   // Generate summary text for each insight if it doesn't exist
   const generateSummary = (type: string, data: any): string => {
     switch (type) {
@@ -202,7 +188,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
       case 'wastedMoney':
         return `Você poderia ter economizado aproximadamente ${formatCurrency(data.total)} em gastos desnecessários ou excessivos.`;
       case 'topCategories':
-        return `Suas principais categorias de gastos são ${data.categories && data.categories.slice(0, 2).map(c => c.name).join(', ')} ou 'diversas categorias', somando ${formatCurrency(data.total)}.`;
+        return `Suas principais categorias de gastos são ${data.categories && data.categories.slice(0, 2).map((c: any) => c.name).join(', ')} ou 'diversas categorias', somando ${formatCurrency(data.total)}.`;
       case 'negativeMonths': 
         return `Você teve ${data.count} meses com saldo negativo, totalizando um déficit de ${formatCurrency(data.totalDeficit)}.`;
       case 'investmentGrowth':
