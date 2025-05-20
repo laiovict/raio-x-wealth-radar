@@ -19,8 +19,10 @@ interface FinancialInsightsModuleProps {
 
 const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleProps) => {
   const { data } = useRaioX();
-  const { financialInsights } = data;
   const [currentDate] = useState(new Date());
+  
+  // Use the financialInsightData property from RaioXData instead of financialInsights
+  const financialInsights = data.financialInsightData;
   
   // If client doesn't have financial insights data
   if (!financialInsights) {

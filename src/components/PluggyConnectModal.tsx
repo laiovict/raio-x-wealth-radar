@@ -8,16 +8,20 @@ interface PluggyConnectModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  isConnecting?: boolean;
+  setIsConnecting?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const PluggyConnectModal: React.FC<PluggyConnectModalProps> = ({ 
   isOpen, 
   onClose,
-  onSuccess
+  onSuccess,
+  isConnecting = false, 
+  setIsConnecting
 }) => {
   const [connectToken, setConnectToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   
   useEffect(() => {
     // Only initialize Pluggy when the modal is open
@@ -35,8 +39,13 @@ const PluggyConnectModal: React.FC<PluggyConnectModalProps> = ({
   }, [isOpen]);
   
   const initializePluggy = async () => {
-    setIsLoading(true);
+    setLoading(true);
     setError(null);
+    
+    // Update isConnecting state if the prop is provided
+    if (setIsConnecting) {
+      setIsConnecting(true);
+    }
     
     try {
       // Here you would fetch your connect token from your backend
@@ -62,13 +71,22 @@ const PluggyConnectModal: React.FC<PluggyConnectModalProps> = ({
             console.log('Pluggy connection successful', data);
             onSuccess();
             onClose();
+            if (setIsConnecting) {
+              setIsConnecting(false);
+            }
           },
           onError: (error: any) => {
             console.error('Pluggy connection error', error);
             setError('Houve um erro ao conectar suas contas. Por favor, tente novamente.');
+            if (setIsConnecting) {
+              setIsConnecting(false);
+            }
           },
           onClose: () => {
             onClose();
+            if (setIsConnecting) {
+              setIsConnecting(false);
+            }
           }
         });
         
@@ -77,11 +95,19 @@ const PluggyConnectModal: React.FC<PluggyConnectModalProps> = ({
       document.body.appendChild(script);
       */
       
-      setIsLoading(false);
+      setLoading(false);
+      // If setIsConnecting prop is provided, update it after loading
+      if (setIsConnecting) {
+        setIsConnecting(false);
+      }
     } catch (err) {
       console.error('Error initializing Pluggy', err);
       setError('Não foi possível inicializar a conexão. Por favor, tente novamente mais tarde.');
-      setIsLoading(false);
+      setLoading(false);
+      // If setIsConnecting prop is provided, update it after error
+      if (setIsConnecting) {
+        setIsConnecting(false);
+      }
     }
   };
   
@@ -98,7 +124,7 @@ const PluggyConnectModal: React.FC<PluggyConnectModalProps> = ({
         </DialogHeader>
         
         <div className="py-4">
-          {isLoading && (
+          {loading && (
             <div className="flex flex-col items-center justify-center py-12">
               <RefreshCw className="w-12 h-12 text-purple-500 animate-spin mb-4" />
               <p className="text-gray-400">Inicializando conexão segura...</p>
@@ -118,7 +144,7 @@ const PluggyConnectModal: React.FC<PluggyConnectModalProps> = ({
             </div>
           )}
           
-          {!isLoading && !error && (
+          {!loading && !error && (
             <div className="min-h-[400px] flex flex-col">
               {/* This div will be replaced by the Pluggy widget */}
               <div 
@@ -135,8 +161,8 @@ const PluggyConnectModal: React.FC<PluggyConnectModalProps> = ({
               {/* For demo purposes, we'll add a button to simulate success */}
               <Button 
                 onClick={onSuccess} 
-                variant="purpleGradient"
-                className="mt-4"
+                variant="default"
+                className="mt-4 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700"
               >
                 Simular Conexão Bem-sucedida
               </Button>
