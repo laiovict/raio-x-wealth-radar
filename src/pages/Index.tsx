@@ -20,6 +20,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
+// Define the user data interface
+interface UserData {
+  clientName: string;
+  clientId?: number;
+}
+
 const Index = () => {
   const [selectedClient, setSelectedClient] = useState<number | null>(null);
   const [hasOpenFinance, setHasOpenFinance] = useState(false);
@@ -30,6 +36,7 @@ const Index = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userRole, setUserRole] = useState<"advisor" | "client" | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState<UserData>({ clientName: "Usuário" });
   const navigate = useNavigate();
   
   useEffect(() => {
@@ -41,14 +48,18 @@ const Index = () => {
     if (storedUserRole === "advisor") {
       setIsLoggedIn(true);
       setUserRole("advisor");
+      setUserData({ clientName: "Consultor" });
       // If there's a previously selected client, use it
       if (selectedClientId) {
         setSelectedClient(parseInt(selectedClientId));
+        // For demo purposes, set a client name
+        setUserData({ clientName: "Cliente Selecionado", clientId: parseInt(selectedClientId) });
       }
     } else if (storedUserRole === "client" && clientId) {
       setIsLoggedIn(true);
       setUserRole("client");
       setSelectedClient(parseInt(clientId));
+      setUserData({ clientName: "Cliente", clientId: parseInt(clientId) });
     } else {
       // Redirect to login if not logged in
       navigate("/auth");
@@ -81,6 +92,8 @@ const Index = () => {
     console.log("Client selected in Index component:", clientId);
     localStorage.setItem("selectedClientId", clientId);
     setSelectedClient(parseInt(clientId));
+    // Update user data when client is selected
+    setUserData({ clientName: `Cliente ${clientId}`, clientId: parseInt(clientId) });
   };
 
   const handleOpenFinanceActivate = () => {
@@ -120,8 +133,8 @@ const Index = () => {
   };
   
   const getUserInitials = () => {
-    if (!data?.clientName) return "UN";
-    return data.clientName.split(" ")
+    if (!userData?.clientName) return "UN";
+    return userData.clientName.split(" ")
       .filter(part => part.length > 0)
       .map(part => part[0].toUpperCase())
       .slice(0, 2)
@@ -245,7 +258,7 @@ const Index = () => {
               <DropdownMenuContent align="end" className="w-56 bg-gradient-to-br from-[#171723] to-[#121218] border border-white/10 text-white">
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium text-white">{data?.clientName || "Usuário"}</p>
+                    <p className="text-sm font-medium text-white">{userData?.clientName || "Usuário"}</p>
                     <p className="text-xs text-gray-400">Gerenciar Conta</p>
                   </div>
                 </DropdownMenuLabel>
