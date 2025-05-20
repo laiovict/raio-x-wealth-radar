@@ -52,7 +52,12 @@ const translations = {
     insightsTab: "Insights",
     socialTab: "Social",
     bankingTab: "Banking",
-    behaviorTab: "Behavior"
+    behaviorTab: "Behavior",
+    // Add missing translations used in ClientSelector
+    loadingClients: "Loading clients...",
+    selectClient: "Select client",
+    noClientsFound: "No clients found",
+    login: "Login"
   },
   pt: {
     welcomeMessage: "Bem-vindo",
@@ -92,7 +97,12 @@ const translations = {
     insightsTab: "Insights",
     socialTab: "Social",
     bankingTab: "Bancos",
-    behaviorTab: "Comportamento"
+    behaviorTab: "Comportamento",
+    // Add missing translations used in ClientSelector
+    loadingClients: "Carregando clientes...",
+    selectClient: "Selecionar cliente",
+    noClientsFound: "Nenhum cliente encontrado",
+    login: "Entrar"
   },
 };
 
