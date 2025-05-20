@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { PieChart, ArrowUp, BadgeCheck } from 'lucide-react';
 import ActionCard from './ActionCard';
 import ActionStatusCard from './ActionStatusCard';
 

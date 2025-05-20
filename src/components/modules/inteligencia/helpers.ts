@@ -1,6 +1,5 @@
 
 import { PieChart, ArrowUp, BadgeCheck } from 'lucide-react';
-import React from 'react';
 
 export const getRecommendedActions = () => {
   return [
@@ -10,7 +9,8 @@ export const getRecommendedActions = () => {
       description: 'Aumente sua exposição a ativos internacionais para reduzir risco local',
       potentialImpact: '+2.4% a.a.',
       urgency: 'Médio',
-      icon: <PieChart className="h-10 w-10 text-blue-600 dark:text-blue-400 p-2 bg-blue-100 dark:bg-blue-900/30 rounded-md" />
+      iconType: 'PieChart',
+      iconColor: 'blue'
     },
     {
       id: 'emergency',
@@ -18,7 +18,8 @@ export const getRecommendedActions = () => {
       description: 'Sua reserva atual cobre 4 meses de despesas, aumente para 6 meses de segurança',
       potentialImpact: 'Risco -30%',
       urgency: 'Alto',
-      icon: <ArrowUp className="h-10 w-10 text-red-600 dark:text-red-400 p-2 bg-red-100 dark:bg-red-900/30 rounded-md" />
+      iconType: 'ArrowUp',
+      iconColor: 'red'
     },
     {
       id: 'tax',
@@ -26,7 +27,8 @@ export const getRecommendedActions = () => {
       description: 'Considere migrar parte dos investimentos para produtos com isenção fiscal',
       potentialImpact: 'Economia R$ 3.200',
       urgency: 'Médio',
-      icon: <BadgeCheck className="h-10 w-10 text-green-600 dark:text-green-400 p-2 bg-green-100 dark:bg-green-900/30 rounded-md" />
+      iconType: 'BadgeCheck',
+      iconColor: 'green'
     }
   ];
 };

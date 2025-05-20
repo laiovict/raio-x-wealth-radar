@@ -10,15 +10,31 @@ interface ActionCardProps {
     description: string;
     potentialImpact: string;
     urgency: string;
-    icon: React.ReactNode;
+    iconType: string;
+    iconColor: string;
   };
 }
 
 const ActionCard: React.FC<ActionCardProps> = ({ action }) => {
+  const renderIcon = () => {
+    const iconClasses = `h-10 w-10 text-${action.iconColor}-600 dark:text-${action.iconColor}-400 p-2 bg-${action.iconColor}-100 dark:bg-${action.iconColor}-900/30 rounded-md`;
+    
+    switch (action.iconType) {
+      case 'PieChart':
+        return <PieChart className={iconClasses} />;
+      case 'ArrowUp':
+        return <ArrowUp className={iconClasses} />;
+      case 'BadgeCheck':
+        return <BadgeCheck className={iconClasses} />;
+      default:
+        return <PieChart className={iconClasses} />;
+    }
+  };
+
   return (
     <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white/5 hover:bg-white/10 dark:hover:bg-gray-700/30 transition-colors cursor-pointer">
       <div className="flex items-start gap-4">
-        {action.icon}
+        {renderIcon()}
         <div className="flex-1">
           <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 mb-2">
             <h3 className="text-base font-medium text-gray-900 dark:text-gray-100">{action.title}</h3>
