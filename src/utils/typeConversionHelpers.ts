@@ -1,3 +1,4 @@
+
 /**
  * Utility functions to help with type conversions
  * consistently across the application
@@ -253,3 +254,19 @@ export const toSafeString = (value: any, fallback: string = 'N/A'): string => {
   if (value === undefined || value === null) return fallback;
   return String(value);
 };
+
+/**
+ * Convert to number and then to string safely for parsing functions
+ * This helper is specifically for functions expecting string inputs
+ * where a number might be provided
+ * 
+ * @param value Any value to convert to string
+ * @param fallback Optional fallback value if null/undefined
+ * @returns String value suitable for parsing
+ */
+export const toParseableString = (value: string | number | undefined | null, fallback: string = '0'): string => {
+  if (value === undefined || value === null) return fallback;
+  if (typeof value === 'number') return value.toString();
+  return value;
+};
+

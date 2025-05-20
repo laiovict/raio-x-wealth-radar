@@ -23,9 +23,13 @@ export const formatPercentage = (value: number) => {
 
 /**
  * Parse string value to number, handling Brazilian currency format
+ * Accepts both string and number inputs for flexibility
  */
-export const parseValueToNumber = (value: string): number => {
-  if (!value) return 0;
+export const parseValueToNumber = (value: string | number | undefined | null): number => {
+  if (value === undefined || value === null) return 0;
+  
+  // If already a number, return it
+  if (typeof value === 'number') return value;
   
   // Remove R$, spaces, and convert comma to dot
   const cleanValue = value.replace(/[^\d.,]/g, '').replace(',', '.');

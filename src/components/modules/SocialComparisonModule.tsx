@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
 import { formatCurrency, formatPercentage } from "@/utils/formattingUtils";
-import { toNumber, compareToNumber, toString, ensureString, toSafeString } from '@/utils/typeConversionHelpers';
+import { toNumber, compareToNumber, toString, ensureString, toSafeString, toParseableString } from '@/utils/typeConversionHelpers';
 import { DataSourceType } from '@/types/raioXTypes';
 import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 
@@ -35,7 +35,7 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
       // Calculate percentile rank based on portfolio diversity
       const diversityScore = 
         data.portfolioSummary.fixed_income_representation > 0 ? 25 : 0 +
-        parseFloat(toSafeString(data.portfolioSummary.stocks_representation, "0")) > 0 ? 25 : 0 +
+        parseFloat(toParseableString(data.portfolioSummary.stocks_representation)) > 0 ? 25 : 0 +
         data.portfolioSummary.real_estate_representation > 0 ? 25 : 0 +
         data.portfolioSummary.investment_fund_representation > 0 ? 25 : 0;
       

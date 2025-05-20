@@ -1,7 +1,6 @@
-
 import { useCallback, useMemo } from 'react';
 import { useRaioX } from '@/context/RaioXContext';
-import { toNumber, toString, ensureString, toSafeString } from '@/utils/typeConversionHelpers';
+import { toNumber, toString, ensureString, toSafeString, toParseableString } from '@/utils/typeConversionHelpers';
 import { 
   INVESTMENT_SONGS, 
   UNUSUAL_INVESTMENTS, 
@@ -40,11 +39,11 @@ export const useWrappedData = () => {
         // Find largest dividend payment
         let largestDividend = {
           asset: data.dividendHistory[0].asset,
-          value: parseFloat(toString(data.dividendHistory[0].value || "0"))
+          value: parseFloat(toParseableString(data.dividendHistory[0].value))
         };
         
         data.dividendHistory.forEach(dividend => {
-          const value = parseFloat(toString(dividend.value || "0"));
+          const value = parseFloat(toParseableString(dividend.value));
           if (value > largestDividend.value) {
             largestDividend = {
               asset: dividend.asset,
@@ -77,7 +76,7 @@ export const useWrappedData = () => {
         let mostProfitableAsset = "Unknown";
         
         data.stocks.forEach(stock => {
-          const performance = parseFloat(toString(stock.performance || "0"));
+          const performance = parseFloat(toParseableString(stock.performance));
           if (performance > highestReturn) {
             highestReturn = performance;
             mostProfitableAsset = stock.asset || "Unknown";
@@ -216,7 +215,7 @@ export const useWrappedData = () => {
         songImage: song.image,
         songArtist: song.artist,
         mostActiveDay: getActiveDay(),
-        investorCompatibility: `${investorComparison.name} (${toString(investorComparison.compatibility)})`,
+        investorCompatibility: `${investorComparison.name} (${toSafeString(investorComparison.compatibility)})`,
         investorStyle: investorComparison.style,
         dataSource: data.portfolioSummary ? 'supabase' as const : 'synthetic' as const
       };
@@ -233,7 +232,7 @@ export const useWrappedData = () => {
       songImage: getClientSong().image,
       songArtist: getClientSong().artist,
       mostActiveDay: getActiveDay(),
-      investorCompatibility: `${getInvestorComparison().name} (${toString(getInvestorComparison().compatibility)})`,
+      investorCompatibility: `${getInvestorComparison().name} (${toSafeString(getInvestorComparison().compatibility)})`,
       investorStyle: getInvestorComparison().style,
       dataSource: 'synthetic' as const
     };

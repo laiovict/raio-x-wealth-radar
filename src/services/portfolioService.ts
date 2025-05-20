@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { parseValueToNumber } from "@/components/modules/dividends/dividendUtils";
-import { toNumber, toString, toFormattableString, toSafeString } from '@/utils/typeConversionHelpers';
+import { toNumber, toString, toFormattableString, toSafeString, toParseableString } from '@/utils/typeConversionHelpers';
 import { DividendHistory, FinancialSummary, DataSourceType } from '@/types/raioXTypes';
 
 // Define the data source type
@@ -541,18 +541,18 @@ export const getStyledPortfolioSummaryData = (portfolioSummary: any, colorScale:
   // Calculate percentages and ensure they're numbers
   const fixed = typeof portfolioSummary.fixed_income_representation === 'number' ? 
                 portfolioSummary.fixed_income_representation : 
-                parseFloat(toString(portfolioSummary.fixed_income_representation || "0"));
+                parseFloat(toParseableString(portfolioSummary.fixed_income_representation, "0"));
                 
   const funds = typeof portfolioSummary.investment_fund_representation === 'number' ? 
                portfolioSummary.investment_fund_representation : 
-               parseFloat(toString(portfolioSummary.investment_fund_representation || "0"));
+               parseFloat(toParseableString(portfolioSummary.investment_fund_representation, "0"));
                
   const real = typeof portfolioSummary.real_estate_representation === 'number' ? 
               portfolioSummary.real_estate_representation : 
-              parseFloat(toString(portfolioSummary.real_estate_representation || "0"));
+              parseFloat(toParseableString(portfolioSummary.real_estate_representation, "0"));
               
   const stocks = typeof portfolioSummary.stocks_representation === 'string' ? 
-                parseFloat(toString(portfolioSummary.stocks_representation || "0")) : 
+                parseFloat(toParseableString(portfolioSummary.stocks_representation, "0")) : 
                 portfolioSummary.stocks_representation || 0;
   
   // Format values for display (ensuring they are strings)
