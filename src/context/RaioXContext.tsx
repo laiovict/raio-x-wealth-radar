@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { clientData } from '@/data/clientData';
 import { supabase } from "@/integrations/supabase/client";
@@ -20,6 +21,7 @@ export interface AIInsight {
   timestamp: Date;
   agent?: 'planner' | 'investor' | 'farmer' | 'insurancer' | 'credit';
   isSynthetic?: boolean;
+  dataSource?: 'supabase' | 'synthetic';
 }
 
 export interface FinancialSummary {
@@ -44,6 +46,7 @@ export interface FinancialSummary {
   totalLiabilities?: number;
   liquidAssets?: number;
   topRisks?: Array<{ name: string; impact: string; severity: 'high' | 'medium' | 'low' }>;
+  dataSource?: 'supabase' | 'synthetic';
 }
 
 export interface RecommendedAction {
@@ -56,6 +59,7 @@ export interface RecommendedAction {
   buttonText: string;
   buttonLink: string;
   completed: boolean;
+  dataSource?: 'supabase' | 'synthetic';
 }
 
 export interface Goal {
@@ -66,6 +70,7 @@ export interface Goal {
   timeframe: string;
   adjustmentNeeded: number;
   category?: string;
+  dataSource?: 'supabase' | 'synthetic';
 }
 
 export interface SentimentAsset {
@@ -73,11 +78,13 @@ export interface SentimentAsset {
   sentiment: number;
   impact: number;
   recentNews: string;
+  dataSource?: 'supabase' | 'synthetic';
 }
 
 export interface SentimentData {
   assets: SentimentAsset[];
   summary: string;
+  dataSource?: 'supabase' | 'synthetic';
 }
 
 export interface SocialComparisonData {
@@ -86,6 +93,7 @@ export interface SocialComparisonData {
   returnVsPeers: number;
   diversificationScore: number;
   summary: string;
+  dataSource?: 'supabase' | 'synthetic';
 }
 
 export interface AllocationData {
@@ -93,6 +101,7 @@ export interface AllocationData {
   recommended: Record<string, number>;
   optimizationGain: number;
   summary: string;
+  dataSource?: 'supabase' | 'synthetic';
 }
 
 export interface WrappedData {
@@ -110,6 +119,7 @@ export interface WrappedData {
     return: number;
   };
   summary: string;
+  dataSource?: 'supabase' | 'synthetic';
 }
 
 export interface FinancialInsightData {
@@ -117,39 +127,48 @@ export interface FinancialInsightData {
     month: string;
     amount: number;
     categories: Array<{name: string, amount: number}>;
+    dataSource?: 'supabase' | 'synthetic';
   };
   wastedMoney: {
     total: number;
     categories: Array<{name: string, amount: number}>;
+    dataSource?: 'supabase' | 'synthetic';
   };
   topCategories: {
     categories: Array<{name: string, amount: number, percentage: number}>;
     total: number;
+    dataSource?: 'supabase' | 'synthetic';
   };
   negativeMonths: {
     count: number;
     months: string[];
     totalDeficit: number;
+    dataSource?: 'supabase' | 'synthetic';
   };
   investmentGrowth: {
     annual: number;
     total: number;
     bestAsset: { name: string, growth: number };
+    dataSource?: 'supabase' | 'synthetic';
   };
   potentialSavings: {
     amount: number;
     suggestions: string[];
+    dataSource?: 'supabase' | 'synthetic';
   };
   bestInvestment: {
     name: string;
     return: number;
     period: string;
+    dataSource?: 'supabase' | 'synthetic';
   };
   retirementReadiness: {
     score: number;
     years: number;
     monthlyNeeded: number;
+    dataSource?: 'supabase' | 'synthetic';
   };
+  dataSource?: 'supabase' | 'synthetic';
 }
 
 // Add portfolioSummary type for the database response
@@ -174,6 +193,7 @@ export interface PortfolioSummary {
   private_pension_representation?: number;
   coe_value?: string;
   coe_representation?: string;
+  dataSource?: 'supabase' | 'synthetic';
 }
 
 export interface RaioXData {
@@ -194,6 +214,7 @@ export interface RaioXData {
   lifeGoals: {
     goals: Goal[];
     summary: string;
+    dataSource?: 'supabase' | 'synthetic';
   };
   liquidity: {
     currentIdle: number;
@@ -201,6 +222,7 @@ export interface RaioXData {
     monthlyExpenses: number;
     idealMonths: number;
     summary: string;
+    dataSource?: 'supabase' | 'synthetic';
   };
   projection: {
     currentTotal: number;
@@ -217,12 +239,14 @@ export interface RaioXData {
         "5 anos": number;
       };
     };
+    dataSource?: 'supabase' | 'synthetic';
   };
   recommendations: Array<{
     action: string;
     description: string;
     urgency: string;
     impact: string;
+    dataSource?: 'supabase' | 'synthetic';
   }>;
   sentiment: SentimentData;
   socialComparison: SocialComparisonData;
@@ -255,23 +279,26 @@ interface RaioXProviderProps {
   selectedClient?: number | null;
 }
 
-// Create mock data for the new properties
+// Create mock data for the new properties with dataSource tags
 const mockSentimentData: SentimentData = {
   assets: [
     {
       ticker: "PETR4",
       sentiment: 75,
       impact: 2.3,
-      recentNews: "Resultados trimestrais superaram expectativas dos analistas, com aumento de 12% na produção."
+      recentNews: "Resultados trimestrais superaram expectativas dos analistas, com aumento de 12% na produção.",
+      dataSource: 'synthetic'
     },
     {
       ticker: "VALE3",
       sentiment: 60,
       impact: -1.5,
-      recentNews: "Preocupações com desaceleração econômica na China afetam perspectivas para mineradoras."
+      recentNews: "Preocupações com desaceleração econômica na China afetam perspectivas para mineradoras.",
+      dataSource: 'synthetic'
     }
   ],
-  summary: "O sentimento geral para suas principais posições é positivo, destacando-se o setor de energia com Petrobras. Recomendamos acompanhar notícias sobre a China que podem impactar Vale."
+  summary: "O sentimento geral para suas principais posições é positivo, destacando-se o setor de energia com Petrobras. Recomendamos acompanhar notícias sobre a China que podem impactar Vale.",
+  dataSource: 'synthetic'
 };
 
 const mockSocialComparison: SocialComparisonData = {
@@ -279,7 +306,8 @@ const mockSocialComparison: SocialComparisonData = {
   percentileRank: 75,
   returnVsPeers: 3.2,
   diversificationScore: 82,
-  summary: "Seu desempenho está superior a 75% dos investidores com perfil similar ao seu. Sua estratégia de diversificação está contribuindo positivamente para resultados acima da média."
+  summary: "Seu desempenho está superior a 75% dos investidores com perfil similar ao seu. Sua estratégia de diversificação está contribuindo positivamente para resultados acima da média.",
+  dataSource: 'synthetic'
 };
 
 const mockAllocationData: AllocationData = {
@@ -302,7 +330,8 @@ const mockAllocationData: AllocationData = {
     "Previdência": 5.0
   },
   optimizationGain: 2.4,
-  summary: "Atualmente sua carteira está concentrada em renda fixa (45%) e ações brasileiras (25%), o que reflete seu perfil conservador. Como empreendedor, recomendamos diversificar com 15% em internacional e 10% em FIIs para melhor equilíbrio entre segurança e crescimento, especialmente considerando seus planos familiares futuros."
+  summary: "Atualmente sua carteira está concentrada em renda fixa (45%) e ações brasileiras (25%), o que reflete seu perfil conservador. Como empreendedor, recomendamos diversificar com 15% em internacional e 10% em FIIs para melhor equilíbrio entre segurança e crescimento, especialmente considerando seus planos familiares futuros.",
+  dataSource: 'synthetic'
 };
 
 const mockWrappedData: WrappedData = {
@@ -319,7 +348,8 @@ const mockWrappedData: WrappedData = {
     name: "WEGE3",
     return: 32.4
   },
-  summary: "2023 foi um ano positivo para sua carteira, com destaque para as ações do setor industrial. Seu padrão de aportes consistentes contribuiu para o bom desempenho, apesar da volatilidade no 2º trimestre."
+  summary: "2023 foi um ano positivo para sua carteira, com destaque para as ações do setor industrial. Seu padrão de aportes consistentes contribuiu para o bom desempenho, apesar da volatilidade no 2º trimestre.",
+  dataSource: 'synthetic'
 };
 
 const mockFinancialInsightData: FinancialInsightData = {
@@ -330,7 +360,8 @@ const mockFinancialInsightData: FinancialInsightData = {
       {name: "Presentes", amount: 4500},
       {name: "Viagens", amount: 3800},
       {name: "Alimentação", amount: 2200}
-    ]
+    ],
+    dataSource: 'synthetic'
   },
   wastedMoney: {
     total: 12400,
@@ -338,7 +369,8 @@ const mockFinancialInsightData: FinancialInsightData = {
       {name: "Taxas bancárias", amount: 4800},
       {name: "Serviços não utilizados", amount: 3600},
       {name: "Juros", amount: 2800}
-    ]
+    ],
+    dataSource: 'synthetic'
   },
   topCategories: {
     categories: [
@@ -346,17 +378,20 @@ const mockFinancialInsightData: FinancialInsightData = {
       {name: "Alimentação", amount: 36000, percentage: 24},
       {name: "Transporte", amount: 24000, percentage: 16}
     ],
-    total: 150000
+    total: 150000,
+    dataSource: 'synthetic'
   },
   negativeMonths: {
     count: 2,
     months: ["Dezembro/2023", "Janeiro/2024"],
-    totalDeficit: 4500
+    totalDeficit: 4500,
+    dataSource: 'synthetic'
   },
   investmentGrowth: {
     annual: 11.2,
     total: 65000,
-    bestAsset: {name: "Fundo Imobiliário XP", growth: 14.8}
+    bestAsset: {name: "Fundo Imobiliário XP", growth: 14.8},
+    dataSource: 'synthetic'
   },
   potentialSavings: {
     amount: 18600,
@@ -364,21 +399,25 @@ const mockFinancialInsightData: FinancialInsightData = {
       "Renegociar contratos de serviços", 
       "Consolidar dívidas para reduzir juros",
       "Eliminar assinaturas redundantes"
-    ]
+    ],
+    dataSource: 'synthetic'
   },
   bestInvestment: {
     name: "Tesouro IPCA+ 2035",
     return: 12.4,
-    period: "últimos 12 meses"
+    period: "últimos 12 meses",
+    dataSource: 'synthetic'
   },
   retirementReadiness: {
     score: 68,
     years: 22,
-    monthlyNeeded: 15000
-  }
+    monthlyNeeded: 15000,
+    dataSource: 'synthetic'
+  },
+  dataSource: 'synthetic'
 };
 
-// Sample AI insights
+// Sample AI insights with data source tags
 const sampleAIInsights: AIInsight[] = [
   {
     id: "1",
@@ -388,7 +427,8 @@ const sampleAIInsights: AIInsight[] = [
     priority: "medium",
     timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
     agent: "investor",
-    isSynthetic: false
+    isSynthetic: false,
+    dataSource: 'synthetic'
   },
   {
     id: "2",
@@ -399,7 +439,8 @@ const sampleAIInsights: AIInsight[] = [
     isNew: true,
     timestamp: new Date(),
     agent: "planner",
-    isSynthetic: false
+    isSynthetic: false,
+    dataSource: 'synthetic'
   },
   {
     id: "3",
@@ -409,7 +450,8 @@ const sampleAIInsights: AIInsight[] = [
     priority: "low",
     timestamp: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 14 days ago
     agent: "planner",
-    isSynthetic: true
+    isSynthetic: true,
+    dataSource: 'synthetic'
   },
   {
     id: "4",
@@ -419,7 +461,8 @@ const sampleAIInsights: AIInsight[] = [
     priority: "medium",
     timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
     agent: "investor",
-    isSynthetic: false
+    isSynthetic: false,
+    dataSource: 'synthetic'
   },
   {
     id: "5",
@@ -429,7 +472,8 @@ const sampleAIInsights: AIInsight[] = [
     priority: "high",
     timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
     agent: "planner",
-    isSynthetic: true
+    isSynthetic: true,
+    dataSource: 'synthetic'
   },
   {
     id: "6",
@@ -439,17 +483,18 @@ const sampleAIInsights: AIInsight[] = [
     priority: "medium",
     timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
     agent: "credit",
-    isSynthetic: false
+    isSynthetic: false,
+    dataSource: 'synthetic'
   }
 ];
 
-// Default data with all required properties
+// Default data with all required properties and data source tags
 const defaultData: RaioXData = {
   clientName: "Cliente Padrão",
   clientAge: 35,
-  financialSummary: clientData.financialSummary,
-  financialInsights: clientData.financialInsights,
-  recommendedActions: clientData.recommendedActions,
+  financialSummary: { ...clientData.financialSummary, dataSource: 'synthetic' },
+  financialInsights: clientData.financialInsights.map(insight => ({ ...insight, dataSource: 'synthetic' })),
+  recommendedActions: clientData.recommendedActions.map(action => ({ ...action, dataSource: 'synthetic' })),
   assetAllocation: {
     equities: 30,
     fixedIncome: 40,
@@ -466,7 +511,8 @@ const defaultData: RaioXData = {
         targetAmount: 1000000,
         timeframe: "Longo prazo",
         adjustmentNeeded: 15,
-        category: "investment"
+        category: "investment",
+        dataSource: 'synthetic'
       },
       {
         name: "Casa própria",
@@ -475,17 +521,20 @@ const defaultData: RaioXData = {
         targetAmount: 500000,
         timeframe: "Médio prazo",
         adjustmentNeeded: 0,
-        category: "real estate"
+        category: "real estate",
+        dataSource: 'synthetic'
       }
     ],
-    summary: "Você está no caminho para alcançar a maioria das suas metas, mas pode precisar aumentar suas contribuições para aposentadoria."
+    summary: "Você está no caminho para alcançar a maioria das suas metas, mas pode precisar aumentar suas contribuições para aposentadoria.",
+    dataSource: 'synthetic'
   },
   liquidity: {
     currentIdle: 30000,
     idealReserve: 60000,
     monthlyExpenses: 10000,
     idealMonths: 6,
-    summary: "Sua reserva de emergência cobre 3 meses de despesas, recomendamos aumentar para 6 meses."
+    summary: "Sua reserva de emergência cobre 3 meses de despesas, recomendamos aumentar para 6 meses.",
+    dataSource: 'synthetic'
   },
   projection: {
     currentTotal: 850000,
@@ -501,20 +550,23 @@ const defaultData: RaioXData = {
         "3 anos": 1100000,
         "5 anos": 1350000
       }
-    }
+    },
+    dataSource: 'synthetic'
   },
   recommendations: [
     {
       action: "Diversificar portfólio internacional",
       description: "Adicionar ETFs globais para reduzir a concentração no mercado doméstico",
       urgency: "Médio",
-      impact: "Alto"
+      impact: "Alto",
+      dataSource: 'synthetic'
     },
     {
       action: "Aumentar reserva de emergência",
       description: "Atingir o equivalente a 6 meses de despesas em ativos de alta liquidez",
       urgency: "Alto",
-      impact: "Médio"
+      impact: "Médio",
+      dataSource: 'synthetic'
     }
   ],
   sentiment: mockSentimentData,
@@ -636,7 +688,8 @@ export const RaioXProvider = ({
           severity: "medium",
           impact: "30% do patrimônio sem proteção cambial"
         }
-      ]
+      ],
+      dataSource: 'supabase' // Mark this as real data from Supabase
     };
     
     setFinancialSummary(summary);

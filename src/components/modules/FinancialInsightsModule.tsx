@@ -6,13 +6,17 @@ import {
   ArrowDown,
   ArrowUp,
   Calendar,
+  CheckCircle,
   Coins, 
   DollarSign,
+  Info,
   PiggyBank,
   Wallet
 } from "lucide-react";
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface FinancialInsightsModuleProps {
   fullWidth?: boolean;
@@ -21,6 +25,7 @@ interface FinancialInsightsModuleProps {
 // Define more specific types for each insight type
 interface BaseInsight {
   summary?: string; // Make summary optional across all insight types
+  dataSource?: 'supabase' | 'synthetic'; // Add dataSource field to track where data comes from
 }
 
 interface HighestSpendingMonth extends BaseInsight {
@@ -78,14 +83,77 @@ interface FinancialInsightData {
   potentialSavings?: PotentialSavings;
   bestInvestment?: BestInvestment;
   retirementReadiness?: RetirementReadiness;
+  dataSource?: 'supabase' | 'synthetic';
 }
+
+// Data source tag component
+const DataSourceTag = ({ dataSource }: { dataSource: 'supabase' | 'synthetic' | undefined }) => {
+  if (!dataSource) return null;
+  
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className={`ml-1 ${dataSource === 'supabase' ? 'text-green-400' : 'text-amber-400'}`}>
+            {dataSource === 'supabase' ? <CheckCircle className="inline-block h-3 w-3" /> : '*'}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{dataSource === 'supabase' ? 'Dado real do Supabase' : 'Dado sintético'}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleProps) => {
   const { data } = useRaioX();
   const [currentDate] = useState(new Date());
+  const [showDataSourceInfo, setShowDataSourceInfo] = useState(false);
   
   // Get financial insights data or create a synthetic version if it doesn't exist
-  const financialInsights: FinancialInsightData = data.financialInsightData || {};
+  const financialInsights: FinancialInsightData = data.financialInsightData 
+    ? { ...data.financialInsightData, dataSource: 'synthetic' } 
+    : { dataSource: 'synthetic' };
+  
+  // Add dataSource tag to each insight if not already present
+  if (financialInsights.highestSpendingMonth && !financialInsights.highestSpendingMonth.dataSource) {
+    financialInsights.highestSpendingMonth.dataSource = 'synthetic';
+  }
+  
+  if (financialInsights.wastedMoney && !financialInsights.wastedMoney.dataSource) {
+    financialInsights.wastedMoney.dataSource = 'synthetic';
+  }
+  
+  if (financialInsights.topCategories && !financialInsights.topCategories.dataSource) {
+    financialInsights.topCategories.dataSource = 'synthetic';
+  }
+  
+  if (financialInsights.negativeMonths && !financialInsights.negativeMonths.dataSource) {
+    financialInsights.negativeMonths.dataSource = 'synthetic';
+  }
+  
+  if (financialInsights.investmentGrowth && !financialInsights.investmentGrowth.dataSource) {
+    financialInsights.investmentGrowth.dataSource = 'synthetic';
+  }
+  
+  if (financialInsights.potentialSavings && !financialInsights.potentialSavings.dataSource) {
+    financialInsights.potentialSavings.dataSource = 'synthetic';
+  }
+  
+  if (financialInsights.bestInvestment && !financialInsights.bestInvestment.dataSource) {
+    financialInsights.bestInvestment.dataSource = 'synthetic';
+  }
+  
+  if (financialInsights.retirementReadiness && !financialInsights.retirementReadiness.dataSource) {
+    financialInsights.retirementReadiness.dataSource = 'synthetic';
+  }
+  
+  // Informações dos indicadores de fonte de dados
+  const dataSourceInfo = {
+    supabase: "Dados provenientes do Supabase, representando informações reais do cliente.",
+    synthetic: "Dados sintéticos gerados para demonstração, não representam valores reais do cliente."
+  };
   
   // If client doesn't have financial insights data at all
   if (!financialInsights || Object.keys(financialInsights).length === 0) {
@@ -159,10 +227,33 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
           <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
             Insights Financeiros Detalhados
           </CardTitle>
-          <span className="text-sm text-gray-400">
-            {formatDate(currentDate)}
-          </span>
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowDataSourceInfo(!showDataSourceInfo)}
+              className="flex items-center gap-1"
+            >
+              <Info className="h-4 w-4" />
+              <span className="text-xs">Legenda</span>
+            </Button>
+            <span className="text-sm text-gray-400 ml-4">
+              {formatDate(currentDate)}
+            </span>
+          </div>
         </div>
+        {showDataSourceInfo && (
+          <div className="mt-2 p-2 bg-gray-800/50 rounded-md text-xs">
+            <div className="flex items-center mb-1">
+              <CheckCircle className="h-3 w-3 text-green-400 mr-1" />
+              <span>{dataSourceInfo.supabase}</span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-amber-400 mr-1">*</span>
+              <span>{dataSourceInfo.synthetic}</span>
+            </div>
+          </div>
+        )}
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[600px] pr-4">
@@ -178,6 +269,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-amber-400 mb-1">
                         Você viveu no limite?
+                        <DataSourceTag dataSource={financialInsights.highestSpendingMonth.dataSource} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 19, 2025</span>
                     </div>
@@ -214,6 +306,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-red-400 mb-1">
                         Dinheiro que escorreu pelo ralo
+                        <DataSourceTag dataSource={financialInsights.wastedMoney.dataSource} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 19, 2025</span>
                     </div>
@@ -250,6 +343,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-blue-400 mb-1">
                         O que você mais comprou?
+                        <DataSourceTag dataSource={financialInsights.topCategories.dataSource} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 19, 2025</span>
                     </div>
@@ -293,6 +387,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-orange-400 mb-1">
                         E quando o dinheiro só... sumiu?
+                        <DataSourceTag dataSource={financialInsights.negativeMonths.dataSource} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 19, 2025</span>
                     </div>
@@ -329,6 +424,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-green-400 mb-1">
                         Mas teve coisa boa também
+                        <DataSourceTag dataSource={financialInsights.investmentGrowth.dataSource} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 17, 2025</span>
                     </div>
@@ -365,6 +461,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-indigo-400 mb-1">
                         E se você focasse de verdade?
+                        <DataSourceTag dataSource={financialInsights.potentialSavings.dataSource} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 17, 2025</span>
                     </div>
@@ -401,6 +498,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-purple-400 mb-1">
                         A hora que você brilhou
+                        <DataSourceTag dataSource={financialInsights.bestInvestment.dataSource} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 17, 2025</span>
                     </div>
@@ -437,6 +535,7 @@ const FinancialInsightsModule = ({ fullWidth = false }: FinancialInsightsModuleP
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium text-teal-400 mb-1">
                         Preparação para Aposentadoria
+                        <DataSourceTag dataSource={financialInsights.retirementReadiness.dataSource} />
                       </h3>
                       <span className="text-xs text-gray-400">Mai 17, 2025</span>
                     </div>
