@@ -43,7 +43,7 @@ const Index = () => {
     // Simulate loading time for the agent screen
     setTimeout(() => {
       setLoading(false);
-    }, 3000);
+    }, 1000);
     
     // Listen for custom event for OpenFinance activation
     const handleOpenFinanceEvent = () => {
@@ -58,6 +58,7 @@ const Index = () => {
   }, [navigate]);
 
   const handleClientSelect = (clientId: string) => {
+    console.log("Client selected in Index component:", clientId);
     setSelectedClient(parseInt(clientId));
   };
 
@@ -146,6 +147,10 @@ const Index = () => {
               src="https://media.licdn.com/dms/image/C4D0BAQEgQpIxQEJvEA/company-logo_200_200/0/1674674650337?e=1716422400&v=beta&t=Gpl4UQRl_o7ArkhZeKM347sOWfO2xdrG5qHZW5kAUyI"
               alt="Reinvent Logo"
               className="h-10 w-auto"
+              onError={(e) => {
+                console.error("Failed to load logo, trying backup");
+                (e.target as HTMLImageElement).src = "/lovable-uploads/e32de997-8c6d-4904-8099-d688fa8427e4.png";
+              }}
             />
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
               Raio-X Financeiro

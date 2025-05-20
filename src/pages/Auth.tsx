@@ -35,29 +35,15 @@ const Auth = () => {
     setLoading(true);
     
     try {
-      // For advisor login
-      if (showAdvisorLogin) {
-        if (password === "America123@") {
-          // Store a special flag in localStorage to indicate advisor mode
+      // For both advisor and client login, use the same password
+      if (password === "America123@") {
+        // Store appropriate role in localStorage
+        if (showAdvisorLogin) {
           localStorage.setItem("userRole", "advisor");
-          toast({
-            title: t('loginSuccess'),
-            description: t('welcomeBack'),
-            variant: "default",
-          });
-          navigate("/");
-          return;
         } else {
-          setError(t('invalidPassword'));
-          return;
+          localStorage.setItem("userRole", "client");
+          localStorage.setItem("clientId", "12345678");
         }
-      }
-      
-      // For client login
-      if (password === "123456") {
-        // Store client info in localStorage
-        localStorage.setItem("userRole", "client");
-        localStorage.setItem("clientId", "12345678");
         
         toast({
           title: t('loginSuccess'),
@@ -100,7 +86,7 @@ const Auth = () => {
       <div className="w-1/2 flex flex-col items-start justify-center p-16">
         <div className="mb-16">
           <img 
-            src="/lovable-uploads/e32de997-8c6d-4904-8099-d688fa8427e4.png" 
+            src="https://media.licdn.com/dms/image/C4D0BAQEgQpIxQEJvEA/company-logo_200_200/0/1674674650337?e=1716422400&v=beta&t=Gpl4UQRl_o7ArkhZeKM347sOWfO2xdrG5qHZW5kAUyI"
             alt="Reinvent Logo" 
             className="h-10"
           />

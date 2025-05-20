@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Sparkles, ChevronDown, User } from "lucide-react";
+import { Sparkles, User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Select,
@@ -62,10 +62,16 @@ const ClientSelector = ({ onClientSelect }: ClientSelectorProps) => {
 
   const handleClientChange = (value: string) => {
     setSelectedClient(value);
+    console.log(`Selected client: ${value}`);
+    
+    // Ensure the callback is called with the selected client ID
     if (onClientSelect) {
       onClientSelect(value);
     }
-    console.log(`Selected client: ${value}`);
+    
+    // Force a refresh of the page to ensure all components update
+    // This is a temporary solution to ensure the RaioX updates properly
+    window.location.reload();
   };
 
   const handleLogin = () => {
