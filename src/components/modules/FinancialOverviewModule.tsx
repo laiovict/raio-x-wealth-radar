@@ -1,4 +1,3 @@
-
 import { useRaioX, FinancialSummary } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -217,7 +216,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
       result.push({
         month: months[i],
         amount: startValue,
-        dataSource: 'synthetic' // Mark all chart data as synthetic
+        dataSource: 'synthetic' as const // Use const assertion to fix the type
       });
     }
     
@@ -243,29 +242,29 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
     investmentConsistency: {
       grade: "A+",
       description: "Investiu consistentemente nos últimos 24 meses",
-      dataSource: 'synthetic'
+      dataSource: 'synthetic' as const
     },
     spendingDiscipline: {
       grade: "B",
       description: "Excedeu o orçamento em 18% em 3 dos últimos 6 meses",
-      dataSource: 'synthetic'
+      dataSource: 'synthetic' as const
     },
     financialResilience: {
       grade: "A",
       description: "Reserva de emergência cobre 8 meses de despesas",
-      dataSource: 'synthetic'
+      dataSource: 'synthetic' as const
     }
   };
   
   // Cross-institutional analysis data - this is all synthetic
   const crossInstitutionalData = {
     bankComparisons: [
-      { name: "Banco A", rate: 2.1, color: "#FF6B6B", dataSource: 'synthetic' },
-      { name: "Banco B", rate: 1.4, color: "#FFD166", dataSource: 'synthetic' },
-      { name: "Reinvent", rate: 0.8, color: "#06D6A0", dataSource: 'synthetic' }
+      { name: "Banco A", rate: 2.1, color: "#FF6B6B", dataSource: 'synthetic' as const },
+      { name: "Banco B", rate: 1.4, color: "#FFD166", dataSource: 'synthetic' as const },
+      { name: "Reinvent", rate: 0.8, color: "#06D6A0", dataSource: 'synthetic' as const }
     ],
     potentialSavings: 8750,
-    dataSource: 'synthetic'
+    dataSource: 'synthetic' as const
   };
   
   // Financial history highlights data - this is all synthetic
@@ -276,7 +275,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
       description: "Em março, você gastou R$ 15.800, o equivalente a 3 iPhones Pro Max ou 1 mês num apê no Jardins. Foi seu recorde do ano.",
       progress: 85,
       color: "#FFD166",
-      dataSource: 'synthetic'
+      dataSource: 'synthetic' as const
     },
     {
       id: 2,
@@ -284,7 +283,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
       description: "Só com assinaturas não utilizadas, você gastou R$ 4.320 no último ano. Se tivesse colocado metade disso num CDB, teria hoje R$ 2.376 adicionais.",
       progress: 60,
       color: "#FF6B6B",
-      dataSource: 'synthetic'
+      dataSource: 'synthetic' as const
     },
     {
       id: 3,
@@ -292,7 +291,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
       description: "Top 3 categorias do seu cartão: Delivery (R$ 12.840), Assinaturas (R$ 8.620) e Eletrônicos (R$ 7.980). Spoiler: você pediu 98 vezes no iFood.",
       progress: 75,
       color: "#4D96FF",
-      dataSource: 'synthetic'
+      dataSource: 'synthetic' as const
     },
     {
       id: 4,
@@ -300,7 +299,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
       description: "Seu melhor investimento foi HGLG11, com 22% de rentabilidade. Se tivesse colocado o dobro, teria ganho R$ 28.600 adicionais.",
       progress: 100,
       color: "#06D6A0",
-      dataSource: 'synthetic'
+      dataSource: 'synthetic' as const
     },
     {
       id: 5,
@@ -308,7 +307,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
       description: "Se reduzir 15% dos seus gastos com restaurantes, dá pra investir R$ 960 todo mês. Isso pode virar R$ 1.470.000 em 25 anos.",
       progress: 50,
       color: "#9C27B0",
-      dataSource: 'synthetic'
+      dataSource: 'synthetic' as const
     }
   ];
   
@@ -319,14 +318,14 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
       title: "Otimizar sua alocação atual",
       description: "Realoque 12% dos seus investimentos de renda fixa para um mix mais diversificado de FIIs e multimercados.",
       impact: "+R$ 24.600/ano",
-      dataSource: 'synthetic'
+      dataSource: 'synthetic' as const
     },
     {
       id: 2,
       title: "Revisar custos fixos mensais",
       description: "Consolidar assinaturas duplicadas e renegociar pacotes bancários pode liberar até R$ 780/mês para investimentos.",
       impact: "+R$ 9.360/ano",
-      dataSource: 'synthetic'
+      dataSource: 'synthetic' as const
     }
   ];
 
