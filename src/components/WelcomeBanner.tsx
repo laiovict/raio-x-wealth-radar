@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
+import { useRaioX } from "@/context/RaioXContext";
+import { Shield, Lock } from "lucide-react";
 
 interface WelcomeBannerProps {
   selectedClient: number | null;
@@ -23,6 +25,7 @@ const clientData: Record<string, ClientInfo> = {
 const WelcomeBanner = ({ selectedClient }: WelcomeBannerProps) => {
   const [clientName, setClientName] = useState<string>("");
   const { t } = useLanguage();
+  const { hasOpenFinance } = useRaioX();
   
   useEffect(() => {
     const fetchClientInfo = async () => {
@@ -77,6 +80,20 @@ const WelcomeBanner = ({ selectedClient }: WelcomeBannerProps) => {
           <p className="text-blue-200/70">
             {t('welcomeMessagePortfolio')}
           </p>
+        </div>
+        
+        <div className="flex items-center">
+          {hasOpenFinance ? (
+            <div className="bg-green-600/20 text-green-400 text-sm px-3 py-1.5 rounded-full flex items-center">
+              <Shield className="h-4 w-4 mr-2 text-green-400" />
+              Open Finance <span className="font-medium ml-1">Ativo</span>
+            </div>
+          ) : (
+            <div className="bg-gray-700/30 text-gray-300 text-sm px-3 py-1.5 rounded-full flex items-center">
+              <Lock className="h-4 w-4 mr-2 text-gray-300" />
+              Open Finance <span className="font-medium ml-1">Inativo</span>
+            </div>
+          )}
         </div>
       </div>
     </Card>
