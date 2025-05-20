@@ -2,7 +2,7 @@
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Mic, Search } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 
@@ -47,6 +47,7 @@ const RaioXDashboard = ({
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
   const { t } = useLanguage();
+  const dashboardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleActivateOpenFinance = () => {
@@ -56,6 +57,12 @@ const RaioXDashboard = ({
 
     document.addEventListener('activate-openfinance', handleActivateOpenFinance);
 
+    // Fix scrolling behavior
+    const mainContainer = document.querySelector('main');
+    if (mainContainer) {
+      mainContainer.classList.add('overflow-y-auto', 'max-h-screen', 'pb-24');
+    }
+
     return () => {
       document.removeEventListener('activate-openfinance', handleActivateOpenFinance);
     };
@@ -63,6 +70,10 @@ const RaioXDashboard = ({
 
   const handleQuickNavClick = (tabId: string) => {
     setActiveTab(tabId);
+    // Scroll to top when changing tabs
+    if (dashboardRef.current) {
+      dashboardRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   // Extract the first name from data.clientName
@@ -131,7 +142,7 @@ const RaioXDashboard = ({
   }
 
   return (
-    <div className="space-y-6 pb-16 min-h-screen max-h-full">
+    <div className="space-y-6 pb-16 min-h-screen" ref={dashboardRef}>
       <div className="flex flex-col items-center justify-center mb-8">
         <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-300 to-indigo-400 bg-clip-text text-transparent mb-2">
           {t('welcomeMessage')} {getClientFirstName()}!
@@ -143,7 +154,7 @@ const RaioXDashboard = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('searchPlaceholder')} 
-            className="w-full glass-morphism backdrop-blur-md border border-white/10 rounded-full px-5 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full backdrop-blur-md border border-white/10 rounded-full px-5 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white/5"
           />
           <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex gap-2">
             <button 
@@ -160,37 +171,37 @@ const RaioXDashboard = ({
         
         <div className="mt-6 mb-2 flex gap-2 flex-wrap justify-center">
           <button 
-            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "overview" ? "bg-white/20 border-blue-400" : ""}`}
+            className={`px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all border ${activeTab === "overview" ? "bg-white/20 border-blue-400" : "border-white/10 bg-white/5"}`}
             onClick={() => handleQuickNavClick("overview")}
           >
             {t('overviewTab')}
           </button>
           <button 
-            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "status" ? "bg-white/20 border-blue-400" : ""}`}
+            className={`px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all border ${activeTab === "status" ? "bg-white/20 border-blue-400" : "border-white/10 bg-white/5"}`}
             onClick={() => handleQuickNavClick("status")}
           >
             {t('statusTab')}
           </button>
           <button 
-            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "actions" ? "bg-white/20 border-blue-400" : ""}`}
+            className={`px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all border ${activeTab === "actions" ? "bg-white/20 border-blue-400" : "border-white/10 bg-white/5"}`}
             onClick={() => handleQuickNavClick("actions")}
           >
             {t('planTab')}
           </button>
           <button 
-            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "market" ? "bg-white/20 border-blue-400" : ""}`}
+            className={`px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all border ${activeTab === "market" ? "bg-white/20 border-blue-400" : "border-white/10 bg-white/5"}`}
             onClick={() => handleQuickNavClick("market")}
           >
             {t('aiTab')}
           </button>
           <button 
-            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "future" ? "bg-white/20 border-blue-400" : ""}`}
+            className={`px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all border ${activeTab === "future" ? "bg-white/20 border-blue-400" : "border-white/10 bg-white/5"}`}
             onClick={() => handleQuickNavClick("future")}
           >
             {t('futureTab')}
           </button>
           <button 
-            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "chat" ? "bg-white/20 border-blue-400" : ""}`}
+            className={`px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all border ${activeTab === "chat" ? "bg-white/20 border-blue-400" : "border-white/10 bg-white/5"}`}
             onClick={() => handleQuickNavClick("chat")}
           >
             {t('chatTab')}
@@ -201,7 +212,7 @@ const RaioXDashboard = ({
       <WelcomeBanner selectedClient={selectedClient} />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-6 scrollbar-none">
+        <TabsList className="mb-6 rounded-lg overflow-x-auto grid grid-cols-6 scrollbar-none bg-white/5 backdrop-blur-md border border-white/10">
           <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Visão Geral</TabsTrigger>
           <TabsTrigger value="status" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('statusTab')}</TabsTrigger>
           <TabsTrigger value="actions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('planTab')}</TabsTrigger>
@@ -210,104 +221,239 @@ const RaioXDashboard = ({
           <TabsTrigger value="chat" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('chatTab')}</TabsTrigger>
         </TabsList>
 
-        {/* Tab 1: Visão Geral - Reordered to match requirements */}
+        {/* Tab 1: Visão Geral - Optimized ordering for better UX */}
         <TabsContent value="overview" className="space-y-6">
           {/* Starting with Financial Overview */}
-          <FinancialOverviewModule />
+          <div>
+            <FinancialOverviewModule />
+            <FeedbackSection sectionId="financial-overview" />
+          </div>
           
           {/* Followed by One Page Financial Plan */}
-          <OnePageFinancialPlanModule />
+          <div>
+            <OnePageFinancialPlanModule />
+            <FeedbackSection sectionId="financial-plan" />
+          </div>
           
           {/* Then Life Goals */}
-          <LifeGoalsModule />
-          
-          {/* Moving MeuFuturoFinanceiro and WholeBanking to the middle */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <MeuFuturoFinanceiroModule />
-            <WholeBankingModule />
+          <div>
+            <LifeGoalsModule />
+            <FeedbackSection sectionId="life-goals" />
           </div>
           
-          <FamousInvestorsModule fullWidth />
-          
+          {/* Moving these modules to the middle as requested */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <AllocationModule />
-            <LiquidityReserveModule />
+            <div>
+              <MeuFuturoFinanceiroModule />
+              <FeedbackSection sectionId="meu-futuro" />
+            </div>
+            <div>
+              <WholeBankingModule />
+              <FeedbackSection sectionId="whole-banking" />
+            </div>
+          </div>
+          
+          <div>
+            <FamousInvestorsModule fullWidth />
+            <FeedbackSection sectionId="famous-investors" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <InteligenciaModule />
-            <SentimentInsightsModule />
+            <div>
+              <AllocationModule />
+              <FeedbackSection sectionId="allocation" />
+            </div>
+            <div>
+              <LiquidityReserveModule />
+              <FeedbackSection sectionId="liquidity" />
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FutureProjectionModule />
-            <PersonalInsightsModule />
+            <div>
+              <InteligenciaModule />
+              <FeedbackSection sectionId="inteligencia" />
+            </div>
+            <div>
+              <SentimentInsightsModule />
+              <FeedbackSection sectionId="sentiment" />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <FutureProjectionModule />
+              <FeedbackSection sectionId="future-projection" />
+            </div>
+            <div>
+              <PersonalInsightsModule />
+              <FeedbackSection sectionId="personal-insights" />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <InvestmentPlanningModule />
-            <SocialComparisonModule />
+            <div>
+              <InvestmentPlanningModule />
+              <FeedbackSection sectionId="investment-planning" />
+            </div>
+            <div>
+              <SocialComparisonModule />
+              <FeedbackSection sectionId="social-comparison" />
+            </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <BehavioralFinanceModule />
-            <WrappedModule />
+            <div>
+              <BehavioralFinanceModule />
+              <FeedbackSection sectionId="behavioral-finance" />
+            </div>
+            <div>
+              <WrappedModule />
+              <FeedbackSection sectionId="wrapped" />
+            </div>
+          </div>
+          
+          {/* Footer for this tab */}
+          <div className="w-full py-10 text-center border-t border-white/10 mt-12">
+            <p className="text-gray-400">Fim da seção - Visão Geral</p>
           </div>
         </TabsContent>
         
         {/* Tab 2: Como Estou? - Status overview */}
         <TabsContent value="status" className="space-y-6">
-          <FinancialOverviewModule fullWidth />
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <AllocationModule />
-            <LiquidityReserveModule />
+          <div>
+            <FinancialOverviewModule fullWidth />
+            <FeedbackSection sectionId="status-financial-overview" />
           </div>
           
-          <SentimentInsightsModule fullWidth />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <AllocationModule />
+              <FeedbackSection sectionId="status-allocation" />
+            </div>
+            <div>
+              <LiquidityReserveModule />
+              <FeedbackSection sectionId="status-liquidity" />
+            </div>
+          </div>
+          
+          <div>
+            <SentimentInsightsModule fullWidth />
+            <FeedbackSection sectionId="status-sentiment" />
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <PersonalInsightsModule />
-            <SocialComparisonModule />
+            <div>
+              <PersonalInsightsModule />
+              <FeedbackSection sectionId="status-personal-insights" />
+            </div>
+            <div>
+              <SocialComparisonModule />
+              <FeedbackSection sectionId="status-social-comparison" />
+            </div>
+          </div>
+          
+          {/* Footer for this tab */}
+          <div className="w-full py-10 text-center border-t border-white/10 mt-12">
+            <p className="text-gray-400">Fim da seção - Como Estou?</p>
           </div>
         </TabsContent>
         
         {/* Tab 3: O que preciso mudar? - Recommendations and actions */}
         <TabsContent value="actions" className="space-y-6">
-          <InteligenciaModule fullWidth />
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <LifeGoalsModule />
-            <PersonalInsightsModule />
+          <div>
+            <InteligenciaModule fullWidth />
+            <FeedbackSection sectionId="actions-inteligencia" />
           </div>
           
-          <OnePageFinancialPlanModule fullWidth />
-          <BehavioralFinanceModule fullWidth />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <LifeGoalsModule />
+              <FeedbackSection sectionId="actions-life-goals" />
+            </div>
+            <div>
+              <PersonalInsightsModule />
+              <FeedbackSection sectionId="actions-personal-insights" />
+            </div>
+          </div>
+          
+          <div>
+            <OnePageFinancialPlanModule fullWidth />
+            <FeedbackSection sectionId="actions-financial-plan" />
+          </div>
+          
+          <div>
+            <BehavioralFinanceModule fullWidth />
+            <FeedbackSection sectionId="actions-behavioral-finance" />
+          </div>
+          
+          {/* Footer for this tab */}
+          <div className="w-full py-10 text-center border-t border-white/10 mt-12">
+            <p className="text-gray-400">Fim da seção - O que preciso mudar?</p>
+          </div>
         </TabsContent>
         
         {/* Tab 4: O que está acontecendo? - Market insights */}
         <TabsContent value="market" className="space-y-6">
-          <InteligenciaModule fullWidth />
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <SentimentInsightsModule />
-            <FamousInvestorsModule />
+          <div>
+            <InteligenciaModule fullWidth />
+            <FeedbackSection sectionId="market-inteligencia" />
           </div>
           
-          <SocialComparisonModule fullWidth />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <SentimentInsightsModule />
+              <FeedbackSection sectionId="market-sentiment" />
+            </div>
+            <div>
+              <FamousInvestorsModule />
+              <FeedbackSection sectionId="market-famous-investors" />
+            </div>
+          </div>
+          
+          <div>
+            <SocialComparisonModule fullWidth />
+            <FeedbackSection sectionId="market-social-comparison" />
+          </div>
+          
+          {/* Footer for this tab */}
+          <div className="w-full py-10 text-center border-t border-white/10 mt-12">
+            <p className="text-gray-400">Fim da seção - O que está acontecendo?</p>
+          </div>
         </TabsContent>
         
         {/* Tab 5: E meu futuro? - Future projections and planning */}
         <TabsContent value="future" className="space-y-6">
-          <MeuFuturoFinanceiroModule fullWidth />
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FutureProjectionModule />
-            <InvestmentPlanningModule />
+          <div>
+            <MeuFuturoFinanceiroModule fullWidth />
+            <FeedbackSection sectionId="future-meu-futuro" />
           </div>
           
-          <WrappedModule fullWidth />
-          <WholeBankingModule fullWidth />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <FutureProjectionModule />
+              <FeedbackSection sectionId="future-projection-module" />
+            </div>
+            <div>
+              <InvestmentPlanningModule />
+              <FeedbackSection sectionId="future-investment-planning" />
+            </div>
+          </div>
+          
+          <div>
+            <WrappedModule fullWidth />
+            <FeedbackSection sectionId="future-wrapped" />
+          </div>
+          
+          <div>
+            <WholeBankingModule fullWidth />
+            <FeedbackSection sectionId="future-whole-banking" />
+          </div>
+          
+          {/* Footer for this tab */}
+          <div className="w-full py-10 text-center border-t border-white/10 mt-12">
+            <p className="text-gray-400">Fim da seção - E meu futuro?</p>
+          </div>
         </TabsContent>
         
         {/* Tab 6: Fale com RM - Chat interface with voice button */}
@@ -322,6 +468,11 @@ const RaioXDashboard = ({
               Falar com RM
             </Button>
             <ChatInterface />
+          </div>
+          
+          {/* Footer for this tab */}
+          <div className="w-full py-10 text-center border-t border-white/10 mt-12">
+            <p className="text-gray-400">Fim da seção - Fale com RM</p>
           </div>
         </TabsContent>
       </Tabs>

@@ -30,7 +30,7 @@ type TranslationKeys = {
   quickInsights: string;
   chatWithRM: string;
   overviewTab: string;
-  statusTab: string; // Added this missing translation key
+  statusTab: string;
   planTab: string;
   futureTab: string;
   aiTab: string;
@@ -83,9 +83,7 @@ type TranslationKeys = {
 };
 
 type Translations = {
-  en: TranslationKeys;
   pt: TranslationKeys;
-  es?: TranslationKeys;
 };
 
 interface LanguageContextProps {
@@ -100,87 +98,8 @@ interface LanguageProviderProps {
   children: React.ReactNode;
 }
 
+// Now we only keep PT-BR translations
 const translations: Translations = {
-  en: {
-    welcomeMessage: "Welcome",
-    welcomeMessagePortfolio: "Here's your financial snapshot",
-    searchPlaceholder: "Search...",
-    openFinanceActive: "Open Finance Active",
-    activateOpenFinance: "Activate Open Finance",
-    behavioralFinanceTitle: "Behavioral Finance",
-    behavioralFinanceLockedDesc: "Activate Open Finance to unlock Behavioral Finance insights.",
-    behavioralFinanceDesc: "Here's how your behavior affects your investments.",
-    lossAversion: "Loss Aversion",
-    lossAversionDesc: "You tend to avoid losses more than you enjoy gains.",
-    lossAversionRec: "Consider a balanced portfolio to mitigate risk.",
-    recencyBias: "Recency Bias",
-    recencyBiasDesc: "You overemphasize recent events, ignoring long-term trends.",
-    recencyBiasRec: "Focus on long-term investment strategies.",
-    overconfidence: "Overconfidence",
-    overconfidenceDesc: "You overestimate your investment skills.",
-    overconfidenceRec: "Seek advice from financial advisors.",
-    emotionalInvesting: "Emotional Investing",
-    emotionalInvestingDescLaio: "You make investment decisions based on emotions rather than logic.",
-    emotionalInvestingRecLaio: "Create a well-thought-out investment plan and stick to it.",
-    recommendation: "Recommendation",
-    exportPdf: "Export PDF",
-    quickAi: "AI Insights",
-    myGoals: "My Goals",
-    planning: "Planning",
-    quickInsights: "Insights",
-    chatWithRM: "Chat with RM",
-    overviewTab: "How am I?",
-    statusTab: "Status",
-    planTab: "What should I change?",
-    futureTab: "What about my future?",
-    aiTab: "What's happening?",
-    chatTab: "Talk to RM",
-    planningTab: "Planning",
-    investmentsTab: "Investments",
-    goalsTab: "Goals",
-    insightsTab: "Insights",
-    socialTab: "Social",
-    bankingTab: "Banking",
-    behaviorTab: "Behavior",
-    loadingClients: "Loading clients...",
-    selectClient: "Select client",
-    noClientsFound: "No clients found",
-    login: "Login",
-    
-    // Additional keys for modules
-    famousInvestorsTitle: "Famous Investors Insights",
-    atYourAge: "At your age",
-    buffettQuoteYoung: "The best investment you can make is in yourself.",
-    buffettQuoteOld: "Risk comes from not knowing what you're doing.",
-    buffettInsightYoung: "Focus on building skills and knowledge. Your human capital is your greatest asset.",
-    buffettInsightOld: "With your experience, now's the time to focus on steady investments and reduced risk.",
-    dalioQuoteHighEquity: "Diversification is the holy grail of investing.",
-    dalioQuoteLowEquity: "Cash is trash, but you still need some.",
-    dalioInsightYoung: "Your portfolio has time to recover from volatility, but don't put all eggs in one basket.",
-    dalioInsightOld: "Consider increasing allocation to fixed income while maintaining some growth potential.",
-    lynchQuoteInfoSeeking: "Know what you own, and know why you own it.",
-    lynchQuoteSimple: "Never invest in an idea you can't illustrate with a crayon.",
-    lynchInsightYoung: "Your curiosity is an asset. Research thoroughly before making investment decisions.",
-    lynchInsightOld: "Keep it simple. Focus on investments you understand completely.",
-    marksQuoteLaio: "The greatest investment opportunities come not from following the crowd, but from diverging from it.",
-    marksInsightLaio: "Your thinking process shows independence - this is a strength in long-term investing.",
-    
-    // Additional keys for other modules
-    priorityRecommendations: "Priority Recommendations",
-    urgencyLabel: "Urgency",
-    impactLabel: "Impact",
-    executeButton: "Execute",
-    recommendedActions: "Recommended Actions",
-    aiSuggestions: "AI-Generated Suggestions",
-    impact: "Impact",
-    effort: "Effort",
-    
-    // Auth related keys
-    loginSuccess: "Login successful",
-    welcomeBack: "Welcome back",
-    invalidPassword: "Invalid password",
-    loginError: "Login error"
-  },
   pt: {
     welcomeMessage: "Bem-vindo",
     welcomeMessagePortfolio: "Aqui está seu panorama financeiro",
@@ -264,25 +183,14 @@ const translations: Translations = {
 };
 
 export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  // Set initial language from localStorage or use 'pt' as default
-  const [language, setLanguage] = useState(localStorage.getItem('language') || 'pt');
+  // Always use 'pt' as language
+  const [language, setLanguage] = useState('pt');
 
-  useEffect(() => {
-    localStorage.setItem('language', language);
-  }, [language]);
-
-  // Updated translation function with proper type checking
+  // The translation function now only returns PT translations
   const t = (key: keyof TranslationKeys): string => {
-    // Check if the language exists in our translations
-    if (!translations[language as keyof typeof translations]) {
-      console.warn(`Language "${language}" not found in translations. Using "pt" as fallback.`);
-      return translations.pt[key] || String(key);
-    }
-    
-    // Check if the key exists in the current language
-    const translation = translations[language as keyof typeof translations][key];
+    const translation = translations.pt[key];
     if (!translation) {
-      console.warn(`Translation key "${String(key)}" not found for language "${language}". Using key as fallback.`);
+      console.warn(`Translation key "${String(key)}" not found. Using key as fallback.`);
       return String(key);
     }
     

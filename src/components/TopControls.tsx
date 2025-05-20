@@ -45,10 +45,10 @@ const TopControls = ({ isAdvisor, onOpenFinanceToggle }: TopControlsProps) => {
   };
 
   return (
-    <div className="w-full flex flex-wrap items-center justify-between gap-4 mb-6">
+    <div className="w-full flex flex-wrap items-center justify-between gap-4 mb-6 py-4 border-b border-white/10">
       <div className="flex flex-wrap items-center gap-3">
         <div className={`flex items-center space-x-2 rounded-full px-4 py-2.5 border transition-all duration-300 ${isOpenFinanceEnabled 
-          ? 'glass-morphism-active bg-gradient-to-r from-green-900/30 to-emerald-800/30 border-green-400/30 shadow-lg shadow-green-900/10' 
+          ? 'bg-gradient-to-r from-green-900/30 to-emerald-800/30 border-green-400/30 shadow-lg shadow-green-900/10' 
           : 'glass-morphism border-white/10'}`}
         >
           <div className="flex items-center space-x-2">

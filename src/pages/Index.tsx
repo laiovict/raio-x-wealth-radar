@@ -47,6 +47,10 @@ const Index = () => {
       setLoading(false);
     }, 1000);
     
+    // Make sure body and main container have proper overflow settings
+    document.body.style.overflow = "hidden";
+    document.body.style.height = "100vh";
+    
     // Listen for custom event for OpenFinance activation
     const handleOpenFinanceEvent = () => {
       setShowPluggyModal(true);
@@ -56,6 +60,8 @@ const Index = () => {
     
     return () => {
       document.removeEventListener('activate-openfinance', handleOpenFinanceEvent);
+      document.body.style.overflow = "";
+      document.body.style.height = "";
     };
   }, [navigate]);
 
@@ -150,8 +156,8 @@ const Index = () => {
       hasOpenFinance={hasOpenFinance}
       selectedClient={selectedClient}
     >
-      <div className="min-h-screen bg-gradient-to-br from-[#0f0f11] to-[#1a1a2e] text-white p-4 sm:p-8">
-        <nav className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+      <div className="min-h-screen h-screen flex flex-col bg-gradient-to-br from-[#0f0f11] to-[#1a1a2e] text-white">
+        <nav className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-6 border-b border-white/10 gap-4">
           <div className="flex items-center gap-4">
             <img 
               src="/lovable-uploads/4b258bed-71ae-4d4c-847b-12968969f2d4.png"
@@ -184,8 +190,6 @@ const Index = () => {
               </Button>
             ) : null}
             
-            <LanguageSelector />
-            
             <Button 
               variant="ghost" 
               className="text-gray-400 hover:text-white hover:bg-white/10"
@@ -197,22 +201,26 @@ const Index = () => {
           </div>
         </nav>
         
-        {userRole === "advisor" && <ClientSelector onClientSelect={handleClientSelect} />}
+        <div className="flex-grow overflow-auto">
+          <div className="container mx-auto px-4 sm:px-6 pt-4">
+            {userRole === "advisor" && <ClientSelector onClientSelect={handleClientSelect} />}
 
-        {selectedClient && (
-          <TopControls 
-            isAdvisor={userRole === "advisor"} 
-            onOpenFinanceToggle={handleOpenFinanceToggle} 
-          />
-        )}
+            {selectedClient && (
+              <TopControls 
+                isAdvisor={userRole === "advisor"} 
+                onOpenFinanceToggle={handleOpenFinanceToggle} 
+              />
+            )}
 
-        <RaioXDashboard
-          showPdfPreview={showPdfPreview}
-          onClosePdfPreview={() => setShowPdfPreview(false)}
-          mediaType={mediaType}
-          isClientFull={hasOpenFinance}
-          onOpenFinanceActivate={handleOpenFinanceActivate}
-        />
+            <RaioXDashboard
+              showPdfPreview={showPdfPreview}
+              onClosePdfPreview={() => setShowPdfPreview(false)}
+              mediaType={mediaType}
+              isClientFull={hasOpenFinance}
+              onOpenFinanceActivate={handleOpenFinanceActivate}
+            />
+          </div>
+        </div>
         
         <PluggyConnectModal
           isOpen={showPluggyModal}

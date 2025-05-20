@@ -58,28 +58,28 @@ const FeedbackSection = ({ sectionId }: FeedbackSectionProps) => {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 mt-2">
       <div className="flex items-center gap-1">
         <Button 
           variant="ghost" 
           size="icon" 
-          className={`${userVoted === 'like' ? 'bg-green-900/20 text-green-400' : 'text-gray-400'}`}
+          className={`${userVoted === 'like' ? 'bg-green-900/20 text-green-400' : 'text-gray-400'} hover:bg-green-900/10 hover:text-green-300`}
           onClick={() => handleVote('like')}
         >
           <ThumbsUp className="h-4 w-4" />
         </Button>
-        <span className="text-xs text-gray-400">{likesCount}</span>
+        <span className={`text-xs ${userVoted === 'like' ? 'text-green-400' : 'text-gray-400'}`}>{likesCount}</span>
       </div>
       <div className="flex items-center gap-1">
         <Button 
           variant="ghost" 
           size="icon" 
-          className={`${userVoted === 'dislike' ? 'bg-red-900/20 text-red-400' : 'text-gray-400'}`}
+          className={`${userVoted === 'dislike' ? 'bg-red-900/20 text-red-400' : 'text-gray-400'} hover:bg-red-900/10 hover:text-red-300`}
           onClick={() => handleVote('dislike')}
         >
           <ThumbsDown className="h-4 w-4" />
         </Button>
-        <span className="text-xs text-gray-400">{dislikesCount}</span>
+        <span className={`text-xs ${userVoted === 'dislike' ? 'text-red-400' : 'text-gray-400'}`}>{dislikesCount}</span>
       </div>
     </div>
   );
