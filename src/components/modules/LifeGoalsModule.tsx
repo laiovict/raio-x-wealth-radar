@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -21,6 +20,12 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
       currency: 'BRL',
       maximumFractionDigits: 0,
     }).format(value);
+  };
+
+  // Function to handle OpenFinance activation button click
+  const handleActivateOpenFinance = () => {
+    const event = new CustomEvent('activate-openfinance');
+    document.dispatchEvent(event);
   };
 
   if (!hasOpenFinance) {
@@ -94,10 +99,7 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
                   variant="outline" 
                   size="sm"
                   className="text-xs"
-                  onClick={() => {
-                    const event = new CustomEvent('activate-openfinance');
-                    document.dispatchEvent(event);
-                  }}
+                  onClick={handleActivateOpenFinance}
                 >
                   Ativar OpenFinance
                 </Button>

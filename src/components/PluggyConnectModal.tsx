@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { RefreshCw } from "lucide-react";
 
@@ -92,6 +92,9 @@ const PluggyConnectModal: React.FC<PluggyConnectModalProps> = ({
           <DialogTitle className="text-xl bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent">
             Conectar ao OpenFinance
           </DialogTitle>
+          <DialogDescription className="text-gray-400">
+            Conecte suas contas bancárias para obter uma visão completa da sua vida financeira.
+          </DialogDescription>
         </DialogHeader>
         
         <div className="py-4">
