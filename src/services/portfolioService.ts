@@ -1,7 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { parseValueToNumber } from "@/components/modules/dividends/dividendUtils";
-import { toNumber, toString } from '@/utils/typeConversionHelpers';
+import { toNumber, toString, toFormattableString } from '@/utils/typeConversionHelpers';
 import { DividendHistory, FinancialSummary, DataSourceType } from '@/types/raioXTypes';
 
 // Define the data source type
@@ -260,7 +260,7 @@ export const calculateTotalDividends = (dividendHistory: any[]) => {
   
   return dividendHistory.reduce((total, item) => {
     // Use the parseValueToNumber helper to handle Brazilian currency format
-    const value = parseValueToNumber(item.value || '0');
+    const value = parseValueToNumber(toString(item.value || '0'));
     return total + value;
   }, 0);
 };
@@ -285,7 +285,7 @@ export const calculateMonthlyAverageDividends = (dividendHistory: any[], monthsT
     const yearMonth = paymentDate.substring(0, 7); // "YYYY-MM"
     
     // Parse the value using the helper function
-    const value = parseValueToNumber(item.value || '0');
+    const value = parseValueToNumber(toString(item.value || '0'));
     
     // Add to month total
     if (!dividendsByMonth[yearMonth]) {
@@ -522,5 +522,5 @@ export const generateFinancialSummary = (
  */
 const formatValue = (value: any): string => {
   if (!value) return "R$ 0,00";
-  return toString(value);
+  return toFormattableString(value);
 };

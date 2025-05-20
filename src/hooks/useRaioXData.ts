@@ -27,6 +27,7 @@ import {
   DividendHistory
 } from '@/types/raioXTypes';
 import { defaultRaioXData } from '@/data/mockRaioXData';
+import { toNumber } from '@/utils/typeConversionHelpers';
 
 interface UseRaioXDataReturn {
   portfolioData: RaioXData;
@@ -75,10 +76,43 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
         const fixedIncome = await getClientFixedIncome(selectedClient);
         const investmentFunds = await getClientInvestmentFunds(selectedClient);
         const realEstate = await getClientRealEstate(selectedClient);
-        const stocks = await getClientStocks(selectedClient);
+        const stocksData = await getClientStocks(selectedClient);
         const profitability = await getClientProfitability(selectedClient);
         const dividendHistory = await getClientDividendHistory(selectedClient);
         const clientSummary = await getClientSummary(selectedClient);
+        
+        console.log("Client summary:", clientSummary);
+        
+        // Try to get client name from summary or use default
+        const clientName = clientSummary?.investor_name || `Cliente ${selectedClient}`;
+        
+        // Store actual stocks data to avoid sharing the state name
+        if (stocksData && stocksData.length) {
+          setStocks(stocksData);
+          console.log("Fetched stocks data:", stocksData);
+        }
+        
+        // Calculate dividend totals from real data if available
+        if (dividendHistory && dividendHistory.length > 0) {
+          try {
+            const totalDivs = calculateTotalDividends(dividendHistory);
+            const avgMonthlyDivs = calculateMonthlyAverageDividends(dividendHistory);
+            
+            setTotalDividends(totalDivs);
+            setAverageMonthlyDividends(avgMonthlyDivs);
+            
+            console.log("Dividend calculations:", {
+              totalDividends: totalDivs,
+              avgMonthlyDividends: avgMonthlyDivs,
+              dividendCount: dividendHistory.length
+            });
+          } catch (error) {
+            console.error("Error calculating dividend stats:", error);
+            // Use default values if calculation fails
+            setTotalDividends(0);
+            setAverageMonthlyDividends(0);
+          }
+        }
         
         // Fetch OpenFinance data
         const openFinanceAccounts = await getClientOpenFinanceAccounts(selectedClient);
@@ -88,7 +122,7 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
         if (openFinanceAccounts && openFinanceAccounts.length > 0) {
           console.log(`Found ${openFinanceAccounts.length} OpenFinance accounts for client ${selectedClient}`);
           
-          // Fetch OpenFinance investments (excluding XP to avoid duplication)
+          // Fetch OpenFinance investments
           const openFinanceInvestments = await getClientOpenFinanceInvestments(selectedClient);
           setOpenFinanceInvestments(openFinanceInvestments);
           
@@ -113,50 +147,32 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
         const consolidatedReport = await generateConsolidatedFinancialReport(selectedClient);
         setConsolidatedFinancialReport(consolidatedReport);
         
-        // Store stocks for other components to use
-        if (stocks && stocks.length) {
-          setStocks(stocks);
-          console.log("Fetched stocks data:", stocks);
-        }
-        
-        // Calculate dividend totals
-        if (dividendHistory && dividendHistory.length > 0) {
-          try {
-            const totalDivs = calculateTotalDividends(dividendHistory);
-            const avgMonthlyDivs = calculateMonthlyAverageDividends(dividendHistory);
-            
-            setTotalDividends(totalDivs);
-            setAverageMonthlyDividends(avgMonthlyDivs);
-            
-            console.log("Dividend calculations:", {
-              totalDividends: totalDivs,
-              avgMonthlyDividends: avgMonthlyDivs,
-              dividendCount: dividendHistory.length
-            });
-          } catch (error) {
-            console.error("Error calculating dividend stats:", error);
-          }
-        }
-        
-        // Update portfolio data with real values from Supabase
-        const hasRealData = summary || fixedIncome.length || investmentFunds.length || 
-                            realEstate.length || stocks.length || profitability || 
-                            dividendHistory.length || clientSummary;
+        // Check if we have any real data from Supabase
+        const hasRealData = summary || 
+                          (fixedIncome && fixedIncome.length) || 
+                          (investmentFunds && investmentFunds.length) || 
+                          (realEstate && realEstate.length) || 
+                          (stocksData && stocksData.length) || 
+                          profitability || 
+                          (dividendHistory && dividendHistory.length) || 
+                          clientSummary;
         
         if (hasRealData) {
+          // Update portfolio data with real values from Supabase
           setPortfolioData(prevData => {
-            // Update portfolio data
-            const newData = {
+            // Create new portfolio data object
+            return {
               ...prevData,
+              clientName,
               portfolioSummary: summary,
               fixedIncome: fixedIncome || [],
               investmentFunds: investmentFunds || [],
               realEstate: realEstate || [],
-              stocks: stocks || [],
+              stocks: stocksData || [],
               profitability,
               dividendHistory: dividendHistory || [],
               clientSummary,
-              // Add OpenFinance data to the portfolio data
+              // Add OpenFinance data
               openFinanceData: {
                 hasOpenFinanceData,
                 openFinanceAccounts,
@@ -164,20 +180,23 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
                 openFinanceTransactions: openFinanceTransactions || [],
                 openFinanceInsights,
               },
-              // Add financial insights based on OpenFinance data
-              financialInsightData: openFinanceInsights || prevData.financialInsightData
+              // Add financial insights based on OpenFinance data if available
+              financialInsightData: hasOpenFinanceData && openFinanceInsights 
+                ? openFinanceInsights 
+                : prevData.financialInsightData,
+              // Track OpenFinance status
+              hasOpenFinance: hasOpenFinanceData
             };
-            
-            // If we have client summary data, update the client name
-            if (clientSummary && clientSummary.investor_name) {
-              newData.clientName = clientSummary.investor_name;
-            }
-            
-            return newData;
           });
         }
       } catch (error) {
         console.error("Error fetching client data:", error);
+        // On error, revert to default data but preserve client info
+        setPortfolioData(prevData => ({
+          ...defaultRaioXData,
+          clientName: `Cliente ${selectedClient}`,
+          hasOpenFinance: false
+        }));
       } finally {
         setIsLoading(false);
       }

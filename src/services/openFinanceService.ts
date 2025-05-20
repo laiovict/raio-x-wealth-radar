@@ -13,7 +13,7 @@ export const getClientOpenFinanceAccounts = async (clientId: number | null): Pro
   
   try {
     const { data: response, error } = await supabase
-      .from('investorXOpenFinanceAccount')
+      .from('investorxopenfinanceaccount') // Note: case-sensitive table name
       .select('*')
       .eq('investor_account_on_brokerage_house', clientId);
     
@@ -25,7 +25,8 @@ export const getClientOpenFinanceAccounts = async (clientId: number | null): Pro
     // Fix the property access error by proper typing and null checks
     if (Array.isArray(response) && response.length > 0) {
       return response.map((account) => {
-        return account.name || "Conta sem nome";
+        // Use account_id as display since name isn't available
+        return `Conta ${account.account_id?.substring(0, 8) || "sem ID"}`;
       });
     }
     
@@ -51,17 +52,37 @@ export const getClientOpenFinanceInvestments = async (clientId: number | null): 
       { name: "Fundo de Investimento", type: "Multimercado", value: 25000, yield: "8.5%", dataSource: "synthetic" }
     ];
     
+    const { data: accounts, error: accountError } = await supabase
+      .from('investorxopenfinanceaccount') // Note: case-sensitive table name
+      .select('account_id')
+      .eq('investor_account_on_brokerage_house', clientId);
+    
+    if (accountError || !accounts || accounts.length === 0) {
+      console.error('Error or no accounts found:', accountError);
+      return mockData;
+    }
+    
+    // Extract account IDs
+    const accountIds = accounts.map(a => a.account_id).filter(Boolean);
+    
+    if (accountIds.length === 0) {
+      return mockData;
+    }
+    
     const { data: response, error } = await supabase
       .from('open_finance_investments')
       .select('*')
-      .eq('investor_account_on_brokerage_house', clientId);
+      .in('item_id', accountIds);
     
-    if (error) {
+    if (error || !response || response.length === 0) {
       console.error('Error fetching Open Finance investments:', error);
       return mockData;
     }
     
-    return response && response.length > 0 ? response : mockData;
+    return response.map(item => ({
+      ...item,
+      dataSource: 'openfinance' 
+    }));
   } catch (error) {
     console.error('Error in getClientOpenFinanceInvestments:', error);
     return [];
@@ -96,19 +117,39 @@ export const getClientOpenFinanceTransactions = async (clientId: number | null, 
       }
     ];
     
+    const { data: accounts, error: accountError } = await supabase
+      .from('investorxopenfinanceaccount') // Note: case-sensitive table name
+      .select('account_id')
+      .eq('investor_account_on_brokerage_house', clientId);
+    
+    if (accountError || !accounts || accounts.length === 0) {
+      console.error('Error or no accounts found:', accountError);
+      return mockData;
+    }
+    
+    // Extract account IDs
+    const accountIds = accounts.map(a => a.account_id).filter(Boolean);
+    
+    if (accountIds.length === 0) {
+      return mockData;
+    }
+    
     const { data: response, error } = await supabase
       .from('open_finance_transactions')
       .select('*')
-      .eq('investor_account_on_brokerage_house', clientId)
-      .order('transaction_date', { ascending: false })
+      .in('account_id', accountIds)
+      .order('transacted_at', { ascending: false })
       .limit(limit);
     
-    if (error) {
+    if (error || !response || response.length === 0) {
       console.error('Error fetching Open Finance transactions:', error);
       return mockData;
     }
     
-    return response && response.length > 0 ? response : mockData;
+    return response.map(item => ({
+      ...item,
+      dataSource: 'openfinance' 
+    }));
   } catch (error) {
     console.error('Error in getClientOpenFinanceTransactions:', error);
     return [];
@@ -125,7 +166,6 @@ export const generateOpenFinanceInsights = async (clientId: number | null) => {
   
   try {
     // Using synthetic data instead of querying a non-existent table
-    // This resolves the TS2589 and TS2769 errors
     console.log('Generating Open Finance insights with synthetic data');
     
     // Get transactions to generate insights
@@ -170,9 +210,9 @@ const generateInsightsFromTransactions = (transactions: any[]) => {
     const spendingByMonth: Record<string, number> = {};
     
     transactions.forEach(transaction => {
-      if (!transaction.transaction_date) return;
+      if (!transaction.transacted_at) return;
       
-      const date = new Date(transaction.transaction_date);
+      const date = new Date(transaction.transacted_at);
       const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
       
       if (!spendingByMonth[yearMonth]) {
@@ -252,7 +292,7 @@ export const generateConsolidatedFinancialReport = async (clientId: number | nul
       
       // Calculate total investment value
       totalInvestmentValue: openFinanceInvestments.reduce((total, investment) => {
-        return total + toNumber(investment.current_value);
+        return total + toNumber(investment.book_amount || 0);
       }, 0),
       
       // Calculate income and expenses from transactions

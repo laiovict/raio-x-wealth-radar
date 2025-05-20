@@ -3,6 +3,8 @@
  * Formatting utilities for consistent display across the application
  */
 
+import { toNumber, toFormattableString } from './typeConversionHelpers';
+
 /**
  * Format a value as currency (BRL)
  * @param value The value to format
@@ -10,23 +12,15 @@
  */
 export const formatCurrency = (value: string | number): string => {
   // Convert to number first
-  let numValue: number;
+  const numValue = toNumber(value);
   
-  if (typeof value === 'string') {
-    // Remove currency symbols and formatting
-    const cleaned = value.replace(/[^\d,-]/g, '').replace(',', '.');
-    numValue = parseFloat(cleaned);
-  } else {
-    numValue = value;
-  }
-
   // Return formatted value
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
-  }).format(isNaN(numValue) ? 0 : numValue);
+  }).format(numValue);
 };
 
 /**
@@ -37,18 +31,10 @@ export const formatCurrency = (value: string | number): string => {
  */
 export const formatPercentage = (value: string | number, decimals = 2): string => {
   // Convert to number first
-  let numValue: number;
+  const numValue = toNumber(value);
   
-  if (typeof value === 'string') {
-    // Remove percentage symbols and formatting
-    const cleaned = value.replace(/[^\d,-]/g, '').replace(',', '.');
-    numValue = parseFloat(cleaned);
-  } else {
-    numValue = value;
-  }
-
   // Return formatted value
-  return `${(isNaN(numValue) ? 0 : numValue).toFixed(decimals)}%`;
+  return `${numValue.toFixed(decimals)}%`;
 };
 
 /**
@@ -95,22 +81,14 @@ export const formatShortDate = (date: Date | string): string => {
  * @returns Formatted number string
  */
 export const formatNumber = (value: string | number, decimals = 0): string => {
-  // Convert to number first
-  let numValue: number;
-  
-  if (typeof value === 'string') {
-    // Remove formatting
-    const cleaned = value.replace(/[^\d,-]/g, '').replace(',', '.');
-    numValue = parseFloat(cleaned);
-  } else {
-    numValue = value;
-  }
+  // Convert to number first  
+  const numValue = toNumber(value);
 
   // Return formatted value
   return new Intl.NumberFormat('pt-BR', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals
-  }).format(isNaN(numValue) ? 0 : numValue);
+  }).format(numValue);
 };
 
 /**

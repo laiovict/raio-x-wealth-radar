@@ -40,6 +40,18 @@ export const toString = (value: string | number | undefined | null): string => {
 };
 
 /**
+ * Safely convert a value to string for use in formatters
+ * Handles both string and number inputs
+ * 
+ * @param value The value to process
+ * @returns The string representation suitable for formatters
+ */
+export const toFormattableString = (value: string | number | undefined | null): string => {
+  if (value === undefined || value === null) return '0';
+  return typeof value === 'number' ? value.toString() : value;
+};
+
+/**
  * Safely compare a value that could be string or number with a number
  * 
  * @param value The value to compare (could be string or number)
@@ -112,4 +124,33 @@ export const arithmeticOperation = (
     case '/': return numB !== 0 ? numA / numB : 0;
     default: return 0;
   }
+};
+
+/**
+ * Safely gets a value with fallback to synthetic data if needed
+ * @param value The value to check
+ * @param fallbackValue The fallback value to use if value is invalid
+ * @returns The safe value
+ */
+export const getSafeValue = <T>(value: T | undefined | null, fallbackValue: T): T => {
+  if (value === undefined || value === null) return fallbackValue;
+  return value;
+};
+
+/**
+ * Determines the appropriate data source for values
+ * @param realValue The real value from the database
+ * @param syntheticValue The synthetic value to use as fallback
+ * @param realSource The data source of the real value
+ * @returns The appropriate value and data source
+ */
+export const determineDataSource = <T>(
+  realValue: T | undefined | null,
+  syntheticValue: T,
+  realSource: 'xp' | 'supabase' | 'openfinance' = 'supabase'
+): { value: T, dataSource: 'xp' | 'supabase' | 'openfinance' | 'synthetic' } => {
+  if (realValue !== undefined && realValue !== null) {
+    return { value: realValue, dataSource: realSource };
+  }
+  return { value: syntheticValue, dataSource: 'synthetic' };
 };
