@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -19,13 +19,17 @@ const Auth = () => {
   const { toast } = useToast();
   const { t } = useLanguage();
   
-  // Function to generate a password based on client account number
-  // For security purposes, the actual logic implementation is hidden
-  const generateClientPassword = (clientId: string) => {
-    // In a real scenario, this would be computed from real CPF data
-    // For demo purposes, we're using a simple algorithm based on the account number
-    return clientId.substring(0, 5);
-  };
+  // Check if already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        navigate("/");
+      }
+    };
+    
+    checkSession();
+  }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,8 +37,20 @@ const Auth = () => {
     setLoading(true);
     
     try {
-      // This would need to be replaced with actual auth logic
-      // For demo purposes, we'll check if the account number exists in the database
+      // Special case for advisor login with the correct password
+      if (accountNumber === "login" && password === "America123@") {
+        // Store a special flag in localStorage to indicate advisor mode
+        localStorage.setItem("userRole", "advisor");
+        toast({
+          title: "Login realizado com sucesso!",
+          description: "Bem-vindo, assessor.",
+          variant: "default",
+        });
+        navigate("/");
+        return;
+      }
+      
+      // For regular client logins, validate account number exists
       const { data: clientExists, error: fetchError } = await supabase
         .from('investor_portfolio_summary')
         .select('investor_account_on_brokerage_house')
@@ -46,47 +62,27 @@ const Auth = () => {
       }
 
       if (!clientExists || clientExists.length === 0) {
-        setError("Conta não encontrada. Por favor verifique o número da conta.");
+        setError(t('accountNotFound'));
+        setLoading(false);
         return;
       }
 
-      // For a real implementation, you would use Supabase Auth:
-      const email = `${accountNumber}@reinvent.com.br`; // Dummy email format
+      // For client login, check if password matches the first 5 digits of their account number
+      const expectedPassword = accountNumber.substring(0, 5);
       
-      // Use the client's expected password or the provided password
-      const clientPassword = password || generateClientPassword(accountNumber);
-      
-      // Try to sign in, if user doesn't exist, sign up
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password: clientPassword,
-      });
-
-      if (signInError) {
-        // If error is "Invalid login credentials", try to sign up
-        if (signInError.message.includes("Invalid login credentials")) {
-          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-            email,
-            password: clientPassword,
-          });
-
-          if (signUpError) {
-            throw signUpError;
-          }
-
-          toast({
-            title: "Conta criada com sucesso!",
-            description: "Você será redirecionado à página principal.",
-            variant: "default",
-          });
-        } else {
-          throw signInError;
-        }
+      if (password !== expectedPassword) {
+        setError(t('invalidPassword'));
+        setLoading(false);
+        return;
       }
-
+      
+      // Store the client ID in localStorage
+      localStorage.setItem("userRole", "client");
+      localStorage.setItem("clientId", accountNumber);
+      
       toast({
-        title: "Login realizado com sucesso!",
-        description: "Bem-vindo de volta.",
+        title: t('loginSuccess'),
+        description: t('welcomeBack'),
         variant: "default",
       });
 
@@ -95,8 +91,7 @@ const Auth = () => {
       
     } catch (error: any) {
       console.error("Authentication error:", error);
-      setError(error.message || "Erro ao realizar login. Tente novamente.");
-    } finally {
+      setError(error.message || t('loginError'));
       setLoading(false);
     }
   };
@@ -156,10 +151,8 @@ const Auth = () => {
               onChange={(e) => setPassword(e.target.value)}
               className="bg-gray-900/50 border-gray-700 text-white placeholder-gray-500 w-full"
               placeholder={t('enterPassword')}
+              required
             />
-            <p className="text-xs text-gray-500 mt-1">
-              {/* No password hints provided per requirements */}
-            </p>
           </div>
           
           <Button 

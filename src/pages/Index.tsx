@@ -15,17 +15,46 @@ import { Button } from "@/components/ui/button";
 import { useMobileBreakpoint } from "@/hooks/use-mobile";
 import { useLanguage } from "@/context/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const [showPdfPreview, setShowPdfPreview] = useState(false);
   const [mediaType, setMediaType] = useState("pdf");
-  const [isClientFull] = useState(true); // Em produção, isso viria da autenticação
   const [hasOpenFinance, setHasOpenFinance] = useState(false);
   const [showPluggyModal, setShowPluggyModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<number | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [clientId, setClientId] = useState<string | null>(null);
   const isMobile = useMobileBreakpoint();
   const { t } = useLanguage();
+  const navigate = useNavigate();
+  
+  // Check auth status on component mount
+  useEffect(() => {
+    // Get auth status from localStorage
+    const storedUserRole = localStorage.getItem('userRole');
+    const storedClientId = localStorage.getItem('clientId');
+    
+    if (!storedUserRole) {
+      // Redirect to login if not authenticated
+      navigate('/auth');
+    } else {
+      setUserRole(storedUserRole);
+      
+      // If client role, set the client ID
+      if (storedUserRole === 'client' && storedClientId) {
+        setClientId(storedClientId);
+        setSelectedClient(parseInt(storedClientId));
+      }
+    }
+  }, [navigate]);
+  
+  const handleLogout = () => {
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('clientId');
+    navigate('/auth');
+  };
   
   const handleExportMedia = (type: string) => {
     setMediaType(type);
@@ -71,6 +100,15 @@ const Index = () => {
   const handleClientSelect = (clientId: string) => {
     setSelectedClient(clientId ? parseInt(clientId) : null);
   };
+  
+  // Check if loading auth state
+  if (userRole === null) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#0f0f11] to-[#1a1a2e] flex items-center justify-center">
+        <div className="text-white">Loading...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f0f11] to-[#1a1a2e] text-gray-100 overflow-x-hidden">
@@ -153,59 +191,50 @@ const Index = () => {
                           <span>{t('pdf')}</span>
                         </DropdownMenuItem>
                         
-                        {isClientFull ? (
-                          <>
-                            <DropdownMenuItem 
-                              onClick={() => {
-                                handleExportMedia("podcast");
-                                setMobileMenuOpen(false);
-                              }}
-                              className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
-                            >
-                              <Podcast className="h-4 w-4" />
-                              <span>{t('podcast')}</span>
-                            </DropdownMenuItem>
-                            
-                            <DropdownMenuItem 
-                              onClick={() => {
-                                handleExportMedia("video");
-                                setMobileMenuOpen(false);
-                              }}
-                              className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
-                            >
-                              <Video className="h-4 w-4" />
-                              <span>{t('video')}</span>
-                            </DropdownMenuItem>
-                          </>
-                        ) : (
-                          <>
-                            <DropdownMenuItem 
-                              className="text-gray-500 flex items-center gap-2 cursor-not-allowed"
-                            >
-                              <Lock className="h-4 w-4" />
-                              <span>{t('podcast')} ({t('onlyClientsFeature')})</span>
-                            </DropdownMenuItem>
-                            
-                            <DropdownMenuItem 
-                              className="text-gray-500 flex items-center gap-2 cursor-not-allowed"
-                            >
-                              <Lock className="h-4 w-4" />
-                              <span>{t('video')} ({t('onlyClientsFeature')})</span>
-                            </DropdownMenuItem>
-                          </>
-                        )}
+                        <DropdownMenuItem 
+                          onClick={() => {
+                            handleExportMedia("podcast");
+                            setMobileMenuOpen(false);
+                          }}
+                          className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
+                        >
+                          <Podcast className="h-4 w-4" />
+                          <span>{t('podcast')}</span>
+                        </DropdownMenuItem>
+                        
+                        <DropdownMenuItem 
+                          onClick={() => {
+                            handleExportMedia("video");
+                            setMobileMenuOpen(false);
+                          }}
+                          className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
+                        >
+                          <Video className="h-4 w-4" />
+                          <span>{t('video')}</span>
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                     
+                    <Button
+                      variant="ghost"
+                      className="text-red-400 hover:text-red-300"
+                      onClick={() => {
+                        handleLogout();
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      {t('logout')}
+                    </Button>
+                    
                     <div className="h-12 w-12 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center text-xl font-medium">
-                      JO
+                      {userRole === 'advisor' ? 'RM' : 'CL'}
                     </div>
                   </div>
                 </div>
               )}
               
               <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center text-sm font-medium">
-                JO
+                {userRole === 'advisor' ? 'RM' : 'CL'}
               </div>
             </div>
           ) : (
@@ -253,61 +282,46 @@ const Index = () => {
                     <span>{t('pdf')}</span>
                   </DropdownMenuItem>
                   
-                  {isClientFull ? (
-                    <>
-                      <DropdownMenuItem 
-                        onClick={() => handleExportMedia("podcast")}
-                        className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
-                      >
-                        <Podcast className="h-4 w-4" />
-                        <span>{t('podcast')}</span>
-                      </DropdownMenuItem>
-                      
-                      <DropdownMenuItem 
-                        onClick={() => handleExportMedia("video")}
-                        className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
-                      >
-                        <Video className="h-4 w-4" />
-                        <span>{t('video')}</span>
-                      </DropdownMenuItem>
-                    </>
-                  ) : (
-                    <>
-                      <DropdownMenuItem 
-                        className="text-gray-500 flex items-center gap-2 cursor-not-allowed"
-                      >
-                        <Lock className="h-4 w-4" />
-                        <span>{t('podcast')} ({t('onlyClientsFeature')})</span>
-                      </DropdownMenuItem>
-                      
-                      <DropdownMenuItem 
-                        className="text-gray-500 flex items-center gap-2 cursor-not-allowed"
-                      >
-                        <Lock className="h-4 w-4" />
-                        <span>{t('video')} ({t('onlyClientsFeature')})</span>
-                      </DropdownMenuItem>
-                    </>
-                  )}
+                  <DropdownMenuItem 
+                    onClick={() => handleExportMedia("podcast")}
+                    className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
+                  >
+                    <Podcast className="h-4 w-4" />
+                    <span>{t('podcast')}</span>
+                  </DropdownMenuItem>
+                  
+                  <DropdownMenuItem 
+                    onClick={() => handleExportMedia("video")}
+                    className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
+                  >
+                    <Video className="h-4 w-4" />
+                    <span>{t('video')}</span>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
               
-              <button className="rounded-full p-2 text-white bg-white/10 hover:bg-white/20 transition-all">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-              </button>
+              <Button
+                variant="ghost"
+                className="text-red-400 hover:text-red-300"
+                onClick={handleLogout}
+              >
+                {t('logout')}
+              </Button>
               
               <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-500 to-indigo-600 flex items-center justify-center text-sm font-medium">
-                JO
+                {userRole === 'advisor' ? 'RM' : 'CL'}
               </div>
             </div>
           )}
         </div>
         
-        <ClientSelector onClientSelect={handleClientSelect} />
+        {/* Only show ClientSelector for advisor role */}
+        {userRole === 'advisor' && (
+          <ClientSelector onClientSelect={handleClientSelect} />
+        )}
         
         <RaioXProvider 
-          clientId="client1" 
+          clientId={clientId || "client1"} 
           hasOpenFinance={hasOpenFinance}
           selectedClient={selectedClient}
         >
@@ -315,7 +329,7 @@ const Index = () => {
             showPdfPreview={showPdfPreview} 
             onClosePdfPreview={handleClosePdfPreview}
             mediaType={mediaType}
-            isClientFull={isClientFull} 
+            isClientFull={true}
           />
         </RaioXProvider>
 

@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, X } from "lucide-react";
@@ -23,6 +22,9 @@ import InvestmentPlanningModule from "./modules/InvestmentPlanningModule";
 import OnePageFinancialPlanModule from "./modules/OnePageFinancialPlanModule";
 import WholeBankingModule from "./modules/WholeBankingModule";
 import MeuFuturoFinanceiroModule from "./modules/MeuFuturoFinanceiroModule";
+import ChatInterface from "../ChatInterface";
+import FamousInvestorsModule from "./modules/FamousInvestorsModule";
+import BehavioralFinanceModule from "./modules/BehavioralFinanceModule";
 
 interface RaioXDashboardProps {
   showPdfPreview?: boolean;
@@ -122,11 +124,17 @@ const RaioXDashboard = ({
           >
             {t('quickInsights')}
           </button>
+          <button 
+            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "chat" ? "bg-white/20 border-blue-400" : ""}`}
+            onClick={() => handleQuickNavClick("chat")}
+          >
+            {t('chatWithRM')}
+          </button>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-3 lg:grid-cols-10 md:grid-cols-5 scrollbar-none">
+        <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-3 lg:grid-cols-12 md:grid-cols-6 scrollbar-none">
           <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('overviewTab')}</TabsTrigger>
           <TabsTrigger value="plan" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('planTab')}</TabsTrigger>
           <TabsTrigger value="future" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('futureTab')}</TabsTrigger>
@@ -137,6 +145,8 @@ const RaioXDashboard = ({
           <TabsTrigger value="insights" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('insightsTab')}</TabsTrigger>
           <TabsTrigger value="social" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('socialTab')}</TabsTrigger>
           <TabsTrigger value="banking" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('bankingTab')}</TabsTrigger>
+          <TabsTrigger value="chat" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('chatTab')}</TabsTrigger>
+          <TabsTrigger value="behavior" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('behaviorTab')}</TabsTrigger>
         </TabsList>
 
         {/* Overview tab - Main dashboard view */}
@@ -153,6 +163,11 @@ const RaioXDashboard = ({
             <AllocationModule />
           </div>
           
+          {/* Famous Investors Module */}
+          <div className="grid grid-cols-1 gap-6">
+            <FamousInvestorsModule />
+          </div>
+          
           {/* Always show WholeBankingModule - it'll adapt based on hasOpenFinance state */}
           <div className="grid grid-cols-1 gap-6">
             <WholeBankingModule />
@@ -161,6 +176,11 @@ const RaioXDashboard = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <MeuFuturoFinanceiroModule />
             <InvestmentPlanningModule />
+          </div>
+          
+          {/* Add BehavioralFinanceModule */}
+          <div className="grid grid-cols-1 gap-6">
+            <BehavioralFinanceModule />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -255,6 +275,16 @@ const RaioXDashboard = ({
         {/* Banking tab */}
         <TabsContent value="banking">
           <WholeBankingModule fullWidth />
+        </TabsContent>
+        
+        {/* Chat tab */}
+        <TabsContent value="chat">
+          <ChatInterface />
+        </TabsContent>
+        
+        {/* Behavioral Finance tab */}
+        <TabsContent value="behavior">
+          <BehavioralFinanceModule fullWidth />
         </TabsContent>
       </Tabs>
     </div>
