@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { Download, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LoadingScreen from "@/components/LoadingScreen";
 import WelcomeBanner from "@/components/WelcomeBanner";
+import TopControls from "@/components/TopControls";
 
 const Index = () => {
   const [selectedClient, setSelectedClient] = useState<number | null>(null);
@@ -89,6 +91,14 @@ const Index = () => {
     navigate("/auth");
   };
   
+  const handleOpenFinanceToggle = () => {
+    if (!hasOpenFinance) {
+      setShowPluggyModal(true);
+    } else {
+      setHasOpenFinance(false);
+    }
+  };
+  
   // Generate monthly report URL based on current date
   const getMonthlyReportUrl = () => {
     const now = new Date();
@@ -141,7 +151,7 @@ const Index = () => {
       selectedClient={selectedClient}
     >
       <div className="min-h-screen bg-gradient-to-br from-[#0f0f11] to-[#1a1a2e] text-white p-4 sm:p-8">
-        <nav className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+        <nav className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
           <div className="flex items-center gap-4">
             <img 
               src="/lovable-uploads/4b258bed-71ae-4d4c-847b-12968969f2d4.png"
@@ -189,8 +199,12 @@ const Index = () => {
         
         {userRole === "advisor" && <ClientSelector onClientSelect={handleClientSelect} />}
 
-        {/* Add welcome banner for the selected client */}
-        {selectedClient && <WelcomeBanner selectedClient={selectedClient} />}
+        {selectedClient && (
+          <TopControls 
+            isAdvisor={userRole === "advisor"} 
+            onOpenFinanceToggle={handleOpenFinanceToggle} 
+          />
+        )}
 
         <RaioXDashboard
           showPdfPreview={showPdfPreview}

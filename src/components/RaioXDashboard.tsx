@@ -1,9 +1,10 @@
 
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search } from "lucide-react";
+import { Mic, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/context/LanguageContext";
+import { Button } from "@/components/ui/button";
 
 import AllocationModule from "./modules/AllocationModule";
 import FutureProjectionModule from "./modules/FutureProjectionModule";
@@ -24,6 +25,7 @@ import BehavioralFinanceModule from "./modules/BehavioralFinanceModule";
 import FamousInvestorsModule from "./modules/FamousInvestorsModule";
 import WelcomeBanner from "./WelcomeBanner";
 import InteligenciaModule from "./modules/InteligenciaModule";
+import { toast } from "@/hooks/use-toast";
 
 interface RaioXDashboardProps {
   showPdfPreview?: boolean;
@@ -69,6 +71,52 @@ const RaioXDashboard = ({
     return data.clientName.split(" ")[0];
   };
 
+  const handleVoiceSearch = () => {
+    if (!('webkitSpeechRecognition' in window)) {
+      toast({
+        title: "Não suportado",
+        description: "Seu navegador não suporta reconhecimento de voz.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // @ts-ignore - WebkitSpeechRecognition não está tipado no TypeScript padrão
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => {
+      toast({
+        title: "Escutando...",
+        description: "Diga o que você gostaria de saber."
+      });
+    };
+
+    recognition.onresult = (event: any) => {
+      const speechResult = event.results[0][0].transcript;
+      setActiveTab("chat");
+      // Aqui você pode implementar a lógica para processar o comando de voz
+      // Por exemplo, enviar para a interface de chat ou realizar uma pesquisa
+      toast({
+        title: "Comando recebido",
+        description: speechResult
+      });
+    };
+
+    recognition.onerror = (event: any) => {
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro no reconhecimento de voz.",
+        variant: "destructive"
+      });
+      console.error('Speech recognition error', event.error);
+    };
+
+    recognition.start();
+  };
+
   if (showPdfPreview) {
     return (
       <PdfPreview 
@@ -96,9 +144,17 @@ const RaioXDashboard = ({
             placeholder={t('searchPlaceholder')} 
             className="w-full glass-morphism backdrop-blur-md border border-white/10 rounded-full px-5 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white">
-            <Search className="h-5 w-5" />
-          </button>
+          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex gap-2">
+            <button 
+              className="text-gray-400 hover:text-white"
+              onClick={handleVoiceSearch}
+            >
+              <Mic className="h-5 w-5" />
+            </button>
+            <button className="text-gray-400 hover:text-white">
+              <Search className="h-5 w-5" />
+            </button>
+          </div>
         </div>
         
         <div className="mt-6 mb-2 flex gap-2 flex-wrap justify-center">
@@ -259,9 +315,19 @@ const RaioXDashboard = ({
           )}
         </TabsContent>
         
-        {/* Tab 6: Fale com RM - Chat interface */}
+        {/* Tab 6: Fale com RM - Chat interface with voice button */}
         <TabsContent value="chat">
-          <ChatInterface />
+          <div className="relative mb-4">
+            <Button
+              variant="gradient"
+              className="absolute right-4 top-4 z-10 flex items-center gap-2"
+              onClick={handleVoiceSearch}
+            >
+              <Mic className="h-5 w-5" />
+              Falar
+            </Button>
+            <ChatInterface />
+          </div>
         </TabsContent>
       </Tabs>
     </div>
