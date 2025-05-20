@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Mic, Search, Share2, Download } from "lucide-react";
@@ -103,6 +104,32 @@ const RaioXDashboard = ({
     return data.clientName.split(" ")[0];
   };
 
+  // Handle search query submission
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (searchQuery.trim()) {
+      // Navigate to chat tab
+      setActiveTab("chat");
+      
+      // Create custom event to pre-load message in the chat
+      const chatEvent = new CustomEvent('load-chat-message', { 
+        detail: { message: searchQuery }
+      });
+      
+      // Dispatch the event
+      document.dispatchEvent(chatEvent);
+      
+      // Reset the search query
+      setSearchQuery("");
+      
+      toast({
+        title: "Pergunta enviada",
+        description: "Sua pergunta foi enviada para o assistente."
+      });
+    }
+  };
+
   const handleVoiceSearch = () => {
     if (!('webkitSpeechRecognition' in window)) {
       toast({
@@ -198,24 +225,30 @@ const RaioXDashboard = ({
     <div className="space-y-8 pb-16 min-h-screen" ref={dashboardRef}>
       <div className="flex flex-col items-center justify-center mb-8">
         <div className="w-full max-w-md relative">
-          <input 
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder={t('searchPlaceholder')} 
-            className="w-full backdrop-blur-md border border-white/10 rounded-full px-5 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white/5"
-          />
-          <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex gap-2">
-            <button 
-              className="text-gray-400 hover:text-white"
-              onClick={handleVoiceSearch}
-            >
-              <Mic className="h-5 w-5" />
-            </button>
-            <button className="text-gray-400 hover:text-white">
-              <Search className="h-5 w-5" />
-            </button>
-          </div>
+          <form onSubmit={handleSearch}>
+            <input 
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t('searchPlaceholder')} 
+              className="w-full backdrop-blur-md border border-white/10 rounded-full px-5 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white/5"
+            />
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex gap-2">
+              <button 
+                type="button"
+                className="text-gray-400 hover:text-white"
+                onClick={handleVoiceSearch}
+              >
+                <Mic className="h-5 w-5" />
+              </button>
+              <button 
+                type="submit"
+                className="text-gray-400 hover:text-white"
+              >
+                <Search className="h-5 w-5" />
+              </button>
+            </div>
+          </form>
         </div>
         
         <div className="mt-4 flex justify-center">

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -47,7 +46,13 @@ const ChatInterface = () => {
   useEffect(() => {
     const handleLoadMessage = (event: CustomEvent) => {
       if (event.detail?.message) {
-        setInputMessage(event.detail.message);
+        const messageText = event.detail.message;
+        setInputMessage(messageText);
+        
+        // Automatically send the loaded message
+        setTimeout(() => {
+          sendMessage(messageText);
+        }, 100);
       }
     };
     
@@ -111,13 +116,13 @@ const ChatInterface = () => {
     return responses[Math.floor(Math.random() * responses.length)];
   };
 
-  const handleSendMessage = async () => {
-    if (!inputMessage.trim()) return;
+  const sendMessage = (messageContent: string) => {
+    if (!messageContent.trim()) return;
     
     // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
-      content: inputMessage,
+      content: messageContent,
       sender: "user",
       timestamp: new Date(),
     };
@@ -153,6 +158,10 @@ const ChatInterface = () => {
       
       setIsLoading(false);
     }, 1500);
+  };
+
+  const handleSendMessage = () => {
+    sendMessage(inputMessage);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
