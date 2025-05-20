@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Circle, Lightbulb } from "lucide-react";
@@ -18,6 +19,9 @@ const RecommendedActionsModule = ({ fullWidth = false }) => {
     }
   };
 
+  // Ensure recommendedActions exists and has default values if not
+  const recommendedActions = data?.recommendedActions || [];
+
   return (
     <Card className={`glass-morphism p-6 ${fullWidth ? 'w-full' : ''}`}>
       <div className="flex items-center justify-between mb-4">
@@ -29,7 +33,7 @@ const RecommendedActionsModule = ({ fullWidth = false }) => {
       </div>
       
       <ul className="space-y-4">
-        {data.recommendedActions.map((action) => (
+        {recommendedActions.map((action) => (
           <li 
             key={action.id} 
             className="bg-gray-800/40 rounded-lg p-4 border border-gray-700/50"
@@ -67,7 +71,7 @@ const RecommendedActionsModule = ({ fullWidth = false }) => {
                 className="recommended-action-button"
                 asChild
               >
-                <a href={action.buttonLink} className="w-full block">
+                <a href={action.buttonLink} className="w-full block text-white">
                   {action.buttonText}
                 </a>
               </Button>

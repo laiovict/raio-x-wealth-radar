@@ -9,7 +9,15 @@ interface LiquidityReserveModuleProps {
 
 const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModuleProps) => {
   const { data } = useRaioX();
-  const { liquidity } = data;
+  
+  // Ensure liquidity exists with default values if not
+  const liquidity = data?.liquidity || {
+    currentIdle: 25000,
+    idealReserve: 60000,
+    monthlyExpenses: 10000,
+    idealMonths: 6,
+    summary: "Sua reserva de emergência está abaixo do ideal de 6 meses de despesas."
+  };
   
   // Calculate progress percentage
   const progressPercentage = Math.min(100, (liquidity.currentIdle / liquidity.idealReserve) * 100);

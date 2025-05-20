@@ -11,7 +11,16 @@ interface FutureProjectionModuleProps {
 
 const FutureProjectionModule = ({ fullWidth = false }: FutureProjectionModuleProps) => {
   const { data } = useRaioX();
-  const { projection } = data;
+  // Ensure projection exists with default values if not
+  const projection = data?.projection || {
+    currentTotal: 100000,
+    monthlyContribution: 2000,
+    scenarios: {
+      base: { "1 ano": 120000, "3 anos": 180000, "5 anos": 250000 },
+      stress: { "1 ano": 110000, "3 anos": 150000, "5 anos": 200000 }
+    }
+  };
+  
   const isMobile = useMobileBreakpoint();
   
   // Format data for the chart

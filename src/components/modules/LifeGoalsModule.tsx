@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -11,7 +12,9 @@ interface LifeGoalsModuleProps {
 
 const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
   const { data, hasOpenFinance } = useRaioX();
-  const { lifeGoals } = data;
+  
+  // Ensure lifeGoals exists with default values if not
+  const lifeGoals = data?.lifeGoals || { goals: [], summary: "" };
   
   // Format currency
   const formatCurrency = (value: number) => {
