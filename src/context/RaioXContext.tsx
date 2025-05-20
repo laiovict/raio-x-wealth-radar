@@ -1,238 +1,143 @@
 
-import { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import { clientData } from '@/data/clientData';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import clientData from "@/data/clientData";
+import { supabase } from "@/integrations/supabase/client";
 
 interface RaioXContextType {
   data: any;
-  clientId: string;
   hasOpenFinance: boolean;
-  financialSummary: FinancialSummary | null;
-  aiInsights: AIInsight[];
-  recommendedActions: RecommendedAction[];
-  isAIAnalysisLoading: boolean;
-  refreshAIAnalysis: () => void;
+  selectedClient: number | null;
 }
 
-export interface FinancialSummary {
-  netWorth: number;
-  totalAssets: number;
-  totalLiabilities: number;
-  liquidAssets: number;
-  monthlyIncome: number;
-  monthlyExpenses: number;
-  savingsRate: number;
-  topRisks: { name: string; severity: 'low' | 'medium' | 'high'; impact: string }[];
-}
-
-export interface AIInsight {
-  id: string;
-  title: string;
-  description: string;
-  category: 'risk' | 'opportunity' | 'goal' | 'education' | 'tax' | 'budget';
-  priority: 'low' | 'medium' | 'high';
-  timestamp: Date;
-  isNew: boolean;
-}
-
-export interface RecommendedAction {
-  id: string;
-  title: string;
-  description: string;
-  impact: string;
-  difficulty: 'easy' | 'medium' | 'complex';
-  estimatedSavings?: number;
-  estimatedReturn?: number;
-  estimatedRiskReduction?: number;
-  category: 'allocation' | 'tax' | 'cash' | 'goal' | 'risk';
-  urgency: 'low' | 'medium' | 'high';
-}
-
-const RaioXContext = createContext<RaioXContextType | undefined>(undefined);
-
-export const useRaioX = () => {
-  const context = useContext(RaioXContext);
-  if (!context) {
-    throw new Error('useRaioX must be used within a RaioXProvider');
-  }
-  return context;
-};
+export const RaioXContext = createContext<RaioXContextType>({
+  data: {},
+  hasOpenFinance: false,
+  selectedClient: null,
+});
 
 interface RaioXProviderProps {
-  children: ReactNode;
-  clientId: string;
-  hasOpenFinance: boolean;
+  children: React.ReactNode;
+  clientId?: string;
+  hasOpenFinance?: boolean;
+  selectedClient?: number | null;
 }
 
-// Mock AI insights for demonstration
-const generateMockInsights = (clientId: string): AIInsight[] => {
-  return [
-    {
-      id: '1',
-      title: 'Oportunidade de Tax-Loss Harvesting',
-      description: 'Identificamos potencial economia de R$ 3.245 em impostos através de tax-loss harvesting com sua posição em PETR4.',
-      category: 'tax',
-      priority: 'high',
-      timestamp: new Date(),
-      isNew: true,
-    },
-    {
-      id: '2',
-      title: 'Concentração excessiva em Tecnologia',
-      description: 'Seu portfolio tem 42% em ações de tecnologia, bem acima do recomendado de 25% para seu perfil.',
-      category: 'risk',
-      priority: 'medium',
-      timestamp: new Date(Date.now() - 86400000), // 1 day ago
-      isNew: false,
-    },
-    {
-      id: '3',
-      title: 'Meta de aposentadoria em risco',
-      description: 'Com os aportes atuais, há apenas 65% de chance de atingir sua meta de aposentadoria. Considere aumentar contribuições mensais.',
-      category: 'goal',
-      priority: 'high',
-      timestamp: new Date(Date.now() - 172800000), // 2 days ago
-      isNew: false,
-    },
-    {
-      id: '4',
-      title: 'Oportunidade de investimento em Renda Fixa',
-      description: 'Com a alta recente na taxa SELIC, identificamos CDBs com retorno acima da média para seu perfil de liquidez.',
-      category: 'opportunity',
-      priority: 'medium',
-      timestamp: new Date(Date.now() - 259200000), // 3 days ago
-      isNew: false,
-    },
-    {
-      id: '5',
-      title: 'Gastos em restaurantes acima do orçamento',
-      description: 'Seus gastos em restaurantes estão 35% acima do orçamento planejado para o mês atual.',
-      category: 'budget',
-      priority: 'low',
-      timestamp: new Date(Date.now() - 345600000), // 4 days ago
-      isNew: false,
-    },
-  ];
-};
-
-// Mock recommended actions
-const generateMockRecommendations = (clientId: string): RecommendedAction[] => {
-  return [
-    {
-      id: '1',
-      title: 'Realize tax-loss harvesting com PETR4',
-      description: 'Venda suas ações PETR4 com prejuízo e reinvista em ativos similares após 30 dias para economia fiscal.',
-      impact: 'Economia estimada de R$ 3.245 em impostos',
-      difficulty: 'easy',
-      estimatedSavings: 3245,
-      category: 'tax',
-      urgency: 'high',
-    },
-    {
-      id: '2',
-      title: 'Rebalanceie sua exposição em tecnologia',
-      description: 'Reduza a exposição ao setor de tecnologia de 42% para 25%, realocando em setores sub-representados.',
-      impact: 'Redução de risco de concentração em 17%',
-      difficulty: 'medium',
-      estimatedRiskReduction: 17,
-      category: 'allocation',
-      urgency: 'medium',
-    },
-    {
-      id: '3',
-      title: 'Aumente aporte para aposentadoria',
-      description: 'Aumente sua contribuição mensal para aposentadoria em R$ 850 para melhorar a probabilidade de atingir sua meta.',
-      impact: 'Aumento de 15% na probabilidade de sucesso da meta de aposentadoria',
-      difficulty: 'medium',
-      category: 'goal',
-      urgency: 'high',
-    },
-    {
-      id: '4',
-      title: 'Aproveite CDBs de alto rendimento',
-      description: 'Aloque parte da sua reserva de emergência em CDBs diários pagando 102% do CDI.',
-      impact: 'Aumento de 0.85% nos rendimentos da reserva de liquidez',
-      difficulty: 'easy',
-      estimatedReturn: 0.85,
-      category: 'cash',
-      urgency: 'low',
-    },
-    {
-      id: '5',
-      title: 'Revise seu orçamento de alimentação',
-      description: 'Seus gastos com restaurantes estão consistentemente acima do planejado. Considere ajustar o orçamento ou os hábitos.',
-      impact: 'Potencial economia mensal de R$ 450',
-      difficulty: 'easy',
-      estimatedSavings: 450,
-      category: 'cash',
-      urgency: 'low',
-    },
-  ];
-};
-
-// Generate mock financial summary
-const generateMockFinancialSummary = (clientId: string): FinancialSummary => {
-  return {
-    netWorth: 1250000,
-    totalAssets: 1450000,
-    totalLiabilities: 200000,
-    liquidAssets: 125000,
-    monthlyIncome: 18500,
-    monthlyExpenses: 12000,
-    savingsRate: 35,
-    topRisks: [
-      { name: 'Concentração em Tecnologia', severity: 'high', impact: 'Exposição excessiva a um único setor' },
-      { name: 'Liquidez Baixa', severity: 'medium', impact: 'Reserva de emergência abaixo do ideal' },
-      { name: 'Meta de Aposentadoria em Risco', severity: 'medium', impact: 'Probabilidade de sucesso abaixo de 70%' },
-    ]
-  };
-};
-
-export const RaioXProvider = ({ children, clientId, hasOpenFinance }: RaioXProviderProps) => {
-  // Get data for the selected client
-  const clientInfo = clientData[clientId] || clientData.client1;
+export const RaioXProvider: React.FC<RaioXProviderProps> = ({
+  children,
+  clientId = 'client1',
+  hasOpenFinance = false,
+  selectedClient = null,
+}) => {
+  const [data, setData] = useState(clientData[clientId]);
   
-  // State for AI insights and recommendations
-  const [aiInsights, setAIInsights] = useState<AIInsight[]>([]);
-  const [recommendedActions, setRecommendedActions] = useState<RecommendedAction[]>([]);
-  const [financialSummary, setFinancialSummary] = useState<FinancialSummary | null>(null);
-  const [isAIAnalysisLoading, setIsAIAnalysisLoading] = useState(true);
-
-  // Function to refresh AI analysis
-  const refreshAIAnalysis = () => {
-    if (hasOpenFinance) {
-      setIsAIAnalysisLoading(true);
-      // Simulate API call delay
-      setTimeout(() => {
-        setAIInsights(generateMockInsights(clientId));
-        setRecommendedActions(generateMockRecommendations(clientId));
-        setFinancialSummary(generateMockFinancialSummary(clientId));
-        setIsAIAnalysisLoading(false);
-      }, 1500);
-    } else {
-      setAIInsights([]);
-      setRecommendedActions([]);
-      setFinancialSummary(null);
-      setIsAIAnalysisLoading(false);
-    }
-  };
-
-  // Initialize AI analysis on mount or client/OpenFinance change
+  // Effect to fetch client data when selectedClient changes
   useEffect(() => {
-    refreshAIAnalysis();
-  }, [clientId, hasOpenFinance]);
+    const fetchClientData = async () => {
+      if (selectedClient) {
+        try {
+          console.log(`Fetching data for client ID: ${selectedClient}`);
+          
+          // Fetch portfolio summary
+          const { data: portfolioData, error: portfolioError } = await supabase
+            .from('investor_portfolio_summary')
+            .select('*')
+            .eq('investor_account_on_brokerage_house', selectedClient)
+            .single();
+
+          if (portfolioError) {
+            console.error('Error fetching portfolio data:', portfolioError);
+            return;
+          }
+
+          // Fetch fixed income data
+          const { data: fixedIncomeData, error: fixedIncomeError } = await supabase
+            .from('fixed_income')
+            .select('*')
+            .eq('investor_account_on_brokerage_house', selectedClient);
+
+          if (fixedIncomeError) {
+            console.error('Error fetching fixed income data:', fixedIncomeError);
+          }
+
+          // Fetch investment funds data
+          const { data: fundsData, error: fundsError } = await supabase
+            .from('investment_funds')
+            .select('*')
+            .eq('investor_account_on_brokerage_house', selectedClient);
+
+          if (fundsError) {
+            console.error('Error fetching investment funds data:', fundsError);
+          }
+
+          // Fetch stocks data
+          const { data: stocksData, error: stocksError } = await supabase
+            .from('stocks')
+            .select('*')
+            .eq('investor_account_on_brokerage_house', selectedClient);
+
+          if (stocksError) {
+            console.error('Error fetching stocks data:', stocksError);
+          }
+
+          // Fetch real estate data
+          const { data: realEstateData, error: realEstateError } = await supabase
+            .from('real_estate')
+            .select('*')
+            .eq('investor_account_on_brokerage_house', selectedClient);
+
+          if (realEstateError) {
+            console.error('Error fetching real estate data:', realEstateError);
+          }
+
+          // Fetch profitability data
+          const { data: profitabilityData, error: profitabilityError } = await supabase
+            .from('profitability_ytd')
+            .select('*')
+            .eq('investor_account_on_brokerage_house', selectedClient)
+            .single();
+
+          if (profitabilityError && profitabilityError.code !== 'PGRST116') {
+            // PGRST116 is "Results contain 0 rows" - not an error if client has no profitability data
+            console.error('Error fetching profitability data:', profitabilityError);
+          }
+
+          // Adapt the data to match the existing structure
+          const adaptedData = {
+            ...data,
+            clientName: `Cliente ${selectedClient}`,
+            portfolioSummary: portfolioData || {},
+            fixedIncome: fixedIncomeData || [],
+            investmentFunds: fundsData || [],
+            stocks: stocksData || [],
+            realEstate: realEstateData || [],
+            profitability: profitabilityData || {},
+          };
+
+          setData(adaptedData);
+          console.log('Client data updated:', adaptedData);
+        } catch (error) {
+          console.error('Error in client data fetch:', error);
+        }
+      } else {
+        // If no client selected, use default data
+        setData(clientData[clientId]);
+      }
+    };
+
+    fetchClientData();
+  }, [selectedClient, clientId]);
 
   return (
-    <RaioXContext.Provider value={{ 
-      data: clientInfo, 
-      clientId, 
-      hasOpenFinance, 
-      aiInsights, 
-      recommendedActions, 
-      financialSummary, 
-      isAIAnalysisLoading, 
-      refreshAIAnalysis 
-    }}>
+    <RaioXContext.Provider
+      value={{
+        data,
+        hasOpenFinance,
+        selectedClient,
+      }}
+    >
       {children}
     </RaioXContext.Provider>
   );
 };
+
+export const useRaioX = () => useContext(RaioXContext);

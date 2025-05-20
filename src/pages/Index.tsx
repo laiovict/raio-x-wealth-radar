@@ -17,9 +17,10 @@ const Index = () => {
   const [showPdfPreview, setShowPdfPreview] = useState(false);
   const [mediaType, setMediaType] = useState("pdf");
   const [isClientFull] = useState(true); // Em produção, isso viria da autenticação
-  const [hasOpenFinance, setHasOpenFinance] = useState(false); // Alterado para false como padrão
+  const [hasOpenFinance, setHasOpenFinance] = useState(false);
   const [showPluggyModal, setShowPluggyModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<number | null>(null);
   const isMobile = useMobileBreakpoint();
   
   const handleExportMedia = (type: string) => {
@@ -62,6 +63,10 @@ const Index = () => {
       document.removeEventListener('activate-openfinance', handleActivateOpenFinance);
     };
   }, [hasOpenFinance]);
+
+  const handleClientSelect = (clientId: string) => {
+    setSelectedClient(clientId ? parseInt(clientId) : null);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f0f11] to-[#1a1a2e] text-gray-100 overflow-x-hidden">
@@ -291,9 +296,13 @@ const Index = () => {
           )}
         </div>
         
-        <ClientSelector />
+        <ClientSelector onClientSelect={handleClientSelect} />
         
-        <RaioXProvider clientId="client1" hasOpenFinance={hasOpenFinance}>
+        <RaioXProvider 
+          clientId="client1" 
+          hasOpenFinance={hasOpenFinance}
+          selectedClient={selectedClient}
+        >
           <RaioXDashboard 
             showPdfPreview={showPdfPreview} 
             onClosePdfPreview={handleClosePdfPreview}
