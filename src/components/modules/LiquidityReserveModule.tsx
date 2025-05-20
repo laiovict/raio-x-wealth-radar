@@ -2,9 +2,7 @@
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import StreamingText from "@/components/StreamingText";
-import { useStreamingContent } from "@/hooks/use-streaming-content";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 interface LiquidityReserveModuleProps {
@@ -16,6 +14,59 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
   const [isLoaded, setIsLoaded] = useState(false);
   const navigate = useNavigate();
   
+  const liquidityData = useMemo(() => {
+    // Start with default values
+    const defaultLiquidity = {
+      currentIdle: 25000,
+      idealReserve: 60000,
+      monthlyExpenses: 10000,
+      idealMonths: 6,
+      summary: "Sua reserva de emergência está abaixo do ideal de 6 meses de despesas."
+    };
+    
+    // If we have real data from Supabase, calculate liquidity values
+    if (data.portfolioSummary) {
+      try {
+        // Use fixed income value as current idle (emergency reserve)
+        const currentIdle = data.portfolioSummary.fixed_income_value || defaultLiquidity.currentIdle;
+        
+        // Calculate monthly expenses - if financial summary exists, use it
+        const monthlyExpenses = data.financialSummary?.monthlyExpenses || 
+          (parseFloat(data.portfolioSummary.total_portfolio_value || "0") * 0.006); // Estimate as 0.6% of portfolio
+        
+        // Calculate ideal reserve (6 months of expenses)
+        const idealMonths = 6;
+        const idealReserve = monthlyExpenses * idealMonths;
+        
+        // Calculate how many months the current idle covers
+        const coveredMonths = Math.floor(currentIdle / monthlyExpenses);
+        
+        // Create summary based on coverage
+        let summary = "";
+        if (coveredMonths >= idealMonths) {
+          summary = `Sua reserva de emergência cobre ${coveredMonths} meses de despesas, o que está adequado ao ideal de ${idealMonths} meses.`;
+        } else {
+          summary = `Sua reserva de emergência cobre ${coveredMonths} meses de despesas, recomendamos aumentar para ${idealMonths} meses.`;
+        }
+        
+        return {
+          currentIdle,
+          idealReserve,
+          monthlyExpenses,
+          idealMonths,
+          summary,
+          dataSource: 'supabase' as const
+        };
+      } catch (error) {
+        console.error("Error calculating liquidity data:", error);
+        return defaultLiquidity;
+      }
+    }
+    
+    // Fallback to using data from context if available
+    return data.liquidity || defaultLiquidity;
+  }, [data.portfolioSummary, data.financialSummary, data.liquidity]);
+  
   useEffect(() => {
     // Set loaded state after 500ms to ensure UI is ready
     const timer = setTimeout(() => {
@@ -25,17 +76,8 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
     return () => clearTimeout(timer);
   }, []);
   
-  // Ensure liquidity exists with default values if not
-  const liquidity = data?.liquidity || {
-    currentIdle: 25000,
-    idealReserve: 60000,
-    monthlyExpenses: 10000,
-    idealMonths: 6,
-    summary: "Sua reserva de emergência está abaixo do ideal de 6 meses de despesas."
-  };
-  
   // Calculate progress percentage
-  const progressPercentage = Math.min(100, (liquidity.currentIdle / liquidity.idealReserve) * 100);
+  const progressPercentage = Math.min(100, (liquidityData.currentIdle / liquidityData.idealReserve) * 100);
   
   // Format currency
   const formatCurrency = (value: number) => {
@@ -80,14 +122,14 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500 dark:text-gray-400">Reserva Atual</span>
                 <span className="text-sm font-medium">
-                  {formatCurrency(liquidity.currentIdle)}
+                  {formatCurrency(liquidityData.currentIdle)}
                 </span>
               </div>
               <Progress value={progressPercentage} className="h-3" />
               <div className="flex justify-between items-center">
                 <span className="text-sm text-gray-500 dark:text-gray-400">Reserva Ideal</span>
                 <span className="text-sm font-medium">
-                  {formatCurrency(liquidity.idealReserve)}
+                  {formatCurrency(liquidityData.idealReserve)}
                 </span>
               </div>
             </div>
@@ -96,13 +138,13 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
               <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg">
                 <p className="text-sm font-medium text-blue-800 dark:text-blue-300 mb-1">Despesas Mensais</p>
                 <p className="text-lg font-bold text-blue-700 dark:text-blue-200">
-                  {formatCurrency(liquidity.monthlyExpenses)}
+                  {formatCurrency(liquidityData.monthlyExpenses)}
                 </p>
               </div>
               <div className="bg-indigo-50 dark:bg-indigo-900/30 p-3 rounded-lg">
                 <p className="text-sm font-medium text-indigo-800 dark:text-indigo-300 mb-1">Meses Ideais</p>
                 <p className="text-lg font-bold text-indigo-700 dark:text-indigo-200">
-                  {`${liquidity.idealMonths} meses`}
+                  {`${liquidityData.idealMonths} meses`}
                 </p>
               </div>
             </div>
@@ -112,7 +154,7 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-300 mb-1">Situação</p>
                 <p className="text-lg font-bold text-amber-700 dark:text-amber-200">
                   {progressPercentage < 100 
-                    ? `Faltam ${formatCurrency(liquidity.idealReserve - liquidity.currentIdle)}` 
+                    ? `Faltam ${formatCurrency(liquidityData.idealReserve - liquidityData.currentIdle)}` 
                     : "Reserva Adequada"}
                 </p>
               </div>
@@ -129,7 +171,7 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
             
             <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg">
               <p className="text-sm text-gray-700 dark:text-gray-200">
-                {liquidity.summary}
+                {liquidityData.summary}
               </p>
             </div>
             

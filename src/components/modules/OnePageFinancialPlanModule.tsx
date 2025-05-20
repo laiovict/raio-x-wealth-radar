@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -100,8 +101,10 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
     let fixedIncomePercentage = 65;
     let stocksValue = 81250;
     let stocksPercentage = 25;
-    let alternativesValue = 32500;
-    let alternativesPercentage = 10;
+    let fundsValue = 16250;
+    let fundsPercentage = 5;
+    let alternativesValue = 16250;
+    let alternativesPercentage = 5;
     let ytdReturn = 7.8;
     let benchmarkReturn = 8.5;
 
@@ -117,14 +120,16 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
       stocksValue = parseFloat(portfolioSummary.stocks_value || "0");
       stocksPercentage = parseFloat(portfolioSummary.stocks_representation || "0");
       
-      // Alternatives - sum of investment funds, real estate and international investments
-      const investmentFundValue = portfolioSummary.investment_fund_value || 0;
+      // Investment Funds as separate category
+      fundsValue = portfolioSummary.investment_fund_value || 0;
+      fundsPercentage = portfolioSummary.investment_fund_representation || 0;
+      
+      // Alternatives - sum of real estate and international investments
       const realEstateValue = portfolioSummary.real_estate_value || 0;
       const internationalValue = parseFloat(portfolioSummary.investment_international_value || "0");
       
-      alternativesValue = investmentFundValue + realEstateValue + internationalValue;
-      alternativesPercentage = portfolioSummary.investment_fund_representation + 
-                              portfolioSummary.real_estate_representation +
+      alternativesValue = realEstateValue + internationalValue;
+      alternativesPercentage = portfolioSummary.real_estate_representation +
                               parseFloat(portfolioSummary.investment_international_representation || "0");
     }
 
@@ -140,6 +145,8 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
       fixedIncomePercentage,
       stocksValue,
       stocksPercentage,
+      fundsValue,
+      fundsPercentage,
       alternativesValue,
       alternativesPercentage,
       ytdReturn,
@@ -203,6 +210,24 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
     );
   }
 
+  // Create a summary for the investment section based on portfolio data
+  const createInvestmentSummary = () => {
+    let summary = `Carteira atual de ${formatCurrency(investmentData.totalValue)} com concentração em `;
+    
+    // Find the asset class with highest percentage
+    const assets = [
+      { name: "renda fixa", percentage: investmentData.fixedIncomePercentage },
+      { name: "renda variável", percentage: investmentData.stocksPercentage },
+      { name: "fundos de investimento", percentage: investmentData.fundsPercentage },
+      { name: "alternativos", percentage: investmentData.alternativesPercentage }
+    ];
+    
+    const highestAsset = assets.sort((a, b) => b.percentage - a.percentage)[0];
+    summary += `${highestAsset.name} (${Math.round(highestAsset.percentage)}%).`;
+    
+    return summary;
+  };
+
   // Data for the financial plan
   const financialPlan = {
     lastUpdated: "2023-05-15T10:30:00Z",
@@ -229,11 +254,12 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
         id: "investments",
         title: "Investimentos",
         icon: <TrendingUp className="h-5 w-5 text-blue-500" />,
-        summary: `Carteira atual de ${formatCurrency(investmentData.totalValue)} com concentração em renda fixa (${investmentData.fixedIncomePercentage}%).`,
+        summary: createInvestmentSummary(),
         details: [
           { label: "Valor total investido", value: formatCurrency(investmentData.totalValue) },
-          { label: "Renda fixa", value: `${formatCurrency(investmentData.fixedIncomeValue)} (${investmentData.fixedIncomePercentage}%)` },
-          { label: "Renda variável", value: `${formatCurrency(investmentData.stocksValue)} (${investmentData.stocksPercentage}%)` },
+          { label: "Renda fixa", value: `${formatCurrency(investmentData.fixedIncomeValue)} (${Math.round(investmentData.fixedIncomePercentage)}%)` },
+          { label: "Renda variável", value: `${formatCurrency(investmentData.stocksValue)} (${Math.round(investmentData.stocksPercentage)}%)` },
+          { label: "Fundos de Investimento", value: `${formatCurrency(investmentData.fundsValue)} (${Math.round(investmentData.fundsPercentage)}%)` },
           { label: "Alternativos", value: `${formatCurrency(investmentData.alternativesValue)} (${Math.round(investmentData.alternativesPercentage)}%)` },
           { label: "Rentabilidade YTD", value: `${investmentData.ytdReturn.toFixed(1)}% (vs. benchmark ${investmentData.benchmarkReturn}%)` }
         ],
