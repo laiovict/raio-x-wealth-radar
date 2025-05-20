@@ -270,6 +270,153 @@ export type Database = {
         }
         Relationships: []
       }
+      open_finance_investments: {
+        Row: {
+          amount_original: number | null
+          asset_subtype: string | null
+          asset_type: string
+          book_amount: number
+          code: string
+          created_at: string
+          currency_code: string
+          due_date: string | null
+          fixed_annual_rate: number | null
+          id: string
+          issue_date: string | null
+          issuer_json: Json | null
+          item_id: string
+          last_quote_date: string
+          metadata_json: Json | null
+          name: string
+          quantity: number
+          rate: number | null
+          rate_type: string | null
+          status: string
+          taxes_json: Json | null
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          amount_original?: number | null
+          asset_subtype?: string | null
+          asset_type: string
+          book_amount: number
+          code: string
+          created_at?: string
+          currency_code?: string
+          due_date?: string | null
+          fixed_annual_rate?: number | null
+          id?: string
+          issue_date?: string | null
+          issuer_json?: Json | null
+          item_id: string
+          last_quote_date: string
+          metadata_json?: Json | null
+          name: string
+          quantity: number
+          rate?: number | null
+          rate_type?: string | null
+          status: string
+          taxes_json?: Json | null
+          unit_price: number
+          updated_at?: string
+        }
+        Update: {
+          amount_original?: number | null
+          asset_subtype?: string | null
+          asset_type?: string
+          book_amount?: number
+          code?: string
+          created_at?: string
+          currency_code?: string
+          due_date?: string | null
+          fixed_annual_rate?: number | null
+          id?: string
+          issue_date?: string | null
+          issuer_json?: Json | null
+          item_id?: string
+          last_quote_date?: string
+          metadata_json?: Json | null
+          name?: string
+          quantity?: number
+          rate?: number | null
+          rate_type?: string | null
+          status?: string
+          taxes_json?: Json | null
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      open_finance_transactions: {
+        Row: {
+          account_id: string
+          acquirer_data_json: Json | null
+          amount: number
+          amount_in_acct_curr: number | null
+          category: string | null
+          category_id: string | null
+          created_at: string
+          credit_card_metadata_json: Json | null
+          currency_code: string
+          description: string
+          description_raw: string
+          id: string
+          merchant_json: Json | null
+          operation_type: string | null
+          payment_data_json: Json | null
+          provider_id: string | null
+          status: string
+          transacted_at: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          account_id: string
+          acquirer_data_json?: Json | null
+          amount: number
+          amount_in_acct_curr?: number | null
+          category?: string | null
+          category_id?: string | null
+          created_at?: string
+          credit_card_metadata_json?: Json | null
+          currency_code?: string
+          description: string
+          description_raw: string
+          id?: string
+          merchant_json?: Json | null
+          operation_type?: string | null
+          payment_data_json?: Json | null
+          provider_id?: string | null
+          status: string
+          transacted_at: string
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          account_id?: string
+          acquirer_data_json?: Json | null
+          amount?: number
+          amount_in_acct_curr?: number | null
+          category?: string | null
+          category_id?: string | null
+          created_at?: string
+          credit_card_metadata_json?: Json | null
+          currency_code?: string
+          description?: string
+          description_raw?: string
+          id?: string
+          merchant_json?: Json | null
+          operation_type?: string | null
+          payment_data_json?: Json | null
+          provider_id?: string | null
+          status?: string
+          transacted_at?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       portfolio_earnings_history: {
         Row: {
           advisor_code: number | null
@@ -399,6 +546,33 @@ export type Database = {
           quantity_day?: string | null
           quantity_designed?: string | null
           total_value?: number | null
+        }
+        Relationships: []
+      }
+      section_feedback: {
+        Row: {
+          created_at: string
+          id: string
+          section_id: string
+          updated_at: string
+          user_id: string
+          vote_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          section_id: string
+          updated_at?: string
+          user_id: string
+          vote_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          section_id?: string
+          updated_at?: string
+          user_id?: string
+          vote_type?: string
         }
         Relationships: []
       }
