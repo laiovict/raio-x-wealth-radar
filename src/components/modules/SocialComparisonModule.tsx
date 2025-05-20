@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
 import { useMemo } from "react";
+import FeedbackSection from "@/components/FeedbackSection";
 
 interface SocialComparisonModuleProps {
   fullWidth?: boolean;
@@ -164,6 +165,9 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
           </div>
         </div>
       </CardContent>
+      <div className="px-4 pb-4">
+        <FeedbackSection sectionId="social-comparison" />
+      </div>
     </Card>
   );
 };
