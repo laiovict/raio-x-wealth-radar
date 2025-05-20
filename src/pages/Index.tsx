@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -27,10 +28,15 @@ const Index = () => {
     // Check if user is logged in based on localStorage
     const storedUserRole = localStorage.getItem("userRole");
     const clientId = localStorage.getItem("clientId");
+    const selectedClientId = localStorage.getItem("selectedClientId");
     
     if (storedUserRole === "advisor") {
       setIsLoggedIn(true);
       setUserRole("advisor");
+      // If there's a previously selected client, use it
+      if (selectedClientId) {
+        setSelectedClient(parseInt(selectedClientId));
+      }
     } else if (storedUserRole === "client" && clientId) {
       setIsLoggedIn(true);
       setUserRole("client");
@@ -65,6 +71,7 @@ const Index = () => {
 
   const handleClientSelect = (clientId: string) => {
     console.log("Client selected in Index component:", clientId);
+    localStorage.setItem("selectedClientId", clientId);
     setSelectedClient(parseInt(clientId));
   };
 
@@ -89,6 +96,7 @@ const Index = () => {
   const handleLogout = () => {
     localStorage.removeItem("userRole");
     localStorage.removeItem("clientId");
+    localStorage.removeItem("selectedClientId");
     setIsLoggedIn(false);
     setUserRole(null);
     setSelectedClient(null);
@@ -210,6 +218,7 @@ const Index = () => {
                 <TopControls 
                   isAdvisor={userRole === "advisor"} 
                   onOpenFinanceToggle={handleOpenFinanceToggle} 
+                  hasOpenFinance={hasOpenFinance}
                 />
               )}
             </div>

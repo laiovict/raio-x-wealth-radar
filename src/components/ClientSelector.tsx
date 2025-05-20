@@ -64,14 +64,13 @@ const ClientSelector = ({ onClientSelect }: ClientSelectorProps) => {
     setSelectedClient(value);
     console.log(`Selected client: ${value}`);
     
+    // Store the selected client ID in localStorage
+    localStorage.setItem("selectedClientId", value);
+    
     // Ensure the callback is called with the selected client ID
     if (onClientSelect) {
       onClientSelect(value);
     }
-    
-    // Force a refresh of the page to ensure all components update
-    // This is a temporary solution to ensure the RaioX updates properly
-    window.location.reload();
   };
 
   const handleLogin = () => {
@@ -100,13 +99,13 @@ const ClientSelector = ({ onClientSelect }: ClientSelectorProps) => {
           
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
             {loading ? (
-              <div className="text-sm text-blue-200">{t('loadingClients')}</div>
+              <div className="text-sm text-blue-200">Carregando clientes...</div>
             ) : (
               <div className="flex flex-col gap-2 w-full sm:w-auto">
-                <label className="text-sm text-blue-200">{t('selectClient')}:</label>
+                <label className="text-sm text-blue-200">Selecione o cliente:</label>
                 <Select onValueChange={handleClientChange} value={selectedClient}>
                   <SelectTrigger className="w-full sm:w-[240px] bg-white/10 border-white/20 text-white">
-                    <SelectValue placeholder={t('selectClient')} />
+                    <SelectValue placeholder="Selecione um cliente" />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-900 border-white/20 text-white">
                     {clients.length > 0 ? (
@@ -121,7 +120,7 @@ const ClientSelector = ({ onClientSelect }: ClientSelectorProps) => {
                         </SelectItem>
                       ))
                     ) : (
-                      <SelectItem value="no-clients" disabled>{t('noClientsFound')}</SelectItem>
+                      <SelectItem value="no-clients" disabled>Nenhum cliente encontrado</SelectItem>
                     )}
                   </SelectContent>
                 </Select>
@@ -135,7 +134,7 @@ const ClientSelector = ({ onClientSelect }: ClientSelectorProps) => {
               onClick={handleLogin}
             >
               <User className="mr-2 h-4 w-4" />
-              {t('login')}
+              Login
             </Button>
           </div>
         </div>

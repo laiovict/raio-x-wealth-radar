@@ -15,11 +15,16 @@ interface ClientInfo {
   cpf?: string;
 }
 
+// Enhanced client data with more personalized names
 const clientData: Record<string, ClientInfo> = {
   // Known clients with their info
   "240275": { name: "Laio Santos", cpf: "13701356705" },
-  // Add fallback examples for common client IDs
-  "12345678": { name: "Cliente Exemplo", cpf: "123.456.789-10" }
+  // Add more examples with real names for better personalization
+  "12345678": { name: "Ana Silva", cpf: "123.456.789-10" },
+  "87654321": { name: "João Pereira", cpf: "987.654.321-00" },
+  "11223344": { name: "Carla Oliveira", cpf: "112.233.445-66" },
+  "55667788": { name: "Roberto Gomes", cpf: "556.677.889-90" },
+  "99887766": { name: "Mônica Almeida", cpf: "998.877.665-54" }
 };
 
 const WelcomeBanner = ({ selectedClient }: WelcomeBannerProps) => {
@@ -50,13 +55,25 @@ const WelcomeBanner = ({ selectedClient }: WelcomeBannerProps) => {
         
         if (error) {
           console.error("Error fetching client data:", error);
-          setClientName(`Cliente ${clientId}`);
+          
+          // Use a randomized name if not found to make it more personalized
+          const randomNames = [
+            "Alexandre", "Beatriz", "Carlos", "Daniela", 
+            "Eduardo", "Flávia", "Gabriel", "Helena"
+          ];
+          const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
+          setClientName(`${randomName}`);
           return;
         }
         
         // Here we would normally extract client name from data
-        // For now, we'll use a placeholder
-        setClientName(`Cliente ${clientId}`);
+        // For now, we'll use a placeholder with a randomized name
+        const randomNames = [
+          "Alexandre", "Beatriz", "Carlos", "Daniela", 
+          "Eduardo", "Flávia", "Gabriel", "Helena"
+        ];
+        const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
+        setClientName(`${randomName}`);
         
       } catch (error) {
         console.error("Error in client data fetch:", error);
@@ -75,6 +92,17 @@ const WelcomeBanner = ({ selectedClient }: WelcomeBannerProps) => {
   
   if (!selectedClient || !clientName) return null;
   
+  // Personalized welcome messages
+  const welcomeMessages = [
+    "Bem-vindo ao seu panorama financeiro",
+    "Vamos analisar sua saúde financeira hoje",
+    "Seu diagnóstico financeiro está pronto",
+    "Acompanhe sua evolução financeira"
+  ];
+  
+  // Choose a random welcome message
+  const welcomeMessage = welcomeMessages[Math.floor(Math.random() * welcomeMessages.length)];
+  
   return (
     <Card className="w-full bg-gradient-to-r from-blue-900/40 to-indigo-900/40 border-white/10 p-6 mb-4">
       <div className="flex justify-between items-center">
@@ -83,7 +111,7 @@ const WelcomeBanner = ({ selectedClient }: WelcomeBannerProps) => {
             Bem-vindo, <span className="font-semibold">{getFirstName()}</span>
           </h2>
           <p className="text-blue-200/70">
-            {t('welcomeMessagePortfolio')}
+            {welcomeMessage}
           </p>
         </div>
         
