@@ -26,6 +26,7 @@ import WelcomeBanner from "./WelcomeBanner";
 import InteligenciaModule from "./modules/InteligenciaModule";
 import { toast } from "@/hooks/use-toast";
 import FeedbackSection from "./FeedbackSection";
+import ClientFeedbackSection from "./ClientFeedbackSection";
 import { 
   Popover,
   PopoverContent,
@@ -38,6 +39,7 @@ interface RaioXDashboardProps {
   mediaType?: string;
   isClientFull?: boolean;
   onOpenFinanceActivate?: () => void;
+  userRole?: "advisor" | "client" | null;
 }
 
 const RaioXDashboard = ({ 
@@ -45,7 +47,8 @@ const RaioXDashboard = ({
   onClosePdfPreview = () => {}, 
   mediaType = "pdf",
   isClientFull = true,
-  onOpenFinanceActivate
+  onOpenFinanceActivate,
+  userRole
 }: RaioXDashboardProps) => {
   const { data, hasOpenFinance, selectedClient } = useRaioX();
   const [searchQuery, setSearchQuery] = useState("");
@@ -326,6 +329,11 @@ const RaioXDashboard = ({
           <div>
             <WrappedModule fullWidth />
             <FeedbackSection sectionId="wrapped" />
+          </div>
+          
+          {/* Add the feedback section at the end of the overview tab */}
+          <div>
+            <ClientFeedbackSection isAdvisorView={userRole === "advisor"} />
           </div>
           
           {/* Footer for this tab */}

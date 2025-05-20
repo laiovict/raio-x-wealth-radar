@@ -317,6 +317,7 @@ const Index = () => {
               mediaType={mediaType}
               isClientFull={hasOpenFinance}
               onOpenFinanceActivate={handleOpenFinanceActivate}
+              userRole={userRole} // Pass the userRole to RaioXDashboard
             />
           </div>
         </div>
