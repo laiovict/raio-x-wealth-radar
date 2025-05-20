@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, LogIn } from "lucide-react";
+import { ArrowLeft, LogIn, User } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
 
@@ -15,6 +15,7 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showAdvisorLogin, setShowAdvisorLogin] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
@@ -38,7 +39,7 @@ const Auth = () => {
     
     try {
       // Special case for advisor login with the correct password
-      if (accountNumber === "login" && password === "America123@") {
+      if (showAdvisorLogin && accountNumber === "login" && password === "America123@") {
         // Store a special flag in localStorage to indicate advisor mode
         localStorage.setItem("userRole", "advisor");
         toast({
@@ -51,49 +52,57 @@ const Auth = () => {
       }
       
       // For regular client logins, validate account number exists
-      const { data: clientExists, error: fetchError } = await supabase
-        .from('investor_portfolio_summary')
-        .select('investor_account_on_brokerage_house')
-        .eq('investor_account_on_brokerage_house', parseInt(accountNumber))
-        .limit(1);
+      if (!showAdvisorLogin) {
+        const { data: clientExists, error: fetchError } = await supabase
+          .from('investor_portfolio_summary')
+          .select('investor_account_on_brokerage_house')
+          .eq('investor_account_on_brokerage_house', parseInt(accountNumber))
+          .limit(1);
+          
+        if (fetchError) {
+          throw fetchError;
+        }
+
+        if (!clientExists || clientExists.length === 0) {
+          setError(t('accountNotFound'));
+          setLoading(false);
+          return;
+        }
+
+        // For client login, check if password matches the first 6 digits of their account number
+        const expectedPassword = accountNumber.substring(0, 6);
         
-      if (fetchError) {
-        throw fetchError;
-      }
+        if (password !== expectedPassword) {
+          setError(t('invalidPassword'));
+          setLoading(false);
+          return;
+        }
+        
+        // Store the client ID in localStorage
+        localStorage.setItem("userRole", "client");
+        localStorage.setItem("clientId", accountNumber);
+        
+        toast({
+          title: t('loginSuccess'),
+          description: t('welcomeBack'),
+          variant: "default",
+        });
 
-      if (!clientExists || clientExists.length === 0) {
-        setError(t('accountNotFound'));
-        setLoading(false);
-        return;
+        // Redirect to home page
+        navigate("/");
       }
-
-      // For client login, check if password matches the first 5 digits of their account number
-      const expectedPassword = accountNumber.substring(0, 5);
-      
-      if (password !== expectedPassword) {
-        setError(t('invalidPassword'));
-        setLoading(false);
-        return;
-      }
-      
-      // Store the client ID in localStorage
-      localStorage.setItem("userRole", "client");
-      localStorage.setItem("clientId", accountNumber);
-      
-      toast({
-        title: t('loginSuccess'),
-        description: t('welcomeBack'),
-        variant: "default",
-      });
-
-      // Redirect to home page
-      navigate("/");
-      
     } catch (error: any) {
       console.error("Authentication error:", error);
       setError(error.message || t('loginError'));
       setLoading(false);
     }
+  };
+
+  const toggleAdvisorLogin = () => {
+    setShowAdvisorLogin(!showAdvisorLogin);
+    setAccountNumber("");
+    setPassword("");
+    setError(null);
   };
 
   return (
@@ -114,8 +123,20 @@ const Auth = () => {
             {t('back')}
           </Button>
           
-          <h1 className="text-2xl font-bold text-white mb-1">{t('accessAccount')}</h1>
-          <p className="text-gray-400">{t('enterWithXP')}</p>
+          <div className="flex justify-between items-center">
+            <h1 className="text-2xl font-bold text-white mb-1">
+              {showAdvisorLogin ? "Acesso Assessor" : t('accessAccount')}
+            </h1>
+            
+            <img 
+              src="https://media.licdn.com/dms/image/C4D0BAQEgQpIxQEJvEA/company-logo_200_200/0/1674674650337?e=1716422400&v=beta&t=Gpl4UQRl_o7ArkhZeKM347sOWfO2xdrG5qHZW5kAUyI"
+              alt="Reinvent Logo"
+              className="h-8 w-auto"
+            />
+          </div>
+          <p className="text-gray-400">
+            {showAdvisorLogin ? "Entre com suas credenciais de assessor" : t('enterWithXP')}
+          </p>
         </div>
         
         {error && (
@@ -127,7 +148,7 @@ const Auth = () => {
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label htmlFor="accountNumber" className="block text-sm font-medium text-gray-300 mb-1">
-              {t('accountNumber')}
+              {showAdvisorLogin ? "Login" : t('accountNumber')}
             </label>
             <Input
               id="accountNumber"
@@ -135,7 +156,7 @@ const Auth = () => {
               value={accountNumber}
               onChange={(e) => setAccountNumber(e.target.value)}
               className="bg-gray-900/50 border-gray-700 text-white placeholder-gray-500 w-full"
-              placeholder={t('enterAccountNumber')}
+              placeholder={showAdvisorLogin ? "Digite seu login" : t('enterAccountNumber')}
               required
             />
           </div>
@@ -153,6 +174,9 @@ const Auth = () => {
               placeholder={t('enterPassword')}
               required
             />
+            {!showAdvisorLogin && (
+              <p className="text-xs text-gray-500 mt-1">Use os primeiros 6 dígitos da sua conta como senha</p>
+            )}
           </div>
           
           <Button 
@@ -168,6 +192,18 @@ const Auth = () => {
             )}
           </Button>
         </form>
+        
+        <div className="mt-6 text-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleAdvisorLogin}
+            className="text-gray-400 hover:text-white text-sm"
+          >
+            <User className="h-4 w-4 mr-1" />
+            {showAdvisorLogin ? "Sou cliente" : "Sou um advisor"}
+          </Button>
+        </div>
       </Card>
     </div>
   );

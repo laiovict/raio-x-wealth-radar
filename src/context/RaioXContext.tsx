@@ -18,6 +18,8 @@ export interface AIInsight {
   isNew?: boolean;
   priority?: 'high' | 'medium' | 'low';
   timestamp: Date;
+  agent?: 'planner' | 'investor' | 'farmer' | 'insurancer' | 'credit';
+  isSynthetic?: boolean;
 }
 
 export interface FinancialSummary {
@@ -202,6 +204,7 @@ export interface RaioXData {
   socialComparison: SocialComparisonData;
   allocation: AllocationData;
   wrapped: WrappedData;
+  financialInsightData?: FinancialInsightData;
   summary?: string;
 }
 
@@ -346,7 +349,9 @@ const sampleAIInsights: AIInsight[] = [
     description: "Sua carteira tem baixa exposição a mercados internacionais, o que representa uma oportunidade de diversificação.",
     category: "allocation",
     priority: "medium",
-    timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // 7 days ago
+    timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+    agent: "investor",
+    isSynthetic: false
   },
   {
     id: "2",
@@ -355,7 +360,9 @@ const sampleAIInsights: AIInsight[] = [
     category: "risk",
     priority: "high",
     isNew: true,
-    timestamp: new Date()
+    timestamp: new Date(),
+    agent: "planner",
+    isSynthetic: false
   },
   {
     id: "3",
@@ -363,7 +370,9 @@ const sampleAIInsights: AIInsight[] = [
     description: "Sua taxa de poupança de 43% está acima da média para sua faixa etária e renda.",
     category: "savings",
     priority: "low",
-    timestamp: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000) // 14 days ago
+    timestamp: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 14 days ago
+    agent: "planner",
+    isSynthetic: true
   },
   {
     id: "4",
@@ -371,14 +380,47 @@ const sampleAIInsights: AIInsight[] = [
     description: "Com a atual curva de juros, há oportunidade para aumentar sua alocação em títulos públicos de longo prazo.",
     category: "opportunity",
     priority: "medium",
-    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 days ago
+    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+    agent: "investor",
+    isSynthetic: false
+  },
+  {
+    id: "5",
+    title: "Despesas recorrentes elevadas",
+    description: "Identificamos que suas despesas recorrentes representam 68% da sua renda mensal, acima do recomendado de 50%.",
+    category: "budget",
+    priority: "high",
+    timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+    agent: "planner",
+    isSynthetic: true
+  },
+  {
+    id: "6",
+    title: "Oportunidade de otimização tributária",
+    description: "Com base no seu perfil de investimentos, você poderia economizar até R$ 4.800 por ano em impostos com ajustes na sua carteira.",
+    category: "tax",
+    priority: "medium",
+    timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+    agent: "credit",
+    isSynthetic: false
   }
 ];
 
 // Update the default context with the new properties
 const defaultContext: RaioXContextProps = {
   data: {
-    ...clientData,
+    clientName: "Cliente Padrão",
+    clientAge: 35,
+    financialSummary: clientData.financialSummary,
+    financialInsights: clientData.financialInsights,
+    recommendedActions: clientData.recommendedActions,
+    assetAllocation: {
+      equities: 30,
+      fixedIncome: 40,
+      alternatives: 10,
+      cash: 15,
+      realEstate: 5
+    },
     lifeGoals: {
       goals: [
         {
@@ -443,6 +485,8 @@ const defaultContext: RaioXContextProps = {
     socialComparison: mockSocialComparison,
     allocation: mockAllocationData,
     wrapped: mockWrappedData,
+    financialInsightData: mockFinancialInsightData,
+    openFinanceMonths: 0,
     hasOpenFinance: false,
     summary: "Seu portfólio está bem diversificado, mas poderia se beneficiar de maior exposição internacional. Sua saúde financeira está em ótimo estado, com fluxo de caixa positivo e bons índices de poupança."
   },
@@ -503,25 +547,33 @@ export const RaioXProvider = ({
             id: "1",
             title: "Alto potencial para diversificação internacional",
             description: "Sua carteira tem baixa exposição a mercados internacionais, o que representa uma oportunidade de diversificação.",
-            category: "allocation"
+            category: "allocation",
+            timestamp: new Date(),
+            agent: "investor"
           },
           {
             id: "2",
             title: "Concentração em tecnologia",
             description: "Seus investimentos em ações estão concentrados no setor de tecnologia, o que aumenta a volatilidade da carteira.",
-            category: "risk"
+            category: "risk",
+            timestamp: new Date(),
+            agent: "planner"
           },
           {
             id: "3",
             title: "Fluxo de caixa positivo",
             description: "Sua taxa de poupança de 43% está acima da média para sua faixa etária e renda.",
-            category: "savings"
+            category: "savings",
+            timestamp: new Date(),
+            agent: "planner"
           },
           {
             id: "4",
             title: "Oportunidade em renda fixa",
             description: "Com a atual curva de juros, há oportunidade para aumentar sua alocação em títulos públicos de longo prazo.",
-            category: "opportunity"
+            category: "opportunity",
+            timestamp: new Date(),
+            agent: "investor"
           }
         ],
         recommendedActions: [
@@ -694,6 +746,7 @@ export const RaioXProvider = ({
           },
           summary: "Em 2023 você demonstrou excelente disciplina nos aportes, com contribuições substanciais e regulares. Sua estratégia de compra em momentos de queda do mercado resultou em bons pontos de entrada."
         },
+        financialInsightData: mockFinancialInsightData,
         summary: "Seu portfólio tem excelente desempenho, mas há oportunidades para otimização. Considerando seu perfil moderado-agressivo, uma maior diversificação global e setorial pode melhorar o equilíbrio entre risco e retorno."
       };
     }
@@ -726,7 +779,12 @@ export const RaioXProvider = ({
           { name: "Concentração", value: 30 + (seed % 50), color: "#2196F3" },
         ]
       },
-      financialInsights: clientData.financialInsights,
+      financialInsights: clientData.financialInsights.map(insight => ({
+        ...insight,
+        timestamp: new Date(),
+        agent: ["planner", "investor", "farmer", "insurancer", "credit"][Math.floor(Math.random() * 5)] as "planner" | "investor" | "farmer" | "insurancer" | "credit",
+        isSynthetic: Math.random() > 0.5
+      })),
       recommendedActions: clientData.recommendedActions,
       assetAllocation: {
         equities: 20 + (riskProfileIndex * 10) + (seed % 10),
@@ -871,6 +929,7 @@ export const RaioXProvider = ({
         },
         summary: "Seu portfólio demonstrou resistência à volatilidade do mercado em 2023. Seus aportes regulares contribuíram para um bom desempenho médio."
       },
+      financialInsightData: mockFinancialInsightData,
       summary: "Seu portfólio está alinhado com seu perfil de risco, mas há oportunidades para otimização e diversificação que podem melhorar seus resultados a longo prazo."
     };
   };
@@ -892,6 +951,10 @@ export const RaioXProvider = ({
             console.log("Using synthetic data for client:", selectedClient);
             const customData = generateClientData(selectedClient);
             setData(customData);
+            
+            // Generate AI insights for this client
+            const clientInsights = generateClientInsights(selectedClient);
+            setAIInsights(clientInsights);
           } else {
             // Process and use the real data
             console.log("Using real data for client:", selectedClient);
@@ -925,7 +988,12 @@ export const RaioXProvider = ({
                 ],
                 creditScore: 650 + (selectedClient % 200)
               },
-              financialInsights: clientData.financialInsights,
+              financialInsights: clientData.financialInsights.map(insight => ({
+                ...insight,
+                timestamp: new Date(),
+                agent: ["planner", "investor", "farmer", "insurancer", "credit"][Math.floor(Math.random() * 5)] as "planner" | "investor" | "farmer" | "insurancer" | "credit",
+                isSynthetic: Math.random() > 0.5
+              })),
               recommendedActions: clientData.recommendedActions,
               assetAllocation: {
                 equities: clientPortfolioData.stocks_representation ? parseFloat(clientPortfolioData.stocks_representation) : 25,
@@ -1000,23 +1068,192 @@ export const RaioXProvider = ({
               socialComparison: mockSocialComparison,
               allocation: mockAllocationData,
               wrapped: mockWrappedData,
+              financialInsightData: mockFinancialInsightData,
               summary: "Seu portfólio está bem estruturado, mas há oportunidades para otimização e diversificação."
             };
             
             setData(realClientData);
+            
+            // Generate AI insights for this client based on real data
+            const clientInsights = generateClientInsights(selectedClient);
+            setAIInsights(clientInsights);
           }
         } else {
           // If no client selected, use default data
           setData({...defaultContext.data});
+          setAIInsights(sampleAIInsights);
         }
       } catch (error) {
         console.error("Error fetching client data:", error);
         setData({...defaultContext.data}); // Use default data on error
+        setAIInsights(sampleAIInsights);
       }
     };
     
     fetchClientData();
   }, [selectedClient, hasOpenFinance]);
+
+  // Generate insights based on client data
+  const generateClientInsights = (clientId: number): AIInsight[] => {
+    const seed = clientId % 1000;
+    const insights: AIInsight[] = [];
+    
+    // Base insights always present
+    const baseInsights: AIInsight[] = [
+      {
+        id: "i1",
+        title: "Potencial diversificação internacional",
+        description: "Sua carteira tem baixa exposição a mercados internacionais, o que representa uma oportunidade para diversificar e reduzir riscos.",
+        category: "allocation",
+        priority: "medium",
+        timestamp: new Date(Date.now() - (7 + seed % 10) * 24 * 60 * 60 * 1000),
+        agent: "investor",
+        isSynthetic: false
+      },
+      {
+        id: "i2",
+        title: "Otimização de reserva de emergência",
+        description: "Sua reserva de emergência atual está abaixo do ideal. Recomendamos aumentar para cobrir 6 meses de despesas.",
+        category: "risk",
+        priority: "high",
+        timestamp: new Date(Date.now() - (2 + seed % 5) * 24 * 60 * 60 * 1000),
+        agent: "planner",
+        isSynthetic: false
+      },
+    ];
+    
+    insights.push(...baseInsights);
+    
+    // Add conditional insights based on client ID
+    if (seed % 2 === 0) {
+      insights.push({
+        id: "ic1",
+        title: "Alto potencial para redução de despesas",
+        description: "Identificamos que 23% de suas despesas poderiam ser reduzidas através da renegociação de serviços recorrentes.",
+        category: "budget",
+        priority: "high",
+        isNew: true,
+        timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        agent: "planner",
+        isSynthetic: true
+      });
+    }
+    
+    if (seed % 3 === 0) {
+      insights.push({
+        id: "ic2",
+        title: "Oportunidade para otimização tributária",
+        description: "Com base no seu perfil, você poderia economizar até R$ 5.400 em impostos anualmente ajustando sua estratégia de investimentos.",
+        category: "tax",
+        priority: "medium",
+        timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
+        agent: "credit",
+        isSynthetic: false
+      });
+    }
+    
+    if (seed % 5 === 0) {
+      insights.push({
+        id: "ic3",
+        title: "Potencial ganho com realocação",
+        description: "Realocando 15% de sua carteira de renda fixa para fundos multimercado selecionados, poderia aumentar seu retorno anual esperado em 1.2%.",
+        category: "opportunity",
+        priority: "medium",
+        timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        agent: "investor",
+        isSynthetic: false
+      });
+    }
+    
+    // Add more variety based on seed
+    const additionalCategories = ["goal", "education", "opportunity", "risk", "tax"];
+    const additionalAgents = ["planner", "investor", "farmer", "insurancer", "credit"];
+    
+    for (let i = 0; i < 3 + (seed % 5); i++) {
+      const randomCat = additionalCategories[Math.floor(Math.random() * additionalCategories.length)];
+      const randomAgent = additionalAgents[Math.floor(Math.random() * additionalAgents.length)] as "planner" | "investor" | "farmer" | "insurancer" | "credit";
+      
+      insights.push({
+        id: `ia${i}`,
+        title: getRandomInsightTitle(randomCat, seed + i),
+        description: getRandomInsightDescription(randomCat, seed + i),
+        category: randomCat,
+        priority: ["high", "medium", "low"][Math.floor(Math.random() * 3)] as "high" | "medium" | "low",
+        timestamp: new Date(Date.now() - (i + 1 + seed % 10) * 24 * 60 * 60 * 1000),
+        agent: randomAgent,
+        isSynthetic: Math.random() > 0.6
+      });
+    }
+    
+    return insights;
+  };
+  
+  // Helper functions to generate insight content
+  const getRandomInsightTitle = (category: string, seed: number): string => {
+    const titles: Record<string, string[]> = {
+      goal: [
+        "Meta de aposentadoria necessita ajustes",
+        "Progresso em metas financeiras desalinhado",
+        "Oportunidade para revisar objetivos de longo prazo"
+      ],
+      education: [
+        "Invista em conhecimento sobre renda variável",
+        "Conheça mais sobre estratégias de hedge",
+        "Entenda o impacto da inflação em seus investimentos"
+      ],
+      opportunity: [
+        "Momento favorável para investir em renda variável",
+        "Oportunidade em FIIs com bons dividendos",
+        "Potencial em empresas de tecnologia sustentável"
+      ],
+      risk: [
+        "Concentração excessiva em setor bancário",
+        "Exposição elevada a um único emissor",
+        "Baixa proteção contra inflação"
+      ],
+      tax: [
+        "Planejamento sucessório pode reduzir impostos",
+        "Otimize declaração de IR com estratégias legais",
+        "Reduza carga tributária em resgates"
+      ]
+    };
+    
+    const options = titles[category] || ["Insight personalizado"];
+    return options[seed % options.length];
+  };
+  
+  const getRandomInsightDescription = (category: string, seed: number): string => {
+    const descriptions: Record<string, string[]> = {
+      goal: [
+        "Com base na sua expectativa de aposentadoria, será necessário aumentar os aportes mensais em cerca de 15% para atingir o objetivo no prazo desejado.",
+        "Suas metas de curto prazo estão consumindo recursos que poderiam ser direcionados para objetivos de longo prazo mais importantes.",
+        "Considerando sua idade atual e objetivos, recomendamos revisitar seu plano de aposentadoria para garantir alinhamento com suas expectativas."
+      ],
+      education: [
+        "Investidores que entendem os fundamentos da renda variável conseguem lidar melhor com volatilidade e tendem a obter melhores retornos a longo prazo.",
+        "Estratégias de hedge podem proteger seu patrimônio em momentos de crise. Conheça as opções disponíveis para seu perfil.",
+        "O impacto da inflação em seu poder de compra futuro é significativo. Aprenda como proteger seu patrimônio contra este risco silencioso."
+      ],
+      opportunity: [
+        "A recente correção no mercado criou pontos de entrada atrativos em empresas de qualidade com fundamentos sólidos.",
+        "Identificamos FIIs com dividend yield acima de 8% a.a. e boa qualidade de ativos que complementariam bem sua carteira atual.",
+        "O setor de tecnologia sustentável apresenta perspectivas promissoras para os próximos anos, com potencial de valorização acima da média."
+      ],
+      risk: [
+        "Sua carteira possui mais de 30% de exposição ao setor bancário, o que aumenta o risco setorial. Recomendamos maior diversificação.",
+        "Você possui concentração superior a 15% em um único emissor, aumentando seu risco específico. Considere diversificar.",
+        "Apenas 20% de seus investimentos possuem proteção efetiva contra inflação, o que pode comprometer seu poder de compra futuro."
+      ],
+      tax: [
+        "Um planejamento sucessório adequado pode reduzir significativamente a carga tributária sobre a transferência de seu patrimônio para herdeiros.",
+        "Estratégias legais de otimização fiscal podem reduzir em até 15% sua carga tributária anual em investimentos.",
+        "Planejando adequadamente seus resgates, é possível reduzir o impacto tributário e aumentar o rendimento líquido."
+      ]
+    };
+    
+    const options = descriptions[category] || ["Este insight foi personalizado com base em seu perfil financeiro e objetivos."];
+    return options[seed % options.length];
+  };
 
   return (
     <RaioXContext.Provider value={{ 

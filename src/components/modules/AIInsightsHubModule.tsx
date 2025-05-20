@@ -3,7 +3,7 @@ import { useRaioX, AIInsight } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, RefreshCw, Search, Filter, ChevronRight } from "lucide-react";
+import { AlertTriangle, RefreshCw, Search, Filter, ChevronRight, Brain, TrendingUp, TrendingDown, Shield, Calculator, Leaf } from "lucide-react";
 import { useState } from "react";
 
 interface AIInsightsHubModuleProps {
@@ -13,6 +13,7 @@ interface AIInsightsHubModuleProps {
 const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) => {
   const { hasOpenFinance, aiInsights, isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [agentFilter, setAgentFilter] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   // Function to handle OpenFinance activation button click
@@ -41,6 +42,10 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
         return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
       case 'budget':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+      case 'allocation':
+        return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300';
+      case 'savings':
+        return 'bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-300';
       default:
         return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
     }
@@ -59,6 +64,40 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
     }
   };
 
+  const getAgentColor = (agent: string) => {
+    switch (agent) {
+      case 'planner':
+        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
+      case 'investor':
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+      case 'farmer':
+        return 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300';
+      case 'insurancer':
+        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
+      case 'credit':
+        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300';
+      default:
+        return 'bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300';
+    }
+  };
+
+  const getAgentIcon = (agent?: string) => {
+    switch (agent) {
+      case 'planner':
+        return <Brain className="h-4 w-4" />;
+      case 'investor':
+        return <TrendingUp className="h-4 w-4" />;
+      case 'farmer':
+        return <Leaf className="h-4 w-4" />;
+      case 'insurancer':
+        return <Shield className="h-4 w-4" />;
+      case 'credit':
+        return <Calculator className="h-4 w-4" />;
+      default:
+        return <Brain className="h-4 w-4" />;
+    }
+  };
+
   const getCategoryLabel = (category: string) => {
     switch (category) {
       case 'risk': return 'Risco';
@@ -67,27 +106,41 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
       case 'education': return 'Educacional';
       case 'tax': return 'Impostos';
       case 'budget': return 'Orçamento';
+      case 'allocation': return 'Alocação';
+      case 'savings': return 'Poupança';
       default: return category;
     }
   };
 
-  const getPriorityLabel = (priority: string) => {
+  const getAgentLabel = (agent?: string) => {
+    switch (agent) {
+      case 'planner': return 'Planejador';
+      case 'investor': return 'Investidor';
+      case 'farmer': return 'Agricultor';
+      case 'insurancer': return 'Segurador';
+      case 'credit': return 'Crédito';
+      default: return 'Assistente';
+    }
+  };
+
+  const getPriorityLabel = (priority?: string) => {
     switch (priority) {
       case 'high': return 'Alta';
       case 'medium': return 'Média';
       case 'low': return 'Baixa';
-      default: return priority;
+      default: return 'Normal';
     }
   };
 
-  // Filter insights based on category and search
-  const filteredInsights = aiInsights.filter(insight => {
+  // Filter insights based on category, agent and search
+  const filteredInsights = aiInsights ? aiInsights.filter(insight => {
     const matchesCategory = !categoryFilter || insight.category === categoryFilter;
+    const matchesAgent = !agentFilter || insight.agent === agentFilter;
     const matchesSearch = !searchQuery || 
       insight.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       insight.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+    return matchesCategory && matchesAgent && matchesSearch;
+  }) : [];
 
   const formatDate = (date: Date) => {
     const now = new Date();
@@ -111,66 +164,25 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
     { id: 'tax', label: 'Impostos' },
     { id: 'budget', label: 'Orçamento' },
     { id: 'education', label: 'Educacional' },
+    { id: 'allocation', label: 'Alocação' },
+    { id: 'savings', label: 'Poupança' }
   ];
 
-  if (!hasOpenFinance) {
-    return (
-      <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-            Central de Insights
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <AlertTriangle className="w-16 h-16 text-amber-400 mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Insights IA Indisponíveis</h3>
-            <p className="text-gray-400 max-w-md mb-4">
-              Para acessar insights personalizados da IA, é necessário ativar o OpenFinance para permitir a análise de seus dados financeiros.
-            </p>
-            <Button 
-              variant="outline" 
-              className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800"
-              onClick={handleActivateOpenFinance}
-            >
-              Ativar OpenFinance
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (isAIAnalysisLoading) {
-    return (
-      <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-            Central de Insights
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-8">
-            <RefreshCw className="w-12 h-12 text-blue-500 animate-spin mb-4" />
-            <p className="text-gray-400">Gerando novos insights IA...</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  // Agents for filter
+  const agents = [
+    { id: 'planner', label: 'Planejador' },
+    { id: 'investor', label: 'Investidor' },
+    { id: 'farmer', label: 'Agricultor' },
+    { id: 'insurancer', label: 'Segurador' },
+    { id: 'credit', label: 'Crédito' }
+  ];
 
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
       <CardHeader className="pb-2">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-            Central de Insights IA
-          </CardTitle>
-          <Button variant="ghost" size="sm" onClick={refreshAIAnalysis} className="flex items-center gap-2">
-            <RefreshCw className="h-4 w-4" />
-            <span className="hidden md:inline">Atualizar</span>
-          </Button>
-        </div>
+        <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+          Central de Insights IA
+        </CardTitle>
       </CardHeader>
       <CardContent>
         {/* Search and Filter */}
@@ -184,6 +196,25 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
               placeholder="Pesquisar insights..." 
               className="pl-10 pr-4 py-2 w-full bg-white/5 border border-white/10 rounded-md text-white placeholder-gray-400"
             />
+          </div>
+          <div className="flex items-center">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={refreshAIAnalysis} 
+              className="flex items-center gap-2 text-gray-300 hover:text-white"
+              disabled={isAIAnalysisLoading}
+            >
+              <RefreshCw className={`h-4 w-4 ${isAIAnalysisLoading ? 'animate-spin' : ''}`} />
+              <span className="hidden md:inline">{isAIAnalysisLoading ? 'Atualizando...' : 'Atualizar'}</span>
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3 mb-4">
+          <div className="flex items-center gap-2 text-sm text-gray-400">
+            <Filter className="h-4 w-4" />
+            <span>Categorias:</span>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 sm:flex-wrap">
             <Badge 
@@ -202,11 +233,53 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
               </Badge>
             ))}
           </div>
+
+          <div className="flex items-center gap-2 text-sm text-gray-400 mt-2">
+            <Brain className="h-4 w-4" />
+            <span>Agentes:</span>
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 sm:flex-wrap">
+            <Badge 
+              className={`cursor-pointer ${!agentFilter ? 'bg-blue-600' : 'bg-white/10'} hover:bg-blue-700`}
+              onClick={() => setAgentFilter(null)}
+            >
+              Todos
+            </Badge>
+            {agents.map(agent => (
+              <Badge 
+                key={agent.id}
+                className={`cursor-pointer ${agentFilter === agent.id ? 'bg-blue-600' : 'bg-white/10'} hover:bg-blue-700`}
+                onClick={() => setAgentFilter(agentFilter === agent.id ? null : agent.id)}
+              >
+                {agent.label}
+              </Badge>
+            ))}
+          </div>
         </div>
 
         {/* Insights List */}
         <div className="space-y-4">
-          {filteredInsights.length === 0 ? (
+          {!hasOpenFinance ? (
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <AlertTriangle className="w-16 h-16 text-amber-400 mb-4" />
+              <h3 className="text-lg font-semibold mb-2">Insights IA Disponíveis</h3>
+              <p className="text-gray-400 max-w-md mb-4">
+                Estamos mostrando insights básicos baseados em seus dados da XP. Para insights mais detalhados e personalizados, ative o OpenFinance.
+              </p>
+              <Button 
+                variant="outline" 
+                className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800"
+                onClick={handleActivateOpenFinance}
+              >
+                Ativar OpenFinance
+              </Button>
+            </div>
+          ) : isAIAnalysisLoading ? (
+            <div className="flex flex-col items-center justify-center py-8">
+              <RefreshCw className="w-12 h-12 text-blue-500 animate-spin mb-4" />
+              <p className="text-gray-400">Gerando novos insights IA...</p>
+            </div>
+          ) : filteredInsights.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-400">Nenhum insight encontrado com os filtros atuais.</p>
             </div>
@@ -218,14 +291,25 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
               >
                 <div className="flex items-start justify-between">
                   <div>
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-2">
                       {insight.isNew && <Badge className="bg-blue-600">Novo</Badge>}
                       <Badge className={getCategoryColor(insight.category)}>
                         {getCategoryLabel(insight.category)}
                       </Badge>
-                      <Badge className={getPriorityColor(insight.priority)}>
-                        Prioridade: {getPriorityLabel(insight.priority)}
-                      </Badge>
+                      {insight.priority && (
+                        <Badge className={getPriorityColor(insight.priority)}>
+                          Prioridade: {getPriorityLabel(insight.priority)}
+                        </Badge>
+                      )}
+                      {insight.agent && (
+                        <Badge className={getAgentColor(insight.agent)}>
+                          <div className="flex items-center gap-1">
+                            {getAgentIcon(insight.agent)}
+                            <span>{getAgentLabel(insight.agent)}</span>
+                          </div>
+                        </Badge>
+                      )}
+                      {insight.isSynthetic && <Badge variant="outline" className="text-gray-400 border-gray-500">Beta</Badge>}
                     </div>
                     <h3 className="text-white font-medium">{insight.title}</h3>
                   </div>
