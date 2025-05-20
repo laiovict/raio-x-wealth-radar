@@ -6,10 +6,11 @@ import { ArrowUp, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
-import { formatCurrency, ensureString } from '@/utils/typeConversionHelpers';
+import { formatCurrency } from '@/utils/raioXUtils';
+import { toNumber } from '@/utils/typeConversionHelpers';
 import DataSourceTag from '@/components/common/DataSourceTag';
 import { DataSourceType } from '@/types/raioXTypes';
-import { toCompatibleDataSource } from '@/utils/dataSourceAdapter';
+import { toLimitedDataSource } from '@/utils/dataSourceAdapter';
 
 interface LifeGoalsModuleProps {
   fullWidth?: boolean;
@@ -18,7 +19,7 @@ interface LifeGoalsModuleProps {
 // Data source indicator component
 const DataSourceIndicator = ({ source }: { source?: DataSourceType | string }) => {
   if (!source) return null;
-  return <DataSourceTag source={toCompatibleDataSource(source as DataSourceType)} />;
+  return <DataSourceTag source={toLimitedDataSource(source as DataSourceType)} />;
 };
 
 const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
@@ -150,17 +151,17 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
               />
               <div className="flex justify-between items-center text-xs text-gray-400">
                 <span>
-                  {`Atual: ${formatCurrency(goal.currentAmount)}`}
+                  {`Atual: ${formatCurrency(goal.currentAmount.toString())}`}
                 </span>
                 <span>
-                  {`Meta: ${formatCurrency(goal.targetAmount)}`}
+                  {`Meta: ${formatCurrency(goal.targetAmount.toString())}`}
                 </span>
               </div>
               {goal.adjustmentNeeded > 0 && (
                 <div className="mt-2 text-xs text-amber-400 flex items-center">
                   <ArrowUp className="h-3.5 w-3.5 mr-1" />
                   <span>
-                    {`Sugestão: Aumentar aportes em ${formatCurrency(goal.targetAmount * goal.adjustmentNeeded / 100 / 12)} mensais`}
+                    {`Sugestão: Aumentar aportes em ${formatCurrency((goal.targetAmount * goal.adjustmentNeeded / 100 / 12).toString())} mensais`}
                   </span>
                 </div>
               )}
