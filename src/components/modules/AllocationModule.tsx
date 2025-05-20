@@ -1,9 +1,9 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend } from "recharts";
 import { useMobileBreakpoint } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
+import { toNumber, fixAllocationDefaults } from "@/utils/typeConversionHelpers";
 
 interface AllocationModuleProps {
   fullWidth?: boolean;
@@ -47,18 +47,16 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
     if (data.portfolioSummary) {
       try {
         const summary = data.portfolioSummary;
-        const total = parseFloat(summary.total_portfolio_value || "0");
+        const total = toNumber(summary.total_portfolio_value, 0);
         
         if (total > 0) {
           // Create allocation data based on real portfolio values
           const currentAllocation = {
             "Renda Fixa": summary.fixed_income_representation || 0,
-            "Ações BR": summary.stocks_representation ? parseFloat(summary.stocks_representation) : 0,
+            "Ações BR": toNumber(summary.stocks_representation, 0),
             "Fundos": summary.investment_fund_representation || 0,
             "FIIs": summary.real_estate_representation || 0,
-            "Internacional": summary.investment_international_representation 
-              ? parseFloat(summary.investment_international_representation) 
-              : 0,
+            "Internacional": toNumber(summary.investment_international_representation, 0),
             "Caixa": 5.0, // Estimate or could be calculated from another source
             "Previdência": summary.private_pension_representation || 0,
             "Alternativos": 0.0 // Now this is a separate category

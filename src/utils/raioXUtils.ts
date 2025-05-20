@@ -1,5 +1,6 @@
 
 import { DividendHistory, FinancialSummary } from '@/types/raioXTypes';
+import { toNumber } from '@/utils/formattingUtils';
 
 /**
  * Format currency values consistently
@@ -131,9 +132,9 @@ export const generateFinancialSummary = (
   const realEstatePercentage = portfolioSummary?.real_estate_representation || 0;
   const alternativesPercentage = (
     (portfolioSummary?.investment_fund_representation || 0) + 
-    parseValueToNumber(portfolioSummary?.investment_international_representation || '0')
+    toNumber(portfolioSummary?.investment_international_representation || '0')
   );
-  const cashPercentage = parseValueToNumber(portfolioSummary?.total_balance_representation || '0');
+  const cashPercentage = toNumber(portfolioSummary?.total_balance_representation || '0');
   
   // Determine risk profile based on asset allocation
   let riskProfile = 'Moderado';
@@ -146,7 +147,7 @@ export const generateFinancialSummary = (
   // Create risk metrics
   const riskMetrics = [
     { name: 'Concentração em Renda Variável', value: stocksPercentage, color: '#34d399' },
-    { name: 'Diversificação Internacional', value: parseValueToNumber(portfolioSummary?.investment_international_representation || '0'), color: '#60a5fa' },
+    { name: 'Diversificação Internacional', value: toNumber(portfolioSummary?.investment_international_representation || '0'), color: '#60a5fa' },
     { name: 'Exposição a Alternativos', value: portfolioSummary?.investment_fund_representation || 0, color: '#a78bfa' },
   ];
   
@@ -155,10 +156,24 @@ export const generateFinancialSummary = (
     monthlyIncome,
     monthlyExpenses,
     savingsRate,
+    netWorth: totalAssets * 0.8, // Net worth = assets - debts (approximation)
     investmentBalance: totalAssets * 0.9, // Approximate investment balance
     cashReserves: totalAssets * 0.1, // Approximate cash reserves
     debtTotal: totalAssets * 0.2, // Approximate debt (placeholder)
-    netWorth: totalAssets * 0.8, // Net worth = assets - debts (approximation)
+    totalLiabilities: totalAssets * 0.2, // Same as debt total
+    liquidAssets: totalAssets * 0.3, // Approximate liquid assets
+    fixedIncomePercent: bondsPercentage,
+    variableIncomePercent: stocksPercentage,
+    realEstatePercent: realEstatePercentage,
+    otherPercent: alternativesPercentage,
+    monthlyDividends: monthlyDividendAvg,
+    annualDividends: monthlyDividendAvg * 12,
+    dividendYield: totalAssets > 0 ? (monthlyDividendAvg * 12 / totalAssets) * 100 : 0,
+    profitability: {
+      ytd: 0,
+      sixMonths: 0,
+      twelveMonths: 0
+    },
     riskProfile,
     allocationSummary: {
       stocks: stocksPercentage,
@@ -169,8 +184,6 @@ export const generateFinancialSummary = (
     },
     riskMetrics,
     creditScore: 750, // Placeholder credit score
-    totalLiabilities: totalAssets * 0.2, // Same as debt total
-    liquidAssets: totalAssets * 0.3, // Approximate liquid assets
     dataSource: portfolioSummary?.dataSource || 'synthetic',
   };
 };

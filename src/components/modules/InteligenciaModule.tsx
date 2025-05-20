@@ -2,254 +2,182 @@
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
-  ArrowRight, 
-  AlertTriangle, 
-  CheckCircle, 
-  Clock, 
-  TrendingUp, 
-  Brain, 
-  Lightbulb,
-  BarChart,
-  Shield,
-  BadgePercent,
-  CheckCircle2,
-  Circle,
-  Sparkles
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { 
   Tabs, 
   TabsContent, 
   TabsList, 
   TabsTrigger 
 } from "@/components/ui/tabs";
-import { useLanguage } from "@/context/LanguageContext";
-import { useState, useEffect } from "react";
+import { 
+  LineChart, 
+  BarChart3, 
+  PieChart, 
+  Lightbulb, 
+  ArrowRight, 
+  ArrowUp, 
+  ArrowDown,
+  TrendingUp,
+  BadgeCheck
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { useEffect, useState } from "react";
+import { formatCurrency } from "@/utils/formattingUtils";
 
 interface InteligenciaModuleProps {
   fullWidth?: boolean;
 }
 
 const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
-  const { data, selectedClient } = useRaioX();
-  const { t } = useLanguage();
-  const [completedActions, setCompletedActions] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState("actions");
-  const [isLoaded, setIsLoaded] = useState(false);
+  const { data, isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
+  const [activeTab, setActiveTab] = useState<string>("insights");
   
-  // Add a loading state to simulate streaming content
+  // Simulate loading time for enhanced UX
+  const [loadingStates, setLoadingStates] = useState({
+    insights: false,
+    actions: false,
+    recommendations: false
+  });
+  
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 300);
-    return () => clearTimeout(timer);
-  }, []);
+    if (activeTab) {
+      setLoadingStates(prev => ({ ...prev, [activeTab]: true }));
+      
+      const timer = setTimeout(() => {
+        setLoadingStates(prev => ({ ...prev, [activeTab]: false }));
+      }, 600);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [activeTab]);
   
-  const toggleActionCompletion = (actionId: string) => {
-    if (completedActions.includes(actionId)) {
-      setCompletedActions(completedActions.filter((id) => id !== actionId));
-    } else {
-      setCompletedActions([...completedActions, actionId]);
-    }
-  };
-
-  // Function to handle recommendation execution
-  const handleExecute = (recommendation: any) => {
-    // Create a message to send to the chat
-    const messageText = `Nicolas, preciso executar a recomendação: ${recommendation.action}. ${recommendation.description}`;
-    
-    // Create custom event to pre-load message in the chat
-    const event = new CustomEvent('load-chat-message', { 
-      detail: { message: messageText }
-    });
-    document.dispatchEvent(event);
-    
-    // Navigate to chat tab
-    const tabsEvent = new CustomEvent('navigate-to-tab', {
-      detail: { tabId: 'chat' }
-    });
-    document.dispatchEvent(tabsEvent);
-  };
-
-  // Function to handle action button click (for recommended actions tab)
-  const handleActionClick = (action: any) => {
-    // Create a message to send to the chat
-    const messageText = `Nicolas, preciso implementar a ação: ${action.title}. ${action.description}`;
-    
-    // Create custom event to pre-load message in the chat
-    const event = new CustomEvent('load-chat-message', { 
-      detail: { message: messageText }
-    });
-    document.dispatchEvent(event);
-    
-    // Navigate to chat tab
-    const tabsEvent = new CustomEvent('navigate-to-tab', {
-      detail: { tabId: 'chat' }
-    });
-    document.dispatchEvent(tabsEvent);
-  };
-
-  // Function to handle insight click
-  const handleInsightClick = (insight: any) => {
-    // Create a message to send to the chat
-    const messageText = `Nicolas, preciso saber mais sobre o insight: ${insight.title}. ${insight.description}`;
-    
-    // Create custom event to pre-load message in the chat
-    const event = new CustomEvent('load-chat-message', { 
-      detail: { message: messageText }
-    });
-    document.dispatchEvent(event);
-    
-    // Navigate to chat tab
-    const tabsEvent = new CustomEvent('navigate-to-tab', {
-      detail: { tabId: 'chat' }
-    });
-    document.dispatchEvent(tabsEvent);
-  };
-
-  // Add the missing functions that were causing the errors
-  const getUrgencyColor = (urgency: string) => {
-    switch (urgency.toLowerCase()) {
-      case "alto":
-        return "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200";
-      case "médio":
-        return "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200";
-      case "baixo":
-        return "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200";
+  const actionStatuses = [
+    { id: 'liquidity', label: 'Reserva de emergência', status: 'pending' },
+    { id: 'risk', label: 'Perfil de risco', status: 'complete' },
+    { id: 'diversification', label: 'Diversificação', status: 'partial' }
+  ];
+  
+  const getActionStatus = (status: string) => {
+    switch (status) {
+      case 'complete':
+        return <Badge className="bg-green-100 text-green-800 ml-auto">Completo</Badge>;
+      case 'partial':
+        return <Badge className="bg-amber-100 text-amber-800 ml-auto">Parcial</Badge>;
+      case 'pending':
+        return <Badge className="bg-red-100 text-red-800 ml-auto">Pendente</Badge>;
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
+        return null;
     }
   };
-
-  const getUrgencyIcon = (urgency: string) => {
-    switch (urgency.toLowerCase()) {
-      case "alto":
-        return <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />;
-      case "médio":
-        return <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />;
-      case "baixo":
-        return <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />;
+  
+  const getActionProgress = (status: string) => {
+    switch (status) {
+      case 'complete':
+        return <div className="w-full h-2 bg-green-500 rounded-full"></div>;
+      case 'partial':
+        return (
+          <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div className="h-full bg-amber-500 rounded-full" style={{ width: '60%' }}></div>
+          </div>
+        );
+      case 'pending':
+        return <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full"></div>;
       default:
         return null;
     }
   };
 
-  const getImpactColor = (impact: string) => {
-    switch (impact.toLowerCase()) {
-      case "alto":
-        return "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200";
-      case "médio":
-        return "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200";
-      case "baixo":
-        return "bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-200";
+  const getIconForInsight = (category: string) => {
+    switch (category.toLowerCase()) {
+      case 'allocation':
+        return <PieChart className="h-10 w-10 text-blue-600 dark:text-blue-400 p-2 bg-blue-100 dark:bg-blue-900/30 rounded-md" />;
+      case 'risk':
+        return <BarChart3 className="h-10 w-10 text-red-600 dark:text-red-400 p-2 bg-red-100 dark:bg-red-900/30 rounded-md" />;
+      case 'opportunity':
+        return <LineChart className="h-10 w-10 text-green-600 dark:text-green-400 p-2 bg-green-100 dark:bg-green-900/30 rounded-md" />;
+      case 'budget':
+        return <ArrowDown className="h-10 w-10 text-amber-600 dark:text-amber-400 p-2 bg-amber-100 dark:bg-amber-900/30 rounded-md" />;
+      case 'tax':
+        return <BadgeCheck className="h-10 w-10 text-purple-600 dark:text-purple-400 p-2 bg-purple-100 dark:bg-purple-900/30 rounded-md" />;
+      case 'savings':
+        return <ArrowUp className="h-10 w-10 text-emerald-600 dark:text-emerald-400 p-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-md" />;
       default:
-        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
+        return <Lightbulb className="h-10 w-10 text-indigo-600 dark:text-indigo-400 p-2 bg-indigo-100 dark:bg-indigo-900/30 rounded-md" />;
     }
   };
-
-  // Get client-specific recommended actions
+  
+  const getBackgroundForInsight = (category: string) => {
+    switch (category.toLowerCase()) {
+      case 'allocation':
+        return 'border-blue-200 dark:border-blue-800/50';
+      case 'risk':
+        return 'border-red-200 dark:border-red-800/50';
+      case 'opportunity':
+        return 'border-green-200 dark:border-green-800/50';
+      case 'budget':
+        return 'border-amber-200 dark:border-amber-800/50';
+      case 'tax':
+        return 'border-purple-200 dark:border-purple-800/50';
+      case 'savings':
+        return 'border-emerald-200 dark:border-emerald-800/50';
+      default:
+        return 'border-indigo-200 dark:border-indigo-800/50';
+    }
+  };
+  
+  const getBackgroundForAction = (id: string) => {
+    switch (id) {
+      case 'liquidity':
+        return 'border-blue-200 dark:border-blue-800/50';
+      case 'risk':
+        return 'border-amber-200 dark:border-amber-800/50';
+      case 'diversification':
+        return 'border-green-200 dark:border-green-800/50';
+      default:
+        return 'border-gray-200 dark:border-gray-700';
+    }
+  };
+  
+  const getIconForRecommendation = (urgency: string) => {
+    if (!urgency) return null;
+    
+    switch (urgency.toLowerCase()) {
+      case 'alto':
+        return <ArrowUp className="h-5 w-5 text-red-600 dark:text-red-400" />;
+      case 'médio':
+        return <ArrowRight className="h-5 w-5 text-amber-600 dark:text-amber-400" />;
+      case 'baixo':
+        return <BadgeCheck className="h-5 w-5 text-green-600 dark:text-green-400" />;
+      default:
+        return null;
+    }
+  };
+  
   const getRecommendedActions = () => {
-    // Default actions for all clients
-    const defaultActions = [
+    return [
       {
-        id: "diversify-portfolio",
-        title: "Diversificar sua carteira",
-        description: "Seus investimentos estão concentrados em poucas classes de ativos. Considere diversificar para reduzir o risco.",
-        impact: "Alto",
-        effort: "Médio",
-        buttonText: "Ver sugestões",
-        buttonLink: "#diversification",
-        category: "investment",
-        icon: "TrendingUp"
+        id: 'diversify',
+        title: 'Diversificar portfólio',
+        description: 'Aumente sua exposição a ativos internacionais para reduzir risco local',
+        potentialImpact: '+2.4% a.a.',
+        urgency: 'Médio',
+        icon: <PieChart className="h-10 w-10 text-blue-600 dark:text-blue-400 p-2 bg-blue-100 dark:bg-blue-900/30 rounded-md" />
       },
       {
-        id: "emergency-fund",
-        title: "Aumentar reserva de emergência",
-        description: "Sua reserva atual cobre apenas 3 meses de despesas. O ideal é ter pelo menos 6 meses.",
-        impact: "Alto",
-        effort: "Médio",
-        buttonText: "Planejar reserva",
-        buttonLink: "#emergency",
-        category: "planning",
-        icon: "Shield"
+        id: 'emergency',
+        title: 'Reserva de emergência',
+        description: 'Sua reserva atual cobre 4 meses de despesas, aumente para 6 meses de segurança',
+        potentialImpact: 'Risco -30%',
+        urgency: 'Alto',
+        icon: <ArrowUp className="h-10 w-10 text-red-600 dark:text-red-400 p-2 bg-red-100 dark:bg-red-900/30 rounded-md" />
       },
       {
-        id: "tax-efficiency",
-        title: "Otimizar eficiência tributária",
-        description: "Existem oportunidades para reduzir sua carga tributária através de investimentos mais eficientes.",
-        impact: "Médio",
-        effort: "Baixo",
-        buttonText: "Ver estratégias",
-        buttonLink: "#tax",
-        category: "tax",
-        icon: "BadgePercent"
+        id: 'tax',
+        title: 'Otimização tributária',
+        description: 'Considere migrar parte dos investimentos para produtos com isenção fiscal',
+        potentialImpact: 'Economia R$ 3.200',
+        urgency: 'Médio',
+        icon: <BadgeCheck className="h-10 w-10 text-green-600 dark:text-green-400 p-2 bg-green-100 dark:bg-green-900/30 rounded-md" />
       }
     ];
-    
-    // Client-specific actions
-    if (selectedClient === 240275) {
-      return [
-        {
-          id: "rebalance-portfolio",
-          title: "Rebalancear alocação internacional",
-          description: "Laio, sua exposição a renda variável internacional está abaixo do ideal para seu perfil de investidor. Recomendamos aumentar para 20%.",
-          impact: "Alto",
-          effort: "Baixo",
-          buttonText: "Ver detalhes",
-          buttonLink: "#rebalance",
-          category: "investment",
-          icon: "BarChart"
-        },
-        {
-          id: "retirement-plan",
-          title: "Revisar plano de aposentadoria",
-          description: "Com base na sua meta de aposentadoria, o aporte menual atual não será suficiente. Considere aumentar as contribuições.",
-          impact: "Alto",
-          effort: "Médio",
-          buttonText: "Atualizar plano",
-          buttonLink: "#retirement",
-          category: "planning",
-          icon: "Shield"
-        },
-        ...defaultActions
-      ];
-    } else if (selectedClient === 12345678) {
-      return [
-        {
-          id: "risk-assessment",
-          title: "Reavaliar perfil de risco",
-          description: "Seus investimentos atuais têm risco maior que seu perfil declarado. Vamos revisar suas preferências?",
-          impact: "Alto",
-          effort: "Baixo",
-          buttonText: "Refazer perfil",
-          buttonLink: "#risk",
-          category: "planning",
-          icon: "AlertTriangle"
-        },
-        ...defaultActions
-      ];
-    }
-    
-    return defaultActions;
-  };
-
-  // Function to get appropriate icon component
-  const getIconComponent = (iconName?: string) => {
-    switch (iconName) {
-      case "TrendingUp":
-        return <TrendingUp className="h-5 w-5 text-blue-400" />;
-      case "Shield":
-        return <Shield className="h-5 w-5 text-green-400" />;
-      case "AlertTriangle":
-        return <AlertTriangle className="h-5 w-5 text-amber-400" />;
-      case "BadgePercent":
-        return <BadgePercent className="h-5 w-5 text-emerald-400" />;
-      case "BarChart":
-        return <BarChart className="h-5 w-5 text-indigo-400" />;
-      default:
-        return <Lightbulb className="h-5 w-5 text-blue-400" />;
-    }
   };
 
   const recommendedActions = getRecommendedActions();
@@ -262,234 +190,199 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
     {
       id: "market-shift",
       title: "Mudança de cenário macroeconômico",
-      description: "Com o Banco Central sinalizando cortes na taxa de juros, é momento de revisar sua alocação em renda fixa.",
-      category: "market",
-      date: "2025-05-15",
-      importance: "high"
+      description: "A recente redução na taxa Selic deve impactar os rendimentos de renda fixa. Considere diversificar para ativos com maior potencial de valorização.",
+      category: "opportunity",
+      priority: "medium"
     },
     {
-      id: "dividend-season",
-      title: "Temporada de dividendos se aproximando",
-      description: "Grandes empresas devem anunciar distribuição de dividendos no próximo mês, considere antecipar compras.",
-      category: "stocks",
-      date: "2025-05-10",
-      importance: "medium"
+      id: "concentration-risk",
+      title: "Concentração excessiva em renda fixa",
+      description: "Sua carteira tem 68% em renda fixa, o que pode limitar retornos no cenário atual de juros em queda.",
+      category: "risk", 
+      priority: "high"
     },
     {
-      id: "inflation-rise",
-      title: "Inflação acima do esperado",
-      description: "Dados recentes mostram inflação acima da meta, o que pode impactar investimentos de renda fixa.",
-      category: "economy",
-      date: "2025-05-08",
-      importance: "high"
-    },
-    {
-      id: "sector-rotation",
-      title: "Rotação setorial em curso",
-      description: "Observamos movimento de saída do setor financeiro para tecnologia, avalie seu posicionamento.",
-      category: "market",
-      date: "2025-05-05",
-      importance: "medium"
+      id: "dividend-increase",
+      title: "Aumento de dividendos",
+      description: "Seus rendimentos em dividendos aumentaram 24% nos últimos 6 meses, mostrando boa escolha de ativos pagadores.",
+      category: "savings",
+      priority: "low"
     }
   ];
 
-  const getImportanceClass = (importance: string) => {
-    switch (importance) {
-      case "high":
-        return "border-l-4 border-red-500";
-      case "medium":
-        return "border-l-4 border-amber-500";
-      default:
-        return "border-l-4 border-blue-500";
-    }
-  };
-
   return (
-    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full overflow-hidden border-none shadow-lg dark:bg-slate-800/30`}>
-      <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 pb-3">
-        <div className="flex items-center gap-2">
-          <div className="rounded-lg bg-white/20 p-2 shadow-xl">
-            <Brain className="h-5 w-5 text-white" />
-          </div>
-          <CardTitle className="text-xl text-white">
-            {t('intelligence.title', 'Inteligência Financeira')}
+    <Card className={fullWidth ? "w-full" : "w-full"}>
+      <CardHeader className="pb-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30">
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-xl text-indigo-800 dark:text-indigo-300 flex items-center">
+            <Lightbulb className="mr-2 h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+            Inteligência Financeira
           </CardTitle>
+          
+          <button
+            onClick={refreshAIAnalysis}
+            disabled={isAIAnalysisLoading}
+            className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+          >
+            {isAIAnalysisLoading ? "Atualizando..." : "Atualizar análise"}
+          </button>
         </div>
       </CardHeader>
       
-      <div className="px-3 pt-3 pb-0 border-b border-gray-200 dark:border-gray-700">
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-3">
-            <TabsTrigger value="actions" className="text-xs sm:text-sm">
-              {t('intelligence.actions', 'Ações')}
+      <Tabs defaultValue="insights" value={activeTab} onValueChange={setActiveTab}>
+        <div className="px-4 border-b border-gray-200 dark:border-gray-700">
+          <TabsList className="bg-transparent -mb-px py-0">
+            <TabsTrigger value="insights" className="py-2 px-4 data-[state=active]:border-b-2 data-[state=active]:border-indigo-600 data-[state=active]:text-indigo-700 rounded-none">
+              Insights
             </TabsTrigger>
-            <TabsTrigger value="insights" className="text-xs sm:text-sm">
-              {t('intelligence.insights', 'Insights')}
+            <TabsTrigger value="actions" className="py-2 px-4 data-[state=active]:border-b-2 data-[state=active]:border-indigo-600 data-[state=active]:text-indigo-700 rounded-none">
+              Ações
             </TabsTrigger>
-            <TabsTrigger value="recommendations" className="text-xs sm:text-sm">
-              {t('intelligence.recommendations', 'Recomendações')}
+            <TabsTrigger value="recommendations" className="py-2 px-4 data-[state=active]:border-b-2 data-[state=active]:border-indigo-600 data-[state=active]:text-indigo-700 rounded-none">
+              Recomendações
             </TabsTrigger>
           </TabsList>
-        </Tabs>
-      </div>
+        </div>
       
-      <CardContent className="p-0">
-        <TabsContent value="actions" className="p-4 space-y-3 m-0">
-          <div className="space-y-4">
-            {getRecommendedActions().map((action) => (
-              <div 
-                key={action.id}
-                className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white/5 hover:bg-white/10 dark:hover:bg-gray-700/30 transition-colors cursor-pointer"
-                onClick={() => handleActionClick(action)}
-              >
-                <div className="flex gap-3 items-start">
-                  <div className="rounded-lg bg-blue-500/20 p-2 flex-shrink-0 mt-1">
-                    {action.icon === "TrendingUp" && <TrendingUp className="h-5 w-5 text-blue-400" />}
-                    {action.icon === "Shield" && <Shield className="h-5 w-5 text-green-400" />}
-                    {action.icon === "AlertTriangle" && <AlertTriangle className="h-5 w-5 text-amber-400" />}
-                    {action.icon === "BadgePercent" && <BadgePercent className="h-5 w-5 text-emerald-400" />}
-                    {action.icon === "BarChart" && <BarChart className="h-5 w-5 text-purple-400" />}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex flex-wrap gap-2 mb-1">
-                      <Badge variant="outline" className="bg-blue-500/10 text-blue-300 border-blue-500/20 hover:border-blue-500/40">
-                        {action.category === 'investment' ? 'Investimento' : 
-                          action.category === 'planning' ? 'Planejamento' : 
-                          action.category === 'tax' ? 'Impostos' : action.category}
-                      </Badge>
-                      <Badge variant="outline" className={`
-                        ${action.impact === 'Alto' ? 'bg-amber-500/10 text-amber-300 border-amber-500/20' : 
-                          action.impact === 'Médio' ? 'bg-blue-500/10 text-blue-300 border-blue-500/20' : 
-                          'bg-green-500/10 text-green-300 border-green-500/20'}
-                      `}>
-                        Impacto: {action.impact}
-                      </Badge>
-                      <Badge variant="outline" className={`
-                        ${action.effort === 'Alto' ? 'bg-red-500/10 text-red-300 border-red-500/20' : 
-                          action.effort === 'Médio' ? 'bg-amber-500/10 text-amber-300 border-amber-500/20' : 
-                          'bg-green-500/10 text-green-300 border-green-500/20'}
-                      `}>
-                        Esforço: {action.effort}
-                      </Badge>
-                    </div>
-                    <h3 className="text-lg font-medium text-white mb-1">{action.title}</h3>
-                    <p className="text-sm text-gray-400 mb-3">{action.description}</p>
-                    <Button 
-                      size="sm" 
-                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
-                    >
-                      {action.buttonText} <ArrowRight className="ml-2 h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </TabsContent>
-        
-        <TabsContent value="insights" className="p-4 space-y-4 m-0">
-          {/* We'll use financialInsightData instead of financialInsights */}
-          {data.financialInsightData ? (
+        <CardContent className="p-0">
+          <TabsContent value="actions" className="p-4 space-y-3 m-0">
             <div className="space-y-4">
-              {/* Add null check and default empty array */}
-              {(data.financialInsightData.insights || []).map((insight: any, index: number) => (
+              {getRecommendedActions().map((action) => (
                 <div 
-                  key={index}
-                  className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white/5"
-                  onClick={() => handleInsightClick(insight)}
+                  key={action.id}
+                  className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white/5 hover:bg-white/10 dark:hover:bg-gray-700/30 transition-colors cursor-pointer"
                 >
-                  <div className="flex gap-2 mb-2">
-                    <Badge className={`bg-${insight.type === 'positive' ? 'green' : insight.type === 'negative' ? 'red' : 'blue'}-600/50`}>
-                      {insight.type === 'positive' ? 'Positivo' : 
-                        insight.type === 'negative' ? 'Atenção' : 'Informativo'}
-                    </Badge>
-                    <Badge variant="outline" className="bg-gray-800/50">
-                      {insight.category}
-                    </Badge>
-                  </div>
-                  <h3 className="text-lg font-medium text-white mb-1">{insight.title}</h3>
-                  <p className="text-sm text-gray-400 mb-3">{insight.description}</p>
-                  <div className="flex justify-between items-center">
-                    <Badge variant="outline" className="bg-gray-800/50 text-gray-400">
-                      {insight.date}
-                    </Badge>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
-                    >
-                      Ver detalhes <ArrowRight className="ml-1 h-4 w-4" />
-                    </Button>
+                  <div className="flex items-start gap-4">
+                    {action.icon}
+                    <div className="flex-1">
+                      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 mb-2">
+                        <h3 className="text-base font-medium text-gray-900 dark:text-gray-100">{action.title}</h3>
+                        <div className="flex items-center">
+                          <Badge className={action.urgency === 'Alto' ? 'bg-red-100 text-red-800' : action.urgency === 'Médio' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}>
+                            {action.urgency}
+                          </Badge>
+                          <Badge className="bg-blue-100 text-blue-800 ml-2">
+                            {action.potentialImpact}
+                          </Badge>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">{action.description}</p>
+                    </div>
+                    <ArrowRight className="h-5 w-5 text-gray-400" />
                   </div>
                 </div>
               ))}
             </div>
-          ) : (
-            <div className="text-center py-8">
-              <div className="rounded-full bg-blue-500/20 p-4 mx-auto w-16 h-16 flex items-center justify-center mb-4">
-                <Lightbulb className="h-8 w-8 text-blue-400" />
-              </div>
-              <h3 className="text-lg font-medium text-white mb-2">Nenhum insight disponível</h3>
-              <p className="text-sm text-gray-400">
-                Ative o Open Finance para habilitar insights personalizados baseados nos seus dados financeiros.
-              </p>
-              <Button
-                className="mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
-              >
-                Ativar Open Finance <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          )}
-        </TabsContent>
-        
-        <TabsContent value="recommendations" className="p-4 space-y-4 m-0">
-          {recommendations && recommendations.length > 0 ? (
-            <div className="space-y-4">
-              {/* Use data.recommendations with null check */}
-              {recommendations.map((recommendation, index) => (
-                <div 
-                  key={index}
-                  className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
-                  onClick={() => handleExecute(recommendation)}
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex gap-2">
-                      <Badge className={`bg-${recommendation.urgency === 'high' ? 'red' : recommendation.urgency === 'medium' ? 'amber' : 'green'}-600/50`}>
-                        {recommendation.urgency === 'high' ? 'Alta Prioridade' : 
-                          recommendation.urgency === 'medium' ? 'Média Prioridade' : 'Baixa Prioridade'}
-                      </Badge>
-                      <Badge variant="outline" className="bg-blue-900/30 text-blue-300 border-blue-700/30">
-                        {recommendation.category}
-                      </Badge>
+            
+            <div className="pt-4">
+              <h3 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-3">Status do plano</h3>
+              <div className="space-y-3">
+                {actionStatuses.map((status) => (
+                  <div key={status.id} className={`p-3 border rounded-lg ${getBackgroundForAction(status.id)}`}>
+                    <div className="flex items-center mb-2">
+                      <span className="text-sm font-medium">{status.label}</span>
+                      {getActionStatus(status.status)}
                     </div>
-                    <Badge variant="outline" className="bg-gray-800/50 text-gray-400">
-                      {recommendation.date}
-                    </Badge>
+                    {getActionProgress(status.status)}
                   </div>
-                  <h3 className="text-lg font-medium text-white mb-1">{recommendation.action}</h3>
-                  <p className="text-sm text-gray-400 mb-3">{recommendation.description}</p>
-                  <Button 
-                    size="sm" 
-                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+                ))}
+              </div>
+            </div>
+          </TabsContent>
+          
+          <TabsContent value="insights" className="p-4 space-y-4 m-0">
+            {/* We'll use financialInsightData instead of financialInsights */}
+            {data.financialInsightData ? (
+              <div className="space-y-4">
+                {/* Add null check and default empty array */}
+                {(data.financialInsightData.insights || []).map((insight: any, index: number) => (
+                  <div 
+                    key={index}
+                    className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white/5"
                   >
-                    Executar <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <div className="rounded-full bg-green-500/20 p-4 mx-auto w-16 h-16 flex items-center justify-center mb-4">
-                <CheckCircle2 className="h-8 w-8 text-green-400" />
+                    <div className="flex items-start gap-4">
+                      {getIconForInsight(insight.category)}
+                      <div className="flex-1">
+                        <h3 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-1">{insight.title}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-300">{insight.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <h3 className="text-lg font-medium text-white mb-2">Sem recomendações pendentes</h3>
-              <p className="text-sm text-gray-400">
-                Todas as suas recomendações financeiras foram executadas. Continue monitorando seu portfólio para novas oportunidades.
-              </p>
-            </div>
-          )}
-        </TabsContent>
-      </CardContent>
+            ) : (
+              <>
+                {loadingStates.insights ? (
+                  <div className="space-y-4 animate-pulse">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                        <div className="flex items-start gap-4">
+                          <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-md"></div>
+                          <div className="flex-1">
+                            <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                            <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-full"></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {insights.map((insight, index) => (
+                      <div 
+                        key={index}
+                        className={`p-4 border ${getBackgroundForInsight(insight.category)} rounded-lg bg-white/5`}
+                      >
+                        <div className="flex items-start gap-4">
+                          {getIconForInsight(insight.category)}
+                          <div className="flex-1">
+                            <h3 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-1">{insight.title}</h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-300">{insight.description}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </TabsContent>
+          
+          <TabsContent value="recommendations" className="p-4 space-y-4 m-0">
+            {recommendations && recommendations.length > 0 ? (
+              <div className="space-y-4">
+                {/* Use data.recommendations with null check */}
+                {recommendations.map((recommendation, index) => (
+                  <div 
+                    key={index}
+                    className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+                  >
+                    <div className="flex items-center mb-2">
+                      {getIconForRecommendation(recommendation.urgency)}
+                      <span className="text-lg font-medium ml-2">{recommendation.action}</span>
+                    </div>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{recommendation.description}</p>
+                    <div className="flex flex-wrap gap-2">
+                      <Badge className={`${recommendation.urgency === 'Alto' ? 'bg-red-100 text-red-800' : recommendation.urgency === 'Médio' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}`}>
+                        Urgência: {recommendation.urgency}
+                      </Badge>
+                      <Badge className="bg-blue-100 text-blue-800">
+                        Impacto: {recommendation.impact}
+                      </Badge>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <TrendingUp className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+                <p className="text-gray-500">Nenhuma recomendação disponível no momento.</p>
+                <p className="text-gray-400 text-sm mt-1">Recomendações serão geradas com base na análise do seu portfólio.</p>
+              </div>
+            )}
+          </TabsContent>
+        </CardContent>
+      </Tabs>
     </Card>
   );
 };

@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { toNumber, arithmeticOperation, fixLiquidityDefaults } from "@/utils/typeConversionHelpers";
 
 interface LiquidityReserveModuleProps {
   fullWidth?: boolean;
@@ -21,6 +22,10 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
       idealReserve: 60000,
       monthlyExpenses: 10000,
       idealMonths: 6,
+      recommended: 60000,
+      difference: -35000,
+      currentIdleMonths: 2.5,
+      recommendedMonths: 6,
       summary: "Sua reserva de emergência está abaixo do ideal de 6 meses de despesas."
     };
     
@@ -28,11 +33,11 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
     if (data.portfolioSummary) {
       try {
         // Use fixed income value as current idle (emergency reserve)
-        const currentIdle = data.portfolioSummary.fixed_income_value || defaultLiquidity.currentIdle;
+        const currentIdle = toNumber(data.portfolioSummary.fixed_income_value, defaultLiquidity.currentIdle);
         
         // Calculate monthly expenses - if financial summary exists, use it
         const monthlyExpenses = data.financialSummary?.monthlyExpenses || 
-          (parseFloat(data.portfolioSummary.total_portfolio_value || "0") * 0.006); // Estimate as 0.6% of portfolio
+          (toNumber(data.portfolioSummary.total_portfolio_value, 0) * 0.006); // Estimate as 0.6% of portfolio
         
         // Calculate ideal reserve (6 months of expenses)
         const idealMonths = 6;
@@ -49,22 +54,26 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
           summary = `Sua reserva de emergência cobre ${coveredMonths} meses de despesas, recomendamos aumentar para ${idealMonths} meses.`;
         }
         
-        return {
+        return fixLiquidityDefaults({
           currentIdle,
           idealReserve,
-          monthlyExpenses,
+          recommended: idealReserve,
+          difference: currentIdle - idealReserve,
+          currentIdleMonths: coveredMonths,
+          recommendedMonths: idealMonths,
           idealMonths,
+          monthlyExpenses,
           summary,
           dataSource: 'supabase' as const
-        };
+        });
       } catch (error) {
         console.error("Error calculating liquidity data:", error);
-        return defaultLiquidity;
+        return fixLiquidityDefaults(defaultLiquidity);
       }
     }
     
     // Fallback to using data from context if available
-    return data.liquidity || defaultLiquidity;
+    return fixLiquidityDefaults(data.liquidity || defaultLiquidity);
   }, [data.portfolioSummary, data.financialSummary, data.liquidity]);
   
   useEffect(() => {
@@ -77,15 +86,16 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
   }, []);
   
   // Calculate progress percentage
-  const progressPercentage = Math.min(100, (liquidityData.currentIdle / liquidityData.idealReserve) * 100);
+  const progressPercentage = Math.min(100, (toNumber(liquidityData.currentIdle) / toNumber(liquidityData.idealReserve)) * 100);
   
   // Format currency
-  const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number | string) => {
+    const numValue = typeof value === 'string' ? parseFloat(value) : value;
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
       maximumFractionDigits: 0,
-    }).format(value);
+    }).format(numValue);
   };
 
   // Handle action button click - redirects to chat with pre-loaded message
@@ -154,7 +164,7 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
                 <p className="text-sm font-medium text-amber-800 dark:text-amber-300 mb-1">Situação</p>
                 <p className="text-lg font-bold text-amber-700 dark:text-amber-200">
                   {progressPercentage < 100 
-                    ? `Faltam ${formatCurrency(liquidityData.idealReserve - liquidityData.currentIdle)}` 
+                    ? `Faltam ${formatCurrency(arithmeticOperation(liquidityData.idealReserve, liquidityData.currentIdle, '-'))}` 
                     : "Reserva Adequada"}
                 </p>
               </div>
