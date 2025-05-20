@@ -12,6 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useNavigate } from "react-router-dom";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface Client {
   investor_account_on_brokerage_house: number;
@@ -27,6 +28,7 @@ const ClientSelector = ({ onClientSelect }: ClientSelectorProps) => {
   const [selectedClient, setSelectedClient] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -92,13 +94,13 @@ const ClientSelector = ({ onClientSelect }: ClientSelectorProps) => {
           
           <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
             {loading ? (
-              <div className="text-sm text-blue-200">Carregando clientes...</div>
+              <div className="text-sm text-blue-200">{t('loadingClients')}</div>
             ) : (
               <div className="flex flex-col gap-2 w-full sm:w-auto">
-                <label className="text-sm text-blue-200">Selecione um cliente:</label>
+                <label className="text-sm text-blue-200">{t('selectClient')}:</label>
                 <Select onValueChange={handleClientChange} value={selectedClient}>
                   <SelectTrigger className="w-full sm:w-[240px] bg-white/10 border-white/20 text-white">
-                    <SelectValue placeholder="Selecionar cliente" />
+                    <SelectValue placeholder={t('selectClient')} />
                   </SelectTrigger>
                   <SelectContent className="bg-gray-900 border-white/20 text-white">
                     {clients.length > 0 ? (
@@ -113,7 +115,7 @@ const ClientSelector = ({ onClientSelect }: ClientSelectorProps) => {
                         </SelectItem>
                       ))
                     ) : (
-                      <SelectItem value="no-clients" disabled>Nenhum cliente encontrado</SelectItem>
+                      <SelectItem value="no-clients" disabled>{t('noClientsFound')}</SelectItem>
                     )}
                   </SelectContent>
                 </Select>
@@ -127,7 +129,7 @@ const ClientSelector = ({ onClientSelect }: ClientSelectorProps) => {
               onClick={handleLogin}
             >
               <User className="mr-2 h-4 w-4" />
-              Login
+              {t('login')}
             </Button>
           </div>
         </div>

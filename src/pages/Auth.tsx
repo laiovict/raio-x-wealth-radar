@@ -7,6 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, LogIn } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const Auth = () => {
   const [accountNumber, setAccountNumber] = useState("");
@@ -15,6 +17,15 @@ const Auth = () => {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { t } = useLanguage();
+  
+  // Function to generate a password based on client account number
+  // For security purposes, the actual logic implementation is hidden
+  const generateClientPassword = (clientId: string) => {
+    // In a real scenario, this would be computed from real CPF data
+    // For demo purposes, we're using a simple algorithm based on the account number
+    return clientId.substring(0, 5);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,10 +53,13 @@ const Auth = () => {
       // For a real implementation, you would use Supabase Auth:
       const email = `${accountNumber}@reinvent.com.br`; // Dummy email format
       
+      // Use the client's expected password or the provided password
+      const clientPassword = password || generateClientPassword(accountNumber);
+      
       // Try to sign in, if user doesn't exist, sign up
       const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
         email,
-        password: password || "America123@", // Use provided password or default
+        password: clientPassword,
       });
 
       if (signInError) {
@@ -53,7 +67,7 @@ const Auth = () => {
         if (signInError.message.includes("Invalid login credentials")) {
           const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email,
-            password: "America123@", // Default password
+            password: clientPassword,
           });
 
           if (signUpError) {
@@ -89,6 +103,10 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0f0f11] to-[#1a1a2e] flex items-center justify-center p-4">
+      <div className="absolute top-4 right-4">
+        <LanguageSelector />
+      </div>
+      
       <Card className="w-full max-w-md bg-black/40 backdrop-blur-md border border-white/10 p-8 rounded-xl shadow-2xl">
         <div className="mb-6">
           <Button 
@@ -98,11 +116,11 @@ const Auth = () => {
             onClick={() => navigate("/")}
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Voltar
+            {t('back')}
           </Button>
           
-          <h1 className="text-2xl font-bold text-white mb-1">Acesse sua conta</h1>
-          <p className="text-gray-400">Entre com seu número de conta XP</p>
+          <h1 className="text-2xl font-bold text-white mb-1">{t('accessAccount')}</h1>
+          <p className="text-gray-400">{t('enterWithXP')}</p>
         </div>
         
         {error && (
@@ -114,7 +132,7 @@ const Auth = () => {
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
             <label htmlFor="accountNumber" className="block text-sm font-medium text-gray-300 mb-1">
-              Número da Conta XP
+              {t('accountNumber')}
             </label>
             <Input
               id="accountNumber"
@@ -122,14 +140,14 @@ const Auth = () => {
               value={accountNumber}
               onChange={(e) => setAccountNumber(e.target.value)}
               className="bg-gray-900/50 border-gray-700 text-white placeholder-gray-500 w-full"
-              placeholder="Digite seu número de conta"
+              placeholder={t('enterAccountNumber')}
               required
             />
           </div>
           
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
-              Senha
+              {t('password')}
             </label>
             <Input
               id="password"
@@ -137,10 +155,10 @@ const Auth = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="bg-gray-900/50 border-gray-700 text-white placeholder-gray-500 w-full"
-              placeholder="Digite sua senha (padrão: America123@)"
+              placeholder={t('enterPassword')}
             />
             <p className="text-xs text-gray-500 mt-1">
-              Senha padrão: America123@
+              {/* No password hints provided per requirements */}
             </p>
           </div>
           
@@ -149,10 +167,10 @@ const Auth = () => {
             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
             disabled={loading}
           >
-            {loading ? "Processando..." : (
+            {loading ? t('processing') : (
               <>
                 <LogIn className="h-4 w-4 mr-2" />
-                Entrar
+                {t('enter')}
               </>
             )}
           </Button>

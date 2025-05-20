@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { clientData } from "@/data/clientData";
 import { supabase } from "@/integrations/supabase/client";
@@ -68,7 +69,11 @@ export const RaioXContext = createContext<RaioXContextType>({
     totalAssets: 0,
     monthlyIncome: 0,
     monthlyExpenses: 0,
-    savingsRate: 0
+    savingsRate: 0,
+    netWorth: 0,
+    totalLiabilities: 0,
+    liquidAssets: 0,
+    topRisks: []
   },
   recommendedActions: [],
   isAIAnalysisLoading: false,
@@ -95,7 +100,11 @@ export const RaioXProvider: React.FC<RaioXProviderProps> = ({
     totalAssets: 0,
     monthlyIncome: 0,
     monthlyExpenses: 0,
-    savingsRate: 0
+    savingsRate: 0,
+    netWorth: 0,
+    totalLiabilities: 0,
+    liquidAssets: 0,
+    topRisks: []
   });
   const [recommendedActions, setRecommendedActions] = useState<RecommendedAction[]>([]);
   
@@ -180,13 +189,63 @@ export const RaioXProvider: React.FC<RaioXProviderProps> = ({
             stocks: stocksData || [],
             realEstate: realEstateData || [],
             profitability: profitabilityData || {},
+            goals: [
+              {
+                name: "Compra de Imóvel",
+                currentValue: 235000,
+                targetValue: 450000,
+                targetDate: "2026-06-30",
+                progress: 52,
+                monthly: 7500,
+                icon: "home"
+              },
+              {
+                name: "Aposentadoria",
+                currentValue: 180000,
+                targetValue: 2000000,
+                targetDate: "2045-01-15",
+                progress: 9,
+                monthly: 3800,
+                icon: "umbrella"
+              },
+              {
+                name: "Educação dos Filhos",
+                currentValue: 45000,
+                targetValue: 300000,
+                targetDate: "2035-12-01",
+                progress: 15,
+                monthly: 1200,
+                icon: "book"
+              }
+            ],
+            recommendations: [
+              {
+                action: "Aumentar alocação internacional",
+                description: "Adicione 8% de exposição a mercados internacionais via ETFs ou fundos para aumentar diversificação geográfica.",
+                urgency: "Médio",
+                impact: "Alto"
+              },
+              {
+                action: "Reforçar reserva de emergência",
+                description: "Direcione R$ 2.000 mensais para sua reserva de emergência até atingir o equivalente a 3 meses de despesas.",
+                urgency: "Alto",
+                impact: "Médio"
+              },
+              {
+                action: "Consolidar investimentos",
+                description: "Você possui investimentos espalhados em 3 instituições diferentes, gerando complexidade e dificultando a visão consolidada.",
+                urgency: "Baixo",
+                impact: "Médio"
+              }
+            ],
+            summary: "Seu portfólio tem um bom equilíbrio entre renda fixa e variável. Considere aumentar sua reserva de emergência e diversificar com mais exposição internacional."
           };
 
           setData(adaptedData);
           console.log('Client data updated:', adaptedData);
           
-          // Generate mock AI insights based on the data
-          generateMockAIInsights(adaptedData);
+          // Generate customized AI insights based on the data
+          generateCustomInsights(adaptedData, selectedClient);
         } catch (error) {
           console.error('Error in client data fetch:', error);
         }
@@ -201,6 +260,37 @@ export const RaioXProvider: React.FC<RaioXProviderProps> = ({
 
     fetchClientData();
   }, [selectedClient, clientId]);
+  
+  const generateCustomInsights = (clientData: any, clientId: number) => {
+    setIsAIAnalysisLoading(true);
+    
+    // Get client-specific data based on client ID
+    const customData = getCustomClientData(clientId);
+    
+    // Simulate API delay
+    setTimeout(() => {
+      // Generate custom financial summary with all required properties
+      const summary: FinancialSummary = {
+        totalAssets: Number(clientData.portfolioSummary?.total_portfolio_value) || customData.totalAssets,
+        monthlyIncome: customData.monthlyIncome,
+        monthlyExpenses: customData.monthlyExpenses,
+        savingsRate: customData.savingsRate,
+        netWorth: Number(clientData.portfolioSummary?.total_portfolio_value) || customData.netWorth,
+        totalLiabilities: customData.totalLiabilities,
+        liquidAssets: customData.liquidAssets,
+        topRisks: customData.topRisks
+      };
+      setFinancialSummary(summary);
+      
+      // Generate custom AI insights
+      setAiInsights(customData.aiInsights);
+      
+      // Generate custom recommended actions with all required properties
+      setRecommendedActions(customData.recommendedActions);
+      
+      setIsAIAnalysisLoading(false);
+    }, 1500);
+  };
   
   // Function to generate mock AI insights
   const generateMockAIInsights = (clientData: any) => {
@@ -326,9 +416,224 @@ export const RaioXProvider: React.FC<RaioXProviderProps> = ({
     }, 1500);
   };
   
+  // Function to provide custom data based on client ID
+  const getCustomClientData = (clientId: number) => {
+    // Default data structure
+    const defaultData = {
+      totalAssets: 450000,
+      monthlyIncome: 12000,
+      monthlyExpenses: 8000,
+      savingsRate: 33,
+      netWorth: 1250000,
+      totalLiabilities: 200000,
+      liquidAssets: 75000,
+      topRisks: [
+        {
+          name: 'Alta concentração em ativos de baixa liquidez',
+          severity: 'high' as const,
+          impact: 'Pode dificultar resgates em momentos de necessidade'
+        },
+        {
+          name: 'Exposição concentrada em um único setor',
+          severity: 'medium' as const,
+          impact: 'Aumenta volatilidade em caso de crises setoriais'
+        },
+        {
+          name: 'Reserva de emergência abaixo do ideal',
+          severity: 'medium' as const,
+          impact: 'Cobertura de apenas 2.5 meses de despesas'
+        }
+      ],
+      aiInsights: [
+        {
+          id: '1',
+          title: 'Concentração excessiva em Renda Fixa',
+          description: 'Sua carteira possui mais de 45% em ativos de renda fixa, o que pode limitar seu potencial de retorno no longo prazo.',
+          category: 'risk',
+          priority: 'high',
+          timestamp: new Date(),
+          isNew: true
+        },
+        {
+          id: '2',
+          title: 'Oportunidade em Fundos Imobiliários',
+          description: 'Considerando seu perfil de investidor e objetivos, uma alocação de 7-10% em FIIs poderia trazer diversificação e renda passiva.',
+          category: 'opportunity',
+          priority: 'medium',
+          timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+          isNew: false
+        },
+        {
+          id: '3',
+          title: 'Gap no objetivo para compra de imóvel',
+          description: 'Com o ritmo atual de investimentos, você alcançará apenas 85% da meta para compra do imóvel no prazo estipulado.',
+          category: 'goal',
+          priority: 'high',
+          timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), // 1 day ago
+          isNew: true
+        },
+      ],
+      recommendedActions: [
+        {
+          id: '1',
+          title: 'Aumentar alocação internacional',
+          action: 'Aumentar alocação internacional',
+          impact: 'Alto',
+          urgency: 'Médio',
+          difficulty: 'Médio',
+          category: 'diversification',
+          description: 'Adicione 8% de exposição a mercados internacionais via ETFs ou fundos para aumentar diversificação geográfica.'
+        },
+        {
+          id: '2',
+          title: 'Reforçar reserva de emergência',
+          action: 'Reforçar reserva de emergência',
+          impact: 'Médio',
+          urgency: 'Alto',
+          difficulty: 'Baixo',
+          category: 'security',
+          description: 'Direcione R$ 2.000 mensais para sua reserva de emergência até atingir o equivalente a 3 meses de despesas.'
+        }
+      ]
+    };
+    
+    // Custom data for client 240275 (Laio Santos)
+    if (clientId === 240275) {
+      return {
+        ...defaultData,
+        totalAssets: 720000,
+        monthlyIncome: 18000,
+        monthlyExpenses: 9000,
+        savingsRate: 50,
+        netWorth: 1850000,
+        totalLiabilities: 150000,
+        liquidAssets: 120000,
+        topRisks: [
+          {
+            name: 'Concentração em renda variável',
+            severity: 'medium' as const,
+            impact: 'Maior volatilidade em períodos de crise'
+          },
+          {
+            name: 'Alocação internacional abaixo do recomendado',
+            severity: 'low' as const,
+            impact: 'Menor diversificação geográfica'
+          }
+        ],
+        aiInsights: [
+          {
+            id: '1',
+            title: 'Potencial para otimização tributária',
+            description: 'Considerando seu perfil fiscal, há oportunidades para reduzir a carga tributária em até 12% com planejamento adequado.',
+            category: 'tax',
+            priority: 'high',
+            timestamp: new Date(),
+            isNew: true
+          },
+          {
+            id: '2',
+            title: 'Oportunidade em investimentos alternativos',
+            description: 'Seu perfil de risco permite alocação de 5-8% em investimentos alternativos como venture capital ou private equity.',
+            category: 'opportunity',
+            priority: 'medium',
+            timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+            isNew: false
+          }
+        ],
+        recommendedActions: [
+          {
+            id: '1',
+            title: 'Otimização tributária',
+            action: 'Implementar estratégia de otimização tributária',
+            impact: 'Alto',
+            urgency: 'Alto',
+            difficulty: 'Médio',
+            category: 'tax',
+            description: 'Redistribuir investimentos entre pessoa física e jurídica para maximizar eficiência fiscal.'
+          },
+          {
+            id: '2',
+            title: 'Diversificação Internacional',
+            action: 'Aumentar exposição internacional',
+            impact: 'Médio',
+            urgency: 'Médio',
+            difficulty: 'Baixo',
+            category: 'diversification',
+            description: 'Elevar exposição internacional de 5% para 15-20% da carteira para mitigar riscos locais.'
+          }
+        ]
+      };
+    }
+    
+    // Custom data for other clients - using clientId as a seed for some variation
+    return {
+      ...defaultData,
+      totalAssets: 350000 + (clientId % 10) * 50000,
+      monthlyIncome: 10000 + (clientId % 8) * 1000,
+      monthlyExpenses: 6000 + (clientId % 5) * 500,
+      savingsRate: 30 + (clientId % 15),
+      netWorth: 950000 + (clientId % 12) * 75000,
+      totalLiabilities: 180000 - (clientId % 10) * 15000,
+      liquidAssets: 60000 + (clientId % 6) * 10000,
+      aiInsights: [
+        {
+          id: '1',
+          title: `Oportunidade em ${clientId % 2 === 0 ? 'Fundos Imobiliários' : 'BDRs'}`,
+          description: `Baseado no seu perfil, recomendamos aumentar exposição em ${clientId % 2 === 0 ? 'FIIs' : 'BDRs'} para melhor diversificação.`,
+          category: 'opportunity',
+          priority: 'medium',
+          timestamp: new Date(),
+          isNew: true
+        },
+        {
+          id: '2',
+          title: clientId % 3 === 0 ? 'Risco de concentração' : 'Potencial de retorno abaixo do ideal',
+          description: clientId % 3 === 0 ? 
+            'Sua carteira tem concentração elevada em poucos ativos, aumentando o risco não-sistemático.' : 
+            'Seu perfil de risco permitiria uma alocação mais agressiva para maior potencial de retorno.',
+          category: clientId % 3 === 0 ? 'risk' : 'performance',
+          priority: clientId % 3 === 0 ? 'high' : 'medium',
+          timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+          isNew: false
+        }
+      ],
+      recommendedActions: [
+        {
+          id: '1',
+          title: clientId % 2 === 0 ? 'Diversificar carteira' : 'Ajustar alocação estratégica',
+          action: clientId % 2 === 0 ? 'Diversificar carteira' : 'Ajustar alocação estratégica',
+          impact: 'Alto',
+          urgency: 'Médio',
+          difficulty: 'Médio',
+          category: 'allocation',
+          description: clientId % 2 === 0 ? 
+            'Reduzir exposição aos 3 principais ativos para no máximo 5% cada, diluindo o risco específico.' : 
+            'Ajustar mix entre renda fixa e variável para alinhar com seus objetivos de longo prazo.'
+        },
+        {
+          id: '2',
+          title: 'Planejar sucessão patrimonial',
+          action: 'Planejar sucessão patrimonial',
+          impact: 'Alto',
+          urgency: 'Baixo',
+          difficulty: 'Alto',
+          category: 'planning',
+          description: 'Iniciar planejamento sucessório para garantir transferência eficiente de patrimônio e minimizar custos.'
+        }
+      ]
+    };
+  };
+  
   // Function to refresh AI analysis
   const refreshAIAnalysis = () => {
-    generateMockAIInsights(data);
+    if (selectedClient) {
+      // Generate client-specific insights
+      const adaptedData = { ...data };
+      generateCustomInsights(adaptedData, selectedClient);
+    } else {
+      // Generate mock AI insights for default client
+      generateMockAIInsights(data);
+    }
   };
 
   return (

@@ -1,9 +1,11 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, AlertTriangle, CheckCircle, Clock } from "lucide-react";
 import { useMobileBreakpoint } from "@/hooks/use-mobile";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface RecommendationsModuleProps {
   fullWidth?: boolean;
@@ -13,6 +15,7 @@ const RecommendationsModule = ({ fullWidth = false }: RecommendationsModuleProps
   const { data, hasOpenFinance } = useRaioX();
   const { recommendations } = data;
   const isMobile = useMobileBreakpoint();
+  const { t } = useLanguage();
 
   // Function to handle recommendation execution
   const handleExecute = (index: number) => {
@@ -65,18 +68,16 @@ const RecommendationsModule = ({ fullWidth = false }: RecommendationsModuleProps
     }
   };
 
-  // Check if OpenFinance is required for this module
-  // If not, continue showing recommendations regardless of OpenFinance status
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} shadow-md hover:shadow-lg transition-shadow`}>
       <CardHeader className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/70 dark:to-indigo-900/70 pb-4 rounded-t-lg border-b border-gray-200 dark:border-gray-700">
         <CardTitle className="text-xl text-blue-800 dark:text-blue-200 flex items-center">
-          Recomendações Prioritárias
+          {t('priorityRecommendations')}
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-5 bg-white dark:bg-slate-900">
         <div className="space-y-4">
-          {recommendations.map((recommendation, index) => (
+          {recommendations?.map((recommendation, index) => (
             <div 
               key={index} 
               className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden transition-all hover:shadow-md hover:translate-y-[-2px]"
@@ -91,10 +92,10 @@ const RecommendationsModule = ({ fullWidth = false }: RecommendationsModuleProps
                   <div className="flex flex-wrap gap-2">
                     <Badge className={`flex items-center gap-1 px-2 py-1 ${getUrgencyColor(recommendation.urgency)}`}>
                       {getUrgencyIcon(recommendation.urgency)}
-                      <span>Urgência: {recommendation.urgency}</span>
+                      <span>{t('urgencyLabel')} {recommendation.urgency}</span>
                     </Badge>
                     <Badge className={`px-2 py-1 ${getImpactColor(recommendation.impact)}`}>
-                      Impacto: {recommendation.impact}
+                      {t('impactLabel')} {recommendation.impact}
                     </Badge>
                   </div>
                 </div>
@@ -105,10 +106,10 @@ const RecommendationsModule = ({ fullWidth = false }: RecommendationsModuleProps
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="bg-white dark:bg-transparent hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-900/30 dark:hover:text-blue-300 transition-colors"
+                    className="bg-white dark:bg-transparent hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-900/30 dark:hover:text-blue-300 transition-colors text-gray-700 dark:text-gray-200"
                     onClick={() => handleExecute(index)}
                   >
-                    Executar <ArrowRight className="ml-2 h-4 w-4" />
+                    {t('executeButton')} <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </div>
               </div>

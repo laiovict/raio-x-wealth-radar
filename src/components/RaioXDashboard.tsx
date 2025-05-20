@@ -3,6 +3,7 @@ import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, X } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useLanguage } from "@/context/LanguageContext";
 
 import AllocationModule from "./modules/AllocationModule";
 import FutureProjectionModule from "./modules/FutureProjectionModule";
@@ -41,6 +42,7 @@ const RaioXDashboard = ({
   const { data, hasOpenFinance } = useRaioX();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
+  const { t } = useLanguage();
 
   // Listen for the custom event to activate OpenFinance
   useEffect(() => {
@@ -79,7 +81,7 @@ const RaioXDashboard = ({
     <div className="space-y-6 pb-16 min-h-screen max-h-full">
       <div className="flex flex-col items-center justify-center mb-8">
         <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-300 to-indigo-400 bg-clip-text text-transparent mb-2">
-          Bem vindo {data.clientName}!
+          {t('welcomeMessage')} {data.clientName}!
         </h2>
         
         <div className="w-full max-w-md relative">
@@ -87,7 +89,7 @@ const RaioXDashboard = ({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Como posso facilitar sua vida?" 
+            placeholder={t('searchPlaceholder')} 
             className="w-full glass-morphism backdrop-blur-md border border-white/10 rounded-full px-5 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white">
@@ -100,41 +102,41 @@ const RaioXDashboard = ({
             className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "ai" ? "bg-white/20 border-blue-400" : ""}`}
             onClick={() => handleQuickNavClick("ai")}
           >
-            Assistente IA
+            {t('quickAi')}
           </button>
           <button 
             className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "goals" ? "bg-white/20 border-blue-400" : ""}`}
             onClick={() => handleQuickNavClick("goals")}
           >
-            Meus Objetivos
+            {t('myGoals')}
           </button>
           <button 
             className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "planning" ? "bg-white/20 border-blue-400" : ""}`}
             onClick={() => handleQuickNavClick("planning")}
           >
-            Planejamento
+            {t('planning')}
           </button>
           <button 
             className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "insights" ? "bg-white/20 border-blue-400" : ""}`}
             onClick={() => handleQuickNavClick("insights")}
           >
-            Insights
+            {t('quickInsights')}
           </button>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-3 lg:grid-cols-10 md:grid-cols-5 scrollbar-none">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Visão Geral</TabsTrigger>
-          <TabsTrigger value="plan" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Plano Financeiro</TabsTrigger>
-          <TabsTrigger value="future" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Meu Futuro</TabsTrigger>
-          <TabsTrigger value="ai" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Assistente IA</TabsTrigger>
-          <TabsTrigger value="planning" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Planejamento</TabsTrigger>
-          <TabsTrigger value="allocation" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Investimentos</TabsTrigger>
-          <TabsTrigger value="goals" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Objetivos</TabsTrigger>
-          <TabsTrigger value="insights" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Insights</TabsTrigger>
-          <TabsTrigger value="social" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Social</TabsTrigger>
-          <TabsTrigger value="banking" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Banking</TabsTrigger>
+          <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('overviewTab')}</TabsTrigger>
+          <TabsTrigger value="plan" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('planTab')}</TabsTrigger>
+          <TabsTrigger value="future" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('futureTab')}</TabsTrigger>
+          <TabsTrigger value="ai" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('aiTab')}</TabsTrigger>
+          <TabsTrigger value="planning" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('planningTab')}</TabsTrigger>
+          <TabsTrigger value="allocation" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('investmentsTab')}</TabsTrigger>
+          <TabsTrigger value="goals" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('goalsTab')}</TabsTrigger>
+          <TabsTrigger value="insights" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('insightsTab')}</TabsTrigger>
+          <TabsTrigger value="social" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('socialTab')}</TabsTrigger>
+          <TabsTrigger value="banking" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('bankingTab')}</TabsTrigger>
         </TabsList>
 
         {/* Overview tab - Main dashboard view */}

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import RaioXDashboard from "@/components/RaioXDashboard";
 import ClientSelector from "@/components/ClientSelector";
@@ -12,6 +13,8 @@ import {
 import PluggyConnectModal from "@/components/PluggyConnectModal";
 import { Button } from "@/components/ui/button";
 import { useMobileBreakpoint } from "@/hooks/use-mobile";
+import { useLanguage } from "@/context/LanguageContext";
+import LanguageSelector from "@/components/LanguageSelector";
 
 const Index = () => {
   const [showPdfPreview, setShowPdfPreview] = useState(false);
@@ -22,6 +25,7 @@ const Index = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<number | null>(null);
   const isMobile = useMobileBreakpoint();
+  const { t } = useLanguage();
   
   const handleExportMedia = (type: string) => {
     setMediaType(type);
@@ -80,6 +84,8 @@ const Index = () => {
           
           {isMobile ? (
             <div className="flex items-center gap-4">
+              <LanguageSelector />
+              
               <Button 
                 variant="ghost" 
                 size="icon" 
@@ -116,13 +122,13 @@ const Index = () => {
                       {hasOpenFinance ? (
                         <>
                           <Shield className="h-4 w-4 mr-2" />
-                          <span>OpenFinance Ativo</span>
+                          <span>{t('openFinanceActive')}</span>
                           <ToggleRight className="h-5 w-5 ml-2" />
                         </>
                       ) : (
                         <>
                           <Lock className="h-4 w-4 mr-2" />
-                          <span>OpenFinance Inativo</span>
+                          <span>{t('openFinanceInactive')}</span>
                           <ToggleLeft className="h-5 w-5 ml-2" />
                         </>
                       )}
@@ -132,7 +138,7 @@ const Index = () => {
                       <DropdownMenuTrigger asChild>
                         <Button variant="purpleGradient" size="lg" className="flex items-center gap-2 w-full justify-center">
                           <FileDown className="h-4 w-4" />
-                          Exportar Diagnóstico
+                          {t('exportDiagnosis')}
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="bg-white/90 backdrop-blur-md border border-white/20 rounded-lg shadow-xl">
@@ -144,7 +150,7 @@ const Index = () => {
                           className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
                         >
                           <FileDown className="h-4 w-4" />
-                          <span>PDF</span>
+                          <span>{t('pdf')}</span>
                         </DropdownMenuItem>
                         
                         {isClientFull ? (
@@ -157,7 +163,7 @@ const Index = () => {
                               className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
                             >
                               <Podcast className="h-4 w-4" />
-                              <span>Podcast</span>
+                              <span>{t('podcast')}</span>
                             </DropdownMenuItem>
                             
                             <DropdownMenuItem 
@@ -168,7 +174,7 @@ const Index = () => {
                               className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
                             >
                               <Video className="h-4 w-4" />
-                              <span>Vídeo</span>
+                              <span>{t('video')}</span>
                             </DropdownMenuItem>
                           </>
                         ) : (
@@ -177,14 +183,14 @@ const Index = () => {
                               className="text-gray-500 flex items-center gap-2 cursor-not-allowed"
                             >
                               <Lock className="h-4 w-4" />
-                              <span>Podcast (Apenas clientes)</span>
+                              <span>{t('podcast')} ({t('onlyClientsFeature')})</span>
                             </DropdownMenuItem>
                             
                             <DropdownMenuItem 
                               className="text-gray-500 flex items-center gap-2 cursor-not-allowed"
                             >
                               <Lock className="h-4 w-4" />
-                              <span>Vídeo (Apenas clientes)</span>
+                              <span>{t('video')} ({t('onlyClientsFeature')})</span>
                             </DropdownMenuItem>
                           </>
                         )}
@@ -204,6 +210,8 @@ const Index = () => {
             </div>
           ) : (
             <div className="flex items-center space-x-4">
+              <LanguageSelector />
+            
               <div className="flex items-center mr-2">
                 <button 
                   className={`flex items-center px-3 py-1 rounded-full transition-colors ${
@@ -216,13 +224,13 @@ const Index = () => {
                   {hasOpenFinance ? (
                     <>
                       <Shield className="h-3.5 w-3.5 mr-1" />
-                      <span>OpenFinance Ativo</span>
+                      <span>{t('openFinanceActive')}</span>
                       <ToggleRight className="h-4 w-4 ml-2" />
                     </>
                   ) : (
                     <>
                       <Lock className="h-3.5 w-3.5 mr-1" />
-                      <span>OpenFinance Inativo</span>
+                      <span>{t('openFinanceInactive')}</span>
                       <ToggleLeft className="h-4 w-4 ml-2" />
                     </>
                   )}
@@ -233,7 +241,7 @@ const Index = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="purpleGradient" size="sm" className="flex items-center gap-2">
                     <FileDown className="h-4 w-4" />
-                    Exportar Diagnóstico
+                    {t('exportDiagnosis')}
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent className="bg-white/90 backdrop-blur-md border border-white/20 rounded-lg shadow-xl">
@@ -242,7 +250,7 @@ const Index = () => {
                     className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
                   >
                     <FileDown className="h-4 w-4" />
-                    <span>PDF</span>
+                    <span>{t('pdf')}</span>
                   </DropdownMenuItem>
                   
                   {isClientFull ? (
@@ -252,7 +260,7 @@ const Index = () => {
                         className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
                       >
                         <Podcast className="h-4 w-4" />
-                        <span>Podcast</span>
+                        <span>{t('podcast')}</span>
                       </DropdownMenuItem>
                       
                       <DropdownMenuItem 
@@ -260,7 +268,7 @@ const Index = () => {
                         className="text-black flex items-center gap-2 hover:bg-blue-100 cursor-pointer"
                       >
                         <Video className="h-4 w-4" />
-                        <span>Vídeo</span>
+                        <span>{t('video')}</span>
                       </DropdownMenuItem>
                     </>
                   ) : (
@@ -269,14 +277,14 @@ const Index = () => {
                         className="text-gray-500 flex items-center gap-2 cursor-not-allowed"
                       >
                         <Lock className="h-4 w-4" />
-                        <span>Podcast (Apenas clientes)</span>
+                        <span>{t('podcast')} ({t('onlyClientsFeature')})</span>
                       </DropdownMenuItem>
                       
                       <DropdownMenuItem 
                         className="text-gray-500 flex items-center gap-2 cursor-not-allowed"
                       >
                         <Lock className="h-4 w-4" />
-                        <span>Vídeo (Apenas clientes)</span>
+                        <span>{t('video')} ({t('onlyClientsFeature')})</span>
                       </DropdownMenuItem>
                     </>
                   )}
