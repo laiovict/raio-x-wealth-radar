@@ -7,6 +7,7 @@ import PluggyConnectModal from "@/components/PluggyConnectModal";
 import { useNavigate } from "react-router-dom";
 import LoadingScreen from "@/components/LoadingScreen";
 import TopNavigation from "@/components/TopNavigation";
+import TopControls from "@/components/TopControls";
 
 // Define the user data interface
 interface UserData {
