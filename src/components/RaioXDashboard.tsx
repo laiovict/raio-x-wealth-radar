@@ -161,15 +161,6 @@ const RaioXDashboard = ({
   return (
     <div className="space-y-8 pb-16 min-h-screen" ref={dashboardRef}>
       <div className="flex flex-col items-center justify-center mb-8">
-        <div className="w-full max-w-4xl bg-gradient-to-r from-[#101020] to-[#111930] rounded-xl border border-indigo-500/20 p-6 mb-6">
-          <h2 className="text-3xl font-bold text-white mb-2">
-            Bem-vindo, <span className="text-blue-400">{getClientFirstName()}</span>
-          </h2>
-          <p className="text-gray-300">
-            Seu diagnóstico financeiro está pronto
-          </p>
-        </div>
-        
         <div className="w-full max-w-md relative">
           <input 
             type="text"
