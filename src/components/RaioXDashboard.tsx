@@ -1,6 +1,6 @@
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mic, Search } from "lucide-react";
+import { Mic, Search, Share2 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
@@ -26,6 +26,11 @@ import WelcomeBanner from "./WelcomeBanner";
 import InteligenciaModule from "./modules/InteligenciaModule";
 import { toast } from "@/hooks/use-toast";
 import FeedbackSection from "./FeedbackSection";
+import { 
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 interface RaioXDashboardProps {
   showPdfPreview?: boolean;
@@ -128,6 +133,18 @@ const RaioXDashboard = ({
     recognition.start();
   };
 
+  const handleSharePdf = () => {
+    // Generate whatsapp share link with pre-filled message
+    const message = encodeURIComponent(`Olá, segue o diagnóstico financeiro para sua análise.`);
+    const whatsappUrl = `https://wa.me/?text=${message}`;
+    window.open(whatsappUrl, '_blank');
+    
+    toast({
+      title: "Link de compartilhamento criado",
+      description: "O link para WhatsApp foi aberto em uma nova aba."
+    });
+  };
+
   if (showPdfPreview) {
     return (
       <PdfPreview 
@@ -136,6 +153,7 @@ const RaioXDashboard = ({
         mediaType={mediaType}
         isClientFull={isClientFull}
         hasOpenFinance={hasOpenFinance}
+        onShare={handleSharePdf}
       />
     );
   }
@@ -143,9 +161,14 @@ const RaioXDashboard = ({
   return (
     <div className="space-y-8 pb-16 min-h-screen" ref={dashboardRef}>
       <div className="flex flex-col items-center justify-center mb-8">
-        <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-300 to-indigo-400 bg-clip-text text-transparent mb-2">
-          {t('welcomeMessage')} {getClientFirstName()}!
-        </h2>
+        <div className="w-full max-w-4xl bg-gradient-to-r from-[#101020] to-[#111930] rounded-xl border border-indigo-500/20 p-6 mb-6">
+          <h2 className="text-3xl font-bold text-white mb-2">
+            Bem-vindo, <span className="text-blue-400">{getClientFirstName()}</span>
+          </h2>
+          <p className="text-gray-300">
+            Seu diagnóstico financeiro está pronto
+          </p>
+        </div>
         
         <div className="w-full max-w-md relative">
           <input 

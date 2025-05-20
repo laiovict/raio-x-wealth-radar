@@ -1,5 +1,5 @@
 
-import { X, FileDown, Podcast, Video, Lock, Shield } from "lucide-react";
+import { X, FileDown, Podcast, Video, Lock, Shield, Share2 } from "lucide-react";
 
 interface PdfPreviewProps {
   onClose: () => void;
@@ -7,6 +7,7 @@ interface PdfPreviewProps {
   mediaType?: string;
   isClientFull?: boolean;
   hasOpenFinance?: boolean;
+  onShare?: () => void;
 }
 
 const PdfPreview = ({ 
@@ -14,7 +15,8 @@ const PdfPreview = ({
   clientData, 
   mediaType = "pdf",
   isClientFull = true,
-  hasOpenFinance = false
+  hasOpenFinance = false,
+  onShare
 }: PdfPreviewProps) => {
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -460,6 +462,13 @@ const PdfPreview = ({
             )}
           </h2>
           <div className="flex items-center space-x-4">
+            <button 
+              onClick={onShare}
+              className="px-4 py-2 bg-green-500/30 hover:bg-green-500/50 border border-green-500/30 rounded-full text-white text-sm font-medium transition-colors flex items-center gap-2"
+            >
+              <Share2 className="h-4 w-4" />
+              Enviar via WhatsApp
+            </button>
             <button 
               onClick={handleDownload}
               className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-full text-white text-sm font-medium transition-colors flex items-center gap-2"
