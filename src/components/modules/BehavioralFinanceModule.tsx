@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
 import { useRaioX } from "@/context/RaioXContext";
-import { Brain, AlertTriangle, TrendingUp, TrendingDown, Lock } from "lucide-react";
+import { Brain, AlertTriangle, TrendingUp, TrendingDown, Lock, Calendar } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 
@@ -62,7 +62,24 @@ const BehavioralFinanceModule = ({ fullWidth = false }) => {
     traits: behaviorTraits
   };
   
-  if (!hasOpenFinanceSixMonths) {
+  // Check if OpenFinance is active but client has less than 6 months of history
+  if (hasOpenFinance && !hasOpenFinanceSixMonths) {
+    return (
+      <Card className={`glass-morphism p-6 ${fullWidth ? 'w-full' : ''}`}>
+        <div className="flex flex-col items-center justify-center py-8 text-center">
+          <Calendar className="h-12 w-12 text-blue-500 mb-4" />
+          <h3 className="text-xl font-bold text-white mb-2">{t('behavioralFinanceTitle')}</h3>
+          <p className="text-gray-400 mb-4 max-w-md">
+            Em 6 meses, vamos mostrar em detalhe como funciona seu comportamento financeiro.
+            Estamos coletando mais dados para oferecer uma análise precisa.
+          </p>
+        </div>
+      </Card>
+    );
+  }
+  
+  // If OpenFinance is not activated at all, show the activation screen
+  if (!hasOpenFinance) {
     return (
       <Card className={`glass-morphism p-6 ${fullWidth ? 'w-full' : ''}`}>
         <div className="flex flex-col items-center justify-center py-8 text-center">
