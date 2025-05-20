@@ -74,7 +74,7 @@ export const ensureSafeNumber = (value: number | string | undefined | null): num
  * @param source DataSourceType value
  * @returns Safe data source value for components that expect 'synthetic' | 'supabase'
  */
-export const getSafeDataSource = (source?: DataSourceType): 'synthetic' | 'supabase' => {
+export const getSafeDataSource = (source?: DataSourceType | string): 'synthetic' | 'supabase' => {
   if (!source || source === 'synthetic') return 'synthetic';
   return 'supabase';
 };
@@ -107,8 +107,10 @@ export const processMixedTypeArray = <T extends Record<string, any>>(
 /**
  * Convert any data source type to a 'synthetic' | 'supabase' format
  * that's compatible with legacy components
+ * @param source The data source type to convert
+ * @returns 'synthetic' or 'supabase'
  */
-export const getCompatibleDataSource = (source?: DataSourceType): 'synthetic' | 'supabase' => {
+export const getCompatibleDataSource = (source?: DataSourceType | string): 'synthetic' | 'supabase' => {
   if (!source || source === 'synthetic') return 'synthetic';
   return 'supabase';
 };

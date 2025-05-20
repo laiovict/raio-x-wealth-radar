@@ -6,7 +6,7 @@ import { ArrowUp, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
-import { formatCurrency } from '@/utils/typeConversionHelpers';
+import { formatCurrency, ensureString } from '@/utils/typeConversionHelpers';
 import DataSourceTag from '@/components/common/DataSourceTag';
 import { DataSourceType } from '@/types/raioXTypes';
 import { toCompatibleDataSource } from '@/utils/dataSourceAdapter';
@@ -16,9 +16,9 @@ interface LifeGoalsModuleProps {
 }
 
 // Data source indicator component
-const DataSourceIndicator = ({ source }: { source?: DataSourceType }) => {
+const DataSourceIndicator = ({ source }: { source?: DataSourceType | string }) => {
   if (!source) return null;
-  return <DataSourceTag source={source} />;
+  return <DataSourceTag source={toCompatibleDataSource(source as DataSourceType)} />;
 };
 
 const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {

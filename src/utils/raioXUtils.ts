@@ -1,6 +1,6 @@
 
 import { DividendHistory, FinancialSummary } from '@/types/raioXTypes';
-import { toNumber as convertToNumber } from '@/utils/typeConversionHelpers';
+import { toNumber as convertToNumber, ensureNumber, ensureString } from '@/utils/typeConversionHelpers';
 
 /**
  * Format currency values consistently
@@ -9,7 +9,7 @@ import { toNumber as convertToNumber } from '@/utils/typeConversionHelpers';
  * @param maximumFractionDigits Maximum fraction digits
  * @returns Formatted currency string
  */
-export const formatCurrency = (value: number | string, minimumFractionDigits = 0, maximumFractionDigits = 0): string => {
+export const formatCurrency = (value: number | string | undefined | null, minimumFractionDigits = 0, maximumFractionDigits = 0): string => {
   // Convert value to number if it's a string
   const numValue = convertToNumber(value);
   
@@ -27,8 +27,9 @@ export const formatCurrency = (value: number | string, minimumFractionDigits = 0
  * @param digits Decimal digits to display
  * @returns Formatted percentage string
  */
-export const formatPercentage = (value: number, digits = 1) => {
-  return `${value.toFixed(digits)}%`;
+export const formatPercentage = (value: number | string | undefined | null, digits = 1): string => {
+  const numValue = convertToNumber(value);
+  return `${numValue.toFixed(digits)}%`;
 };
 
 /**
@@ -37,7 +38,7 @@ export const formatPercentage = (value: number, digits = 1) => {
  * @param options Intl.DateTimeFormatOptions
  * @returns Formatted date string
  */
-export const formatDate = (date: Date | string, options?: Intl.DateTimeFormatOptions) => {
+export const formatDate = (date: Date | string, options?: Intl.DateTimeFormatOptions): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
   return dateObj.toLocaleDateString('pt-BR', options || {
     day: '2-digit',
@@ -67,7 +68,7 @@ export const calculateTotalDividends = (dividendHistory: DividendHistory[] | und
   if (!dividendHistory || dividendHistory.length === 0) return 0;
   
   return dividendHistory.reduce((total, item) => {
-    return total + parseValueToNumber(item.value || '0');
+    return total + parseValueToNumber(ensureString(item.value || '0'));
   }, 0);
 };
 

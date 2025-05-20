@@ -10,7 +10,7 @@ import { toNumber, toString, ensureString, ensureNumber } from './typeConversion
  * @param value The value to format
  * @returns Formatted currency string
  */
-export const formatCurrency = (value: string | number): string => {
+export const formatCurrency = (value: string | number | undefined | null): string => {
   // Convert to number first
   const numValue = toNumber(value);
   
@@ -29,7 +29,7 @@ export const formatCurrency = (value: string | number): string => {
  * @param decimals Number of decimal places
  * @returns Formatted percentage string
  */
-export const formatPercentage = (value: string | number, decimals = 2): string => {
+export const formatPercentage = (value: string | number | undefined | null, decimals = 2): string => {
   // Convert to number first
   const numValue = toNumber(value);
   

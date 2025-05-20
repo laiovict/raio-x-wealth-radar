@@ -9,8 +9,10 @@ import { DataSourceType } from '@/types/raioXTypes';
 
 /**
  * Convert full DataSourceType to the limited version expected by some components
+ * @param sourceType The original DataSourceType value
+ * @returns 'synthetic' or 'supabase' for legacy component compatibility
  */
-export const toLimitedDataSource = (sourceType?: DataSourceType): 'synthetic' | 'supabase' => {
+export const toLimitedDataSource = (sourceType?: DataSourceType | string): 'synthetic' | 'supabase' => {
   if (!sourceType || sourceType === 'synthetic') {
     return 'synthetic';
   }
@@ -21,8 +23,14 @@ export const toLimitedDataSource = (sourceType?: DataSourceType): 'synthetic' | 
 
 /**
  * Convert the limited DataSource type back to a full DataSourceType
+ * @param limitedType The limited data source type ('synthetic' or 'supabase')
+ * @param actualSource The actual data source if known
+ * @returns The full DataSourceType value
  */
-export const toFullDataSource = (limitedType: 'synthetic' | 'supabase', actualSource?: DataSourceType): DataSourceType => {
+export const toFullDataSource = (
+  limitedType: 'synthetic' | 'supabase', 
+  actualSource?: DataSourceType
+): DataSourceType => {
   if (limitedType === 'synthetic') {
     return 'synthetic';
   }
@@ -34,15 +42,19 @@ export const toFullDataSource = (limitedType: 'synthetic' | 'supabase', actualSo
 /**
  * Convert to compatible data source format for older components
  * Alias for toLimitedDataSource
+ * @param sourceType The original DataSourceType value
+ * @returns 'synthetic' or 'supabase' for legacy component compatibility
  */
-export const toCompatibleDataSource = (sourceType?: DataSourceType): 'synthetic' | 'supabase' => {
+export const toCompatibleDataSource = (sourceType?: DataSourceType | string): 'synthetic' | 'supabase' => {
   return toLimitedDataSource(sourceType);
 };
 
 /**
  * Check if a value is from a real data source or is synthetic
+ * @param sourceType The data source type to check
+ * @returns True if this is real (non-synthetic) data
  */
-export const isRealData = (sourceType?: DataSourceType): boolean => {
+export const isRealData = (sourceType?: DataSourceType | string): boolean => {
   return sourceType !== undefined && sourceType !== 'synthetic';
 };
 
@@ -50,11 +62,13 @@ export const isRealData = (sourceType?: DataSourceType): boolean => {
  * Interface for objects with a dataSource property
  */
 export interface WithDataSource {
-  dataSource?: DataSourceType;
+  dataSource?: DataSourceType | string;
 }
 
 /**
  * Adapt an object's dataSource property to be compatible with limited components
+ * @param obj The object with a dataSource property
+ * @returns The object with a compatible dataSource property
  */
 export const adaptForLimitedComponents = <T extends WithDataSource>(obj: T): T & {dataSource: 'synthetic' | 'supabase'} => {
   return {
@@ -65,13 +79,19 @@ export const adaptForLimitedComponents = <T extends WithDataSource>(obj: T): T &
 
 /**
  * Adapt a collection of objects with dataSource properties
+ * @param collection The collection of objects with dataSource properties
+ * @returns The collection with compatible dataSource properties
  */
-export const adaptCollectionForLimitedComponents = <T extends WithDataSource>(collection: T[]): (T & {dataSource: 'synthetic' | 'supabase'})[] => {
+export const adaptCollectionForLimitedComponents = <T extends WithDataSource>(
+  collection: T[]
+): (T & {dataSource: 'synthetic' | 'supabase'})[] => {
   return collection.map(item => adaptForLimitedComponents(item));
 };
 
 /**
  * Determine if a value is likely a "real" value (not missing/empty/zero)
+ * @param value The value to check
+ * @returns True if the value is considered real (not empty/zero)
  */
 export const hasActualValue = (value: any): boolean => {
   if (value === undefined || value === null) return false;
