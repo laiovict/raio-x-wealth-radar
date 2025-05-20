@@ -11,6 +11,18 @@ interface RecommendedActionsModuleProps {
 
 const RecommendedActionsModule = ({ fullWidth = false }: RecommendedActionsModuleProps) => {
   const { hasOpenFinance, recommendedActions, isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
+  
+  // Function to handle OpenFinance activation button click
+  const handleActivateOpenFinance = () => {
+    const event = new CustomEvent('activate-openfinance');
+    document.dispatchEvent(event);
+  };
+  
+  // Function to handle action execution
+  const handleExecuteAction = (actionId: string) => {
+    console.log(`Executing action with ID: ${actionId}`);
+    // In a real implementation, this would execute the action
+  };
 
   const getCategoryColor = (category: string) => {
     switch (category) {
@@ -112,7 +124,11 @@ const RecommendedActionsModule = ({ fullWidth = false }: RecommendedActionsModul
             <p className="text-gray-400 max-w-md mb-4">
               Para receber recomendações personalizadas, é necessário ativar o OpenFinance para permitir a análise completa de seus dados financeiros.
             </p>
-            <Button variant="outline" className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800">
+            <Button 
+              variant="outline" 
+              className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800"
+              onClick={handleActivateOpenFinance}
+            >
               Ativar OpenFinance
             </Button>
           </div>
@@ -180,7 +196,10 @@ const RecommendedActionsModule = ({ fullWidth = false }: RecommendedActionsModul
                 <span className="font-medium">Impacto Esperado:</span> {action.impact}
               </div>
               <div className="mt-3 flex justify-end">
-                <Button className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800">
+                <Button 
+                  className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800"
+                  onClick={() => handleExecuteAction(action.id)}
+                >
                   Executar <ArrowRight className="ml-1 h-4 w-4" />
                 </Button>
               </div>

@@ -11,8 +11,20 @@ interface MeuFuturoFinanceiroModuleProps {
 }
 
 const MeuFuturoFinanceiroModule = ({ fullWidth = false }: MeuFuturoFinanceiroModuleProps) => {
-  const { data } = useRaioX();
+  const { data, hasOpenFinance } = useRaioX();
   const isMobile = useMobileBreakpoint();
+
+  // Function to handle actions in the Meu Futuro Financeiro module
+  const handleAction = (action: string) => {
+    console.log(`Action triggered: ${action}`);
+    // In a real implementation, this would execute the action
+  };
+  
+  // Function to handle OpenFinance activation button click
+  const handleActivateOpenFinance = () => {
+    const event = new CustomEvent('activate-openfinance');
+    document.dispatchEvent(event);
+  };
   
   // Diagnostic data inspired by the Instagram posts
   const diagnostic = {
@@ -96,6 +108,8 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false }: MeuFuturoFinanceiroMod
     }).format(value);
   };
 
+  // OpenFinance is not required for this module specifically
+  // It can function with limited data even without OpenFinance
   return (
     <Card className={`overflow-hidden ${fullWidth ? "w-full" : "w-full"}`}>
       <CardHeader className="bg-gradient-to-r from-blue-900 to-indigo-900 pb-3">
@@ -240,6 +254,7 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false }: MeuFuturoFinanceiroMod
         <div className="p-5 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 flex justify-center">
           <Button 
             className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all"
+            onClick={() => handleAction("ViewCompletePlan")}
           >
             Ver Plano Financeiro Completo
             <ArrowRight className="ml-2 h-4 w-4" />

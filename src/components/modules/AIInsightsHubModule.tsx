@@ -15,6 +15,18 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Function to handle OpenFinance activation button click
+  const handleActivateOpenFinance = () => {
+    const event = new CustomEvent('activate-openfinance');
+    document.dispatchEvent(event);
+  };
+  
+  // Function to handle view details click
+  const handleViewDetails = (insightId: string) => {
+    console.log(`Viewing details for insight with ID: ${insightId}`);
+    // In a real implementation, this would navigate to or open a modal with insight details
+  };
+  
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'risk':
@@ -116,7 +128,11 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
             <p className="text-gray-400 max-w-md mb-4">
               Para acessar insights personalizados da IA, é necessário ativar o OpenFinance para permitir a análise de seus dados financeiros.
             </p>
-            <Button variant="outline" className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800">
+            <Button 
+              variant="outline" 
+              className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800"
+              onClick={handleActivateOpenFinance}
+            >
               Ativar OpenFinance
             </Button>
           </div>
@@ -217,7 +233,12 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
                 </div>
                 <p className="mt-2 text-sm text-gray-300">{insight.description}</p>
                 <div className="mt-3 flex justify-end">
-                  <Button variant="ghost" size="sm" className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                    onClick={() => handleViewDetails(insight.id)}
+                  >
                     Ver detalhes <ChevronRight className="ml-1 h-4 w-4" />
                   </Button>
                 </div>

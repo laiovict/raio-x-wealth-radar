@@ -1,107 +1,36 @@
 
-import { useState } from "react";
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Pencil, Check, ArrowUp, ArrowDown, Minus, Target, Wallet, PiggyBank, CalendarClock, Briefcase } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { AlertTriangle, RefreshCw, Clock, ChevronDown, ChevronUp, ArrowRight, ChevronRight, Shield } from "lucide-react";
+import { useState } from "react";
 
 interface OnePageFinancialPlanModuleProps {
   fullWidth?: boolean;
 }
 
 const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanModuleProps) => {
-  const { data, hasOpenFinance, financialSummary } = useRaioX();
-  const [isEditingPurpose, setIsEditingPurpose] = useState(false);
-  const [financialPurpose, setFinancialPurpose] = useState(
-    data.financialPurpose || "Reduzir significativamente minha carga horária aos 45 anos com segurança financeira, e atingir independência financeira completa aos 50 anos."
-  );
-  const [tempPurpose, setTempPurpose] = useState(financialPurpose);
+  const { hasOpenFinance, isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    "cashFlow": true,
+    "investments": false,
+    "goals": false,
+    "protection": false,
+    "taxes": false,
+    "estate": false
+  });
 
-  // Format currency
-  const formatCurrency = (value: number | undefined) => {
-    if (value === undefined) return "N/A";
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      maximumFractionDigits: 0,
-    }).format(value);
+  // Function to handle OpenFinance activation button click
+  const handleActivateOpenFinance = () => {
+    const event = new CustomEvent('activate-openfinance');
+    document.dispatchEvent(event);
   };
 
-  const handleSavePurpose = () => {
-    setFinancialPurpose(tempPurpose);
-    setIsEditingPurpose(false);
-    // In a real app, we would save this to the backend
-  };
-
-  // Get top 3 goals from the life goals data
-  const topGoals = [
-    {
-      name: "Redução de carga horária aos 45 anos",
-      targetAmount: 6000000,
-      currentAmount: 2300000,
-      progress: 38,
-      timeframe: "8 anos (2033)",
-      adjustmentNeeded: 4
-    },
-    {
-      name: "Aposentadoria completa aos 50 anos",
-      targetAmount: 10000000,
-      currentAmount: 2300000,
-      progress: 23,
-      timeframe: "13 anos (2038)",
-      adjustmentNeeded: 8
-    },
-    {
-      name: "Fundo para sucessão familiar",
-      targetAmount: 10000000,
-      currentAmount: 10000000,
-      progress: 100,
-      timeframe: "Imediato (Seguros de vida)",
-      adjustmentNeeded: 0
-    }
-  ];
-  
-  // Monthly cash flow data
-  const monthlyIncome = financialSummary?.monthlyIncome || 120000;
-  const monthlyExpenses = financialSummary?.monthlyExpenses || 25000;
-  const monthlySavings = monthlyIncome - monthlyExpenses;
-  const savingsRate = ((monthlySavings / monthlyIncome) * 100).toFixed(1);
-  
-  // Cash flow trend (would be calculated from historical data)
-  const cashFlowTrend = "up"; // "up", "down", or "stable"
-  
-  // Next actions (would come from AI recommendations)
-  const nextActions = [
-    { 
-      id: "1", 
-      description: "Otimizar estrutura tributária PJ para reduzir carga fiscal",
-      deadline: "Próximos 60 dias", 
-      completed: false,
-      priority: "high" 
-    },
-    { 
-      id: "2", 
-      description: "Diversificar investimentos internacionais além da Avenue",
-      deadline: "Próximos 90 dias", 
-      completed: false,
-      priority: "medium" 
-    },
-    { 
-      id: "3", 
-      description: "Estruturar planejamento sucessório formal (testamento/holding)",
-      deadline: "Até 31/12/2025", 
-      completed: false,
-      priority: "medium" 
-    }
-  ];
-  
-  // Toggle action completion
-  const toggleActionCompletion = (id: string) => {
-    // In a real app, we would update this in the backend
-    console.log(`Toggling action ${id}`);
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
   };
 
   if (!hasOpenFinance) {
@@ -109,17 +38,21 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
       <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
         <CardHeader className="pb-2">
           <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-            Plano Financeiro RaioX em Uma Página
+            Plano Financeiro (One-Page)
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col items-center justify-center py-8 text-center">
-            <Target className="h-12 w-12 text-blue-400 mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Ative o OpenFinance para Acessar seu Plano Personalizado</h3>
+            <AlertTriangle className="w-16 h-16 text-amber-400 mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Plano Financeiro Indisponível</h3>
             <p className="text-gray-400 max-w-md mb-4">
-              O Plano Financeiro RaioX em Uma Página sintetiza sua situação financeira, objetivos e próximos passos em uma visão clara e acionável.
+              Para acessar seu plano financeiro personalizado, é necessário ativar o OpenFinance para permitir a análise completa de seus dados financeiros.
             </p>
-            <Button className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+            <Button 
+              variant="outline" 
+              className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800"
+              onClick={handleActivateOpenFinance}
+            >
               Ativar OpenFinance
             </Button>
           </div>
@@ -128,338 +61,302 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
     );
   }
 
+  if (isAIAnalysisLoading) {
+    return (
+      <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+            Plano Financeiro (One-Page)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col items-center justify-center py-8">
+            <RefreshCw className="w-12 h-12 text-blue-500 animate-spin mb-4" />
+            <p className="text-gray-400">Gerando plano financeiro personalizado...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Mock data for the financial plan
+  const financialPlan = {
+    lastUpdated: "2023-05-15T10:30:00Z",
+    sections: [
+      {
+        id: "cashFlow",
+        title: "Fluxo de Caixa",
+        icon: <Clock className="h-5 w-5 text-green-500" />,
+        summary: "Renda mensal líquida de R$ 12.500 com despesas fixas de R$ 8.750 (70% da renda).",
+        details: [
+          { label: "Receita total", value: "R$ 15.000/mês" },
+          { label: "Impostos", value: "R$ 2.500 (16,7%)" },
+          { label: "Despesas fixas", value: "R$ 8.750 (70% da receita líquida)" },
+          { label: "Despesas variáveis", value: "R$ 2.500 (20% da receita líquida)" },
+          { label: "Poupança atual", value: "R$ 1.250 (10% da receita líquida)" }
+        ],
+        actions: [
+          { text: "Aumentar taxa de poupança para 20%" },
+          { text: "Reduzir gastos com streaming em 30%" },
+          { text: "Revisar plano de telefonia" }
+        ]
+      },
+      {
+        id: "investments",
+        title: "Investimentos",
+        icon: <TrendingUp className="h-5 w-5 text-blue-500" />,
+        summary: "Carteira atual de R$ 325.000 com concentração em renda fixa (65%).",
+        details: [
+          { label: "Valor total investido", value: "R$ 325.000" },
+          { label: "Renda fixa", value: "R$ 211.250 (65%)" },
+          { label: "Renda variável", value: "R$ 81.250 (25%)" },
+          { label: "Alternativos", value: "R$ 32.500 (10%)" },
+          { label: "Rentabilidade YTD", value: "7,8% (vs. benchmark 8,5%)" }
+        ],
+        actions: [
+          { text: "Rebalancear carteira para 50/35/15" },
+          { text: "Diversificar exposição internacional" },
+          { text: "Avaliar fundos de dividendos" }
+        ]
+      },
+      {
+        id: "goals",
+        title: "Objetivos Financeiros",
+        icon: <Target className="h-5 w-5 text-purple-500" />,
+        summary: "3 objetivos principais definidos, com gap de 35% no financeiro para aposentadoria.",
+        details: [
+          { 
+            label: "Aposentadoria", 
+            value: "Meta: R$ 4,5M (2043) / Atual: R$ 250.000", 
+            progress: 35
+          },
+          { 
+            label: "Educação filhos", 
+            value: "Meta: R$ 500.000 (2030) / Atual: R$ 125.000", 
+            progress: 60 
+          },
+          { 
+            label: "Imóvel de veraneio", 
+            value: "Meta: R$ 800.000 (2027) / Atual: R$ 200.000", 
+            progress: 45
+          }
+        ],
+        actions: [
+          { text: "Aumentar aportes para aposentadoria em R$ 1.500/mês" },
+          { text: "Revisar estratégia para objetivo de curto prazo" }
+        ]
+      },
+      {
+        id: "protection",
+        title: "Proteção Patrimonial",
+        icon: <Shield className="h-5 w-5 text-red-500" />,
+        summary: "Cobertura básica de seguros, com gaps em seguro de vida e previdência.",
+        details: [
+          { label: "Seguro de vida", value: "R$ 500.000 (recomendado: R$ 1,2M)" },
+          { label: "Seguro saúde", value: "Plano empresarial completo" },
+          { label: "Seguro patrimonial", value: "Residência segurada (80% do valor)" },
+          { label: "Previdência privada", value: "Não possui" }
+        ],
+        actions: [
+          { text: "Contratar seguro de vida complementar" },
+          { text: "Avaliar PGBL/VGBL com benefício fiscal" },
+          { text: "Revisar coberturas do seguro residencial" }
+        ]
+      },
+      {
+        id: "taxes",
+        title: "Planejamento Tributário",
+        icon: <FileClock className="h-5 w-5 text-amber-500" />,
+        summary: "Potencial economia de R$ 9.500/ano com otimizações tributárias.",
+        details: [
+          { label: "IR pessoa física", value: "Alíquota efetiva: 15,5%" },
+          { label: "Declaração completa", value: "Sim (mais vantajosa)" },
+          { label: "Despesas dedutíveis", value: "R$ 28.000/ano" },
+          { label: "Ganhos isentos", value: "R$ 35.000/ano" }
+        ],
+        actions: [
+          { text: "Avaliar uso de holding familiar" },
+          { text: "Otimizar declaração com despesas médicas" },
+          { text: "Revisar estratégia de previdência privada" }
+        ]
+      },
+      {
+        id: "estate",
+        title: "Planejamento Sucessório",
+        icon: <Users className="h-5 w-5 text-indigo-500" />,
+        summary: "Sem planejamento sucessório formal estabelecido.",
+        details: [
+          { label: "Testamento", value: "Não possui" },
+          { label: "Holding familiar", value: "Não possui" },
+          { label: "Doação em vida", value: "Não realizada" },
+          { label: "Seguro vida com beneficiários", value: "Parcial (R$ 500.000)" }
+        ],
+        actions: [
+          { text: "Elaborar testamento" },
+          { text: "Consultar sobre planejamento sucessório" },
+          { text: "Revisar beneficiários do seguro" }
+        ]
+      }
+    ]
+  };
+
+  // Components needed for the financial plan sections
+  const Target = (props: any) => (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      width="24" 
+      height="24" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      {...props}
+    >
+      <circle cx="12" cy="12" r="10" />
+      <circle cx="12" cy="12" r="6" />
+      <circle cx="12" cy="12" r="2" />
+    </svg>
+  );
+
+  const FileClock = (props: any) => (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      width="24" 
+      height="24" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      {...props}
+    >
+      <path d="M16 2v4a2 2 0 0 0 2 2h4" />
+      <path d="M22 5.5V22a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h12.5z" />
+      <circle cx="12" cy="14" r="4" />
+      <path d="M12 12v2l1.5 1" />
+    </svg>
+  );
+
+  const Users = (props: any) => (
+    <svg 
+      xmlns="http://www.w3.org/2000/svg" 
+      width="24" 
+      height="24" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      {...props}
+    >
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+    </svg>
+  );
+
+  // Helper function to format date
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('pt-BR', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
-      <CardHeader>
-        <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent flex items-center">
-          <Target className="mr-2 h-5 w-5" />
-          Plano Financeiro RaioX em Uma Página
-        </CardTitle>
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+            Plano Financeiro (One-Page)
+          </CardTitle>
+          <Button variant="ghost" size="sm" onClick={refreshAIAnalysis} className="flex items-center gap-2">
+            <RefreshCw className="h-4 w-4" />
+            <span className="hidden md:inline">Atualizar</span>
+          </Button>
+        </div>
+        <p className="text-xs text-gray-400">
+          Última atualização: {formatDate(financialPlan.lastUpdated)}
+        </p>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* 1. Financial Purpose (The "Why") */}
-        <div className="bg-gradient-to-r from-blue-900/20 to-indigo-900/20 rounded-lg p-5 border border-blue-900/30">
-          <div className="flex justify-between items-start mb-2">
-            <h3 className="text-white font-medium">Meu Propósito Financeiro</h3>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="h-8 w-8 p-0" 
-              onClick={() => {
-                if (isEditingPurpose) {
-                  handleSavePurpose();
-                } else {
-                  setTempPurpose(financialPurpose);
-                  setIsEditingPurpose(true);
-                }
-              }}
+      <CardContent>
+        <div className="space-y-4">
+          {financialPlan.sections.map((section) => (
+            <div 
+              key={section.id}
+              className="border border-white/10 rounded-lg overflow-hidden bg-white/5"
             >
-              {isEditingPurpose ? <Check className="h-4 w-4" /> : <Pencil className="h-4 w-4" />}
-            </Button>
-          </div>
-          
-          {isEditingPurpose ? (
-            <textarea
-              value={tempPurpose}
-              onChange={(e) => setTempPurpose(e.target.value)}
-              className="w-full bg-white/5 rounded-md p-3 text-white border border-white/10 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              rows={3}
-              placeholder="Por que o dinheiro é importante para você? O que você quer alcançar com seus recursos financeiros?"
-            />
-          ) : (
-            <p className="text-gray-200 italic">&ldquo;{financialPurpose}&rdquo;</p>
-          )}
-        </div>
-        
-        {/* 2. Key Goals (The "What" and "Where") */}
-        <div>
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-white font-medium flex items-center">
-              <Target className="mr-2 h-5 w-5 text-blue-400" />
-              Meus Objetivos Principais
-            </h3>
-            <Button variant="outline" size="sm" className="h-8 text-xs">
-              Ver Todos
-            </Button>
-          </div>
-          
-          <div className="space-y-4">
-            {topGoals.map((goal, index) => (
-              <div key={index} className="bg-white/5 rounded-lg p-4 border border-white/10">
-                <div className="flex justify-between items-start mb-2">
-                  <div>
-                    <div className="flex items-center">
-                      <h4 className="text-white font-medium">{goal.name}</h4>
-                      <Badge className="ml-2" variant={
-                        goal.adjustmentNeeded <= 0 ? "success" :
-                        goal.adjustmentNeeded <= 5 ? "warning" : "destructive"
-                      }>
-                        {goal.adjustmentNeeded <= 0 ? "No Caminho" : "Requer Atenção"}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-gray-400">Meta: {formatCurrency(goal.targetAmount)} até {goal.timeframe}</p>
-                  </div>
-                  <span className="text-lg font-semibold text-white">{goal.progress}%</span>
-                </div>
-                
-                <Progress value={goal.progress} className="h-2" variant={
-                  goal.adjustmentNeeded <= 0 ? "success" :
-                  goal.adjustmentNeeded <= 5 ? "warning" : "destructive"
-                } />
-                
-                <div className="flex justify-between text-xs text-gray-400 mt-1">
-                  <span>Atual: {formatCurrency(goal.currentAmount)}</span>
-                  <span>Faltam: {formatCurrency(goal.targetAmount - goal.currentAmount)}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* 3. Current Financial Snapshot (The "Where I Am") */}
-        <div>
-          <h3 className="text-white font-medium flex items-center mb-3">
-            <Wallet className="mr-2 h-5 w-5 text-blue-400" />
-            Meu Instantâneo Financeiro
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-              <p className="text-sm text-gray-400 mb-1">Patrimônio Total</p>
-              <div className="flex items-center justify-between">
-                <span className="text-xl font-bold text-white">{formatCurrency(4800000)}</span>
-                <div className="flex flex-col items-end">
-                  <div className="text-green-400 flex items-center text-xs">
-                    <ArrowUp className="h-3 w-3 mr-1" />
-                    <span>+12.8% (YTD)</span>
-                  </div>
-                  <div className="text-xs text-gray-400 mt-1">Inclui participações societárias</div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-              <p className="text-sm text-gray-400 mb-1">Fluxo de Caixa Mensal</p>
-              <div className="space-y-1">
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-400">Receita Média:</span>
-                  <span className="text-white">{formatCurrency(monthlyIncome)}</span>
-                </div>
-                <div className="flex justify-between text-xs">
-                  <span className="text-gray-400">Despesa Média:</span>
-                  <span className="text-white">{formatCurrency(monthlyExpenses)}</span>
-                </div>
-                <div className="flex justify-between text-sm font-medium pt-1 border-t border-white/10 mt-1">
-                  <span className="text-gray-300">Saldo Médio:</span>
-                  <span className={cn(
-                    "flex items-center",
-                    monthlySavings > 0 ? "text-green-400" : "text-red-400"
-                  )}>
-                    {monthlySavings > 0 ? (
-                      <ArrowUp className="h-3 w-3 mr-1" />
-                    ) : (
-                      <ArrowDown className="h-3 w-3 mr-1" />
-                    )}
-                    {formatCurrency(Math.abs(monthlySavings))}
-                  </span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-              <p className="text-sm text-gray-400 mb-1">Taxa de Poupança</p>
-              <div className="flex items-center justify-between">
-                <span className="text-xl font-bold text-white">{savingsRate}%</span>
-                <div className={cn(
-                  "flex items-center text-xs",
-                  cashFlowTrend === "up" ? "text-green-400" : 
-                  cashFlowTrend === "down" ? "text-red-400" : "text-gray-400"
-                )}>
-                  {cashFlowTrend === "up" ? (
-                    <>
-                      <ArrowUp className="h-3 w-3 mr-1" />
-                      <span>Excelente</span>
-                    </>
-                  ) : cashFlowTrend === "down" ? (
-                    <>
-                      <ArrowDown className="h-3 w-3 mr-1" />
-                      <span>Tendência Negativa</span>
-                    </>
-                  ) : (
-                    <>
-                      <Minus className="h-3 w-3 mr-1" />
-                      <span>Estável</span>
-                    </>
-                  )}
-                </div>
-              </div>
-              <p className="text-xs text-gray-400 mt-2">
-                <span className="text-blue-400">Destaque:</span> Sua taxa está entre as 1% mais altas, indicando excelente capacidade de acumulação.
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        {/* Business Participation Section */}
-        <div>
-          <h3 className="text-white font-medium flex items-center mb-3">
-            <Briefcase className="mr-2 h-5 w-5 text-blue-400" />
-            Minhas Participações Societárias
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h4 className="text-white font-medium">Núcleo Oftalmológico (Valadares)</h4>
-                  <p className="text-xs text-gray-400 mt-1">Clínica principal com mais de 40 funcionários</p>
-                </div>
-                <Badge variant="outline">Principal</Badge>
-              </div>
-              <div className="mt-3 flex items-center justify-between">
-                <div className="text-sm">
-                  <div className="text-gray-400">Participação: 100%</div>
-                  <div className="text-white mt-1">Valor estimado: <span className="font-medium">Em análise</span></div>
-                </div>
-                <div className="text-xs text-green-400 flex items-center">
-                  <ArrowUp className="h-3 w-3 mr-1" />
-                  <span>Crescimento estável</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h4 className="text-white font-medium">Instituto de Olhos (Teófilo Otoni)</h4>
-                  <p className="text-xs text-gray-400 mt-1">Atendimento semanal com mais de 25 funcionários</p>
-                </div>
-                <Badge variant="outline">Sociedade</Badge>
-              </div>
-              <div className="mt-3 flex items-center justify-between">
-                <div className="text-sm">
-                  <div className="text-gray-400">Participação: 10%</div>
-                  <div className="text-white mt-1">Valor estimado: <span className="font-medium">{formatCurrency(1600000)}</span></div>
-                </div>
-                <div className="text-xs text-green-400 flex items-center">
-                  <ArrowUp className="h-3 w-3 mr-1" />
-                  <span>Alto crescimento</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h4 className="text-white font-medium">Instituto de Olhos (Caratinga)</h4>
-                  <p className="text-xs text-gray-400 mt-1">Atendimento semanal com 5 funcionários</p>
-                </div>
-                <Badge variant="outline">Sociedade</Badge>
-              </div>
-              <div className="mt-3 flex items-center justify-between">
-                <div className="text-sm">
-                  <div className="text-gray-400">Participação: 25%</div>
-                  <div className="text-white mt-1">Valor estimado: <span className="font-medium">{formatCurrency(750000)}</span></div>
-                </div>
-                <div className="text-xs text-yellow-400 flex items-center">
-                  <Minus className="h-3 w-3 mr-1" />
-                  <span>Crescimento moderado</span>
-                </div>
-              </div>
-            </div>
-            
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h4 className="text-white font-medium">Investimento em Terreno</h4>
-                  <p className="text-xs text-gray-400 mt-1">Sociedade com amigo</p>
-                </div>
-                <Badge variant="outline">Imóvel</Badge>
-              </div>
-              <div className="mt-3 flex items-center justify-between">
-                <div className="text-sm">
-                  <div className="text-gray-400">Participação: 50%</div>
-                  <div className="text-white mt-1">Valor estimado: <span className="font-medium">{formatCurrency(100000)}</span></div>
-                </div>
-                <div className="text-xs text-gray-400 flex items-center">
-                  <Minus className="h-3 w-3 mr-1" />
-                  <span>Valorização lenta</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* 4. Next Crucial Actions (The "How" / "What to Do Now") */}
-        <div>
-          <h3 className="text-white font-medium flex items-center mb-3">
-            <CalendarClock className="mr-2 h-5 w-5 text-blue-400" />
-            Minhas Próximas Ações
-          </h3>
-          
-          <div className="space-y-3">
-            {nextActions.map((action) => (
-              <div 
-                key={action.id} 
-                className={cn(
-                  "flex items-start p-4 rounded-lg border",
-                  action.completed 
-                    ? "bg-green-900/20 border-green-900/30 line-through opacity-60" 
-                    : "bg-white/5 border-white/10"
-                )}
+              <button 
+                className="w-full flex items-center justify-between p-4 text-left"
+                onClick={() => toggleSection(section.id)}
               >
-                <Button
-                  variant={action.completed ? "success" : "outline"}
-                  size="sm"
-                  className="h-6 w-6 p-0 mr-3 mt-0.5 flex-shrink-0"
-                  onClick={() => toggleActionCompletion(action.id)}
-                >
-                  <Check className="h-3 w-3" />
-                </Button>
-                
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <p className={cn(
-                      "font-medium",
-                      action.completed ? "text-gray-400" : "text-white"
-                    )}>
-                      {action.description}
-                    </p>
-                    <Badge 
-                      variant={
-                        action.priority === "high" ? "destructive" : 
-                        action.priority === "medium" ? "warning" : "default"
-                      }
-                      className="ml-2"
-                    >
-                      {action.priority === "high" ? "Alta" : 
-                       action.priority === "medium" ? "Média" : "Baixa"}
-                    </Badge>
-                  </div>
-                  {action.deadline && (
-                    <p className="text-xs text-gray-400 mt-1">
-                      Prazo: {action.deadline}
-                    </p>
-                  )}
+                <div className="flex items-center gap-3">
+                  {section.icon}
+                  <span className="font-medium text-white">{section.title}</span>
                 </div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="mt-4 text-center">
-            <Button variant="outline" size="sm">
-              Ver Todas as Ações Recomendadas
-            </Button>
-          </div>
+                <div className="flex items-center">
+                  <span className="text-sm text-gray-400 mr-3">{section.summary}</span>
+                  {expandedSections[section.id] ? 
+                    <ChevronUp className="h-5 w-5 text-gray-400" /> : 
+                    <ChevronDown className="h-5 w-5 text-gray-400" />
+                  }
+                </div>
+              </button>
+              
+              {expandedSections[section.id] && (
+                <div className="px-4 pb-4">
+                  <div className="bg-white/5 rounded-lg p-3 mb-3">
+                    <h4 className="text-sm font-medium text-gray-300 mb-2">Detalhes</h4>
+                    <ul className="space-y-2">
+                      {section.details.map((detail, idx) => (
+                        <li key={idx} className="flex justify-between text-sm">
+                          <span className="text-gray-400">{detail.label}</span>
+                          <span className="text-white font-medium">{detail.value}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium text-gray-300 mb-2">Ações Recomendadas</h4>
+                    <ul className="space-y-2">
+                      {section.actions.map((action, idx) => (
+                        <li key={idx} className="flex items-start">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20 flex items-center"
+                            onClick={() => console.log(`Action clicked: ${action.text}`)}
+                          >
+                            <ChevronRight className="h-4 w-4 mr-1" />
+                            <span className="text-sm">{action.text}</span>
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
         
-        {/* Plan Footer */}
-        <div className="flex justify-between items-center text-xs text-gray-400 pt-2 border-t border-white/10">
-          <div>Última Atualização: 19 de Maio de 2025</div>
-          <div className="flex items-center">
-            <Pencil className="h-3 w-3 mr-1" />
-            <span>Revise seu plano regularmente</span>
-          </div>
+        <div className="mt-6 flex justify-center">
+          <Button 
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
+            onClick={() => console.log("Download full financial plan")}
+          >
+            Ver Plano Financeiro Completo <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
         </div>
       </CardContent>
     </Card>
@@ -467,4 +364,3 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
 };
 
 export default OnePageFinancialPlanModule;
-

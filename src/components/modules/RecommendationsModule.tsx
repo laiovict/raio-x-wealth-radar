@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,9 +10,21 @@ interface RecommendationsModuleProps {
 }
 
 const RecommendationsModule = ({ fullWidth = false }: RecommendationsModuleProps) => {
-  const { data } = useRaioX();
+  const { data, hasOpenFinance } = useRaioX();
   const { recommendations } = data;
   const isMobile = useMobileBreakpoint();
+
+  // Function to handle recommendation execution
+  const handleExecute = (index: number) => {
+    console.log(`Executing recommendation at index: ${index}`);
+    // In a real implementation, this would execute the recommendation
+  };
+
+  // Function to handle OpenFinance activation button click
+  const handleActivateOpenFinance = () => {
+    const event = new CustomEvent('activate-openfinance');
+    document.dispatchEvent(event);
+  };
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency.toLowerCase()) {
@@ -54,6 +65,8 @@ const RecommendationsModule = ({ fullWidth = false }: RecommendationsModuleProps
     }
   };
 
+  // Check if OpenFinance is required for this module
+  // If not, continue showing recommendations regardless of OpenFinance status
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} shadow-md hover:shadow-lg transition-shadow`}>
       <CardHeader className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/70 dark:to-indigo-900/70 pb-4 rounded-t-lg border-b border-gray-200 dark:border-gray-700">
@@ -93,6 +106,7 @@ const RecommendationsModule = ({ fullWidth = false }: RecommendationsModuleProps
                     variant="outline" 
                     size="sm" 
                     className="bg-white dark:bg-transparent hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-900/30 dark:hover:text-blue-300 transition-colors"
+                    onClick={() => handleExecute(index)}
                   >
                     Executar <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
