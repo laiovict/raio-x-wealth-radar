@@ -1,71 +1,41 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import ClientSelector from "@/components/ClientSelector";
 import RaioXDashboard from "@/components/RaioXDashboard";
 import { RaioXProvider } from "@/context/RaioXContext";
-import PluggyConnectModal from "@/components/PluggyConnectModal";
-import { useNavigate } from "react-router-dom";
+import OpenFinanceControl from "@/components/OpenFinanceControl";
 import LoadingScreen from "@/components/LoadingScreen";
 import TopNavigation from "@/components/TopNavigation";
 import TopControls from "@/components/TopControls";
-
-// Define the user data interface
-interface UserData {
-  clientName: string;
-  clientId?: number;
-}
+import { useAuthentication } from "@/hooks/useAuthentication";
+import { getMonthlyReportUrl } from "@/utils/reportUtils";
 
 const Index = () => {
-  const [selectedClient, setSelectedClient] = useState<number | null>(null);
+  // States
   const [hasOpenFinance, setHasOpenFinance] = useState(false);
   const [showPdfPreview, setShowPdfPreview] = useState(false);
   const [mediaType, setMediaType] = useState("pdf");
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [showPluggyModal, setShowPluggyModal] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userRole, setUserRole] = useState<"advisor" | "client" | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState<UserData>({ clientName: "Usuário" });
-  const navigate = useNavigate();
+  
+  // Custom authentication hook
+  const {
+    isLoggedIn,
+    userRole,
+    loading,
+    userData,
+    selectedClient,
+    handleClientSelect,
+    handleLogout
+  } = useAuthentication();
   
   useEffect(() => {
-    // Check if user is logged in based on localStorage
-    const storedUserRole = localStorage.getItem("userRole");
-    const clientId = localStorage.getItem("clientId");
-    const selectedClientId = localStorage.getItem("selectedClientId");
-    
-    if (storedUserRole === "advisor") {
-      setIsLoggedIn(true);
-      setUserRole("advisor");
-      setUserData({ clientName: "Consultor" });
-      // If there's a previously selected client, use it
-      if (selectedClientId) {
-        setSelectedClient(parseInt(selectedClientId));
-        // For demo purposes, set a client name
-        setUserData({ clientName: "Cliente Selecionado", clientId: parseInt(selectedClientId) });
-      }
-    } else if (storedUserRole === "client" && clientId) {
-      setIsLoggedIn(true);
-      setUserRole("client");
-      setSelectedClient(parseInt(clientId));
-      setUserData({ clientName: "Cliente", clientId: parseInt(clientId) });
-    } else {
-      // Redirect to login if not logged in
-      navigate("/auth");
-    }
-    
-    // Garantir que a tela de loading seja exibida por completo (7 segundos)
-    setTimeout(() => {
-      setLoading(false);
-    }, 7000);
-    
-    // Make sure body and main container have proper overflow settings
+    // Setup body styling
     document.body.style.overflow = "hidden";
     document.body.style.height = "100vh";
     
     // Listen for custom event for OpenFinance activation
     const handleOpenFinanceEvent = () => {
-      setShowPluggyModal(true);
+      document.dispatchEvent(new CustomEvent('activate-openfinance'));
     };
     
     document.addEventListener('activate-openfinance', handleOpenFinanceEvent);
@@ -75,88 +45,14 @@ const Index = () => {
       document.body.style.overflow = "";
       document.body.style.height = "";
     };
-  }, [navigate]);
+  }, []);
 
-  const handleClientSelect = (clientId: string) => {
-    console.log("Client selected in Index component:", clientId);
-    localStorage.setItem("selectedClientId", clientId);
-    setSelectedClient(parseInt(clientId));
-    // Update user data when client is selected
-    setUserData({ clientName: `Cliente ${clientId}`, clientId: parseInt(clientId) });
-  };
-
-  const handleOpenFinanceActivate = () => {
-    setShowPluggyModal(true);
-  };
-
-  const handlePluggySuccess = () => {
-    setShowPluggyModal(false);
-    setHasOpenFinance(true);
-  };
-
-  const handlePluggyClose = () => {
-    setShowPluggyModal(false);
-  };
-
+  // Handle PDF preview functionality
   const handlePdfPreview = (type: string) => {
     setMediaType(type);
     setShowPdfPreview(true);
   };
-
-  const handleLogout = () => {
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("clientId");
-    localStorage.removeItem("selectedClientId");
-    setIsLoggedIn(false);
-    setUserRole(null);
-    setSelectedClient(null);
-    navigate("/auth");
-  };
   
-  const handleOpenFinanceToggle = () => {
-    if (!hasOpenFinance) {
-      setShowPluggyModal(true);
-    } else {
-      setHasOpenFinance(false);
-    }
-  };
-  
-  const getMonthlyReportUrl = () => {
-    const now = new Date();
-    const today = now.getDate();
-    const isBeforeFifthWorkingDay = today < 5; // Simplified check for 5th working day
-    
-    let reportMonth, reportYear;
-    
-    if (isBeforeFifthWorkingDay) {
-      // If before 5th working day, use report from 2 months ago
-      reportMonth = now.getMonth() - 1;
-      reportYear = now.getFullYear();
-      
-      // Handle January case (need to go back to previous year)
-      if (reportMonth < 0) {
-        reportMonth = 11; // December
-        reportYear = reportYear - 1;
-      }
-    } else {
-      // Otherwise use report from last month
-      reportMonth = now.getMonth();
-      reportYear = now.getFullYear();
-      
-      // Handle January case (need to go back to previous year)
-      if (reportMonth < 0) {
-        reportMonth = 11; // December
-        reportYear = reportYear - 1;
-      }
-    }
-    
-    // Format month as MM
-    const formattedMonth = (reportMonth + 1).toString().padStart(2, '0');
-    
-    // Return the URL for the report
-    return `https://report.letsreinvent.vc/reinvent/5b552db1-7aa6-4f0b-b25e-f145a2688936/report?period=${reportYear}${formattedMonth}&reportId=c767ceee-e4f4-449a-bd3e-ea00a5567880&clientId=${selectedClient || ''}`;
-  };
-
   // Handle logo click - return to home/default page
   const handleLogoClick = () => {
     // Reset to default view
@@ -168,6 +64,7 @@ const Index = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Show loading screen if still loading
   if (loading) {
     return <LoadingScreen forceShow={true} />;
   }
@@ -188,7 +85,7 @@ const Index = () => {
           userData={userData}
           handleLogout={handleLogout}
           handleLogoClick={handleLogoClick}
-          getMonthlyReportUrl={getMonthlyReportUrl}
+          getMonthlyReportUrl={() => getMonthlyReportUrl(selectedClient)}
         />
         
         <div className="flex-grow overflow-auto">
@@ -199,7 +96,7 @@ const Index = () => {
               {selectedClient && (
                 <TopControls 
                   isAdvisor={userRole === "advisor"} 
-                  onOpenFinanceToggle={handleOpenFinanceToggle} 
+                  onOpenFinanceToggle={() => setHasOpenFinance(!hasOpenFinance)} 
                   hasOpenFinance={hasOpenFinance}
                 />
               )}
@@ -210,18 +107,15 @@ const Index = () => {
               onClosePdfPreview={() => setShowPdfPreview(false)}
               mediaType={mediaType}
               isClientFull={hasOpenFinance}
-              onOpenFinanceActivate={handleOpenFinanceActivate}
+              onOpenFinanceActivate={() => setHasOpenFinance(true)}
               userRole={userRole}
             />
           </div>
         </div>
         
-        <PluggyConnectModal
-          isOpen={showPluggyModal}
-          onClose={handlePluggyClose}
-          onSuccess={handlePluggySuccess}
-          isConnecting={isConnecting}
-          setIsConnecting={setIsConnecting}
+        <OpenFinanceControl
+          hasOpenFinance={hasOpenFinance}
+          setHasOpenFinance={setHasOpenFinance}
         />
       </div>
     </RaioXProvider>
