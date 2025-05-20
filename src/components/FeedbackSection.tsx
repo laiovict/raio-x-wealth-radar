@@ -43,14 +43,18 @@ const FeedbackSection = ({ sectionId }: FeedbackSectionProps) => {
 
         // If user is logged in, check if they've already voted
         if (isLoggedIn) {
-          const { data: userVoteData, error: userVoteError } = await supabase
-            .from('section_feedback')
-            .select('vote_type')
-            .eq('section_id', sectionId)
-            .maybeSingle();
+          const { data: userSession } = await supabase.auth.getSession();
+          if (userSession.session?.user.id) {
+            const { data: userVoteData, error: userVoteError } = await supabase
+              .from('section_feedback')
+              .select('vote_type')
+              .eq('section_id', sectionId)
+              .eq('user_id', userSession.session.user.id)
+              .maybeSingle();
 
-          if (userVoteError) throw userVoteError;
-          setUserVoted(userVoteData?.vote_type as 'like' | 'dislike' | null);
+            if (userVoteError) throw userVoteError;
+            setUserVoted(userVoteData?.vote_type as 'like' | 'dislike' | null);
+          }
         }
       } catch (error) {
         console.error('Error fetching feedback data:', error);
@@ -82,13 +86,22 @@ const FeedbackSection = ({ sectionId }: FeedbackSectionProps) => {
     setLoading(true);
 
     try {
+      // Get current user session to get the user ID
+      const { data: userSession } = await supabase.auth.getSession();
+      if (!userSession.session?.user.id) {
+        throw new Error("User ID not available");
+      }
+      
+      const userId = userSession.session.user.id;
+
       // If user already voted with this type, remove their vote
       if (userVoted === type) {
         // Delete the vote from the database
         const { error } = await supabase
           .from('section_feedback')
           .delete()
-          .eq('section_id', sectionId);
+          .eq('section_id', sectionId)
+          .eq('user_id', userId);
 
         if (error) throw error;
 
@@ -111,8 +124,12 @@ const FeedbackSection = ({ sectionId }: FeedbackSectionProps) => {
           // Update the existing vote
           const { error } = await supabase
             .from('section_feedback')
-            .update({ vote_type: type, updated_at: new Date().toISOString() })
-            .eq('section_id', sectionId);
+            .update({ 
+              vote_type: type, 
+              updated_at: new Date().toISOString() 
+            })
+            .eq('section_id', sectionId)
+            .eq('user_id', userId);
 
           if (error) throw error;
 
@@ -130,7 +147,8 @@ const FeedbackSection = ({ sectionId }: FeedbackSectionProps) => {
             .from('section_feedback')
             .insert({
               section_id: sectionId,
-              vote_type: type
+              vote_type: type,
+              user_id: userId
             });
 
           if (error) throw error;
