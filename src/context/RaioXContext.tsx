@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { clientData } from "@/data/clientData";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,12 +13,24 @@ export interface AIInsight {
   isNew: boolean;
 }
 
+// Risk item for financial summary
+interface RiskItem {
+  name: string;
+  severity: 'low' | 'medium' | 'high';
+  impact: string;
+}
+
 // Define interface for financial summary
 export interface FinancialSummary {
   totalAssets: number;
   monthlyIncome: number;
   monthlyExpenses: number;
   savingsRate: number;
+  // Add missing properties that are used in FinancialOverviewModule
+  netWorth: number;
+  totalLiabilities: number;
+  liquidAssets: number;
+  topRisks: RiskItem[];
 }
 
 // Define interface for recommended actions
@@ -29,6 +40,10 @@ export interface RecommendedAction {
   impact: string;
   urgency: string;
   description: string;
+  // Add missing properties used in RecommendedActionsModule
+  title: string;
+  category: string;
+  difficulty: string;
 }
 
 interface RaioXContextType {
@@ -193,12 +208,32 @@ export const RaioXProvider: React.FC<RaioXProviderProps> = ({
     
     // Simulate API delay
     setTimeout(() => {
-      // Generate mock financial summary
+      // Generate mock financial summary with all required properties
       const summary: FinancialSummary = {
         totalAssets: clientData.portfolioSummary?.total_portfolio_value || 450000,
         monthlyIncome: 12000,
         monthlyExpenses: 8000,
-        savingsRate: 33
+        savingsRate: 33,
+        netWorth: clientData.portfolioSummary?.total_portfolio_value || 1250000,
+        totalLiabilities: 200000,
+        liquidAssets: 75000,
+        topRisks: [
+          {
+            name: 'Alta concentração em ativos de baixa liquidez',
+            severity: 'high',
+            impact: 'Pode dificultar resgates em momentos de necessidade'
+          },
+          {
+            name: 'Exposição concentrada em um único setor',
+            severity: 'medium',
+            impact: 'Aumenta volatilidade em caso de crises setoriais'
+          },
+          {
+            name: 'Reserva de emergência abaixo do ideal',
+            severity: 'medium',
+            impact: 'Cobertura de apenas 2.5 meses de despesas'
+          }
+        ]
       };
       setFinancialSummary(summary);
       
@@ -252,27 +287,36 @@ export const RaioXProvider: React.FC<RaioXProviderProps> = ({
       ];
       setAiInsights(insights);
       
-      // Generate mock recommended actions
+      // Generate mock recommended actions with all required properties
       const actions: RecommendedAction[] = [
         {
           id: '1',
+          title: 'Aumentar alocação internacional',
           action: 'Aumentar alocação internacional',
           impact: 'Alto',
           urgency: 'Médio',
+          difficulty: 'Médio',
+          category: 'diversification',
           description: 'Adicione 8% de exposição a mercados internacionais via ETFs ou fundos para aumentar diversificação geográfica.'
         },
         {
           id: '2',
+          title: 'Reforçar reserva de emergência',
           action: 'Reforçar reserva de emergência',
           impact: 'Médio',
           urgency: 'Alto',
+          difficulty: 'Baixo',
+          category: 'security',
           description: 'Direcione R$ 2.000 mensais para sua reserva de emergência até atingir o equivalente a 3 meses de despesas.'
         },
         {
           id: '3',
+          title: 'Consolidar investimentos',
           action: 'Consolidar investimentos',
           impact: 'Médio',
           urgency: 'Baixo',
+          difficulty: 'Médio',
+          category: 'optimization',
           description: 'Você possui investimentos espalhados em 3 instituições diferentes, gerando complexidade e dificultando a visão consolidada.'
         }
       ];

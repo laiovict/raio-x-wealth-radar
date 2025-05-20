@@ -1,3 +1,4 @@
+
 import { useRaioX, FinancialSummary } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -256,11 +257,11 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
             </div>
           </div>
           
-          {/* Top Risks */}
+          {/* Top Risks - Add null check for topRisks */}
           <div>
             <h3 className="font-medium text-white mb-2">Principais Riscos</h3>
             <div className="space-y-3">
-              {financialSummary?.topRisks.map((risk, index) => (
+              {financialSummary?.topRisks?.map((risk, index) => (
                 <div key={index} className="flex items-start gap-3">
                   <Badge className={`
                     ${risk.severity === 'high' ? 'bg-red-600' : 
