@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search } from "lucide-react";
@@ -24,7 +23,6 @@ import OnePageFinancialPlanModule from "./modules/OnePageFinancialPlanModule";
 import WholeBankingModule from "./modules/WholeBankingModule";
 import MeuFuturoFinanceiroModule from "./modules/MeuFuturoFinanceiroModule";
 import ChatInterface from "./ChatInterface";
-import FamousInvestorsModule from "./modules/FamousInvestorsModule";
 import BehavioralFinanceModule from "./modules/BehavioralFinanceModule";
 
 interface RaioXDashboardProps {
@@ -42,23 +40,19 @@ const RaioXDashboard = ({
   isClientFull = true,
   onOpenFinanceActivate
 }: RaioXDashboardProps) => {
-  const { data, hasOpenFinance } = useRaioX();
+  const { data, hasOpenFinance, selectedClient } = useRaioX();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState("status");
   const { t } = useLanguage();
 
-  // Listen for the custom event to activate OpenFinance
   useEffect(() => {
     const handleActivateOpenFinance = () => {
-      // Display the Pluggy widget through the parent component
       const event = new CustomEvent('activate-openfinance');
       document.dispatchEvent(event);
     };
 
-    // Add event listener
     document.addEventListener('activate-openfinance', handleActivateOpenFinance);
 
-    // Remove event listener on cleanup
     return () => {
       document.removeEventListener('activate-openfinance', handleActivateOpenFinance);
     };
@@ -105,42 +99,42 @@ const RaioXDashboard = ({
             className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "status" ? "bg-white/20 border-blue-400" : ""}`}
             onClick={() => handleQuickNavClick("status")}
           >
-            Como estou?
+            {t('overviewTab')}
           </button>
           <button 
             className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "actions" ? "bg-white/20 border-blue-400" : ""}`}
             onClick={() => handleQuickNavClick("actions")}
           >
-            O que preciso mudar?
+            {t('planTab')}
           </button>
           <button 
             className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "market" ? "bg-white/20 border-blue-400" : ""}`}
             onClick={() => handleQuickNavClick("market")}
           >
-            O que está acontecendo?
+            {t('aiTab')}
           </button>
           <button 
             className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "future" ? "bg-white/20 border-blue-400" : ""}`}
             onClick={() => handleQuickNavClick("future")}
           >
-            E meu futuro?
+            {t('futureTab')}
           </button>
           <button 
             className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "chat" ? "bg-white/20 border-blue-400" : ""}`}
             onClick={() => handleQuickNavClick("chat")}
           >
-            Fale com RM
+            {t('chatTab')}
           </button>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-5 scrollbar-none">
-          <TabsTrigger value="status" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Como estou?</TabsTrigger>
-          <TabsTrigger value="actions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">O que preciso mudar?</TabsTrigger>
-          <TabsTrigger value="market" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">O que está acontecendo?</TabsTrigger>
-          <TabsTrigger value="future" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">E meu futuro?</TabsTrigger>
-          <TabsTrigger value="chat" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Fale com RM</TabsTrigger>
+          <TabsTrigger value="status" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('overviewTab')}</TabsTrigger>
+          <TabsTrigger value="actions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('planTab')}</TabsTrigger>
+          <TabsTrigger value="market" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('aiTab')}</TabsTrigger>
+          <TabsTrigger value="future" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('futureTab')}</TabsTrigger>
+          <TabsTrigger value="chat" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('chatTab')}</TabsTrigger>
         </TabsList>
 
         {/* Tab 1: Como estou? - Current financial state overview */}
@@ -149,32 +143,28 @@ const RaioXDashboard = ({
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <AllocationModule />
-            <BehavioralFinanceModule />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <LiquidityReserveModule />
-            <WholeBankingModule />
-          </div>
-          
-          <div className="grid grid-cols-1 gap-6">
-            <SocialComparisonModule />
           </div>
         </TabsContent>
         
         {/* Tab 2: O que preciso mudar? - Recommendations and actions */}
         <TabsContent value="actions" className="space-y-6">
           <RecommendedActionsModule fullWidth />
-          <OnePageFinancialPlanModule fullWidth />
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <LifeGoalsModule />
             <PersonalInsightsModule />
           </div>
           
-          <div className="grid grid-cols-1 gap-6">
-            <RecommendationsModule />
-          </div>
+          {hasOpenFinance && (
+            <>
+              <OnePageFinancialPlanModule fullWidth />
+              <BehavioralFinanceModule />
+              <div className="grid grid-cols-1 gap-6">
+                <RecommendationsModule />
+              </div>
+            </>
+          )}
         </TabsContent>
         
         {/* Tab 3: O que está acontecendo? - Market insights */}
@@ -186,9 +176,11 @@ const RaioXDashboard = ({
             <FinancialInsightsModule />
           </div>
           
-          <div className="grid grid-cols-1 gap-6">
-            <FamousInvestorsModule />
-          </div>
+          {hasOpenFinance && (
+            <div className="grid grid-cols-1 gap-6">
+              <SocialComparisonModule />
+            </div>
+          )}
         </TabsContent>
         
         {/* Tab 4: E meu futuro? - Future projections and planning */}
@@ -200,7 +192,12 @@ const RaioXDashboard = ({
             <InvestmentPlanningModule />
           </div>
           
-          <WrappedModule fullWidth />
+          {hasOpenFinance && (
+            <>
+              <WrappedModule fullWidth />
+              <WholeBankingModule />
+            </>
+          )}
         </TabsContent>
         
         {/* Tab 5: Fale com RM - Chat interface */}

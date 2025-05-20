@@ -1,10 +1,12 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Send, Bot } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useRaioX } from "@/context/RaioXContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 type Message = {
   id: string;
@@ -14,17 +16,75 @@ type Message = {
 };
 
 const ChatInterface = () => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: "1",
-      content: "Olá, sou o assistente financeiro da Reinvent. Como posso ajudá-lo com suas finanças hoje?",
-      sender: "assistant",
-      timestamp: new Date(),
-    },
-  ]);
+  const { data, selectedClient, hasOpenFinance } = useRaioX();
+  const { t, language } = useLanguage();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  
+  // Update welcome message based on client data when component mounts or client changes
+  useEffect(() => {
+    const welcomeMessage = {
+      id: "welcome",
+      content: `Olá${data.clientName ? `, ${data.clientName}` : ""}! Sou o assistente financeiro da Reinvent. Como posso ajudá-lo com suas finanças hoje?`,
+      sender: "assistant" as const,
+      timestamp: new Date(),
+    };
+    
+    setMessages([welcomeMessage]);
+  }, [data.clientName, selectedClient]);
+
+  const generateContextAwareResponse = (userMessage: string) => {
+    // This function analyzes the user message and generates a response using client data
+    // In a real implementation, this would call an AI service with proper context
+    
+    const clientContext = {
+      name: data.clientName || "Cliente",
+      portfolio: {
+        totalValue: data.portfolioValue || "desconhecido",
+        allocation: data.assetAllocation || {},
+        liquidity: data.liquidityReserve || "desconhecido",
+      },
+      goals: data.lifeGoals || [],
+      hasOpenFinance: hasOpenFinance,
+    };
+    
+    // Simple response templates based on detected keywords
+    if (userMessage.toLowerCase().includes("portfólio") || userMessage.toLowerCase().includes("portfolio")) {
+      return `Seu portfólio total está avaliado em R$ ${clientContext.portfolio.totalValue}. Posso ajudar com alguma análise específica?`;
+    }
+    
+    if (userMessage.toLowerCase().includes("liquidez") || userMessage.toLowerCase().includes("reserva")) {
+      return `Sua reserva de liquidez está em R$ ${clientContext.portfolio.liquidity}. Recomendo manter essa reserva equivalente a pelo menos 6 meses de despesas.`;
+    }
+    
+    if (userMessage.toLowerCase().includes("objetivo") || userMessage.toLowerCase().includes("meta")) {
+      if (clientContext.goals.length > 0) {
+        return `Você possui ${clientContext.goals.length} objetivos financeiros registrados. Gostaria de discutir algum específico?`;
+      } else {
+        return "Não vejo objetivos financeiros registrados. Gostaria de definir alguns para orientar seu planejamento financeiro?";
+      }
+    }
+    
+    if (userMessage.toLowerCase().includes("open finance") || userMessage.toLowerCase().includes("openfinance")) {
+      if (clientContext.hasOpenFinance) {
+        return "Você já tem o Open Finance ativado! Isso me permite oferecer insights mais completos sobre sua vida financeira.";
+      } else {
+        return "Você ainda não ativou o Open Finance. Ativar essa funcionalidade me permitiria ter uma visão mais completa das suas finanças e oferecer recomendações mais personalizadas.";
+      }
+    }
+    
+    // Default responses based on portfolio data
+    const responses = [
+      `Analisando seu portfólio atual de R$ ${clientContext.portfolio.totalValue}, posso ajudar a identificar oportunidades para otimização de acordo com seus objetivos.`,
+      `Com base no seu perfil financeiro, posso sugerir estratégias que equilibrem risco e retorno para seu patrimônio atual.`,
+      `Considerando sua alocação atual, há espaço para diversificação que pode melhorar o desempenho do seu portfólio.`,
+      `Vamos revisar juntos seus objetivos financeiros para garantir que sua estratégia de investimento esteja alinhada com suas metas de curto e longo prazo.`
+    ];
+    
+    return responses[Math.floor(Math.random() * responses.length)];
+  };
 
   const handleSendMessage = async () => {
     if (!inputMessage.trim()) return;
@@ -41,19 +101,13 @@ const ChatInterface = () => {
     setInputMessage("");
     setIsLoading(true);
     
-    // Simulate AI response delay
+    // Generate contextually relevant response
     setTimeout(() => {
-      // Mock AI response
-      const aiResponses = [
-        "Entendi sua dúvida sobre investimentos. Uma estratégia diversificada geralmente oferece melhor equilíbrio entre risco e retorno.",
-        "Posso analisar seu portfólio atual para identificar oportunidades de otimização. Isso ajudaria a alinhar seus investimentos com seus objetivos.",
-        "Considerando seu perfil, vale avaliar uma alocação em renda fixa de alta qualidade para equilibrar sua exposição a ativos de risco.",
-        "Vamos revisar juntos seus objetivos financeiros para garantir que sua estratégia de investimento esteja alinhada com suas metas de curto e longo prazo.",
-      ];
+      const responseContent = generateContextAwareResponse(userMessage.content);
       
       const assistantMessage: Message = {
-        id: Date.now().toString(),
-        content: aiResponses[Math.floor(Math.random() * aiResponses.length)],
+        id: (Date.now() + 1).toString(),
+        content: responseContent,
         sender: "assistant",
         timestamp: new Date(),
       };
@@ -69,6 +123,17 @@ const ChatInterface = () => {
       handleSendMessage();
     }
   };
+
+  // Create a ref for the message container to scroll to bottom on new messages
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+  
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+  
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   return (
     <Card className="glass-morphism w-full border border-white/10 h-[85vh] flex flex-col">
@@ -120,6 +185,7 @@ const ChatInterface = () => {
             </div>
           </div>
         )}
+        <div ref={messagesEndRef} />
       </div>
       
       <div className="p-4 border-t border-white/10">
@@ -128,7 +194,7 @@ const ChatInterface = () => {
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={handleKeyPress}
-            placeholder="Envie sua mensagem..."
+            placeholder={language === 'en' ? "Send your message..." : "Envie sua mensagem..."}
             className="bg-gray-800/50 border-gray-700 text-white"
           />
           <Button 
