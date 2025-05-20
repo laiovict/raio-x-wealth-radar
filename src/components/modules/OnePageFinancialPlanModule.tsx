@@ -1,9 +1,8 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, RefreshCw, Clock, ChevronDown, ChevronUp, ArrowRight, ChevronRight, Shield, TrendingUp } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 interface OnePageFinancialPlanModuleProps {
   fullWidth?: boolean;
@@ -70,7 +69,7 @@ const Users = (props: any) => (
 );
 
 const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanModuleProps) => {
-  const { hasOpenFinance, isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
+  const { hasOpenFinance, isAIAnalysisLoading, refreshAIAnalysis, portfolioSummary, profitability } = useRaioX();
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     "cashFlow": true,
     "investments": false,
@@ -91,6 +90,71 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
       ...prev,
       [section]: !prev[section]
     }));
+  };
+
+  // Calculate investment data from real Supabase data
+  const investmentData = useMemo(() => {
+    // Default values if no portfolio summary is available
+    let totalValue = 325000;
+    let fixedIncomeValue = 211250;
+    let fixedIncomePercentage = 65;
+    let stocksValue = 81250;
+    let stocksPercentage = 25;
+    let alternativesValue = 32500;
+    let alternativesPercentage = 10;
+    let ytdReturn = 7.8;
+    let benchmarkReturn = 8.5;
+
+    // If we have real data from Supabase, use it
+    if (portfolioSummary) {
+      totalValue = parseFloat(portfolioSummary.total_portfolio_value || "0");
+      
+      // Fixed Income values
+      fixedIncomeValue = portfolioSummary.fixed_income_value || 0;
+      fixedIncomePercentage = portfolioSummary.fixed_income_representation || 0;
+      
+      // Stocks values - handling string values from API
+      stocksValue = parseFloat(portfolioSummary.stocks_value || "0");
+      stocksPercentage = parseFloat(portfolioSummary.stocks_representation || "0");
+      
+      // Alternatives - sum of investment funds, real estate and international investments
+      const investmentFundValue = portfolioSummary.investment_fund_value || 0;
+      const realEstateValue = portfolioSummary.real_estate_value || 0;
+      const internationalValue = parseFloat(portfolioSummary.investment_international_value || "0");
+      
+      alternativesValue = investmentFundValue + realEstateValue + internationalValue;
+      alternativesPercentage = portfolioSummary.investment_fund_representation + 
+                              portfolioSummary.real_estate_representation +
+                              parseFloat(portfolioSummary.investment_international_representation || "0");
+    }
+
+    // If we have profitability data, use it
+    if (profitability) {
+      ytdReturn = profitability.ytd || 7.8;
+      // Benchmark is often not provided in the data, so we'll keep the default
+    }
+
+    return {
+      totalValue,
+      fixedIncomeValue,
+      fixedIncomePercentage,
+      stocksValue,
+      stocksPercentage,
+      alternativesValue,
+      alternativesPercentage,
+      ytdReturn,
+      benchmarkReturn
+    };
+  }, [portfolioSummary, profitability]);
+
+  // Format currency
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(value);
   };
 
   if (!hasOpenFinance) {
@@ -139,7 +203,7 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
     );
   }
 
-  // Mock data for the financial plan
+  // Data for the financial plan
   const financialPlan = {
     lastUpdated: "2023-05-15T10:30:00Z",
     sections: [
@@ -165,13 +229,13 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
         id: "investments",
         title: "Investimentos",
         icon: <TrendingUp className="h-5 w-5 text-blue-500" />,
-        summary: "Carteira atual de R$ 325.000 com concentração em renda fixa (65%).",
+        summary: `Carteira atual de ${formatCurrency(investmentData.totalValue)} com concentração em renda fixa (${investmentData.fixedIncomePercentage}%).`,
         details: [
-          { label: "Valor total investido", value: "R$ 325.000" },
-          { label: "Renda fixa", value: "R$ 211.250 (65%)" },
-          { label: "Renda variável", value: "R$ 81.250 (25%)" },
-          { label: "Alternativos", value: "R$ 32.500 (10%)" },
-          { label: "Rentabilidade YTD", value: "7,8% (vs. benchmark 8,5%)" }
+          { label: "Valor total investido", value: formatCurrency(investmentData.totalValue) },
+          { label: "Renda fixa", value: `${formatCurrency(investmentData.fixedIncomeValue)} (${investmentData.fixedIncomePercentage}%)` },
+          { label: "Renda variável", value: `${formatCurrency(investmentData.stocksValue)} (${investmentData.stocksPercentage}%)` },
+          { label: "Alternativos", value: `${formatCurrency(investmentData.alternativesValue)} (${Math.round(investmentData.alternativesPercentage)}%)` },
+          { label: "Rentabilidade YTD", value: `${investmentData.ytdReturn.toFixed(1)}% (vs. benchmark ${investmentData.benchmarkReturn}%)` }
         ],
         actions: [
           { text: "Rebalancear carteira para 50/35/15" },

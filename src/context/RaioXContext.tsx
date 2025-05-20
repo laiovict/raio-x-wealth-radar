@@ -270,6 +270,8 @@ interface RaioXContextProps {
   isAIAnalysisLoading?: boolean;
   financialSummary?: FinancialSummary;
   aiInsights: AIInsight[];
+  portfolioSummary?: PortfolioSummary;
+  profitability?: any;
 }
 
 interface RaioXProviderProps {
@@ -593,7 +595,9 @@ const RaioXContext = createContext<RaioXContextProps>({
   data: defaultData,
   hasOpenFinance: false,
   selectedClient: null,
-  aiInsights: sampleAIInsights
+  aiInsights: sampleAIInsights,
+  portfolioSummary: undefined,
+  profitability: undefined
 });
 
 export const RaioXProvider = ({ 
@@ -714,7 +718,9 @@ export const RaioXProvider = ({
         financialSummary,
         isAIAnalysisLoading,
         refreshAIAnalysis,
-        aiInsights: sampleAIInsights
+        aiInsights: sampleAIInsights,
+        portfolioSummary: portfolioData.portfolioSummary,
+        profitability: portfolioData.profitability
       }}
     >
       {children}
