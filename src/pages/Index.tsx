@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -203,20 +204,24 @@ const Index = () => {
       selectedClient={selectedClient}
     >
       <div className="min-h-screen h-screen flex flex-col bg-gradient-to-br from-[#0f0f11] to-[#1a1a2e] text-white">
-        <nav className="backdrop-blur-md bg-black/20 border-b border-white/5 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sticky top-0 z-10">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center cursor-pointer" onClick={handleLogoClick}>
-              <img 
-                src="/lovable-uploads/4b258bed-71ae-4d4c-847b-12968969f2d4.png"
-                alt="Reinvent Logo"
-                className="h-8 w-auto mr-3"
-              />
-              <h1 className="text-xl font-light tracking-wider text-white">
-                Raio-X <span className="font-medium">Financeiro</span>
-              </h1>
-            </div>
+        <nav className="backdrop-blur-md bg-black/20 border-b border-white/5 px-6 py-4 flex items-center justify-between gap-4 sticky top-0 z-10">
+          {/* Left section - Logo only */}
+          <div className="flex items-center cursor-pointer" onClick={handleLogoClick}>
+            <img 
+              src="/lovable-uploads/4b258bed-71ae-4d4c-847b-12968969f2d4.png"
+              alt="Reinvent Logo"
+              className="h-8 w-auto"
+            />
           </div>
           
+          {/* Center section - Raio-X Financeiro title */}
+          <div className="flex-1 flex justify-center">
+            <h1 className="text-xl font-light tracking-wider text-white">
+              Raio-X <span className="font-medium">Financeiro</span>
+            </h1>
+          </div>
+          
+          {/* Right section - Action buttons */}
           <div className="flex flex-wrap items-center gap-3">
             {/* Show API Docs button for all users */}
             <Button 
