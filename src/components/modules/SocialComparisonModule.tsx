@@ -98,7 +98,7 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
                 Retorno vs. Pares
               </span>
               <span className="text-lg font-semibold">
-                {formatCurrency(ensureString(comparisonData.returnVsPeers))}
+                {formatCurrency(String(comparisonData.returnVsPeers))}
               </span>
             </div>
             <div className="flex justify-between items-center">

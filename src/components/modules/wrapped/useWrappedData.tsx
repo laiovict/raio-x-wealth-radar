@@ -216,7 +216,7 @@ export const useWrappedData = () => {
         songImage: song.image,
         songArtist: song.artist,
         mostActiveDay: getActiveDay(),
-        investorCompatibility: `${investorComparison.name} (${investorComparison.compatibility})`,
+        investorCompatibility: `${investorComparison.name} (${String(investorComparison.compatibility)})`,
         investorStyle: investorComparison.style,
         dataSource: data.portfolioSummary ? 'supabase' as const : 'synthetic' as const
       };
@@ -233,7 +233,7 @@ export const useWrappedData = () => {
       songImage: getClientSong().image,
       songArtist: getClientSong().artist,
       mostActiveDay: getActiveDay(),
-      investorCompatibility: `${getInvestorComparison().name} (${getInvestorComparison().compatibility})`,
+      investorCompatibility: `${getInvestorComparison().name} (${String(getInvestorComparison().compatibility)})`,
       investorStyle: getInvestorComparison().style,
       dataSource: 'synthetic' as const
     };
