@@ -44,7 +44,7 @@ const RaioXDashboard = ({
 }: RaioXDashboardProps) => {
   const { data, hasOpenFinance } = useRaioX();
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("status");
   const { t } = useLanguage();
 
   // Listen for the custom event to activate OpenFinance
@@ -102,190 +102,110 @@ const RaioXDashboard = ({
         
         <div className="mt-6 mb-2 flex gap-2 flex-wrap justify-center">
           <button 
-            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "ai" ? "bg-white/20 border-blue-400" : ""}`}
-            onClick={() => handleQuickNavClick("ai")}
+            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "status" ? "bg-white/20 border-blue-400" : ""}`}
+            onClick={() => handleQuickNavClick("status")}
           >
-            {t('quickAi')}
+            Como estou?
           </button>
           <button 
-            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "goals" ? "bg-white/20 border-blue-400" : ""}`}
-            onClick={() => handleQuickNavClick("goals")}
+            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "actions" ? "bg-white/20 border-blue-400" : ""}`}
+            onClick={() => handleQuickNavClick("actions")}
           >
-            {t('myGoals')}
+            O que preciso mudar?
           </button>
           <button 
-            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "planning" ? "bg-white/20 border-blue-400" : ""}`}
-            onClick={() => handleQuickNavClick("planning")}
+            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "market" ? "bg-white/20 border-blue-400" : ""}`}
+            onClick={() => handleQuickNavClick("market")}
           >
-            {t('planning')}
+            O que está acontecendo?
           </button>
           <button 
-            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "insights" ? "bg-white/20 border-blue-400" : ""}`}
-            onClick={() => handleQuickNavClick("insights")}
+            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "future" ? "bg-white/20 border-blue-400" : ""}`}
+            onClick={() => handleQuickNavClick("future")}
           >
-            {t('quickInsights')}
+            E meu futuro?
           </button>
           <button 
             className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "chat" ? "bg-white/20 border-blue-400" : ""}`}
             onClick={() => handleQuickNavClick("chat")}
           >
-            {t('chatWithRM')}
+            Fale com RM
           </button>
         </div>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-3 lg:grid-cols-12 md:grid-cols-6 scrollbar-none">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('overviewTab')}</TabsTrigger>
-          <TabsTrigger value="plan" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('planTab')}</TabsTrigger>
-          <TabsTrigger value="future" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('futureTab')}</TabsTrigger>
-          <TabsTrigger value="ai" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('aiTab')}</TabsTrigger>
-          <TabsTrigger value="planning" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('planningTab')}</TabsTrigger>
-          <TabsTrigger value="allocation" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('investmentsTab')}</TabsTrigger>
-          <TabsTrigger value="goals" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('goalsTab')}</TabsTrigger>
-          <TabsTrigger value="insights" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('insightsTab')}</TabsTrigger>
-          <TabsTrigger value="social" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('socialTab')}</TabsTrigger>
-          <TabsTrigger value="banking" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('bankingTab')}</TabsTrigger>
-          <TabsTrigger value="chat" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('chatTab')}</TabsTrigger>
-          <TabsTrigger value="behavior" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('behaviorTab')}</TabsTrigger>
+        <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-5 scrollbar-none">
+          <TabsTrigger value="status" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Como estou?</TabsTrigger>
+          <TabsTrigger value="actions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">O que preciso mudar?</TabsTrigger>
+          <TabsTrigger value="market" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">O que está acontecendo?</TabsTrigger>
+          <TabsTrigger value="future" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">E meu futuro?</TabsTrigger>
+          <TabsTrigger value="chat" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Fale com RM</TabsTrigger>
         </TabsList>
 
-        {/* Overview tab - Main dashboard view */}
-        <TabsContent value="overview" className="space-y-6">
+        {/* Tab 1: Como estou? - Current financial state overview */}
+        <TabsContent value="status" className="space-y-6">
           <FinancialOverviewModule />
-          <OnePageFinancialPlanModule />
-          
-          <div className="grid grid-cols-1 gap-6">
-            <RecommendedActionsModule />
-          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <LifeGoalsModule />
             <AllocationModule />
-          </div>
-          
-          {/* Famous Investors Module */}
-          <div className="grid grid-cols-1 gap-6">
-            <FamousInvestorsModule />
-          </div>
-          
-          {/* Always show WholeBankingModule - it'll adapt based on hasOpenFinance state */}
-          <div className="grid grid-cols-1 gap-6">
-            <WholeBankingModule />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <MeuFuturoFinanceiroModule />
-            <InvestmentPlanningModule />
-          </div>
-          
-          {/* Add BehavioralFinanceModule */}
-          <div className="grid grid-cols-1 gap-6">
             <BehavioralFinanceModule />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-1">
-              <SocialComparisonModule />
-            </div>
-            <div className="md:col-span-1">
-              <FutureProjectionModule />
-            </div>
-            <div className="md:col-span-1">
-              <SentimentInsightsModule />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FinancialInsightsModule />
-            <PersonalInsightsModule />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <LiquidityReserveModule />
-            <WrappedModule />
+            <WholeBankingModule />
+          </div>
+          
+          <div className="grid grid-cols-1 gap-6">
+            <SocialComparisonModule />
+          </div>
+        </TabsContent>
+        
+        {/* Tab 2: O que preciso mudar? - Recommendations and actions */}
+        <TabsContent value="actions" className="space-y-6">
+          <RecommendedActionsModule fullWidth />
+          <OnePageFinancialPlanModule fullWidth />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <LifeGoalsModule />
+            <PersonalInsightsModule />
           </div>
           
           <div className="grid grid-cols-1 gap-6">
             <RecommendationsModule />
-            <AIInsightsHubModule />
           </div>
         </TabsContent>
         
-        {/* Financial Plan tab */}
-        <TabsContent value="plan">
-          <OnePageFinancialPlanModule fullWidth />
-        </TabsContent>
-
-        {/* Meu Futuro tab */}
-        <TabsContent value="future">
-          <MeuFuturoFinanceiroModule fullWidth />
-          <div className="mt-6">
-            <FutureProjectionModule fullWidth />
+        {/* Tab 3: O que está acontecendo? - Market insights */}
+        <TabsContent value="market" className="space-y-6">
+          <AIInsightsHubModule fullWidth />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SentimentInsightsModule />
+            <FinancialInsightsModule />
           </div>
-        </TabsContent>
-        
-        {/* AI Assistant tab */}
-        <TabsContent value="ai" className="space-y-6">
+          
           <div className="grid grid-cols-1 gap-6">
-            <AIInsightsHubModule fullWidth />
-            <RecommendedActionsModule fullWidth />
+            <FamousInvestorsModule />
           </div>
         </TabsContent>
         
-        {/* Planning tab */}
-        <TabsContent value="planning" className="space-y-6">
-          <InvestmentPlanningModule fullWidth />
-          <div className="mt-6">
-            <LiquidityReserveModule fullWidth />
+        {/* Tab 4: E meu futuro? - Future projections and planning */}
+        <TabsContent value="future" className="space-y-6">
+          <MeuFuturoFinanceiroModule fullWidth />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FutureProjectionModule />
+            <InvestmentPlanningModule />
           </div>
+          
+          <WrappedModule fullWidth />
         </TabsContent>
         
-        {/* Investments tab */}
-        <TabsContent value="allocation">
-          <AllocationModule fullWidth />
-          <div className="mt-6">
-            <WrappedModule fullWidth />
-          </div>
-        </TabsContent>
-        
-        {/* Goals tab */}
-        <TabsContent value="goals">
-          <LifeGoalsModule fullWidth />
-          <div className="mt-6">
-            <PersonalInsightsModule fullWidth />
-          </div>
-        </TabsContent>
-        
-        {/* Insights tab */}
-        <TabsContent value="insights" className="space-y-6">
-          <FinancialInsightsModule fullWidth />
-          <div className="mt-6">
-            <SentimentInsightsModule fullWidth />
-          </div>
-        </TabsContent>
-        
-        {/* Social tab */}
-        <TabsContent value="social">
-          <SocialComparisonModule fullWidth />
-          <div className="mt-6">
-            <RecommendationsModule fullWidth />
-          </div>
-        </TabsContent>
-        
-        {/* Banking tab */}
-        <TabsContent value="banking">
-          <WholeBankingModule fullWidth />
-        </TabsContent>
-        
-        {/* Chat tab */}
+        {/* Tab 5: Fale com RM - Chat interface */}
         <TabsContent value="chat">
           <ChatInterface />
-        </TabsContent>
-        
-        {/* Behavioral Finance tab */}
-        <TabsContent value="behavior">
-          <BehavioralFinanceModule fullWidth />
         </TabsContent>
       </Tabs>
     </div>
