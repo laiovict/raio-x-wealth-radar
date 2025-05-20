@@ -86,9 +86,9 @@ const Auth = () => {
       <div className="w-1/2 flex flex-col items-start justify-center p-16">
         <div className="mb-16">
           <img 
-            src="https://media.licdn.com/dms/image/C4D0BAQEgQpIxQEJvEA/company-logo_200_200/0/1674674650337?e=1716422400&v=beta&t=Gpl4UQRl_o7ArkhZeKM347sOWfO2xdrG5qHZW5kAUyI"
+            src="/lovable-uploads/4b258bed-71ae-4d4c-847b-12968969f2d4.png"
             alt="Reinvent Logo" 
-            className="h-10"
+            className="h-16"
           />
         </div>
         

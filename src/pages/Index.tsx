@@ -10,6 +10,7 @@ import PluggyConnectModal from "@/components/PluggyConnectModal";
 import { Download, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LoadingScreen from "@/components/LoadingScreen";
+import WelcomeBanner from "@/components/WelcomeBanner";
 
 const Index = () => {
   const [selectedClient, setSelectedClient] = useState<number | null>(null);
@@ -144,13 +145,9 @@ const Index = () => {
         <nav className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
           <div className="flex items-center gap-4">
             <img 
-              src="https://media.licdn.com/dms/image/C4D0BAQEgQpIxQEJvEA/company-logo_200_200/0/1674674650337?e=1716422400&v=beta&t=Gpl4UQRl_o7ArkhZeKM347sOWfO2xdrG5qHZW5kAUyI"
+              src="/lovable-uploads/4b258bed-71ae-4d4c-847b-12968969f2d4.png"
               alt="Reinvent Logo"
-              className="h-10 w-auto"
-              onError={(e) => {
-                console.error("Failed to load logo, trying backup");
-                (e.target as HTMLImageElement).src = "/lovable-uploads/e32de997-8c6d-4904-8099-d688fa8427e4.png";
-              }}
+              className="h-12 w-auto"
             />
             <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
               Raio-X Financeiro
@@ -192,6 +189,9 @@ const Index = () => {
         </nav>
         
         {userRole === "advisor" && <ClientSelector onClientSelect={handleClientSelect} />}
+
+        {/* Add welcome banner for the selected client */}
+        {selectedClient && <WelcomeBanner selectedClient={selectedClient} />}
 
         <RaioXDashboard
           showPdfPreview={showPdfPreview}
