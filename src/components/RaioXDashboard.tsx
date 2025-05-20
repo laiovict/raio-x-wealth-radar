@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search } from "lucide-react";
@@ -108,6 +109,12 @@ const RaioXDashboard = ({
             {t('overviewTab')}
           </button>
           <button 
+            className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "status" ? "bg-white/20 border-blue-400" : ""}`}
+            onClick={() => handleQuickNavClick("status")}
+          >
+            {t('statusTab')}
+          </button>
+          <button 
             className={`glass-morphism px-6 py-2 rounded-full text-white hover:bg-white/10 transition-all ${activeTab === "actions" ? "bg-white/20 border-blue-400" : ""}`}
             onClick={() => handleQuickNavClick("actions")}
           >
@@ -137,17 +144,20 @@ const RaioXDashboard = ({
       <WelcomeBanner selectedClient={selectedClient} />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-5 scrollbar-none">
+        <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-6 scrollbar-none">
           <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Visão Geral</TabsTrigger>
+          <TabsTrigger value="status" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Como Estou</TabsTrigger>
           <TabsTrigger value="actions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('planTab')}</TabsTrigger>
           <TabsTrigger value="market" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('aiTab')}</TabsTrigger>
           <TabsTrigger value="future" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('futureTab')}</TabsTrigger>
           <TabsTrigger value="chat" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('chatTab')}</TabsTrigger>
         </TabsList>
 
-        {/* Tab 1: Visão Geral - Comprehensive overview of all 18 sections */}
+        {/* Tab 1: Visão Geral - Comprehensive overview of all 18 sections, reordered */}
         <TabsContent value="overview" className="space-y-6">
           <FinancialOverviewModule />
+          <OnePageFinancialPlanModule />
+          <LifeGoalsModule />
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <AllocationModule />
@@ -155,31 +165,26 @@ const RaioXDashboard = ({
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <LifeGoalsModule />
             <InteligenciaModule />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <SentimentInsightsModule />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FutureProjectionModule />
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <PersonalInsightsModule />
-            <InvestmentPlanningModule />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <SocialComparisonModule />
-            <BehavioralFinanceModule />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <WrappedModule />
-            <FamousInvestorsModule />
           </div>
 
-          <OnePageFinancialPlanModule />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InvestmentPlanningModule />
+            <SocialComparisonModule />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <BehavioralFinanceModule />
+            <WrappedModule />
+          </div>
+          
+          <FamousInvestorsModule fullWidth />
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <MeuFuturoFinanceiroModule />
@@ -187,7 +192,24 @@ const RaioXDashboard = ({
           </div>
         </TabsContent>
         
-        {/* Tab 2: O que preciso mudar? - Recommendations and actions */}
+        {/* Tab 2: Como Estou? - Status overview */}
+        <TabsContent value="status" className="space-y-6">
+          <FinancialOverviewModule fullWidth />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <AllocationModule />
+            <LiquidityReserveModule />
+          </div>
+          
+          <SentimentInsightsModule fullWidth />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <PersonalInsightsModule />
+            <SocialComparisonModule />
+          </div>
+        </TabsContent>
+        
+        {/* Tab 3: O que preciso mudar? - Recommendations and actions */}
         <TabsContent value="actions" className="space-y-6">
           <InteligenciaModule fullWidth />
           
@@ -204,7 +226,7 @@ const RaioXDashboard = ({
           )}
         </TabsContent>
         
-        {/* Tab 3: O que está acontecendo? - Market insights */}
+        {/* Tab 4: O que está acontecendo? - Market insights */}
         <TabsContent value="market" className="space-y-6">
           <InteligenciaModule fullWidth />
           
@@ -220,7 +242,7 @@ const RaioXDashboard = ({
           )}
         </TabsContent>
         
-        {/* Tab 4: E meu futuro? - Future projections and planning */}
+        {/* Tab 5: E meu futuro? - Future projections and planning */}
         <TabsContent value="future" className="space-y-6">
           <MeuFuturoFinanceiroModule fullWidth />
           
@@ -237,7 +259,7 @@ const RaioXDashboard = ({
           )}
         </TabsContent>
         
-        {/* Tab 5: Fale com RM - Chat interface */}
+        {/* Tab 6: Fale com RM - Chat interface */}
         <TabsContent value="chat">
           <ChatInterface />
         </TabsContent>

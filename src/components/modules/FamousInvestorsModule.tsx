@@ -2,8 +2,16 @@
 import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
 import { useRaioX } from "@/context/RaioXContext";
-import { Quote, Info } from "lucide-react";
+import { Quote, Info, ChevronLeft, ChevronRight } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { 
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious
+} from "@/components/ui/carousel";
+import { useState, useEffect } from "react";
 
 interface InvestorQuote {
   investor: string;
@@ -17,6 +25,27 @@ interface InvestorQuote {
 const FamousInvestorsModule = ({ fullWidth = false }) => {
   const { t } = useLanguage();
   const { data, selectedClient } = useRaioX();
+  const [api, setApi] = useState<any>(null);
+  const [current, setCurrent] = useState(0);
+  
+  useEffect(() => {
+    if (!api) return;
+    
+    const updateCurrent = () => {
+      if (!api) return;
+      setCurrent(api.selectedScrollSnap());
+    };
+    
+    api.on("select", updateCurrent);
+    api.on("reInit", updateCurrent);
+    
+    return () => {
+      if (api) {
+        api.off("select", updateCurrent);
+        api.off("reInit", updateCurrent);
+      }
+    };
+  }, [api]);
   
   // Generate age-specific insights based on client's presumed age (for demo purposes)
   const clientAge = data?.clientAge || 35; // Default age if not available
@@ -113,66 +142,96 @@ const FamousInvestorsModule = ({ fullWidth = false }) => {
   }
 
   return (
-    <Card className={`glass-morphism p-6 ${fullWidth ? 'w-full' : ''}`}>
-      <h2 className="text-xl font-bold text-white mb-4">{t('famousInvestorsTitle')}</h2>
+    <Card className={`glass-morphism p-6 ${fullWidth ? 'w-full' : ''} bg-gradient-to-b from-indigo-800/40 to-purple-900/40 backdrop-blur-lg`}>
+      <h2 className="text-xl font-bold text-white mb-6">{t('famousInvestorsTitle')}</h2>
       
-      <div className="space-y-8">
-        {investorQuotes.map((item, index) => (
-          <div key={index} className="space-y-4">
-            <div className="flex flex-col md:flex-row gap-4 items-start">
-              <div className="flex-shrink-0">
-                <Avatar className="h-20 w-20 border-2 border-blue-400">
-                  <AvatarImage src={item.photoUrl} alt={item.investor} className="object-cover" />
-                  <AvatarFallback className="bg-blue-900 text-blue-200">
-                    {item.investor.split(' ').map(name => name[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-              
-              <div className="flex-1">
-                <h3 className="font-bold text-lg text-blue-300">{item.investor}</h3>
-                
-                <div className="mt-2 bg-gray-800/40 p-4 rounded-lg border border-gray-700/50 relative">
-                  <Quote className="absolute top-2 left-2 h-8 w-8 text-blue-900/20" />
-                  <p className="text-gray-200 italic pl-6">{item.quote}</p>
+      <Carousel
+        setApi={setApi}
+        className="w-full"
+        opts={{
+          loop: true,
+          align: "center",
+        }}
+      >
+        <CarouselContent>
+          {investorQuotes.map((item, index) => (
+            <CarouselItem key={index} className="md:basis-2/3 lg:basis-1/2 pl-4">
+              <div className="space-y-4 bg-gradient-to-br from-gray-900/80 to-indigo-900/80 p-6 rounded-xl shadow-xl border border-indigo-500/30">
+                <div className="flex flex-col md:flex-row gap-4 items-start">
+                  <div className="flex-shrink-0">
+                    <Avatar className="h-20 w-20 border-2 border-blue-400">
+                      <AvatarImage src={item.photoUrl} alt={item.investor} className="object-cover" />
+                      <AvatarFallback className="bg-blue-900 text-blue-200">
+                        {item.investor.split(' ').map(name => name[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  
+                  <div className="flex-1">
+                    <h3 className="font-bold text-lg text-blue-300">{item.investor}</h3>
+                    
+                    <div className="mt-2 bg-gray-800/40 p-4 rounded-lg border border-gray-700/50 relative">
+                      <Quote className="absolute top-2 left-2 h-8 w-8 text-blue-900/20" />
+                      <p className="text-gray-200 italic pl-6">{item.quote}</p>
+                    </div>
+                    
+                    {item.ageRelatedInsight && (
+                      <div className="mt-3 bg-indigo-900/20 p-3 rounded-lg">
+                        <p className="text-sm text-blue-200">
+                          <span className="font-bold">{t('atYourAge')}: </span>
+                          {item.ageRelatedInsight}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {item.philosophy && (
+                      <div className="mt-3 bg-blue-900/20 p-3 rounded-lg">
+                        <p className="text-sm text-blue-200">
+                          <span className="font-bold">Filosofia de Investimento: </span>
+                          {item.philosophy}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
-                {item.ageRelatedInsight && (
-                  <div className="mt-3 bg-indigo-900/20 p-3 rounded-lg">
-                    <p className="text-sm text-blue-200">
-                      <span className="font-bold">{t('atYourAge')}: </span>
-                      {item.ageRelatedInsight}
-                    </p>
-                  </div>
-                )}
-                
-                {item.philosophy && (
-                  <div className="mt-3 bg-blue-900/20 p-3 rounded-lg">
-                    <p className="text-sm text-blue-200">
-                      <span className="font-bold">Filosofia de Investimento: </span>
-                      {item.philosophy}
-                    </p>
+                {item.books && item.books.length > 0 && (
+                  <div className="bg-gray-800/30 p-3 rounded-lg ml-0 md:ml-24">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Info className="h-4 w-4 text-amber-400" />
+                      <span className="text-sm font-medium text-amber-300">Livros Recomendados</span>
+                    </div>
+                    <ul className="list-disc list-inside space-y-1">
+                      {item.books.map((book, bookIndex) => (
+                        <li key={bookIndex} className="text-sm text-gray-300">{book}</li>
+                      ))}
+                    </ul>
                   </div>
                 )}
               </div>
-            </div>
-            
-            {item.books && item.books.length > 0 && (
-              <div className="bg-gray-800/30 p-3 rounded-lg ml-0 md:ml-24">
-                <div className="flex items-center gap-2 mb-2">
-                  <Info className="h-4 w-4 text-amber-400" />
-                  <span className="text-sm font-medium text-amber-300">Livros Recomendados</span>
-                </div>
-                <ul className="list-disc list-inside space-y-1">
-                  {item.books.map((book, bookIndex) => (
-                    <li key={bookIndex} className="text-sm text-gray-300">{book}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        
+        <div className="flex items-center justify-center mt-8 gap-2">
+          <CarouselPrevious className="relative static left-0 right-auto translate-y-0 h-10 w-10" />
+          
+          <div className="flex gap-1">
+            {Array.from({ length: investorQuotes.length }).map((_, i) => (
+              <button
+                key={i}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  i === current ? "bg-blue-500 w-4" : "bg-gray-500"
+                }`}
+                onClick={() => api?.scrollTo(i)}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
           </div>
-        ))}
-      </div>
+          
+          <CarouselNext className="relative static right-0 left-auto translate-y-0 h-10 w-10" />
+        </div>
+      </Carousel>
     </Card>
   );
 };

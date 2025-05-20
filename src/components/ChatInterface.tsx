@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Bot } from "lucide-react";
+import { Send, Bot, Mic, MicOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRaioX } from "@/context/RaioXContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -21,6 +21,7 @@ const ChatInterface = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const { toast } = useToast();
   
   // Update welcome message based on client data when component mounts or client changes
@@ -126,6 +127,53 @@ const ChatInterface = () => {
     }
   };
 
+  const toggleRecording = () => {
+    if (isRecording) {
+      // Stop recording
+      setIsRecording(false);
+      toast({
+        title: "Gravação finalizada",
+        description: "Sua mensagem está sendo processada...",
+      });
+      
+      // Simulate voice message after a delay
+      setTimeout(() => {
+        const voiceMessage: Message = {
+          id: Date.now().toString(),
+          content: "Quais são meus objetivos financeiros de longo prazo?",
+          sender: "user",
+          timestamp: new Date(),
+        };
+        
+        setMessages((prev) => [...prev, voiceMessage]);
+        setInputMessage("");
+        setIsLoading(true);
+        
+        // Generate response to voice message
+        setTimeout(() => {
+          const responseContent = generateContextAwareResponse(voiceMessage.content);
+          
+          const assistantMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            content: responseContent,
+            sender: "assistant",
+            timestamp: new Date(),
+          };
+          
+          setMessages((prev) => [...prev, assistantMessage]);
+          setIsLoading(false);
+        }, 1500);
+      }, 1000);
+    } else {
+      // Start recording
+      setIsRecording(true);
+      toast({
+        title: "Gravando mensagem",
+        description: "Fale sua pergunta ou comando...",
+      });
+    }
+  };
+
   // Create a ref for the message container to scroll to bottom on new messages
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
   
@@ -192,16 +240,25 @@ const ChatInterface = () => {
       
       <div className="p-4 border-t border-white/10">
         <div className="flex gap-2">
+          <Button
+            onClick={toggleRecording}
+            className={`${isRecording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-blue-600 hover:bg-blue-700'} rounded-full h-12 w-12 flex items-center justify-center`}
+            size="icon"
+          >
+            {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+          </Button>
+          
           <Input
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={language === 'en' ? "Send your message..." : "Envie sua mensagem..."}
             className="bg-gray-800/50 border-gray-700 text-white"
+            disabled={isRecording}
           />
           <Button 
             onClick={handleSendMessage} 
-            disabled={!inputMessage.trim() || isLoading}
+            disabled={!inputMessage.trim() || isLoading || isRecording}
             className="bg-blue-600 hover:bg-blue-700"
           >
             <Send className="h-4 w-4" />
