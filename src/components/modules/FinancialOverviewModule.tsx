@@ -1,4 +1,3 @@
-
 import { useRaioX, FinancialSummary } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,11 +11,11 @@ interface FinancialOverviewModuleProps {
 }
 
 const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleProps) => {
-  const { data, hasOpenFinance, financialSummary, isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
+  const { data, hasOpenFinance, financialSummary, isAIAnalysisLoading, refreshAIAnalysis, selectedClient } = useRaioX();
 
   // Format currency
   const formatCurrency = (value: number | undefined) => {
-    if (value === undefined) return "N/A";
+    if (value === undefined) return "R$ 0";
     return new Intl.NumberFormat('pt-BR', {
       style: 'currency',
       currency: 'BRL',
@@ -24,21 +23,130 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
     }).format(value);
   };
 
-  // Mock data for net worth chart
-  const mockNetWorthHistory = [
-    { month: 'Jan', amount: 980000 },
-    { month: 'Feb', amount: 995000 },
-    { month: 'Mar', amount: 1010000 },
-    { month: 'Apr', amount: 1030000 },
-    { month: 'May', amount: 1060000 },
-    { month: 'Jun', amount: 1090000 },
-    { month: 'Jul', amount: 1120000 },
-    { month: 'Aug', amount: 1150000 },
-    { month: 'Sep', amount: 1170000 },
-    { month: 'Oct', amount: 1200000 },
-    { month: 'Nov', amount: 1230000 },
-    { month: 'Dec', amount: hasOpenFinance ? (financialSummary?.netWorth || 1250000) : 1250000 },
-  ];
+  // Enhanced synthetic data based on client profiles
+  const getSyntheticData = () => {
+    // Default synthetic values
+    let netWorth = 1250000;
+    let totalAssets = 1450000;
+    let totalLiabilities = 200000;
+    let liquidAssets = 210000;
+    let monthlyIncome = 42000;
+    let monthlyExpenses = 28000;
+    let savingsRate = 33.3;
+    let monthlyTrend = "+4.3%";
+    let savingsRateTrend = "+2.1%";
+    
+    // Customize based on selected client
+    if (selectedClient) {
+      switch (selectedClient) {
+        // Laio Santos (240275) - High net worth client
+        case 240275:
+          netWorth = 4800000;
+          totalAssets = 5300000;
+          totalLiabilities = 500000;
+          liquidAssets = 780000;
+          monthlyIncome = 95000;
+          monthlyExpenses = 48000;
+          savingsRate = 49.5;
+          monthlyTrend = "+5.7%";
+          savingsRateTrend = "+3.2%";
+          break;
+          
+        // Ana Oliveira (316982) - Aggressive profile
+        case 316982:
+          netWorth = 1850000;
+          totalAssets = 2200000;
+          totalLiabilities = 350000;
+          liquidAssets = 140000;
+          monthlyIncome = 38000;
+          monthlyExpenses = 29000;
+          savingsRate = 23.7;
+          monthlyTrend = "+7.2%";
+          savingsRateTrend = "-1.3%";
+          break;
+          
+        // Marcos Santos (327272) - Conservative profile
+        case 327272:
+          netWorth = 980000;
+          totalAssets = 995000;
+          totalLiabilities = 15000;
+          liquidAssets = 420000;
+          monthlyIncome = 26000;
+          monthlyExpenses = 19500;
+          savingsRate = 25.0;
+          monthlyTrend = "+1.8%";
+          savingsRateTrend = "+1.5%";
+          break;
+          
+        default:
+          // Keep default values
+      }
+    }
+    
+    // Create synthetic financial summary
+    return {
+      netWorth,
+      totalAssets,
+      totalLiabilities,
+      liquidAssets,
+      monthlyIncome,
+      monthlyExpenses,
+      savingsRate,
+      monthlyTrend,
+      savingsRateTrend,
+      topRisks: [
+        {
+          name: "Concentração em Poucos Ativos",
+          severity: "high",
+          impact: "68% do patrimônio em apenas 4 ativos"
+        },
+        {
+          name: "Baixa Reserva de Emergência",
+          severity: "medium",
+          impact: `Cobertura de ${(liquidAssets / monthlyExpenses).toFixed(1)} meses de despesas`
+        },
+        {
+          name: "Exposição Cambial",
+          severity: "medium",
+          impact: "30% do patrimônio sem proteção cambial"
+        }
+      ]
+    };
+  };
+
+  // Generate synthetic history data for net worth chart
+  const generateNetWorthHistory = (currentValue: number) => {
+    const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const result = [];
+    
+    // Start with a value 12% lower than current
+    let startValue = currentValue * 0.88;
+    
+    // Generate monthly data with slight randomness
+    for (let i = 0; i < 12; i++) {
+      // Add some randomness to growth
+      const monthlyGrowth = 1 + (0.005 + Math.random() * 0.01);
+      startValue = Math.round(startValue * monthlyGrowth);
+      
+      result.push({
+        month: months[i],
+        amount: startValue
+      });
+    }
+    
+    // Ensure the final value matches our target
+    result[11].amount = currentValue;
+    
+    return result;
+  };
+  
+  // Use synthetic data when financial summary is missing
+  const finData = hasOpenFinance 
+    ? financialSummary || getSyntheticData() 
+    : getSyntheticData();
+    
+  // Get historical net worth data
+  const netWorthHistory = generateNetWorthHistory(finData.netWorth);
 
   if (!hasOpenFinance) {
     return (
@@ -56,18 +164,18 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
                 <h3 className="font-medium text-lg text-white">Patrimônio de Investimentos</h3>
                 <div className="text-right">
                   <div className="text-2xl font-bold text-white">
-                    {formatCurrency(1250000)}
+                    {formatCurrency(finData.netWorth)}
                   </div>
                   <div className="flex items-center text-sm text-green-400">
                     <ArrowUp className="h-4 w-4 mr-1" />
-                    <span>+4.3% este mês</span>
+                    <span>{finData.monthlyTrend} este mês</span>
                   </div>
                 </div>
               </div>
               
               <div className="h-40">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={mockNetWorthHistory}>
+                  <LineChart data={netWorthHistory}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                     <XAxis dataKey="month" stroke="#666" />
                     <YAxis 
@@ -123,7 +231,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               <div className="p-4 rounded-lg bg-gradient-to-br from-purple-900/40 to-purple-800/20">
                 <div className="text-sm text-gray-400 mb-1">Total Investido</div>
-                <div className="text-xl font-bold text-white">{formatCurrency(1450000)}</div>
+                <div className="text-xl font-bold text-white">{formatCurrency(finData.totalAssets)}</div>
               </div>
               <div className="p-4 rounded-lg bg-gradient-to-br from-blue-900/40 to-blue-800/20">
                 <div className="text-sm text-gray-400 mb-1">Retorno Acumulado</div>
@@ -131,7 +239,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
               </div>
               <div className="p-4 rounded-lg bg-gradient-to-br from-green-900/40 to-green-800/20">
                 <div className="text-sm text-gray-400 mb-1">Dividendos Anuais</div>
-                <div className="text-xl font-bold text-white">{formatCurrency(42000)}</div>
+                <div className="text-xl font-bold text-white">{formatCurrency(finData.monthlyIncome * 0.15 * 12)}</div>
               </div>
             </div>
           </div>
@@ -179,18 +287,18 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
               <h3 className="font-medium text-lg text-white">Patrimônio Líquido</h3>
               <div className="text-right">
                 <div className="text-2xl font-bold text-white">
-                  {formatCurrency(financialSummary?.netWorth)}
+                  {formatCurrency(finData.netWorth)}
                 </div>
                 <div className="flex items-center text-sm text-green-400">
                   <ArrowUp className="h-4 w-4 mr-1" />
-                  <span>+4.3% este mês</span>
+                  <span>{finData.monthlyTrend} este mês</span>
                 </div>
               </div>
             </div>
             
             <div className="h-40">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={mockNetWorthHistory}>
+                <LineChart data={netWorthHistory}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                   <XAxis dataKey="month" stroke="#666" />
                   <YAxis 
@@ -221,11 +329,11 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 rounded-lg bg-gradient-to-br from-blue-900/40 to-blue-800/20">
               <div className="text-sm text-gray-400 mb-1">Total de Ativos</div>
-              <div className="text-xl font-bold text-white">{formatCurrency(financialSummary?.totalAssets)}</div>
+              <div className="text-xl font-bold text-white">{formatCurrency(finData.totalAssets)}</div>
             </div>
             <div className="p-4 rounded-lg bg-gradient-to-br from-red-900/40 to-red-800/20">
               <div className="text-sm text-gray-400 mb-1">Total de Passivos</div>
-              <div className="text-xl font-bold text-white">{formatCurrency(financialSummary?.totalLiabilities)}</div>
+              <div className="text-xl font-bold text-white">{formatCurrency(finData.totalLiabilities)}</div>
             </div>
           </div>
           
@@ -233,26 +341,26 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="p-4 rounded-lg bg-gradient-to-br from-green-900/40 to-green-800/20">
               <div className="text-sm text-gray-400 mb-1">Taxa de Poupança</div>
-              <div className="text-xl font-bold text-white">{financialSummary?.savingsRate}%</div>
+              <div className="text-xl font-bold text-white">{finData.savingsRate}%</div>
               <div className="flex items-center text-xs text-green-400 mt-1">
                 <ArrowUp className="h-3 w-3 mr-1" />
-                <span>+2.1% vs. média</span>
+                <span>{finData.savingsRateTrend} vs. média</span>
               </div>
             </div>
             <div className="p-4 rounded-lg bg-gradient-to-br from-purple-900/40 to-purple-800/20">
               <div className="text-sm text-gray-400 mb-1">Liquidez Imediata</div>
-              <div className="text-xl font-bold text-white">{formatCurrency(financialSummary?.liquidAssets)}</div>
+              <div className="text-xl font-bold text-white">{formatCurrency(finData.liquidAssets)}</div>
               <div className="flex items-center text-xs text-amber-400 mt-1">
-                <span>Cobertura de {((financialSummary?.liquidAssets || 0) / (financialSummary?.monthlyExpenses || 1)).toFixed(1)} meses</span>
+                <span>Cobertura de {(finData.liquidAssets / finData.monthlyExpenses).toFixed(1)} meses</span>
               </div>
             </div>
             <div className="p-4 rounded-lg bg-gradient-to-br from-indigo-900/40 to-indigo-800/20">
               <div className="text-sm text-gray-400 mb-1">Fluxo Líquido Mensal</div>
               <div className="text-xl font-bold text-white">
-                {formatCurrency((financialSummary?.monthlyIncome || 0) - (financialSummary?.monthlyExpenses || 0))}
+                {formatCurrency(finData.monthlyIncome - finData.monthlyExpenses)}
               </div>
               <div className="text-xs text-gray-400 mt-1">
-                <span>Receita: {formatCurrency(financialSummary?.monthlyIncome)}</span>
+                <span>Receita: {formatCurrency(finData.monthlyIncome)}</span>
               </div>
             </div>
           </div>
@@ -261,7 +369,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
           <div>
             <h3 className="font-medium text-white mb-2">Principais Riscos</h3>
             <div className="space-y-3">
-              {financialSummary?.topRisks?.map((risk, index) => (
+              {finData.topRisks?.map((risk, index) => (
                 <div key={index} className="flex items-start gap-3">
                   <Badge className={`
                     ${risk.severity === 'high' ? 'bg-red-600' : 
