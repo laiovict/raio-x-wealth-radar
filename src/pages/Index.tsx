@@ -178,6 +178,17 @@ const Index = () => {
     return `https://report.letsreinvent.vc/reinvent/5b552db1-7aa6-4f0b-b25e-f145a2688936/report?period=${reportYear}${formattedMonth}&reportId=c767ceee-e4f4-449a-bd3e-ea00a5567880&clientId=${selectedClient || ''}`;
   };
 
+  // Handle logo click - return to home/default page
+  const handleLogoClick = () => {
+    // Reset to default view
+    document.dispatchEvent(new CustomEvent('navigate-to-tab', {
+      detail: { tabId: 'overview' }
+    }));
+    
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   if (loading) {
     return <LoadingScreen forceShow={true} />;
   }
@@ -195,7 +206,7 @@ const Index = () => {
       <div className="min-h-screen h-screen flex flex-col bg-gradient-to-br from-[#0f0f11] to-[#1a1a2e] text-white">
         <nav className="backdrop-blur-md bg-black/20 border-b border-white/5 px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 sticky top-0 z-10">
           <div className="flex items-center gap-4">
-            <div className="flex items-center">
+            <div className="flex items-center cursor-pointer" onClick={handleLogoClick}>
               <img 
                 src="/lovable-uploads/4b258bed-71ae-4d4c-847b-12968969f2d4.png"
                 alt="Reinvent Logo"

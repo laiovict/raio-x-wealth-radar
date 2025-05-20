@@ -65,6 +65,21 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
     }, 2000);
   };
 
+  // Create a chat action using the asset data
+  const handleChatAction = (assetTicker: string) => {
+    // Create custom event to pre-load message in the chat
+    const event = new CustomEvent('load-chat-message', { 
+      detail: { message: `Nicolas, o que você acha do ativo ${assetTicker} no cenário atual? Vale a pena investir?` }
+    });
+    document.dispatchEvent(event);
+    
+    // Navigate to chat tab
+    const tabsEvent = new CustomEvent('navigate-to-tab', {
+      detail: { tabId: 'chat' }
+    });
+    document.dispatchEvent(tabsEvent);
+  };
+
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} h-full shadow-md hover:shadow-lg transition-shadow`}>
       <CardHeader className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/70 dark:to-indigo-900/70 pb-4 rounded-t-lg border-b border-gray-200 dark:border-gray-700 flex flex-row justify-between items-center">
@@ -111,6 +126,16 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
                     <p className="text-gray-800 dark:text-gray-100 text-sm">
                       {asset.recentNews}
                     </p>
+                  </div>
+                  <div className="mt-3">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="w-full text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800/50"
+                      onClick={() => handleChatAction(asset.ticker)}
+                    >
+                      Perguntar ao Nicolas
+                    </Button>
                   </div>
                 </div>
               ))}

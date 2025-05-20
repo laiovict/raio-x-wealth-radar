@@ -9,6 +9,7 @@ import { useRaioX } from "@/context/RaioXContext";
 import { useLanguage } from "@/context/LanguageContext";
 import StreamingText from "@/components/StreamingText";
 import { useStreamingContent } from "@/hooks/use-streaming-content";
+import { supabase } from "@/integrations/supabase/client";
 
 type Message = {
   id: string;
@@ -27,18 +28,35 @@ const ChatInterface = () => {
   const [isRecording, setIsRecording] = useState(false);
   const { toast } = useToast();
   const { isStreaming } = useStreamingContent(false, 500);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
   
   // Update welcome message based on client data when component mounts or client changes
   useEffect(() => {
     const welcomeMessage = {
       id: "welcome",
-      content: `Olá${data.clientName ? `, ${data.clientName}` : ""}! Sou o assistente financeiro da Reinvent. Como posso ajudá-lo com suas finanças hoje?`,
+      content: `Olá${data.clientName ? `, ${data.clientName}` : ""}! Sou Nicolas, seu assistente financeiro da Reinvent. Como posso ajudá-lo com suas finanças hoje?`,
       sender: "assistant" as const,
       timestamp: new Date(),
     };
     
     setMessages([welcomeMessage]);
   }, [data.clientName, selectedClient]);
+
+  // Listen for requests to navigate to this tab with a preloaded message
+  useEffect(() => {
+    const handleLoadMessage = (event: CustomEvent) => {
+      if (event.detail?.message) {
+        setInputMessage(event.detail.message);
+      }
+    };
+    
+    document.addEventListener('load-chat-message', handleLoadMessage as EventListener);
+    
+    return () => {
+      document.removeEventListener('load-chat-message', handleLoadMessage as EventListener);
+    };
+  }, []);
 
   const generateContextAwareResponse = (userMessage: string) => {
     // This function analyzes the user message and generates a response using client data
@@ -144,59 +162,142 @@ const ChatInterface = () => {
     }
   };
 
-  const toggleRecording = () => {
-    if (isRecording) {
-      // Stop recording
-      setIsRecording(false);
-      toast({
-        title: "Gravação finalizada",
-        description: "Sua mensagem está sendo processada...",
-      });
+  // Process audio recording and send to OpenAI for transcription
+  const processAudioRecording = async (audioBlob: Blob) => {
+    try {
+      // Convert blob to base64
+      const reader = new FileReader();
       
-      // Simulate voice message after a delay
-      setTimeout(() => {
-        const voiceMessage: Message = {
-          id: Date.now().toString(),
-          content: "Quais são meus objetivos financeiros de longo prazo?",
-          sender: "user",
-          timestamp: new Date(),
-        };
+      reader.onloadend = async () => {
+        const base64Audio = reader.result?.toString().split(',')[1];
         
-        setMessages((prev) => [...prev, voiceMessage]);
+        if (!base64Audio) {
+          throw new Error("Failed to convert audio to base64");
+        }
         
-        // Add temporary streaming message with loading indicator
-        const tempId = `temp-${Date.now()}`;
-        setMessages((prev) => [...prev, {
-          id: tempId,
-          content: "",
-          sender: "assistant",
-          timestamp: new Date(),
-          isStreaming: true
-        }]);
+        toast({
+          title: "Processando áudio",
+          description: "Convertendo sua mensagem de voz para texto...",
+        });
         
-        // Generate response to voice message after a delay
-        setTimeout(() => {
-          const responseContent = generateContextAwareResponse(voiceMessage.content);
+        try {
+          // Call Supabase Edge Function (you'd need to implement this)
+          const { data, error } = await supabase.functions.invoke('speech-to-text', {
+            body: { audio: base64Audio }
+          });
           
-          // Replace streaming message with final message
-          setMessages((prev) => prev.map(msg => 
-            msg.id === tempId ? {
-              id: (Date.now() + 1).toString(),
-              content: responseContent,
+          if (error) {
+            throw new Error(error.message);
+          }
+          
+          if (data?.text) {
+            // Add the transcribed text as a user message
+            const voiceMessage: Message = {
+              id: Date.now().toString(),
+              content: data.text,
+              sender: "user",
+              timestamp: new Date(),
+            };
+            
+            setMessages((prev) => [...prev, voiceMessage]);
+            
+            // Process the message as if it was typed
+            const tempId = `temp-${Date.now()}`;
+            setMessages((prev) => [...prev, {
+              id: tempId,
+              content: "",
               sender: "assistant",
               timestamp: new Date(),
-              isStreaming: false
-            } : msg
-          ));
-        }, 1500);
-      }, 1000);
-    } else {
-      // Start recording
-      setIsRecording(true);
+              isStreaming: true
+            }]);
+            
+            // Generate response to voice message after a delay
+            setTimeout(() => {
+              const responseContent = generateContextAwareResponse(voiceMessage.content);
+              
+              // Replace streaming message with final message
+              setMessages((prev) => prev.map(msg => 
+                msg.id === tempId ? {
+                  id: (Date.now() + 1).toString(),
+                  content: responseContent,
+                  sender: "assistant",
+                  timestamp: new Date(),
+                  isStreaming: false
+                } : msg
+              ));
+            }, 1500);
+          }
+        } catch (error) {
+          console.error("Error processing voice:", error);
+          toast({
+            title: "Erro no processamento",
+            description: "Não foi possível processar o áudio. Tente novamente.",
+            variant: "destructive",
+          });
+        }
+      };
+      
+      reader.readAsDataURL(audioBlob);
+      
+    } catch (error) {
+      console.error("Error processing recording:", error);
       toast({
-        title: "Gravando mensagem",
-        description: "Fale sua pergunta ou comando...",
+        title: "Erro",
+        description: "Não foi possível processar a gravação.",
+        variant: "destructive"
       });
+    }
+  };
+
+  const toggleRecording = async () => {
+    if (isRecording) {
+      // Stop recording
+      if (mediaRecorderRef.current) {
+        mediaRecorderRef.current.stop();
+        setIsRecording(false);
+        toast({
+          title: "Gravação finalizada",
+          description: "Sua mensagem está sendo processada...",
+        });
+      }
+    } else {
+      try {
+        // Start recording
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mediaRecorder = new MediaRecorder(stream);
+        
+        mediaRecorderRef.current = mediaRecorder;
+        audioChunksRef.current = [];
+        
+        mediaRecorder.ondataavailable = (e) => {
+          if (e.data.size > 0) {
+            audioChunksRef.current.push(e.data);
+          }
+        };
+        
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+          processAudioRecording(audioBlob);
+          
+          // Stop all audio tracks
+          stream.getTracks().forEach(track => track.stop());
+        };
+        
+        mediaRecorder.start();
+        setIsRecording(true);
+        
+        toast({
+          title: "Gravando mensagem",
+          description: "Fale sua pergunta ou comando...",
+        });
+      } catch (error) {
+        console.error("Error accessing microphone:", error);
+        toast({
+          title: "Erro de acesso",
+          description: "Não foi possível acessar o microfone. Verifique as permissões do navegador.",
+          variant: "destructive"
+        });
+      }
     }
   };
 
@@ -219,8 +320,8 @@ const ChatInterface = () => {
             <Bot className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-medium text-white">Reinvent RM</h2>
-            <p className="text-xs text-blue-200/70">Assistente financeiro inteligente</p>
+            <h2 className="text-lg font-medium text-white">Nicolas</h2>
+            <p className="text-xs text-blue-200/70">Assistente financeiro Reinvent</p>
           </div>
         </div>
       </div>
@@ -245,7 +346,7 @@ const ChatInterface = () => {
                     <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse delay-150"></div>
                     <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse delay-300"></div>
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">Reinvent RM está escrevendo...</p>
+                  <p className="text-xs text-gray-400 mt-1">Nicolas está escrevendo...</p>
                 </div>
               ) : message.sender === "assistant" ? (
                 <>
@@ -262,7 +363,7 @@ const ChatInterface = () => {
                         minute: "2-digit",
                       })}
                     </p>
-                    <p className="text-xs font-medium text-blue-300">Reinvent RM</p>
+                    <p className="text-xs font-medium text-blue-300">Nicolas</p>
                   </div>
                 </>
               ) : (

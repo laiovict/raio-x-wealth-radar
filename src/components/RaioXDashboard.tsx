@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Mic, Search, Share2, Download } from "lucide-react";
@@ -61,7 +60,18 @@ const RaioXDashboard = ({
       }
     };
 
+    const handleTabNavigation = (event: CustomEvent) => {
+      if (event.detail?.tabId) {
+        setActiveTab(event.detail.tabId);
+        // Scroll to top when changing tabs
+        if (dashboardRef.current) {
+          dashboardRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    };
+
     document.addEventListener('activate-openfinance', handleActivateOpenFinance);
+    document.addEventListener('navigate-to-tab', handleTabNavigation as EventListener);
 
     // Fix scrolling behavior
     const mainContainer = document.querySelector('main');
@@ -71,6 +81,7 @@ const RaioXDashboard = ({
 
     return () => {
       document.removeEventListener('activate-openfinance', handleActivateOpenFinance);
+      document.removeEventListener('navigate-to-tab', handleTabNavigation as EventListener);
     };
   }, [onOpenFinanceActivate]);
 
@@ -115,8 +126,13 @@ const RaioXDashboard = ({
     recognition.onresult = (event: any) => {
       const speechResult = event.results[0][0].transcript;
       setActiveTab("chat");
-      // Aqui você pode implementar a lógica para processar o comando de voz
-      // Por exemplo, enviar para a interface de chat ou realizar uma pesquisa
+      
+      // Create custom event to pre-load message in the chat
+      const chatEvent = new CustomEvent('load-chat-message', { 
+        detail: { message: speechResult }
+      });
+      document.dispatchEvent(chatEvent);
+      
       toast({
         title: "Comando recebido",
         description: speechResult

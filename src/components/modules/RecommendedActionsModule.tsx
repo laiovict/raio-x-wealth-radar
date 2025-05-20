@@ -1,10 +1,10 @@
-
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle2, Circle, Lightbulb, TrendingUp, Shield, AlertTriangle, Leaf } from "lucide-react";
 import { useRaioX } from "@/context/RaioXContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 // Define recommended action type
 interface RecommendedAction {
@@ -16,6 +16,7 @@ interface RecommendedAction {
   buttonText: string;
   buttonLink: string;
   category: string;
+  chatMessage?: string;
   icon?: string;
 }
 
@@ -23,12 +24,48 @@ const RecommendedActionsModule = ({ fullWidth = false }) => {
   const { data, selectedClient } = useRaioX();
   const { t } = useLanguage();
   const [completedActions, setCompletedActions] = useState<string[]>([]);
+  const navigate = useNavigate();
 
   const toggleActionCompletion = (actionId: string) => {
     if (completedActions.includes(actionId)) {
       setCompletedActions(completedActions.filter((id) => id !== actionId));
     } else {
       setCompletedActions([...completedActions, actionId]);
+    }
+  };
+
+  // Handle action button click
+  const handleActionClick = (action: RecommendedAction) => {
+    // If we have a custom chat message, redirect to chat with that message
+    if (action.chatMessage) {
+      // Create custom event to pre-load message in the chat
+      const event = new CustomEvent('load-chat-message', { 
+        detail: { message: action.chatMessage }
+      });
+      document.dispatchEvent(event);
+      
+      // Navigate to chat tab
+      const tabsEvent = new CustomEvent('navigate-to-tab', {
+        detail: { tabId: 'chat' }
+      });
+      document.dispatchEvent(tabsEvent);
+    } else if (action.buttonLink) {
+      // Otherwise use the original link
+      if (action.buttonLink.startsWith('#')) {
+        // Handle internal links
+        if (action.buttonLink === '#chat') {
+          const tabsEvent = new CustomEvent('navigate-to-tab', {
+            detail: { tabId: 'chat' }
+          });
+          document.dispatchEvent(tabsEvent);
+        } else {
+          // For other anchor links
+          document.querySelector(action.buttonLink)?.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else {
+        // External links
+        window.open(action.buttonLink, '_blank');
+      }
     }
   };
 
@@ -44,6 +81,7 @@ const RecommendedActionsModule = ({ fullWidth = false }) => {
         effort: "Médio",
         buttonText: "Ver sugestões",
         buttonLink: "#diversification",
+        chatMessage: "Nicolas, preciso diversificar minha carteira de investimentos. Pode me sugerir algumas estratégias?",
         category: "investment",
         icon: "TrendingUp"
       },
@@ -55,6 +93,7 @@ const RecommendedActionsModule = ({ fullWidth = false }) => {
         effort: "Médio",
         buttonText: "Planejar reserva",
         buttonLink: "#emergency",
+        chatMessage: "Nicolas, preciso aumentar minha reserva de emergência. Como posso fazer isso de forma eficiente?",
         category: "planning",
         icon: "Shield"
       },
@@ -66,6 +105,7 @@ const RecommendedActionsModule = ({ fullWidth = false }) => {
         effort: "Baixo",
         buttonText: "Ver estratégias",
         buttonLink: "#tax",
+        chatMessage: "Nicolas, preciso otimizar a eficiência tributária dos meus investimentos. Quais estratégias você recomenda?",
         category: "tax",
         icon: "Leaf"
       }
@@ -82,6 +122,7 @@ const RecommendedActionsModule = ({ fullWidth = false }) => {
           effort: "Baixo",
           buttonText: "Ver detalhes",
           buttonLink: "#rebalance",
+          chatMessage: "Nicolas, preciso rebalancear minha alocação internacional. Pode me ajudar a aumentar para 20%?",
           category: "investment",
           icon: "TrendingUp"
         },
@@ -93,6 +134,7 @@ const RecommendedActionsModule = ({ fullWidth = false }) => {
           effort: "Médio",
           buttonText: "Atualizar plano",
           buttonLink: "#retirement",
+          chatMessage: "Nicolas, preciso revisar meu plano de aposentadoria. Meu aporte mensal não está sendo suficiente.",
           category: "planning",
           icon: "Shield"
         },
@@ -108,6 +150,7 @@ const RecommendedActionsModule = ({ fullWidth = false }) => {
           effort: "Baixo",
           buttonText: "Refazer perfil",
           buttonLink: "#risk",
+          chatMessage: "Nicolas, preciso reavaliar meu perfil de risco. Meus investimentos atuais parecem ter um risco maior do que o que me sinto confortável.",
           category: "planning",
           icon: "AlertTriangle"
         },
@@ -187,11 +230,9 @@ const RecommendedActionsModule = ({ fullWidth = false }) => {
                 variant="gradient" 
                 size="sm"
                 className="recommended-action-button"
-                asChild
+                onClick={() => handleActionClick(action)}
               >
-                <a href={action.buttonLink} className="w-full block text-white">
-                  {action.buttonText}
-                </a>
+                {action.buttonText}
               </Button>
             </div>
           </li>
