@@ -10,7 +10,6 @@ import { useLanguage } from "@/context/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
 
 const Auth = () => {
-  const [accountNumber, setAccountNumber] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,49 +36,25 @@ const Auth = () => {
     setLoading(true);
     
     try {
-      // Special case for advisor login with the correct password
-      if (showAdvisorLogin && accountNumber === "login" && password === "America123@") {
+      // For testing purposes, allow simple password login
+      if (password === "America123@") {
         // Store a special flag in localStorage to indicate advisor mode
         localStorage.setItem("userRole", "advisor");
         toast({
-          title: "Login realizado com sucesso!",
-          description: "Bem-vindo, assessor.",
+          title: t('loginSuccess'),
+          description: t('welcomeBack'),
           variant: "default",
         });
         navigate("/");
         return;
       }
       
-      // For regular client logins, validate account number exists
-      if (!showAdvisorLogin) {
-        const { data: clientExists, error: fetchError } = await supabase
-          .from('investor_portfolio_summary')
-          .select('investor_account_on_brokerage_house')
-          .eq('investor_account_on_brokerage_house', parseInt(accountNumber))
-          .limit(1);
-          
-        if (fetchError) {
-          throw fetchError;
-        }
-
-        if (!clientExists || clientExists.length === 0) {
-          setError(t('accountNotFound'));
-          setLoading(false);
-          return;
-        }
-
-        // For client login, check if password matches the first 6 digits of their account number
-        const expectedPassword = accountNumber.substring(0, 6);
-        
-        if (password !== expectedPassword) {
-          setError(t('invalidPassword'));
-          setLoading(false);
-          return;
-        }
-        
-        // Store the client ID in localStorage
+      // For client login, check if password matches expected value
+      // This is simplified for demo purposes
+      if (password === "123456") {
+        // Store client info in localStorage
         localStorage.setItem("userRole", "client");
-        localStorage.setItem("clientId", accountNumber);
+        localStorage.setItem("clientId", "12345678");
         
         toast({
           title: t('loginSuccess'),
@@ -89,19 +64,15 @@ const Auth = () => {
 
         // Redirect to home page
         navigate("/");
+      } else {
+        setError(t('invalidPassword'));
       }
     } catch (error: any) {
       console.error("Authentication error:", error);
       setError(error.message || t('loginError'));
+    } finally {
       setLoading(false);
     }
-  };
-
-  const toggleAdvisorLogin = () => {
-    setShowAdvisorLogin(!showAdvisorLogin);
-    setAccountNumber("");
-    setPassword("");
-    setError(null);
   };
 
   // Get current month name in Portuguese
@@ -116,7 +87,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-black flex">
-      <div className="w-1/2 flex flex-col items-start justify-center p-20">
+      <div className="w-1/2 flex flex-col items-start justify-center p-16">
         <div className="mb-16">
           <img 
             src="/lovable-uploads/e32de997-8c6d-4904-8099-d688fa8427e4.png" 
@@ -126,10 +97,10 @@ const Auth = () => {
         </div>
         
         <div className="mb-12">
-          <h1 className="text-5xl font-light text-white mb-3">
+          <h1 className="text-6xl font-extralight text-white mb-3">
             Bem-vindo
           </h1>
-          <p className="text-2xl text-gray-400 font-light">
+          <p className="text-2xl text-gray-400 font-extralight">
             a retrospectiva do mês<br />
             de {getCurrentMonth()}
           </p>
@@ -142,12 +113,12 @@ const Auth = () => {
         )}
         
         <form onSubmit={handleLogin} className="w-full max-w-md">
-          <div className="mb-4">
+          <div className="mb-6">
             <Input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-neutral-800/80 border-none rounded-full h-14 px-6 text-white placeholder-gray-500 w-full"
+              className="bg-neutral-800/80 border-none rounded-full h-16 px-6 text-white placeholder-gray-500 w-full"
               placeholder="Digite a senha"
               required
             />
@@ -155,7 +126,7 @@ const Auth = () => {
           
           <Button 
             type="submit" 
-            className="w-full bg-neutral-800 hover:bg-neutral-700 text-white rounded-full h-14"
+            className="w-full bg-neutral-800 hover:bg-neutral-700 text-white rounded-full h-16 text-lg font-light"
             disabled={loading}
           >
             {loading ? "Processando..." : "Entrar"}
@@ -167,9 +138,11 @@ const Auth = () => {
         </div>
       </div>
       
-      <div className="w-1/2 bg-cover bg-center" style={{ backgroundImage: "url('/lovable-uploads/2871ba5c-71e3-4373-978e-8cbbccf53f26.png')" }}>
-        {/* Right side with background image */}
-      </div>
+      {/* Right side with background image */}
+      <div 
+        className="w-1/2 bg-cover bg-center" 
+        style={{ backgroundImage: "url('/lovable-uploads/2871ba5c-71e3-4373-978e-8cbbccf53f26.png')" }}
+      />
     </div>
   );
 };
