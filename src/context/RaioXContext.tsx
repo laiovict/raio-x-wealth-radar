@@ -24,6 +24,9 @@ import {
   getClientSummary
 } from '@/services/portfolioService';
 
+// Export necessary types for modules to use
+export type { FinancialSummary, AIInsight, PortfolioSummary, DividendHistory, ClientSummary } from '@/types/raioXTypes';
+
 // Create context with default values
 const RaioXContext = createContext<RaioXContextProps>({
   data: defaultRaioXData,

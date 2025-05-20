@@ -1,5 +1,6 @@
 
-import { useRaioX, AIInsight } from "@/context/RaioXContext";
+import { useRaioX } from "@/context/RaioXContext";
+import type { AIInsight } from "@/types/raioXTypes";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
