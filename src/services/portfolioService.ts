@@ -1,6 +1,7 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { parseValueToNumber } from "@/components/modules/dividends/dividendUtils";
-import { toNumber, toString, toFormattableString } from '@/utils/typeConversionHelpers';
+import { toNumber, toString, toFormattableString, toSafeString } from '@/utils/typeConversionHelpers';
 import { DividendHistory, FinancialSummary, DataSourceType } from '@/types/raioXTypes';
 
 // Define the data source type
@@ -521,7 +522,7 @@ export const generateFinancialSummary = (
  */
 const formatCurrency = (value: any): string => {
   if (!value) return "R$ 0,00";
-  return typeof value === 'string' ? value : String(value);
+  return toString(value);
 };
 
 /**
@@ -535,34 +536,34 @@ export const getStyledPortfolioSummaryData = (portfolioSummary: any, colorScale:
   if (!portfolioSummary) return null;
   
   // Extract values or use defaults
-  const totalValue = portfolioSummary.total_portfolio_value ? parseFloat(portfolioSummary.total_portfolio_value) : 0;
+  const totalValue = portfolioSummary.total_portfolio_value ? parseFloat(toString(portfolioSummary.total_portfolio_value)) : 0;
   
   // Calculate percentages and ensure they're numbers
   const fixed = typeof portfolioSummary.fixed_income_representation === 'number' ? 
                 portfolioSummary.fixed_income_representation : 
-                parseFloat(portfolioSummary.fixed_income_representation || "0");
+                parseFloat(toString(portfolioSummary.fixed_income_representation || "0"));
                 
   const funds = typeof portfolioSummary.investment_fund_representation === 'number' ? 
                portfolioSummary.investment_fund_representation : 
-               parseFloat(portfolioSummary.investment_fund_representation || "0");
+               parseFloat(toString(portfolioSummary.investment_fund_representation || "0"));
                
   const real = typeof portfolioSummary.real_estate_representation === 'number' ? 
               portfolioSummary.real_estate_representation : 
-              parseFloat(portfolioSummary.real_estate_representation || "0");
+              parseFloat(toString(portfolioSummary.real_estate_representation || "0"));
               
   const stocks = typeof portfolioSummary.stocks_representation === 'string' ? 
-                parseFloat(portfolioSummary.stocks_representation || "0") : 
+                parseFloat(toString(portfolioSummary.stocks_representation || "0")) : 
                 portfolioSummary.stocks_representation || 0;
   
   // Format values for display (ensuring they are strings)
   const fixedIncomeValue = formatCurrency(portfolioSummary.fixed_income_value ? 
-    String(portfolioSummary.fixed_income_value) : "0");
+    toString(portfolioSummary.fixed_income_value) : "0");
   const fundsValue = formatCurrency(portfolioSummary.investment_fund_value ? 
-    String(portfolioSummary.investment_fund_value) : "0");
+    toString(portfolioSummary.investment_fund_value) : "0");
   const realEstateValue = formatCurrency(portfolioSummary.real_estate_value ? 
-    String(portfolioSummary.real_estate_value) : "0");
+    toString(portfolioSummary.real_estate_value) : "0");
   const stocksValue = formatCurrency(portfolioSummary.stocks_value ? 
-    String(portfolioSummary.stocks_value) : "0");
+    toString(portfolioSummary.stocks_value) : "0");
   
   // Return the formatted data
   return [

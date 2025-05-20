@@ -1,7 +1,7 @@
 
 import { useCallback, useMemo } from 'react';
 import { useRaioX } from '@/context/RaioXContext';
-import { toNumber, toString, ensureString } from '@/utils/typeConversionHelpers';
+import { toNumber, toString, ensureString, toSafeString } from '@/utils/typeConversionHelpers';
 import { 
   INVESTMENT_SONGS, 
   UNUSUAL_INVESTMENTS, 
@@ -40,11 +40,11 @@ export const useWrappedData = () => {
         // Find largest dividend payment
         let largestDividend = {
           asset: data.dividendHistory[0].asset,
-          value: parseFloat(data.dividendHistory[0].value || "0")
+          value: parseFloat(toString(data.dividendHistory[0].value || "0"))
         };
         
         data.dividendHistory.forEach(dividend => {
-          const value = parseFloat(dividend.value || "0");
+          const value = parseFloat(toString(dividend.value || "0"));
           if (value > largestDividend.value) {
             largestDividend = {
               asset: dividend.asset,
@@ -77,7 +77,7 @@ export const useWrappedData = () => {
         let mostProfitableAsset = "Unknown";
         
         data.stocks.forEach(stock => {
-          const performance = parseFloat(String(stock.performance || "0"));
+          const performance = parseFloat(toString(stock.performance || "0"));
           if (performance > highestReturn) {
             highestReturn = performance;
             mostProfitableAsset = stock.asset || "Unknown";
@@ -89,9 +89,9 @@ export const useWrappedData = () => {
                               (data.profitability?.ytd || 0) > 5 ? 6 : 4;
         
         // Generate a summary based on real data
-        const portfolioValue = parseFloat(data.portfolioSummary.total_portfolio_value || "0");
+        const portfolioValue = parseFloat(toString(data.portfolioSummary.total_portfolio_value || "0"));
         const fixedIncomePercent = data.portfolioSummary.fixed_income_representation;
-        const stocksPercent = parseFloat(data.portfolioSummary.stocks_representation || "0");
+        const stocksPercent = parseFloat(toString(data.portfolioSummary.stocks_representation || "0"));
         
         let assetFocus = "diversificada";
         if (fixedIncomePercent > 60) assetFocus = "renda fixa";
@@ -176,7 +176,7 @@ export const useWrappedData = () => {
       // If we have portfolio data, make insights more specific
       if (data.portfolioSummary) {
         const fixedIncomePerc = data.portfolioSummary.fixed_income_representation || 0;
-        const stocksPerc = parseFloat(data.portfolioSummary.stocks_representation || "0");
+        const stocksPerc = parseFloat(toString(data.portfolioSummary.stocks_representation || "0"));
         
         if (fixedIncomePerc > 60) {
           personalityType = "Conservador Estratégico";

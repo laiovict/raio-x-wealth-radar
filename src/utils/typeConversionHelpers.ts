@@ -242,3 +242,14 @@ export const getSafeDisplayString = (value: any): string => {
   if (value === undefined || value === null) return '';
   return String(value);
 };
+
+/**
+ * Safe string conversion - always returns a string, even with invalid inputs
+ * @param value Any value to convert to string
+ * @param fallback Optional fallback value if null/undefined
+ * @returns String value
+ */
+export const toSafeString = (value: any, fallback: string = 'N/A'): string => {
+  if (value === undefined || value === null) return fallback;
+  return String(value);
+};
