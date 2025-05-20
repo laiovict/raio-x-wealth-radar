@@ -32,7 +32,7 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
       const clientStocks = stocks.slice(0, 2).map(stockItem => ({
         ticker: stockItem.asset || "",
         sentiment: Math.floor(Math.random() * 30) + 60, // Generate a sentiment score between 60-90
-        impact: (Math.random() * 5 * (Math.random() > 0.5 ? 1 : -1)).toFixed(1),
+        impact: parseFloat((Math.random() * 5 * (Math.random() > 0.5 ? 1 : -1)).toFixed(1)), // Convert to number
         recentNews: generateNewsForStock(stockItem.asset || ""),
         dataSource: 'supabase' as const
       }));
@@ -92,7 +92,47 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
         "Renovação da frota com veículos elétricos atrai clientes corporativos preocupados com ESG.",
         "Expansão para novas cidades aumenta base de clientes em 14% no último trimestre.",
         "Nova plataforma de gestão de frota para empresas mostra forte adoção inicial."
-      ]
+      ],
+      "AAPL34": [
+        "Nova linha de produtos apresenta avanços significativos em inteligência artificial.",
+        "Vendas internacionais superam expectativas, com crescimento expressivo no mercado asiático.",
+        "Estratégia de serviços continua impulsionando receita recorrente da empresa."
+      ],
+      "TSLA34": [
+        "Produção de veículos elétricos atinge novo recorde trimestral.",
+        "Expansão de fábricas na Europa e Ásia avança conforme o cronograma.",
+        "Novas tecnologias de bateria prometem aumentar autonomia dos veículos em 20%."
+      ],
+      "HASH11": [
+        "ETF de criptoativos apresenta recuperação consistente após período de volatilidade.",
+        "Aumento de adoção institucional fortalece fundamentos do setor de blockchain.",
+        "Estratégia de diversificação de ativos digitais reduz impacto de oscilações de mercado."
+      ],
+      "GOLD11": [
+        "ETF de ouro beneficia-se de incertezas macroeconômicas globais.",
+        "Demanda por ativos de proteção aumenta em cenário de volatilidade em mercados emergentes.",
+        "Correlação negativa com ativos de risco reforça papel do ouro em carteiras diversificadas."
+      ],
+      "GMCO34": [
+        "Resultados operacionais superam expectativas do mercado no último trimestre.",
+        "Estratégia de expansão internacional mostra resultados promissores em novos mercados.",
+        "Investimentos em inovação reforçam vantagem competitiva da empresa no setor."
+      ],
+      "JPMC34": [
+        "Banco apresenta crescimento robusto na divisão de investimentos corporativos.",
+        "Estratégia digital atrai nova geração de clientes para serviços financeiros.",
+        "Resultados superam expectativas com forte desempenho no segmento de gestão de patrimônio."
+      ],
+      "MELI34": [
+        "Plataforma de e-commerce registra crescimento de 25% em transações na América Latina.",
+        "Divisão de serviços financeiros continua expandindo base de usuários em mercados-chave.",
+        "Investimentos em logística reduzem tempo de entrega e aumentam satisfação dos clientes."
+      ],
+      "IVVB11": [
+        "ETF que replica o S&P 500 beneficia-se de forte desempenho das ações americanas.",
+        "Estratégia de exposição ao mercado norte-americano mostra resultados consistentes.",
+        "Aumenta procura por instrumentos de diversificação internacional entre investidores brasileiros."
+      ],
     };
     
     // For known stocks, use specific news
@@ -116,8 +156,8 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
   const generateSummaryFromStocks = (stocks: any[]) => {
     if (stocks.length === 0) return "Sem dados de sentimento disponíveis para sua carteira atual.";
     
-    const positiveStocks = stocks.filter(s => parseFloat(s.impact) > 0);
-    const negativeStocks = stocks.filter(s => parseFloat(s.impact) < 0);
+    const positiveStocks = stocks.filter(s => s.impact > 0);
+    const negativeStocks = stocks.filter(s => s.impact < 0);
     
     if (positiveStocks.length > negativeStocks.length) {
       return `O sentimento geral para suas principais posições é positivo, destacando-se ${positiveStocks.map(s => s.ticker).join(", ")}. ${negativeStocks.length > 0 ? `Recomendamos acompanhar notícias sobre ${negativeStocks[0].ticker} que podem impactar seu desempenho.` : ''}`;
@@ -214,13 +254,13 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
                         </span>
                       </Badge>
                     </div>
-                    <span className={`flex items-center font-medium ${getImpactColor(parseFloat(asset.impact as string))}`}>
-                      {parseFloat(asset.impact as string) > 0 ? (
+                    <span className={`flex items-center font-medium ${getImpactColor(asset.impact)}`}>
+                      {asset.impact > 0 ? (
                         <TrendingUp className="h-4 w-4 mr-1" />
                       ) : (
                         <TrendingDown className="h-4 w-4 mr-1" />
                       )}
-                      {`${getImpactPrefix(parseFloat(asset.impact as string))}${asset.impact}%`}
+                      {`${getImpactPrefix(asset.impact)}${asset.impact.toFixed(1)}%`}
                     </span>
                   </div>
                   <div className="flex items-start mt-2">
