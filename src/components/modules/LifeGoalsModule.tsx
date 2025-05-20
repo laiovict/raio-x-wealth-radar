@@ -3,11 +3,10 @@ import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUp, AlertTriangle, Lock } from "lucide-react";
+import { ArrowUp, AlertTriangle, Lock, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import StreamingText from "@/components/StreamingText";
-import { useStreamingContent } from "@/hooks/use-streaming-content";
 import { useEffect, useState } from "react";
+import { toast } from "@/hooks/use-toast";
 
 interface LifeGoalsModuleProps {
   fullWidth?: boolean;
@@ -70,16 +69,9 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
   // Use data from context or fallback to default values
   const lifeGoals: LifeGoals = data?.lifeGoals || defaultGoals;
   
-  // Trigger streaming effect with a slight delay after component mount
-  const { isStreaming, isComplete } = useStreamingContent(false, 500, true, 5000);
-  
   useEffect(() => {
-    // Small delay to ensure component is properly loaded
-    const timer = setTimeout(() => {
-      setModuleLoaded(true);
-    }, 300);
-    
-    return () => clearTimeout(timer);
+    // Set module as loaded immediately to avoid streaming delay issues
+    setModuleLoaded(true);
   }, []);
   
   // Format currency
@@ -97,14 +89,33 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
     document.dispatchEvent(event);
   };
 
+  // Function to handle PDF download
+  const handleDownloadPdf = () => {
+    toast({
+      title: "PDF sendo gerado",
+      description: "Seu relatório de metas de vida está sendo preparado para download.",
+    });
+    
+    // Simulating PDF download - in a real application this would call an API
+    setTimeout(() => {
+      toast({
+        title: "PDF gerado com sucesso",
+        description: "Seu relatório de metas de vida está pronto.",
+      });
+    }, 2000);
+  };
+
   if (!hasOpenFinance) {
     // Show limited version when OpenFinance is not enabled
     return (
       <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
-        <CardHeader className="pb-2">
+        <CardHeader className="pb-2 flex flex-row justify-between items-center">
           <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
             Metas de Vida
           </CardTitle>
+          <Button variant="outline" size="sm" onClick={handleDownloadPdf} className="flex items-center gap-1">
+            <Download className="h-4 w-4" /> PDF
+          </Button>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
@@ -117,56 +128,26 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
                     <div>
                       <div className="flex items-center">
                         <span className="text-md font-medium text-white">
-                          {moduleLoaded && (
-                            <StreamingText 
-                              text={goal.name}
-                              speed={30}
-                              delay={300 + index * 200}
-                            />
-                          )}
+                          {goal.name}
                         </span>
                         <Badge className="ml-2 bg-blue-600/60">
-                          {moduleLoaded && (
-                            <StreamingText 
-                              text={goal.timeframe}
-                              speed={40}
-                              delay={500 + index * 200}
-                            />
-                          )}
+                          {goal.timeframe}
                         </Badge>
                       </div>
                     </div>
                     <div className="text-right">
                       <span className="text-sm font-medium">
                         <span className="text-white">
-                          {moduleLoaded && (
-                            <StreamingText 
-                              text={`${goal.progress}%`}
-                              speed={40}
-                              delay={700 + index * 200}
-                            />
-                          )}
+                          {`${goal.progress}%`}
                         </span>
                         {goal.adjustmentNeeded > 0 && (
                           <Badge className="ml-2 bg-amber-600/60">
-                            {moduleLoaded && (
-                              <StreamingText 
-                                text={`+${goal.adjustmentNeeded}% necessário`}
-                                speed={30}
-                                delay={900 + index * 200}
-                              />
-                            )}
+                            {`+${goal.adjustmentNeeded}% necessário`}
                           </Badge>
                         )}
                         {goal.adjustmentNeeded <= 0 && (
                           <Badge className="ml-2 bg-green-600/60">
-                            {moduleLoaded && (
-                              <StreamingText 
-                                text="No Caminho"
-                                speed={30}
-                                delay={900 + index * 200}
-                              />
-                            )}
+                            No Caminho
                           </Badge>
                         )}
                       </span>
@@ -178,35 +159,17 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
                   />
                   <div className="flex justify-between items-center text-xs text-gray-400">
                     <span>
-                      {moduleLoaded && (
-                        <StreamingText 
-                          text={`Atual: ${formatCurrency(goal.currentAmount)}`}
-                          speed={30}
-                          delay={1100 + index * 200}
-                        />
-                      )}
+                      {`Atual: ${formatCurrency(goal.currentAmount)}`}
                     </span>
                     <span>
-                      {moduleLoaded && (
-                        <StreamingText 
-                          text={`Meta: ${formatCurrency(goal.targetAmount)}`}
-                          speed={30}
-                          delay={1300 + index * 200}
-                        />
-                      )}
+                      {`Meta: ${formatCurrency(goal.targetAmount)}`}
                     </span>
                   </div>
                   {goal.adjustmentNeeded > 0 && (
                     <div className="mt-2 text-xs text-amber-400 flex items-center">
                       <ArrowUp className="h-3.5 w-3.5 mr-1" />
                       <span>
-                        {moduleLoaded && (
-                          <StreamingText 
-                            text={`Sugestão: Aumentar aportes em ${formatCurrency(goal.targetAmount * goal.adjustmentNeeded / 100 / 12)} mensais`}
-                            speed={15}
-                            delay={1500 + index * 200}
-                          />
-                        )}
+                        {`Sugestão: Aumentar aportes em ${formatCurrency(goal.targetAmount * goal.adjustmentNeeded / 100 / 12)} mensais`}
                       </span>
                     </div>
                   )}
@@ -220,13 +183,7 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
               <div>
                 <h3 className="text-sm font-medium text-white mb-2">Metas adicionais disponíveis</h3>
                 <p className="text-xs text-gray-300 mb-2">
-                  {moduleLoaded && (
-                    <StreamingText 
-                      text="Ative o OpenFinance para acessar todas as suas metas de vida e receber recomendações personalizadas para alcançá-las."
-                      speed={15}
-                      delay={1800}
-                    />
-                  )}
+                  Ative o OpenFinance para acessar todas as suas metas de vida e receber recomendações personalizadas para alcançá-las.
                 </p>
                 <Button 
                   variant="outline" 
@@ -246,10 +203,13 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
 
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 flex flex-row justify-between items-center">
         <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
           Metas de Vida
         </CardTitle>
+        <Button variant="outline" size="sm" onClick={handleDownloadPdf} className="flex items-center gap-1">
+          <Download className="h-4 w-4" /> PDF
+        </Button>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
@@ -259,56 +219,26 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
                 <div>
                   <div className="flex items-center">
                     <span className="text-md font-medium text-white">
-                      {moduleLoaded && (
-                        <StreamingText 
-                          text={goal.name}
-                          speed={30}
-                          delay={300 + index * 200}
-                        />
-                      )}
+                      {goal.name}
                     </span>
                     <Badge className="ml-2 bg-blue-600/60">
-                      {moduleLoaded && (
-                        <StreamingText 
-                          text={goal.timeframe}
-                          speed={40}
-                          delay={500 + index * 200}
-                        />
-                      )}
+                      {goal.timeframe}
                     </Badge>
                   </div>
                 </div>
                 <div className="text-right">
                   <span className="text-sm font-medium">
                     <span className="text-white">
-                      {moduleLoaded && (
-                        <StreamingText 
-                          text={`${goal.progress}%`}
-                          speed={40}
-                          delay={700 + index * 200}
-                        />
-                      )}
+                      {`${goal.progress}%`}
                     </span>
                     {goal.adjustmentNeeded > 0 && (
                       <Badge className="ml-2 bg-amber-600/60">
-                        {moduleLoaded && (
-                          <StreamingText 
-                            text={`+${goal.adjustmentNeeded}% necessário`}
-                            speed={30}
-                            delay={900 + index * 200}
-                          />
-                        )}
+                        {`+${goal.adjustmentNeeded}% necessário`}
                       </Badge>
                     )}
                     {goal.adjustmentNeeded <= 0 && (
                       <Badge className="ml-2 bg-green-600/60">
-                        {moduleLoaded && (
-                          <StreamingText 
-                            text="No Caminho"
-                            speed={30}
-                            delay={900 + index * 200}
-                          />
-                        )}
+                        No Caminho
                       </Badge>
                     )}
                   </span>
@@ -320,35 +250,17 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
               />
               <div className="flex justify-between items-center text-xs text-gray-400">
                 <span>
-                  {moduleLoaded && (
-                    <StreamingText 
-                      text={`Atual: ${formatCurrency(goal.currentAmount)}`}
-                      speed={30}
-                      delay={1100 + index * 200}
-                    />
-                  )}
+                  {`Atual: ${formatCurrency(goal.currentAmount)}`}
                 </span>
                 <span>
-                  {moduleLoaded && (
-                    <StreamingText 
-                      text={`Meta: ${formatCurrency(goal.targetAmount)}`}
-                      speed={30}
-                      delay={1300 + index * 200}
-                    />
-                  )}
+                  {`Meta: ${formatCurrency(goal.targetAmount)}`}
                 </span>
               </div>
               {goal.adjustmentNeeded > 0 && (
                 <div className="mt-2 text-xs text-amber-400 flex items-center">
                   <ArrowUp className="h-3.5 w-3.5 mr-1" />
                   <span>
-                    {moduleLoaded && (
-                      <StreamingText 
-                        text={`Sugestão: Aumentar aportes em ${formatCurrency(goal.targetAmount * goal.adjustmentNeeded / 100 / 12)} mensais`}
-                        speed={15}
-                        delay={1500 + index * 200}
-                      />
-                    )}
+                    {`Sugestão: Aumentar aportes em ${formatCurrency(goal.targetAmount * goal.adjustmentNeeded / 100 / 12)} mensais`}
                   </span>
                 </div>
               )}
@@ -357,13 +269,7 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
           
           <div className="bg-blue-900/20 p-4 rounded-lg border border-blue-900/30">
             <p className="text-sm text-gray-300">
-              {moduleLoaded && (
-                <StreamingText 
-                  text={lifeGoals.summary}
-                  speed={10}
-                  delay={1800}
-                />
-              )}
+              {lifeGoals.summary}
             </p>
           </div>
         </div>

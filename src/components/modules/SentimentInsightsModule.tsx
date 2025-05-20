@@ -2,10 +2,11 @@
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, Newspaper } from "lucide-react";
+import { TrendingUp, TrendingDown, Newspaper, Download } from "lucide-react";
 import { useMobileBreakpoint } from "@/hooks/use-mobile";
-import StreamingText from "@/components/StreamingText";
-import { useStreamingContent } from "@/hooks/use-streaming-content";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
+import { useEffect, useState } from "react";
 
 interface SentimentInsightsModuleProps {
   fullWidth?: boolean;
@@ -15,7 +16,12 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
   const { data } = useRaioX();
   const { sentiment } = data;
   const isMobile = useMobileBreakpoint();
-  const { isStreaming, isComplete } = useStreamingContent(false, 1200);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    // Set loaded state immediately to avoid streaming issues
+    setIsLoaded(true);
+  }, []);
 
   const getSentimentColor = (score: number) => {
     if (score >= 70) return "text-green-600 dark:text-green-400";
@@ -40,14 +46,33 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
     return "";
   };
 
+  // Function to handle PDF download
+  const handleDownloadPdf = () => {
+    toast({
+      title: "PDF sendo gerado",
+      description: "Seu relatório de sentimentos de mercado está sendo preparado para download.",
+    });
+    
+    // Simulating PDF download - in a real application this would call an API
+    setTimeout(() => {
+      toast({
+        title: "PDF gerado com sucesso",
+        description: "Seu relatório de sentimentos de mercado está pronto.",
+      });
+    }, 2000);
+  };
+
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} h-full shadow-md hover:shadow-lg transition-shadow`}>
-      <CardHeader className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/70 dark:to-indigo-900/70 pb-4 rounded-t-lg border-b border-gray-200 dark:border-gray-700">
+      <CardHeader className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/70 dark:to-indigo-900/70 pb-4 rounded-t-lg border-b border-gray-200 dark:border-gray-700 flex flex-row justify-between items-center">
         <CardTitle className="text-xl flex items-center">
           <span className="text-blue-800 dark:text-blue-200">
             Insights de Sentimento
           </span>
         </CardTitle>
+        <Button variant="outline" size="sm" onClick={handleDownloadPdf} className="flex items-center gap-1 bg-white/80 dark:bg-gray-800/80">
+          <Download className="h-4 w-4" /> PDF
+        </Button>
       </CardHeader>
       <CardContent className="pt-5 bg-white dark:bg-slate-900">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -59,23 +84,11 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center">
                   <span className="text-lg font-semibold text-gray-900 dark:text-white">
-                    {isStreaming ? (
-                      <StreamingText 
-                        text={asset.ticker} 
-                        speed={40}
-                        delay={400 + index * 300}
-                      />
-                    ) : '...'}
+                    {asset.ticker}
                   </span>
                   <Badge className="ml-2 px-2" variant="outline">
                     <span className={getSentimentColor(asset.sentiment)}>
-                      {isStreaming ? (
-                        <StreamingText 
-                          text={`${asset.sentiment}/100`}
-                          speed={30}
-                          delay={600 + index * 300}
-                        />
-                      ) : '...'}
+                      {`${asset.sentiment}/100`}
                     </span>
                   </Badge>
                 </div>
@@ -85,25 +98,13 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
                   ) : (
                     <TrendingDown className="h-4 w-4 mr-1" />
                   )}
-                  {isStreaming ? (
-                    <StreamingText 
-                      text={`${getImpactPrefix(asset.impact)}${asset.impact}%`}
-                      speed={30}
-                      delay={800 + index * 300}
-                    />
-                  ) : '...'}
+                  {`${getImpactPrefix(asset.impact)}${asset.impact}%`}
                 </span>
               </div>
               <div className="flex items-start mt-2">
                 <Newspaper className="h-4 w-4 mr-2 mt-1 flex-shrink-0 text-gray-500 dark:text-gray-400" />
                 <p className="text-gray-800 dark:text-gray-100 text-sm">
-                  {isStreaming ? (
-                    <StreamingText 
-                      text={asset.recentNews}
-                      speed={5}
-                      delay={1000 + index * 400}
-                    />
-                  ) : '...'}
+                  {asset.recentNews}
                 </p>
               </div>
             </div>
@@ -112,13 +113,7 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
         
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 p-4 rounded-lg border border-blue-100 dark:border-blue-800/50 mt-4">
           <p className="text-gray-800 dark:text-gray-100">
-            {isStreaming ? (
-              <StreamingText 
-                text={sentiment.summary}
-                speed={8}
-                delay={2000}
-              />
-            ) : '...'}
+            {sentiment.summary}
           </p>
         </div>
       </CardContent>

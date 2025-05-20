@@ -1,7 +1,7 @@
 
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Mic, Search, Share2 } from "lucide-react";
+import { Mic, Search, Share2, Download } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
@@ -56,8 +56,9 @@ const RaioXDashboard = ({
 
   useEffect(() => {
     const handleActivateOpenFinance = () => {
-      const event = new CustomEvent('activate-openfinance');
-      document.dispatchEvent(event);
+      if (onOpenFinanceActivate) {
+        onOpenFinanceActivate();
+      }
     };
 
     document.addEventListener('activate-openfinance', handleActivateOpenFinance);
@@ -71,7 +72,7 @@ const RaioXDashboard = ({
     return () => {
       document.removeEventListener('activate-openfinance', handleActivateOpenFinance);
     };
-  }, []);
+  }, [onOpenFinanceActivate]);
 
   const handleQuickNavClick = (tabId: string) => {
     setActiveTab(tabId);
@@ -145,6 +146,21 @@ const RaioXDashboard = ({
       description: "O link para WhatsApp foi aberto em uma nova aba."
     });
   };
+  
+  const handleDownloadPdf = () => {
+    toast({
+      title: "Relatório sendo gerado",
+      description: "Seu relatório completo está sendo preparado para download.",
+    });
+    
+    // Simulating PDF download
+    setTimeout(() => {
+      toast({
+        title: "PDF gerado com sucesso",
+        description: "Seu relatório completo está pronto.",
+      });
+    }, 2000);
+  };
 
   if (showPdfPreview) {
     return (
@@ -182,9 +198,23 @@ const RaioXDashboard = ({
             </button>
           </div>
         </div>
+        
+        <div className="mt-4 flex justify-center">
+          <Button 
+            variant="outline" 
+            className="flex items-center gap-2 border-white/10 bg-white/5 hover:bg-white/10"
+            onClick={handleDownloadPdf}
+          >
+            <Download className="h-5 w-5" /> Baixar Relatório Completo
+          </Button>
+        </div>
       </div>
 
       <WelcomeBanner selectedClient={selectedClient} />
+      
+      {/* Moved InteligenciaModule to the top for greater prominence */}
+      <InteligenciaModule fullWidth />
+      <FeedbackSection sectionId="top-inteligencia" />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-8 rounded-lg overflow-x-auto grid grid-cols-6 scrollbar-none bg-white/5 backdrop-blur-md border border-white/10">
@@ -246,12 +276,12 @@ const RaioXDashboard = ({
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <InteligenciaModule />
-              <FeedbackSection sectionId="inteligencia" />
-            </div>
-            <div>
               <SentimentInsightsModule />
               <FeedbackSection sectionId="sentiment" />
+            </div>
+            <div>
+              <PersonalInsightsModule />
+              <FeedbackSection sectionId="personal-insights" />
             </div>
           </div>
           
@@ -261,31 +291,25 @@ const RaioXDashboard = ({
               <FeedbackSection sectionId="future-projection" />
             </div>
             <div>
-              <PersonalInsightsModule />
-              <FeedbackSection sectionId="personal-insights" />
+              <InvestmentPlanningModule />
+              <FeedbackSection sectionId="investment-planning" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <InvestmentPlanningModule />
-              <FeedbackSection sectionId="investment-planning" />
-            </div>
-            <div>
               <SocialComparisonModule />
               <FeedbackSection sectionId="social-comparison" />
             </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <BehavioralFinanceModule />
               <FeedbackSection sectionId="behavioral-finance" />
             </div>
-            <div>
-              <WrappedModule />
-              <FeedbackSection sectionId="wrapped" />
-            </div>
+          </div>
+          
+          <div>
+            <WrappedModule fullWidth />
+            <FeedbackSection sectionId="wrapped" />
           </div>
           
           {/* Footer for this tab */}
