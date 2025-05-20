@@ -1,3 +1,4 @@
+
 import { useRaioX, FinancialSummary } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,6 +9,17 @@ import { Button } from "@/components/ui/button";
 
 interface FinancialOverviewModuleProps {
   fullWidth?: boolean;
+}
+
+// Extended financial summary type with our synthetic data properties
+interface EnhancedFinancialSummary extends FinancialSummary {
+  monthlyTrend?: string;
+  savingsRateTrend?: string;
+  topRisks?: {
+    name: string;
+    severity: string;
+    impact: string;
+  }[];
 }
 
 const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleProps) => {
@@ -24,7 +36,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
   };
 
   // Enhanced synthetic data based on client profiles
-  const getSyntheticData = () => {
+  const getSyntheticData = (): EnhancedFinancialSummary => {
     // Default synthetic values
     let netWorth = 1250000;
     let totalAssets = 1450000;
@@ -148,6 +160,9 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
   // Get historical net worth data
   const netWorthHistory = generateNetWorthHistory(finData.netWorth);
 
+  // Default trend values when not available
+  const defaultTrend = "+3.5%";
+
   if (!hasOpenFinance) {
     return (
       <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
@@ -168,7 +183,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
                   </div>
                   <div className="flex items-center text-sm text-green-400">
                     <ArrowUp className="h-4 w-4 mr-1" />
-                    <span>{finData.monthlyTrend} este mês</span>
+                    <span>{(finData as EnhancedFinancialSummary).monthlyTrend || defaultTrend} este mês</span>
                   </div>
                 </div>
               </div>
@@ -291,7 +306,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
                 </div>
                 <div className="flex items-center text-sm text-green-400">
                   <ArrowUp className="h-4 w-4 mr-1" />
-                  <span>{finData.monthlyTrend} este mês</span>
+                  <span>{(finData as EnhancedFinancialSummary).monthlyTrend || defaultTrend} este mês</span>
                 </div>
               </div>
             </div>
@@ -344,7 +359,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
               <div className="text-xl font-bold text-white">{finData.savingsRate}%</div>
               <div className="flex items-center text-xs text-green-400 mt-1">
                 <ArrowUp className="h-3 w-3 mr-1" />
-                <span>{finData.savingsRateTrend} vs. média</span>
+                <span>{(finData as EnhancedFinancialSummary).savingsRateTrend || "+2.0%"} vs. média</span>
               </div>
             </div>
             <div className="p-4 rounded-lg bg-gradient-to-br from-purple-900/40 to-purple-800/20">
@@ -369,7 +384,7 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
           <div>
             <h3 className="font-medium text-white mb-2">Principais Riscos</h3>
             <div className="space-y-3">
-              {finData.topRisks?.map((risk, index) => (
+              {(finData as EnhancedFinancialSummary).topRisks?.map((risk, index) => (
                 <div key={index} className="flex items-start gap-3">
                   <Badge className={`
                     ${risk.severity === 'high' ? 'bg-red-600' : 
