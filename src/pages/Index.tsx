@@ -1,25 +1,12 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import ClientSelector from "@/components/ClientSelector";
 import RaioXDashboard from "@/components/RaioXDashboard";
 import { RaioXProvider } from "@/context/RaioXContext";
 import PluggyConnectModal from "@/components/PluggyConnectModal";
-import { Download, ArrowLeft, Code, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import LoadingScreen from "@/components/LoadingScreen";
-import WelcomeBanner from "@/components/WelcomeBanner";
-import TopControls from "@/components/TopControls";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import TopNavigation from "@/components/TopNavigation";
 
 // Define the user data interface
 interface UserData {
@@ -133,15 +120,6 @@ const Index = () => {
     }
   };
   
-  const getUserInitials = () => {
-    if (!userData?.clientName) return "UN";
-    return userData.clientName.split(" ")
-      .filter(part => part.length > 0)
-      .map(part => part[0].toUpperCase())
-      .slice(0, 2)
-      .join("");
-  };
-  
   const getMonthlyReportUrl = () => {
     const now = new Date();
     const today = now.getDate();
@@ -204,103 +182,16 @@ const Index = () => {
       selectedClient={selectedClient}
     >
       <div className="min-h-screen h-screen flex flex-col bg-gradient-to-br from-[#0f0f11] to-[#1a1a2e] text-white">
-        <nav className="backdrop-blur-md bg-black/20 border-b border-white/5 px-6 py-4 flex items-center justify-between gap-4 sticky top-0 z-10">
-          {/* Left section - Logo only */}
-          <div className="flex items-center cursor-pointer" onClick={handleLogoClick}>
-            <img 
-              src="/lovable-uploads/4b258bed-71ae-4d4c-847b-12968969f2d4.png"
-              alt="Reinvent Logo"
-              className="h-8 w-auto"
-            />
-          </div>
-          
-          {/* Center section - Raio-X Financeiro title */}
-          <div className="flex-1 flex justify-center">
-            <h1 className="text-xl font-light tracking-wider text-white">
-              Raio-X <span className="font-medium">Financeiro</span>
-            </h1>
-          </div>
-          
-          {/* Right section - Action buttons */}
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Show API Docs button for all users */}
-            <Button 
-              variant="outline" 
-              className="bg-indigo-500/30 hover:bg-indigo-500/50 border-indigo-400/30 text-indigo-200 rounded-full text-sm font-normal px-5"
-              onClick={() => navigate("/api-docs")}
-            >
-              <Code className="mr-2 h-4 w-4" />
-              API Docs
-            </Button>
-          
-            {selectedClient && (
-              <Button 
-                className="bg-white/10 hover:bg-white/20 text-white border-0 rounded-full text-sm font-normal px-5"
-                onClick={() => window.open(getMonthlyReportUrl(), '_blank')}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                Relatório Mensal
-              </Button>
-            )}
-            
-            {/* Show PDF export for both advisor and client */}
-            {selectedClient && (
-              <Button
-                variant="outline"
-                className="border-white/10 text-white hover:bg-white/10 rounded-full text-sm font-normal px-5"
-                onClick={() => handlePdfPreview('pdf')}
-              >
-                Exportar PDF
-              </Button>
-            )}
-            
-            <Button 
-              variant="ghost" 
-              className="text-white/70 hover:text-white hover:bg-white/10 rounded-full"
-              onClick={handleLogout}
-            >
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Sair
-            </Button>
-            
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative p-0 h-9 w-9 rounded-full">
-                  <Avatar className="h-9 w-9 bg-indigo-600/60 hover:bg-indigo-600/80 transition-colors">
-                    <AvatarFallback className="text-sm text-white">
-                      {getUserInitials()}
-                    </AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56 bg-gradient-to-br from-[#171723] to-[#121218] border border-white/10 text-white">
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium text-white">{userData?.clientName || "Usuário"}</p>
-                    <p className="text-xs text-gray-400">Gerenciar Conta</p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem className="text-white focus:bg-white/10 focus:text-white cursor-pointer">
-                  Configurações
-                </DropdownMenuItem>
-                <DropdownMenuItem className="text-white focus:bg-white/10 focus:text-white cursor-pointer">
-                  Preferências
-                </DropdownMenuItem>
-                <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem 
-                  className="text-white focus:bg-white/10 focus:text-white cursor-pointer"
-                  onClick={handleLogout}
-                >
-                  Sair da conta
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </nav>
+        <TopNavigation 
+          selectedClient={selectedClient}
+          userData={userData}
+          handleLogout={handleLogout}
+          handleLogoClick={handleLogoClick}
+          getMonthlyReportUrl={getMonthlyReportUrl}
+        />
         
         <div className="flex-grow overflow-auto">
-          <div className="container mx-auto px-4 sm:px-6 pt-4">
+          <div className="container mx-auto px-3 sm:px-6 pt-4">
             <div className="mb-6">
               {userRole === "advisor" && <ClientSelector onClientSelect={handleClientSelect} />}
               
@@ -319,7 +210,7 @@ const Index = () => {
               mediaType={mediaType}
               isClientFull={hasOpenFinance}
               onOpenFinanceActivate={handleOpenFinanceActivate}
-              userRole={userRole} // Pass the userRole to RaioXDashboard
+              userRole={userRole}
             />
           </div>
         </div>

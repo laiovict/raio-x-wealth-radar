@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
+import { useMobileBreakpoint } from "@/hooks/use-mobile";
 
 const Auth = () => {
   const [password, setPassword] = useState("");
@@ -16,6 +17,7 @@ const Auth = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const { t } = useLanguage();
+  const isMobile = useMobileBreakpoint(768);
   
   // Check if already logged in
   useEffect(() => {
@@ -82,21 +84,21 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black flex">
-      <div className="w-1/2 flex flex-col items-start justify-center p-16">
-        <div className="mb-16">
+    <div className="min-h-screen bg-black flex flex-col md:flex-row">
+      <div className={`${isMobile ? 'w-full p-6' : 'w-1/2 p-16'} flex flex-col items-start justify-center`}>
+        <div className="mb-8 md:mb-16">
           <img 
             src="/lovable-uploads/4b258bed-71ae-4d4c-847b-12968969f2d4.png"
             alt="Reinvent Logo" 
-            className="h-16"
+            className="h-12 md:h-16"
           />
         </div>
         
-        <div className="mb-12">
-          <h1 className="text-6xl font-extralight text-white mb-3">
+        <div className="mb-8 md:mb-12">
+          <h1 className="text-4xl md:text-6xl font-extralight text-white mb-2 md:mb-3">
             Bem-vindo
           </h1>
-          <p className="text-2xl text-gray-400 font-extralight">
+          <p className="text-xl md:text-2xl text-gray-400 font-extralight">
             ao seu raio-x financeiro
           </p>
         </div>
@@ -113,7 +115,7 @@ const Auth = () => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="bg-neutral-800/80 border-none rounded-full h-16 px-6 text-white placeholder-gray-500 w-full"
+              className="bg-neutral-800/80 border-none rounded-full h-12 md:h-16 px-6 text-white placeholder-gray-500 w-full"
               placeholder={showAdvisorLogin ? "Digite a senha de advisor" : "Digite a senha"}
               required
             />
@@ -121,7 +123,7 @@ const Auth = () => {
           
           <Button 
             type="submit" 
-            className="w-full bg-neutral-800 hover:bg-neutral-700 text-white rounded-full h-16 text-lg font-light"
+            className="w-full bg-neutral-800 hover:bg-neutral-700 text-white rounded-full h-12 md:h-16 text-lg font-light"
             disabled={loading}
           >
             {loading ? "Processando..." : "Entrar"}
@@ -143,11 +145,13 @@ const Auth = () => {
         </div>
       </div>
       
-      {/* Right side with background image */}
-      <div 
-        className="w-1/2 bg-cover bg-center" 
-        style={{ backgroundImage: "url('/lovable-uploads/28d0fefb-0481-49df-80f9-5b708d52358f.png')" }}
-      />
+      {/* Right side with background image - hide on small screens */}
+      {!isMobile && (
+        <div 
+          className="w-1/2 bg-cover bg-center" 
+          style={{ backgroundImage: "url('/lovable-uploads/28d0fefb-0481-49df-80f9-5b708d52358f.png')" }}
+        />
+      )}
     </div>
   );
 };
