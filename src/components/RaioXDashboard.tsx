@@ -286,7 +286,7 @@ const RaioXDashboard = ({
             <FeedbackSection sectionId="financial-overview" />
           </div>
           
-          {/* Followed by One Page Financial Plan */}
+          {/* Followed by One Page Financial Plan - Always show regardless of OpenFinance */}
           <div>
             <OnePageFinancialPlanModule />
             <FeedbackSection sectionId="financial-plan" />

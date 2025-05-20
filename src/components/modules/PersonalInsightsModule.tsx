@@ -1,80 +1,206 @@
+
 import React, { useEffect, useState } from "react";
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, Wine, Wallet, Plane, Home, Briefcase, Heart, ShieldCheck, Target, TrendingUp, AlertTriangle, Calendar, MapPin, Car, Award, PiggyBank } from "lucide-react";
+import { 
+  Users, Briefcase, Wallet, Target, Calendar, 
+  AlertTriangle, TrendingUp, PiggyBank, Award,
+  Shield, ChartBar, Tag, BookOpen, User
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 interface PersonalInsightsModuleProps {
   fullWidth?: boolean;
 }
 
-interface ClientProfile {
-  professionalProfile: string;
-  financialProfile: string;
-  assetsInvestments: string;
-  financialGoals: string;
-  investmentHorizon: string;
-  riskProfile?: string;
-  essentialServices?: string;
-  dataSource: 'supabase' | 'synthetic';
-}
+// Key sections we want to identify in the summary text
+const TOPIC_KEYWORDS = {
+  professional: ['profissão', 'carreira', 'trabalho', 'emprego', 'formado', 'formação', 'profissional'],
+  financial: ['investidor', 'investimento', 'renda', 'salário', 'financeiro', 'despesas', 'gastos'],
+  assets: ['patrimônio', 'imóveis', 'ativos', 'investimentos', 'carteira', 'ações'],
+  goals: ['objetivo', 'meta', 'plano', 'aposentadoria', 'futuro', 'sonho'],
+  timeline: ['idade', 'anos', 'horizonte', 'prazo', 'tempo'],
+  risk: ['risco', 'perfil', 'tolerância', 'volatilidade', 'conservador', 'moderado', 'agressivo']
+};
+
+// Helper function to extract sections from the plain text summary
+const extractSectionFromText = (text: string, keywords: string[], minLength: number = 30): string => {
+  if (!text) return "";
+  
+  // Split the text into sentences
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+  
+  // Find sentences that contain at least one keyword
+  const relevantSentences = sentences.filter(sentence => 
+    keywords.some(keyword => 
+      sentence.toLowerCase().includes(keyword.toLowerCase())
+    )
+  );
+  
+  // Join the relevant sentences back together
+  let section = relevantSentences.join('. ');
+  if (section && !section.endsWith('.')) section += '.';
+  
+  // If the extracted section is too short, return a larger chunk of the original text
+  if (section.length < minLength) {
+    // Find the first occurrence of any keyword in the text
+    const firstIndex = keywords.reduce((earliest, keyword) => {
+      const index = text.toLowerCase().indexOf(keyword.toLowerCase());
+      return index !== -1 && (index < earliest || earliest === -1) ? index : earliest;
+    }, -1);
+    
+    if (firstIndex !== -1) {
+      // Extract a paragraph around the first occurrence
+      const startIndex = Math.max(0, text.lastIndexOf('.', firstIndex) + 1);
+      let endIndex = text.indexOf('.', firstIndex + 50);
+      if (endIndex === -1) endIndex = text.length;
+      
+      return text.substring(startIndex, endIndex + 1).trim();
+    }
+    
+    // If no keywords were found, return the beginning of the text
+    return text.split('.').slice(0, 3).join('.') + '.';
+  }
+  
+  return section;
+};
+
+// Helper function to enhance text with visual highlights
+const enhanceText = (text: string): React.ReactNode => {
+  if (!text) return null;
+  
+  // Highlight numbers and percentages
+  const parts = text.split(/(\d+[\d.,]*%?)/g);
+  
+  return (
+    <span>
+      {parts.map((part, index) => {
+        // Check if part is a number or percentage
+        if (part.match(/\d+[\d.,]*%?/)) {
+          return <strong key={index} className="text-blue-400">{part}</strong>;
+        }
+        
+        // Highlight key terms
+        const keyTerms = ['meta', 'objetivo', 'financeiro', 'investimento', 'risco', 'perfil'];
+        let highlightedPart = part;
+        
+        keyTerms.forEach(term => {
+          // Avoid partial word matches by checking for word boundaries
+          const regex = new RegExp(`\\b${term}\\w*\\b`, 'gi');
+          if (part.match(regex)) {
+            highlightedPart = highlightedPart.replace(
+              regex, 
+              match => `<span class="text-emerald-400 font-medium">${match}</span>`
+            );
+          }
+        });
+        
+        if (highlightedPart !== part) {
+          return <span key={index} dangerouslySetInnerHTML={{ __html: highlightedPart }} />;
+        }
+        
+        return <span key={index}>{part}</span>;
+      })}
+    </span>
+  );
+};
+
+// Helper function to extract client age from text
+const extractAge = (text: string): string => {
+  if (!text) return "";
+  
+  // Look for age patterns
+  const agePattern = /\b(\d{1,2})\s*anos\b/i;
+  const match = text.match(agePattern);
+  
+  if (match && match[1]) {
+    return match[1];
+  }
+  
+  return "";
+};
 
 const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModuleProps) => {
   const { data, clientSummary } = useRaioX();
-  const [clientProfile, setClientProfile] = useState<ClientProfile>({
-    professionalProfile: "Médico oftalmologista com sociedade em três clínicas (Núcleo Oftalmológico em Valadares, Instituto de Olhos em Teófilo Otoni e Instituto de Olhos em Caratinga), com rotina de trabalho intenso de segunda a sábado. Formado em 2013 com participação recente nas sociedades (2 anos).",
-    financialProfile: "Investidor desde 2017, com carteira diversificada entre XP, Clear e Avenue (USD 43 mil). Gastos mensais de R$ 25 mil representam pequena fração da renda combinada com a esposa (R$ 30-35 mil adicionais), permitindo alta capacidade de poupança (R$ 50-100 mil/mês).",
-    assetsInvestments: "Patrimônio diversificado: participações nas clínicas oftalmológicas, investimentos na XP, ações na Clear, USD 43 mil na Avenue, R$ 8,5 mil na Inco, terreno em sociedade (R$ 200 mil) e veículo (R$ 220 mil) com financiamento sem juros (R$ 1.800/mês).",
-    financialGoals: "Meta de reduzir carga horária aos 45 anos com patrimônio de R$ 5-6 milhões. Plano de aposentadoria completa aos 50 anos com renda mensal projetada de R$ 35-40 mil.",
-    investmentHorizon: "Atual idade: 37 anos. Horizonte de investimento de médio prazo (8 anos) para primeira meta de redução de trabalho e longo prazo (13 anos) para aposentadoria completa, permitindo estratégia de investimentos escalonada.",
-    riskProfile: "Experiência com volatilidade durante a pandemia moldou percepção de risco. Alta capacidade de assumir riscos devido à elevada geração de caixa mensal, mas tolerância emocional à volatilidade moderada.",
-    essentialServices: "Necessita de visão clara e organizada da situação financeira mensal, com acompanhamento detalhado de investimentos e patrimônio para acompanhar o progresso em direção às metas de médio e longo prazo.",
-    dataSource: 'synthetic'
+  const [parsedSummary, setParsedSummary] = useState<string>("");
+  const [clientAge, setClientAge] = useState<string>("");
+  const [sections, setSections] = useState<{
+    professional: string;
+    financial: string;
+    assets: string;
+    goals: string;
+    timeline: string;
+    risk: string;
+  }>({
+    professional: "",
+    financial: "",
+    assets: "",
+    goals: "",
+    timeline: "",
+    risk: ""
   });
   
-  // Check if OpenFinance is integrated
-  const hasOpenFinance = data.hasOpenFinance || false;
+  const [dataSource, setDataSource] = useState<'supabase' | 'synthetic'>('synthetic');
   
-  // Parse client summary from Supabase when available
+  // Process client summary from Supabase when available
   useEffect(() => {
     if (clientSummary?.summary) {
       try {
         console.log("Processing client summary:", clientSummary);
         
-        // Try to parse JSON if the summary is in JSON format
-        let parsedSummary;
-        try {
-          parsedSummary = JSON.parse(clientSummary.summary);
-          console.log("Successfully parsed JSON summary:", parsedSummary);
-        } catch (e) {
-          console.log("Summary is not in JSON format, using as string", e);
-          // If not JSON, use the summary as a simple string for the professional profile
-          setClientProfile(prevProfile => ({
-            ...prevProfile,
-            professionalProfile: clientSummary?.summary || prevProfile.professionalProfile,
-            dataSource: 'supabase'
-          }));
-          return;
+        // Use the summary as a text string
+        const summaryText = clientSummary.summary;
+        setParsedSummary(summaryText);
+        setDataSource('supabase');
+        
+        // Extract age
+        const age = extractAge(summaryText);
+        if (age) {
+          setClientAge(age);
         }
         
-        // If we successfully parsed JSON, extract the sections
-        if (parsedSummary && typeof parsedSummary === 'object') {
-          console.log("Setting profile from parsed JSON");
-          setClientProfile({
-            professionalProfile: parsedSummary.professionalProfile || parsedSummary.professional_profile || clientProfile.professionalProfile,
-            financialProfile: parsedSummary.financialProfile || parsedSummary.financial_profile || clientProfile.financialProfile,
-            assetsInvestments: parsedSummary.assetsInvestments || parsedSummary.assets_investments || clientProfile.assetsInvestments,
-            financialGoals: parsedSummary.financialGoals || parsedSummary.financial_goals || clientProfile.financialGoals,
-            investmentHorizon: parsedSummary.investmentHorizon || parsedSummary.investment_horizon || clientProfile.investmentHorizon,
-            riskProfile: parsedSummary.riskProfile || parsedSummary.risk_profile || clientProfile.riskProfile,
-            essentialServices: parsedSummary.essentialServices || parsedSummary.essential_services || clientProfile.essentialServices,
-            dataSource: 'supabase'
-          });
-        }
+        // Extract sections using keyword matching
+        setSections({
+          professional: extractSectionFromText(summaryText, TOPIC_KEYWORDS.professional),
+          financial: extractSectionFromText(summaryText, TOPIC_KEYWORDS.financial),
+          assets: extractSectionFromText(summaryText, TOPIC_KEYWORDS.assets),
+          goals: extractSectionFromText(summaryText, TOPIC_KEYWORDS.goals),
+          timeline: extractSectionFromText(summaryText, TOPIC_KEYWORDS.timeline),
+          risk: extractSectionFromText(summaryText, TOPIC_KEYWORDS.risk)
+        });
       } catch (error) {
-        console.error("Error parsing client summary:", error);
+        console.error("Error processing client summary:", error);
+        // Fallback to synthetic data
+        setDataSource('synthetic');
       }
+    } else {
+      // No client summary available, use synthetic data
+      console.log("No client summary available, using synthetic data");
+      setDataSource('synthetic');
     }
   }, [clientSummary]);
+  
+  // Fallback content for when no summary is available
+  const getFallbackSection = (section: string): string => {
+    const fallbacks = {
+      professional: "Profissional com experiência no mercado, buscando otimizar seus investimentos e planejar para o futuro.",
+      financial: "Investidor com boa gestão de recursos e interesse em diversificar seus investimentos para alcançar seus objetivos.",
+      assets: "Carteira diversificada com potencial para otimização de acordo com objetivos de longo prazo.",
+      goals: "Objetivos financeiros incluem segurança para o futuro e crescimento patrimonial sustentável.",
+      timeline: "Horizonte de investimento adequado para estratégias de médio a longo prazo.",
+      risk: "Perfil de risco equilibrado, buscando crescimento com proteção patrimonial."
+    };
+    
+    return fallbacks[section as keyof typeof fallbacks] || "Informação não disponível.";
+  };
+  
+  // Return appropriate section text, falling back if empty
+  const getSectionContent = (section: keyof typeof sections): string => {
+    if (dataSource === 'supabase' && sections[section]) {
+      return sections[section];
+    }
+    return getFallbackSection(section);
+  };
   
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} h-full overflow-hidden border-none shadow-lg`}>
@@ -86,28 +212,28 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
             </div>
             <CardTitle className="text-xl text-white">
               O Que Sabemos Sobre Você
-              {clientProfile.dataSource === 'supabase' && (
+              {dataSource === 'supabase' && (
                 <span className="ml-1 text-green-400">
                   <span className="inline-block h-3 w-3">✓</span>
                 </span>
               )}
             </CardTitle>
           </div>
-          {hasOpenFinance && (
-            <div className="flex items-center bg-green-400/20 text-green-100 text-xs px-3 py-1.5 rounded-full border border-green-400/30">
-              <ShieldCheck className="h-3.5 w-3.5 mr-1.5" />
-              <span className="font-medium">OpenFinance</span>
-            </div>
+          {dataSource === 'supabase' && (
+            <Badge variant="outline" className="bg-green-400/20 text-green-100 border-green-400/30">
+              <Shield className="h-3.5 w-3.5 mr-1.5" />
+              <span className="font-medium">Dados Validados</span>
+            </Badge>
           )}
         </div>
         <p className="text-blue-200 mt-1 text-sm">
-          Análise financeira personalizada baseada em seu perfil profissional e objetivos
+          Análise personalizada baseada em seu perfil profissional e objetivos
         </p>
       </CardHeader>
       
       <CardContent className="bg-gradient-to-b from-gray-950 to-gray-900/95 p-0">
         <div className="space-y-0">
-          {/* Client Profile */}
+          {/* Professional Profile Section */}
           <div className="group hover:bg-blue-900/10 transition-colors">
             <div className="p-6 flex items-start gap-5">
               <div className="rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 p-3.5 shadow-md">
@@ -116,20 +242,25 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
               <div className="flex-1">
                 <h3 className="font-semibold text-xl text-gray-100 group-hover:text-blue-400 transition-colors flex items-center">
                   Perfil Profissional
-                  {clientProfile.dataSource === 'supabase' && (
+                  {dataSource === 'supabase' && (
                     <span className="ml-1 text-green-400">
                       <span className="inline-block h-3 w-3">✓</span>
                     </span>
                   )}
                 </h3>
-                <p className="text-gray-300 mt-2 leading-relaxed">
-                  {clientProfile.professionalProfile}
-                </p>
-                {hasOpenFinance && (
-                  <div className="mt-3 p-3.5 bg-blue-900/30 backdrop-blur-sm rounded-lg border border-blue-700/30">
-                    <p className="text-sm text-blue-200 leading-relaxed">
-                      <strong className="font-semibold text-blue-100">Análise Financeira Profissional:</strong> Rendimentos mensais de R$ 80-120 mil, com potencial para otimização tributária na estrutura PJ entre pró-labore e dividendos.
-                    </p>
+                <div className="text-gray-300 mt-2 leading-relaxed">
+                  {enhanceText(getSectionContent('professional'))}
+                </div>
+                
+                {dataSource === 'supabase' && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {/* Extract key terms as tags */}
+                    {['Experiência', 'Qualificação', 'Setor'].map(tag => (
+                      <Badge key={tag} variant="outline" className="bg-blue-900/30 text-blue-300 border-blue-700/30">
+                        <Tag className="h-3 w-3 mr-1.5" />
+                        {tag}
+                      </Badge>
+                    ))}
                   </div>
                 )}
               </div>
@@ -145,20 +276,21 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
               <div className="flex-1">
                 <h3 className="font-semibold text-xl text-gray-100 group-hover:text-teal-400 transition-colors flex items-center">
                   Perfil Financeiro
-                  {clientProfile.dataSource === 'supabase' && (
+                  {dataSource === 'supabase' && (
                     <span className="ml-1 text-green-400">
                       <span className="inline-block h-3 w-3">✓</span>
                     </span>
                   )}
                 </h3>
-                <p className="text-gray-300 mt-2 leading-relaxed">
-                  {clientProfile.financialProfile}
-                </p>
-                {hasOpenFinance && (
+                <div className="text-gray-300 mt-2 leading-relaxed">
+                  {enhanceText(getSectionContent('financial'))}
+                </div>
+                
+                {dataSource === 'supabase' && (
                   <div className="mt-3 p-3.5 bg-teal-900/30 backdrop-blur-sm rounded-lg border border-teal-700/30">
-                    <p className="text-sm text-teal-200 leading-relaxed">
-                      <strong className="font-semibold text-teal-100">Fluxo de Caixa:</strong> Taxa de poupança de 45-65% da renda total, muito acima da média nacional. Patrimônio inclui participações societárias nas clínicas, um terreno em sociedade (R$ 200 mil) e veículo (R$ 220 mil).
-                    </p>
+                    <div className="text-sm text-teal-200 leading-relaxed">
+                      <strong className="font-semibold text-teal-100">Análise Financeira:</strong> Baseada em seu histórico e padrões de investimento, identificamos oportunidades para otimização da sua carteira em linha com seus objetivos.
+                    </div>
                   </div>
                 )}
               </div>
@@ -174,20 +306,24 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
               <div className="flex-1">
                 <h3 className="font-semibold text-xl text-gray-100 group-hover:text-indigo-400 transition-colors flex items-center">
                   Patrimônio e Investimentos
-                  {clientProfile.dataSource === 'supabase' && (
+                  {dataSource === 'supabase' && (
                     <span className="ml-1 text-green-400">
                       <span className="inline-block h-3 w-3">✓</span>
                     </span>
                   )}
                 </h3>
-                <p className="text-gray-300 mt-2 leading-relaxed">
-                  {clientProfile.assetsInvestments}
-                </p>
-                {hasOpenFinance && (
-                  <div className="mt-3 p-3.5 bg-indigo-900/30 backdrop-blur-sm rounded-lg border border-indigo-700/30">
-                    <p className="text-sm text-indigo-200 leading-relaxed">
-                      <strong className="font-semibold text-indigo-100">Estratégia de Alocação:</strong> Diversificação necessária para balancear concentração em ativos empresariais com investimentos mais líquidos e geograficamente diversificados.
-                    </p>
+                <div className="text-gray-300 mt-2 leading-relaxed">
+                  {enhanceText(getSectionContent('assets'))}
+                </div>
+                
+                {dataSource === 'supabase' && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {['Diversificação', 'Alocação', 'Liquidez'].map(tag => (
+                      <Badge key={tag} variant="outline" className="bg-indigo-900/30 text-indigo-300 border-indigo-700/30">
+                        <ChartBar className="h-3 w-3 mr-1.5" />
+                        {tag}
+                      </Badge>
+                    ))}
                   </div>
                 )}
               </div>
@@ -203,20 +339,30 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
               <div className="flex-1">
                 <h3 className="font-semibold text-xl text-gray-100 group-hover:text-amber-400 transition-colors flex items-center">
                   Objetivos Financeiros
-                  {clientProfile.dataSource === 'supabase' && (
+                  {dataSource === 'supabase' && (
                     <span className="ml-1 text-green-400">
                       <span className="inline-block h-3 w-3">✓</span>
                     </span>
                   )}
                 </h3>
-                <p className="text-gray-300 mt-2 leading-relaxed">
-                  {clientProfile.financialGoals}
-                </p>
-                {hasOpenFinance && (
+                <div className="text-gray-300 mt-2 leading-relaxed">
+                  {enhanceText(getSectionContent('goals'))}
+                </div>
+                
+                {dataSource === 'supabase' && (
                   <div className="mt-3 p-3.5 bg-amber-900/30 backdrop-blur-sm rounded-lg border border-amber-700/30">
-                    <p className="text-sm text-amber-200 leading-relaxed">
-                      <strong className="font-semibold text-amber-100">Projeção Financeira:</strong> Meta viável considerando participações societárias: 10% em Teófilo Otoni (avaliada em R$ 16 milhões) e 25% em Caratinga (R$ 2,5-3 milhões) com potencial de alcançar R$ 5,8 milhões em 8 anos e R$ 10,2 milhões aos 50 anos.
-                    </p>
+                    <div className="flex items-center">
+                      <div className="flex-1">
+                        <p className="text-sm text-amber-200 leading-relaxed">
+                          <strong className="font-semibold text-amber-100">Projeção Financeira:</strong> As análises indicam que seus objetivos estão alinhados com sua capacidade financeira atual e potencial de crescimento.
+                        </p>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <div className="rounded-full h-12 w-12 border-2 border-amber-500/50 flex items-center justify-center">
+                          <Award className="h-6 w-6 text-amber-400" />
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
@@ -232,20 +378,22 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
               <div className="flex-1">
                 <h3 className="font-semibold text-xl text-gray-100 group-hover:text-blue-400 transition-colors flex items-center">
                   Horizonte de Investimentos
-                  {clientProfile.dataSource === 'supabase' && (
+                  {dataSource === 'supabase' && (
                     <span className="ml-1 text-green-400">
                       <span className="inline-block h-3 w-3">✓</span>
                     </span>
                   )}
                 </h3>
-                <p className="text-gray-300 mt-2 leading-relaxed">
-                  {clientProfile.investmentHorizon}
-                </p>
-                {hasOpenFinance && (
-                  <div className="mt-3 p-3.5 bg-blue-900/30 backdrop-blur-sm rounded-lg border border-blue-700/30">
-                    <p className="text-sm text-blue-200 leading-relaxed">
-                      <strong className="font-semibold text-blue-100">Simulação de Aposentadoria:</strong> Taxa atual de poupança com rendimento anual médio de 10% projeta R$ 5,8 milhões em 8 anos e R$ 10,2 milhões aos 50 anos, superando as metas estabelecidas.
-                    </p>
+                <div className="text-gray-300 mt-2 leading-relaxed">
+                  {enhanceText(getSectionContent('timeline'))}
+                </div>
+                
+                {(dataSource === 'supabase' && clientAge) && (
+                  <div className="mt-3 flex items-center">
+                    <div className="rounded-full bg-blue-900/30 border border-blue-700/30 px-4 py-2 flex items-center">
+                      <User className="h-5 w-5 text-blue-400 mr-2" />
+                      <span className="text-blue-300">Idade atual: <strong className="text-blue-200">{clientAge} anos</strong></span>
+                    </div>
                   </div>
                 )}
               </div>
@@ -253,96 +401,90 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
           </div>
           
           {/* Risk Profile */}
-          {clientProfile.riskProfile && (hasOpenFinance || clientProfile.dataSource === 'supabase') && (
-            <div className="group hover:bg-red-900/10 transition-colors border-t border-white/5">
-              <div className="p-6 flex items-start gap-5">
-                <div className="rounded-xl bg-gradient-to-br from-red-600 to-red-700 p-3.5 shadow-md">
-                  <AlertTriangle className="h-6 w-6 text-white" />
+          <div className="group hover:bg-red-900/10 transition-colors border-t border-white/5">
+            <div className="p-6 flex items-start gap-5">
+              <div className="rounded-xl bg-gradient-to-br from-red-600 to-red-700 p-3.5 shadow-md">
+                <AlertTriangle className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-xl text-gray-100 group-hover:text-red-400 transition-colors flex items-center">
+                  Perfil de Risco
+                  {dataSource === 'supabase' && (
+                    <span className="ml-1 text-green-400">
+                      <span className="inline-block h-3 w-3">✓</span>
+                    </span>
+                  )}
+                </h3>
+                <div className="text-gray-300 mt-2 leading-relaxed">
+                  {enhanceText(getSectionContent('risk'))}
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-xl text-gray-100 group-hover:text-red-400 transition-colors flex items-center">
-                    Perfil de Risco
-                    {clientProfile.dataSource === 'supabase' && (
-                      <span className="ml-1 text-green-400">
-                        <span className="inline-block h-3 w-3">✓</span>
-                      </span>
-                    )}
-                  </h3>
-                  <p className="text-gray-300 mt-2 leading-relaxed">
-                    {clientProfile.riskProfile}
-                  </p>
-                  <div className="mt-4 space-y-3">
-                    <div>
-                      <div className="flex justify-between text-sm mb-1.5">
-                        <span className="text-gray-400 font-medium">Conservador</span>
-                        <span className="text-gray-400 font-medium">Agressivo</span>
-                      </div>
-                      <div className="h-2.5 w-full bg-gray-800/50 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500" style={{width: "65%"}}></div>
-                      </div>
-                      <div className="flex justify-between mt-1.5">
-                        <span className="text-sm text-gray-400">Capacidade de Risco</span>
-                        <span className="text-sm font-medium text-gray-300">65%</span>
-                      </div>
+                
+                <div className="mt-4 space-y-3">
+                  <div>
+                    <div className="flex justify-between text-sm mb-1.5">
+                      <span className="text-gray-400 font-medium">Conservador</span>
+                      <span className="text-gray-400 font-medium">Agressivo</span>
                     </div>
-                    
-                    <div>
-                      <div className="h-2.5 w-full bg-gray-800/50 rounded-full overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500" style={{width: "42%"}}></div>
-                      </div>
-                      <div className="flex justify-between mt-1.5">
-                        <span className="text-sm text-gray-400">Tolerância Emocional</span>
-                        <span className="text-sm font-medium text-gray-300">42%</span>
-                      </div>
+                    <div className="h-2.5 w-full bg-gray-800/50 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500" style={{width: "55%"}}></div>
+                    </div>
+                    <div className="flex justify-between mt-1.5">
+                      <span className="text-sm text-gray-400">Capacidade de Risco</span>
+                      <span className="text-sm font-medium text-gray-300">55%</span>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <div className="h-2.5 w-full bg-gray-800/50 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500" style={{width: "42%"}}></div>
+                    </div>
+                    <div className="flex justify-between mt-1.5">
+                      <span className="text-sm text-gray-400">Tolerância Emocional</span>
+                      <span className="text-sm font-medium text-gray-300">42%</span>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          )}
-
+          </div>
+          
           {/* Expectations */}
-          {clientProfile.essentialServices && (
-            <div className="group hover:bg-teal-900/10 transition-colors border-t border-white/5">
-              <div className="p-6 flex items-start gap-5">
-                <div className="rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 p-3.5 shadow-md">
-                  <TrendingUp className="h-6 w-6 text-white" />
+          <div className="group hover:bg-teal-900/10 transition-colors border-t border-white/5">
+            <div className="p-6 flex items-start gap-5">
+              <div className="rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 p-3.5 shadow-md">
+                <TrendingUp className="h-6 w-6 text-white" />
+              </div>
+              <div className="flex-1">
+                <h3 className="font-semibold text-xl text-gray-100 group-hover:text-teal-400 transition-colors flex items-center">
+                  Serviços Financeiros Essenciais
+                </h3>
+                <div className="text-gray-300 mt-2 leading-relaxed">
+                  Visualização consolidada de seus ativos, passivos e fluxo de caixa em todas as instituições financeiras, com relatórios mensais detalhados de evolução patrimonial e projeção atualizada para suas metas de curto, médio e longo prazo.
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-xl text-gray-100 group-hover:text-teal-400 transition-colors flex items-center">
-                    Serviços Financeiros Essenciais
-                    {clientProfile.dataSource === 'supabase' && (
-                      <span className="ml-1 text-green-400">
-                        <span className="inline-block h-3 w-3">✓</span>
-                      </span>
-                    )}
-                  </h3>
-                  <p className="text-gray-300 mt-2 leading-relaxed">
-                    {clientProfile.essentialServices}
-                  </p>
-                  {hasOpenFinance && (
-                    <div className="mt-3 p-3.5 bg-teal-900/30 backdrop-blur-sm rounded-lg border border-teal-700/30">
-                      <p className="text-sm text-teal-200 leading-relaxed">
-                        <strong className="font-semibold text-teal-100">Proposta de Valor:</strong> Visão consolidada de ativos, passivos e fluxo de caixa em todas as instituições financeiras, com relatórios mensais detalhados de evolução patrimonial e projeção atualizada para metas de 45 e 50 anos.
-                      </p>
-                    </div>
-                  )}
+                
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {['Consolidação', 'Relatórios', 'Projeções'].map(tag => (
+                    <Badge key={tag} variant="outline" className="bg-teal-900/30 text-teal-300 border-teal-700/30">
+                      <BookOpen className="h-3 w-3 mr-1.5" />
+                      {tag}
+                    </Badge>
+                  ))}
                 </div>
               </div>
             </div>
-          )}
+          </div>
           
-          {hasOpenFinance && (
+          {dataSource === 'supabase' && (
             <div className="border-t border-white/5 p-6">
               <div className="bg-gradient-to-r from-blue-800/20 to-indigo-800/20 p-5 rounded-lg backdrop-blur-sm border border-blue-700/20">
                 <h3 className="font-semibold text-lg text-blue-300 mb-2 flex items-center">
-                  <ShieldCheck className="h-5 w-5 mr-2" />
-                  Dados exclusivos via OpenFinance
+                  <Shield className="h-5 w-5 mr-2" />
+                  Dados validados com sua autorização
                 </h3>
                 <p className="text-gray-300 leading-relaxed">
-                  Visualizando insights avançados baseados em seus dados completos de OpenFinance,
-                  permitindo análise de comportamento financeiro em todos os bancos e instituições
-                  para recomendações mais precisas e personalizadas.
+                  Visualizando insights baseados em seus dados financeiros completos,
+                  permitindo análise de comportamento financeiro para recomendações
+                  mais precisas e personalizadas.
                 </p>
               </div>
             </div>
