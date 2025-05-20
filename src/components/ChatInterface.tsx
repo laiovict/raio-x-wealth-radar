@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -70,7 +71,7 @@ const ChatInterface = () => {
     const clientContext = {
       name: data.clientName || "Cliente",
       portfolio: {
-        totalValue: data.allocation?.current?.total || "desconhecido",
+        totalValue: data.portfolioSummary?.total_portfolio_value || "desconhecido",
         allocation: data.allocation?.current || {},
         liquidity: data.liquidity?.currentIdle || "desconhecido",
       },

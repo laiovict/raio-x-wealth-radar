@@ -5,16 +5,24 @@
 
 /**
  * Format currency values according to Brazilian format
- * @param value Number to format as currency
+ * @param value Number or string to format as currency
  * @param maxDigits Maximum fraction digits (default: 0)
  * @returns Formatted currency string
  */
-export const formatCurrency = (value: number, maxDigits: number = 0) => {
+export const formatCurrency = (value: number | string, maxDigits: number = 0) => {
+  // Parse the value if it's a string
+  const numValue = typeof value === 'string' ? parseFloat(value) : value;
+  
+  // Check if it's a valid number
+  if (isNaN(numValue)) {
+    return 'R$ 0';
+  }
+  
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
     maximumFractionDigits: maxDigits,
-  }).format(value);
+  }).format(numValue);
 };
 
 /**
@@ -42,15 +50,23 @@ export const formatDate = (date: Date) => {
 
 /**
  * Format number with thousands separator
- * @param value Number to format
+ * @param value Number or string to format
  * @param decimals Number of decimal places (default: 0)
  * @returns Formatted number string
  */
-export const formatNumber = (value: number, decimals: number = 0) => {
+export const formatNumber = (value: number | string, decimals: number = 0) => {
+  // Parse the value if it's a string
+  const numValue = typeof value === 'string' ? parseFloat(value) : value;
+  
+  // Check if it's a valid number
+  if (isNaN(numValue)) {
+    return '0';
+  }
+  
   return new Intl.NumberFormat('pt-BR', {
     maximumFractionDigits: decimals,
     minimumFractionDigits: decimals
-  }).format(value);
+  }).format(numValue);
 };
 
 /**
@@ -104,4 +120,18 @@ export const parseYYYYMMDD = (dateString: string): Date | null => {
     console.error("Error parsing YYYY-MM-DD date:", error);
     return null;
   }
+};
+
+/**
+ * Convert string or number to number safely
+ * @param value String or number to convert
+ * @param defaultValue Default value if conversion fails
+ * @returns Number value
+ */
+export const toNumber = (value: string | number, defaultValue: number = 0): number => {
+  if (typeof value === 'number') return value;
+  if (!value) return defaultValue;
+  
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? defaultValue : parsed;
 };

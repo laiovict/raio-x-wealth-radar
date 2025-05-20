@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import type { AIInsight } from "@/types/raioXTypes";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -52,7 +51,7 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  const getPriorityColor = (priority?: string) => {
     switch (priority) {
       case 'high':
         return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300';
@@ -65,7 +64,7 @@ const AIInsightsHubModule = ({ fullWidth = false }: AIInsightsHubModuleProps) =>
     }
   };
 
-  const getAgentColor = (agent: string) => {
+  const getAgentColor = (agent?: string) => {
     switch (agent) {
       case 'planner':
         return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';

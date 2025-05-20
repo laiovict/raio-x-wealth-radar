@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -255,8 +254,8 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
   const recommendedActions = getRecommendedActions();
   const { recommendations } = data;
   
-  // Define insights here using data.financialInsights instead of data.insights
-  const insights = data.financialInsights || [
+  // Define insights here using data.financialInsightData instead of data.financialInsights
+  const insights = data.financialInsightData ? data.financialInsightData.insights : [
     {
       id: "market-shift",
       title: "Mudança de cenário macroeconômico",
@@ -303,211 +302,189 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
   };
 
   return (
-    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full overflow-hidden border-none shadow-lg`}>
-      <CardHeader className="bg-gradient-to-r from-indigo-800 to-purple-800 pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="rounded-lg bg-indigo-600/50 p-2">
-              <Brain className="h-5 w-5 text-indigo-100" />
-            </div>
-            <CardTitle className="text-xl text-white flex items-center gap-2">
-              Inteligência Financeira
-              <Badge className="bg-indigo-700/70 text-indigo-100 hover:bg-indigo-600 border-indigo-500/30 ml-2 flex items-center gap-1">
-                <Sparkles className="h-3 w-3" /> Powered by AI
-              </Badge>
-            </CardTitle>
+    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full overflow-hidden border-none shadow-lg dark:bg-slate-800/30`}>
+      <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 pb-3">
+        <div className="flex items-center gap-2">
+          <div className="rounded-lg bg-white/20 p-2 shadow-xl">
+            <Brain className="h-5 w-5 text-white" />
           </div>
+          <CardTitle className="text-xl text-white">
+            {t('intelligence.title', 'Inteligência Financeira')}
+          </CardTitle>
         </div>
-        <p className="text-indigo-200 mt-1 text-sm">
-          Recomendações personalizadas baseadas na análise de seu perfil financeiro
-        </p>
       </CardHeader>
-      <CardContent className="bg-gradient-to-b from-gray-950 to-gray-900/95 p-0">
-        <Tabs 
-          defaultValue="actions" 
-          className="w-full"
-          value={activeTab}
-          onValueChange={setActiveTab}
-        >
-          <TabsList className="w-full grid grid-cols-3 rounded-none border-b border-gray-800">
-            <TabsTrigger 
-              value="actions" 
-              className="data-[state=active]:bg-indigo-900/30 rounded-none border-b-2 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-300"
-            >
-              Ações Recomendadas
+      
+      <div className="px-3 pt-3 pb-0 border-b border-gray-200 dark:border-gray-700">
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="grid grid-cols-3">
+            <TabsTrigger value="actions" className="text-xs sm:text-sm">
+              {t('intelligence.actions', 'Ações')}
             </TabsTrigger>
-            <TabsTrigger 
-              value="recommendations" 
-              className="data-[state=active]:bg-indigo-900/30 rounded-none border-b-2 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-300"
-            >
-              Prioridades
+            <TabsTrigger value="insights" className="text-xs sm:text-sm">
+              {t('intelligence.insights', 'Insights')}
             </TabsTrigger>
-            <TabsTrigger 
-              value="insights" 
-              className="data-[state=active]:bg-indigo-900/30 rounded-none border-b-2 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-300"
-            >
-              Insights de Mercado
+            <TabsTrigger value="recommendations" className="text-xs sm:text-sm">
+              {t('intelligence.recommendations', 'Recomendações')}
             </TabsTrigger>
           </TabsList>
-
-          {isLoaded ? (
-            <>
-              {/* Tab 1: Ações Recomendadas */}
-              <TabsContent value="actions" className="p-4">
-                <ul className="space-y-4">
-                  {recommendedActions.map((action) => (
-                    <li 
-                      key={action.id} 
-                      className="bg-gray-800/40 rounded-lg p-4 border border-gray-700/50 hover:bg-gray-800/60 transition-colors"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-2 flex-1">
-                          <div className="flex items-center gap-2">
-                            <div className="p-2 rounded-lg bg-indigo-900/30 border border-indigo-700/30">
-                              {getIconComponent(action.icon)}
-                            </div>
-                            <h3 className="font-semibold text-white">{action.title}</h3>
-                          </div>
-                          <p className="text-sm text-gray-400">{action.description}</p>
-                          <div className="flex items-center space-x-3">
-                            <span className="text-xs px-2 py-1 rounded-full bg-indigo-900/30 border border-indigo-700/20 text-indigo-300">
-                              Impacto: {action.impact}
-                            </span>
-                            <span className="text-xs px-2 py-1 rounded-full bg-blue-900/30 border border-blue-700/20 text-blue-300">
-                              Esforço: {action.effort}
-                            </span>
-                          </div>
-                        </div>
-                        
-                        <button 
-                          onClick={() => toggleActionCompletion(action.id)}
-                          className="p-1 rounded-full hover:bg-gray-700/50 transition-colors ml-4"
-                          aria-label={completedActions.includes(action.id) ? "Marcar como não concluído" : "Marcar como concluído"}
-                        >
-                          {completedActions.includes(action.id) ? (
-                            <CheckCircle2 className="h-6 w-6 text-green-500" />
-                          ) : (
-                            <Circle className="h-6 w-6 text-gray-500" />
-                          )}
-                        </button>
-                      </div>
-                      
-                      <div className="mt-3 flex justify-end">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="bg-indigo-900/30 text-indigo-300 border-indigo-700/50 hover:bg-indigo-800/50"
-                          onClick={() => handleActionClick(action)}
-                        >
-                          {action.buttonText} <ArrowRight className="ml-2 h-4 w-4" />
-                        </Button>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </TabsContent>
-
-              {/* Tab 2: Recomendações Prioritárias */}
-              <TabsContent value="recommendations" className="p-4">
-                <div className="space-y-4">
-                  {recommendations?.map((recommendation, index) => (
-                    <div 
-                      key={index} 
-                      className="bg-gray-800/40 rounded-lg border border-gray-700/50 overflow-hidden transition-all hover:bg-gray-800/60"
-                    >
-                      <div className="p-4">
-                        <div className="flex justify-between items-start flex-wrap gap-2 mb-2">
-                          <div className="flex items-center">
-                            <div className="p-2 rounded-lg bg-indigo-900/30 border border-indigo-700/30 mr-3">
-                              <Shield className="h-5 w-5 text-indigo-400" />
-                            </div>
-                            <span className="text-lg font-semibold text-white">
-                              {recommendation.action}
-                            </span>
-                          </div>
-                          <div className="flex flex-wrap gap-2">
-                            <Badge className={`flex items-center gap-1 px-2 py-1 border ${getUrgencyColor(recommendation.urgency)}`}>
-                              {getUrgencyIcon(recommendation.urgency)}
-                              <span>Urgência: {recommendation.urgency}</span>
-                            </Badge>
-                            <Badge className={`px-2 py-1 border ${getImpactColor(recommendation.impact)}`}>
-                              Impacto: {recommendation.impact}
-                            </Badge>
-                          </div>
-                        </div>
-                        <p className="text-gray-300 mb-4 leading-relaxed">
-                          {recommendation.description}
-                        </p>
-                        <div className="flex justify-end">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            className="bg-indigo-900/30 text-indigo-300 border-indigo-700/50 hover:bg-indigo-800/50"
-                            onClick={() => handleExecute(recommendation)}
-                          >
-                            Executar <ArrowRight className="ml-2 h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
+        </Tabs>
+      </div>
+      
+      <CardContent className="p-0">
+        <TabsContent value="actions" className="p-4 space-y-3 m-0">
+          <div className="space-y-4">
+            {getRecommendedActions().map(action => (
+              <div 
+                key={action.id}
+                className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white/5 hover:bg-white/10 dark:hover:bg-gray-700/30 transition-colors cursor-pointer"
+                onClick={() => handleActionClick(action)}
+              >
+                <div className="flex gap-3 items-start">
+                  <div className="rounded-lg bg-blue-500/20 p-2 flex-shrink-0 mt-1">
+                    {action.icon === "TrendingUp" && <TrendingUp className="h-5 w-5 text-blue-400" />}
+                    {action.icon === "Shield" && <Shield className="h-5 w-5 text-green-400" />}
+                    {action.icon === "AlertTriangle" && <AlertTriangle className="h-5 w-5 text-amber-400" />}
+                    {action.icon === "BadgePercent" && <BadgePercent className="h-5 w-5 text-emerald-400" />}
+                    {action.icon === "BarChart" && <BarChart className="h-5 w-5 text-purple-400" />}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex flex-wrap gap-2 mb-1">
+                      <Badge variant="outline" className="bg-blue-500/10 text-blue-300 border-blue-500/20 hover:border-blue-500/40">
+                        {action.category === 'investment' ? 'Investimento' : 
+                          action.category === 'planning' ? 'Planejamento' : 
+                          action.category === 'tax' ? 'Impostos' : action.category}
+                      </Badge>
+                      <Badge variant="outline" className={`
+                        ${action.impact === 'Alto' ? 'bg-amber-500/10 text-amber-300 border-amber-500/20' : 
+                          action.impact === 'Médio' ? 'bg-blue-500/10 text-blue-300 border-blue-500/20' : 
+                          'bg-green-500/10 text-green-300 border-green-500/20'}
+                      `}>
+                        Impacto: {action.impact}
+                      </Badge>
+                      <Badge variant="outline" className={`
+                        ${action.effort === 'Alto' ? 'bg-red-500/10 text-red-300 border-red-500/20' : 
+                          action.effort === 'Médio' ? 'bg-amber-500/10 text-amber-300 border-amber-500/20' : 
+                          'bg-green-500/10 text-green-300 border-green-500/20'}
+                      `}>
+                        Esforço: {action.effort}
+                      </Badge>
                     </div>
-                  ))}
-                </div>
-              </TabsContent>
-
-              {/* Tab 3: Insights de Mercado */}
-              <TabsContent value="insights" className="p-4">
-                <div className="space-y-4">
-                  {insights.map((insight) => (
-                    <div 
-                      key={insight.id} 
-                      className={`bg-gray-800/40 rounded-lg p-4 ${getImportanceClass(insight.importance || 'medium')} hover:bg-gray-800/60 transition-colors`}
+                    <h3 className="text-lg font-medium text-white mb-1">{action.title}</h3>
+                    <p className="text-sm text-gray-400 mb-3">{action.description}</p>
+                    <Button 
+                      size="sm" 
+                      className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
                     >
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-start gap-3">
-                          <div className="p-2 rounded-lg bg-blue-900/30 border border-blue-700/30">
-                            <Lightbulb className="h-5 w-5 text-blue-400" />
-                          </div>
-                          <h3 className="font-medium text-white mb-2">{insight.title}</h3>
-                        </div>
-                        <Badge className="bg-gray-700 text-gray-300 border border-gray-600/50">
-                          {insight.date ? new Date(insight.date).toLocaleDateString('pt-BR', {day: '2-digit', month: 'short'}) : 
-                          insight.timestamp ? new Date(insight.timestamp).toLocaleDateString('pt-BR', {day: '2-digit', month: 'short'}) :
-                          new Date().toLocaleDateString('pt-BR', {day: '2-digit', month: 'short'})}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-gray-400 mb-3 ml-10">{insight.description}</p>
-                      <div className="flex items-center justify-between mt-1 ml-10">
-                        <Badge variant="outline" className="text-xs text-gray-400 border-gray-700 bg-gray-800/50">
-                          {insight.category}
-                        </Badge>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="text-indigo-400 hover:text-indigo-300 hover:bg-indigo-900/20"
-                          onClick={() => handleInsightClick(insight)}
-                        >
-                          Saiba mais <ArrowRight className="ml-1 h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                      {action.buttonText} <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </TabsContent>
-            </>
+              </div>
+            ))}
+          </div>
+        </TabsContent>
+        
+        <TabsContent value="insights" className="p-4 space-y-4 m-0">
+          {/* We'll use financialInsightData instead of financialInsights */}
+          {data.financialInsightData ? (
+            <div className="space-y-4">
+              {data.financialInsightData.insights.map((insight: any, index: number) => (
+                <div 
+                  key={index}
+                  className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white/5"
+                  onClick={() => handleInsightClick(insight)}
+                >
+                  <div className="flex gap-2 mb-2">
+                    <Badge className={`bg-${insight.type === 'positive' ? 'green' : insight.type === 'negative' ? 'red' : 'blue'}-600/50`}>
+                      {insight.type === 'positive' ? 'Positivo' : 
+                        insight.type === 'negative' ? 'Atenção' : 'Informativo'}
+                    </Badge>
+                    <Badge variant="outline" className="bg-gray-800/50">
+                      {insight.category}
+                    </Badge>
+                  </div>
+                  <h3 className="text-lg font-medium text-white mb-1">{insight.title}</h3>
+                  <p className="text-sm text-gray-400 mb-3">{insight.description}</p>
+                  <div className="flex justify-between items-center">
+                    <Badge variant="outline" className="bg-gray-800/50 text-gray-400">
+                      {insight.date}
+                    </Badge>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-blue-400 hover:text-blue-300 hover:bg-blue-900/20"
+                    >
+                      Ver detalhes <ArrowRight className="ml-1 h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
-            <div className="p-4 space-y-4">
-              <div className="h-24 bg-gray-800/40 animate-pulse rounded-lg"></div>
-              <div className="h-24 bg-gray-800/40 animate-pulse rounded-lg"></div>
-              <div className="h-24 bg-gray-800/40 animate-pulse rounded-lg"></div>
+            <div className="text-center py-8">
+              <div className="rounded-full bg-blue-500/20 p-4 mx-auto w-16 h-16 flex items-center justify-center mb-4">
+                <Lightbulb className="h-8 w-8 text-blue-400" />
+              </div>
+              <h3 className="text-lg font-medium text-white mb-2">Nenhum insight disponível</h3>
+              <p className="text-sm text-gray-400">
+                Ative o Open Finance para habilitar insights personalizados baseados nos seus dados financeiros.
+              </p>
+              <Button
+                className="mt-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
+              >
+                Ativar Open Finance <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </div>
           )}
-        </Tabs>
-
-        <div className="p-6 border-t border-gray-800">
-          <p className="text-sm text-gray-400">
-            As recomendações e insights são gerados com base na análise de seus dados financeiros, tendências de mercado e objetivos pessoais. Atualizamos estas informações regularmente para mantê-lo informado sobre as melhores decisões financeiras.
-          </p>
-        </div>
+        </TabsContent>
+        
+        <TabsContent value="recommendations" className="p-4 space-y-4 m-0">
+          {data.recommendations && data.recommendations.length > 0 ? (
+            <div className="space-y-4">
+              {/* Use data.recommendations here */}
+              {data.recommendations.map((recommendation, index) => (
+                <div 
+                  key={index}
+                  className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white/5 hover:bg-white/10 transition-colors cursor-pointer"
+                  onClick={() => handleExecute(recommendation)}
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex gap-2">
+                      <Badge className={`bg-${recommendation.urgency === 'high' ? 'red' : recommendation.urgency === 'medium' ? 'amber' : 'green'}-600/50`}>
+                        {recommendation.urgency === 'high' ? 'Alta Prioridade' : 
+                          recommendation.urgency === 'medium' ? 'Média Prioridade' : 'Baixa Prioridade'}
+                      </Badge>
+                      <Badge variant="outline" className="bg-blue-900/30 text-blue-300 border-blue-700/30">
+                        {recommendation.category}
+                      </Badge>
+                    </div>
+                    <Badge variant="outline" className="bg-gray-800/50 text-gray-400">
+                      {recommendation.date}
+                    </Badge>
+                  </div>
+                  <h3 className="text-lg font-medium text-white mb-1">{recommendation.action}</h3>
+                  <p className="text-sm text-gray-400 mb-3">{recommendation.description}</p>
+                  <Button 
+                    size="sm" 
+                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white"
+                  >
+                    Executar <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <div className="rounded-full bg-green-500/20 p-4 mx-auto w-16 h-16 flex items-center justify-center mb-4">
+                <CheckCircle2 className="h-8 w-8 text-green-400" />
+              </div>
+              <h3 className="text-lg font-medium text-white mb-2">Sem recomendações pendentes</h3>
+              <p className="text-sm text-gray-400">
+                Todas as suas recomendações financeiras foram executadas. Continue monitorando seu portfólio para novas oportunidades.
+              </p>
+            </div>
+          )}
+        </TabsContent>
       </CardContent>
     </Card>
   );

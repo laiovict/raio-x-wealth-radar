@@ -8,6 +8,12 @@ export interface AIInsight {
   category: string;
   impact: 'high' | 'medium' | 'low';
   actions?: string[];
+  // Add missing properties
+  agent?: string;
+  priority?: 'high' | 'medium' | 'low';
+  isNew?: boolean;
+  isSynthetic?: boolean;
+  timestamp: Date;
 }
 
 // Define the PortfolioSummary type
@@ -68,6 +74,13 @@ export interface FinancialSummary {
     twelveMonths: number;
   };
   dataSource?: 'synthetic' | 'supabase';
+  // Add missing properties needed for FinancialOverviewModule
+  netWorth?: number;
+  monthlyIncome?: number;
+  monthlyExpenses?: number;
+  totalLiabilities?: number;
+  savingsRate?: number;
+  liquidAssets?: number;
 }
 
 // Define the OpenFinanceData type
@@ -77,6 +90,26 @@ export interface OpenFinanceData {
   openFinanceInvestments: any[];
   openFinanceTransactions: any[];
   openFinanceInsights: any;
+}
+
+// Define the Allocation type
+export interface Allocation {
+  current: {
+    [key: string]: number;
+    total?: number | string;
+  };
+  recommended: {
+    [key: string]: number;
+  };
+}
+
+// Define the Liquidity type
+export interface Liquidity {
+  currentIdle: number | string;
+  recommended: number;
+  difference: number;
+  currentIdleMonths: number;
+  recommendedMonths: number;
 }
 
 // Complete Raio-X data structure for easy access to all client information
@@ -95,6 +128,14 @@ export interface RaioXData {
   financialPlans?: any[];
   financialInsightData?: any;
   openFinanceData?: OpenFinanceData;
+  // Add missing properties
+  allocation?: Allocation;
+  liquidity?: Liquidity;
+  projection?: any;
+  recommendations?: any[];
+  sentiment?: any;
+  clientAge?: number;
+  financialSummary?: FinancialSummary;
 }
 
 // Props for the Raio-X context provider
