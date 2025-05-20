@@ -16,7 +16,7 @@ interface BehaviorTrait {
 
 const BehavioralFinanceModule = ({ fullWidth = false }) => {
   const { t } = useLanguage();
-  const { data, hasOpenFinance } = useRaioX();
+  const { data, hasOpenFinance, selectedClient } = useRaioX();
   
   // This should be determined based on real user data
   const hasOpenFinanceSixMonths = hasOpenFinance && data?.openFinanceMonths >= 6;
@@ -62,8 +62,6 @@ const BehavioralFinanceModule = ({ fullWidth = false }) => {
     traits: behaviorTraits
   };
   
-  const { selectedClient } = useRaioX();
-
   if (!hasOpenFinanceSixMonths) {
     return (
       <Card className={`glass-morphism p-6 ${fullWidth ? 'w-full' : ''}`}>

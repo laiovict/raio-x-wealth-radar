@@ -15,6 +15,9 @@ export interface AIInsight {
   title: string;
   description: string;
   category: string;
+  isNew?: boolean;
+  priority?: 'high' | 'medium' | 'low';
+  timestamp: Date;
 }
 
 export interface FinancialSummary {
@@ -63,6 +66,90 @@ export interface Goal {
   category?: string;
 }
 
+export interface SentimentAsset {
+  ticker: string;
+  sentiment: number;
+  impact: number;
+  recentNews: string;
+}
+
+export interface SentimentData {
+  assets: SentimentAsset[];
+  summary: string;
+}
+
+export interface SocialComparisonData {
+  peerGroup: string;
+  percentileRank: number;
+  returnVsPeers: number;
+  diversificationScore: number;
+  summary: string;
+}
+
+export interface AllocationData {
+  current: Record<string, number>;
+  recommended: Record<string, number>;
+  optimizationGain: number;
+  summary: string;
+}
+
+export interface WrappedData {
+  biggestContribution: {
+    amount: number;
+    date: string;
+  };
+  longestPositiveStreak: number;
+  largestDrawdown: {
+    percentage: number;
+    period: string;
+  };
+  mostProfitableAsset: {
+    name: string;
+    return: number;
+  };
+  summary: string;
+}
+
+export interface FinancialInsightData {
+  highestSpendingMonth: {
+    month: string;
+    amount: number;
+    categories: Array<{name: string, amount: number}>;
+  };
+  wastedMoney: {
+    total: number;
+    categories: Array<{name: string, amount: number}>;
+  };
+  topCategories: {
+    categories: Array<{name: string, amount: number, percentage: number}>;
+    total: number;
+  };
+  negativeMonths: {
+    count: number;
+    months: string[];
+    totalDeficit: number;
+  };
+  investmentGrowth: {
+    annual: number;
+    total: number;
+    bestAsset: { name: string, growth: number };
+  };
+  potentialSavings: {
+    amount: number;
+    suggestions: string[];
+  };
+  bestInvestment: {
+    name: string;
+    return: number;
+    period: string;
+  };
+  retirementReadiness: {
+    score: number;
+    years: number;
+    monthlyNeeded: number;
+  };
+}
+
 export interface RaioXData {
   clientName: string;
   clientAge: number;
@@ -77,7 +164,7 @@ export interface RaioXData {
     realEstate: number;
   };
   openFinanceMonths: number;
-  // Add the missing properties
+  hasOpenFinance?: boolean;
   lifeGoals: {
     goals: Goal[];
     summary: string;
@@ -111,6 +198,10 @@ export interface RaioXData {
     urgency: string;
     impact: string;
   }>;
+  sentiment: SentimentData;
+  socialComparison: SocialComparisonData;
+  allocation: AllocationData;
+  wrapped: WrappedData;
   summary?: string;
 }
 
@@ -121,7 +212,168 @@ interface RaioXContextProps {
   refreshAIAnalysis?: () => void;
   isAIAnalysisLoading?: boolean;
   financialSummary?: FinancialSummary;
+  aiInsights: AIInsight[];
 }
+
+// Create mock data for the new properties
+const mockSentimentData: SentimentData = {
+  assets: [
+    {
+      ticker: "PETR4",
+      sentiment: 75,
+      impact: 2.3,
+      recentNews: "Resultados trimestrais superaram expectativas dos analistas, com aumento de 12% na produção."
+    },
+    {
+      ticker: "VALE3",
+      sentiment: 60,
+      impact: -1.5,
+      recentNews: "Preocupações com desaceleração econômica na China afetam perspectivas para mineradoras."
+    }
+  ],
+  summary: "O sentimento geral para suas principais posições é positivo, destacando-se o setor de energia com Petrobras. Recomendamos acompanhar notícias sobre a China que podem impactar Vale."
+};
+
+const mockSocialComparison: SocialComparisonData = {
+  peerGroup: "30-40 anos | Moderado",
+  percentileRank: 75,
+  returnVsPeers: 3.2,
+  diversificationScore: 82,
+  summary: "Seu desempenho está superior a 75% dos investidores com perfil similar ao seu. Sua estratégia de diversificação está contribuindo positivamente para resultados acima da média."
+};
+
+const mockAllocationData: AllocationData = {
+  current: {
+    "Renda Fixa": 45.0,
+    "Ações BR": 25.0,
+    "Fundos": 20.0,
+    "Caixa": 10.0,
+    "Internacional": 0.0,
+    "FIIs": 0.0,
+    "Previdência": 0.0
+  },
+  recommended: {
+    "Renda Fixa": 30.0,
+    "Ações BR": 20.0,
+    "Fundos": 15.0,
+    "Caixa": 5.0,
+    "Internacional": 15.0,
+    "FIIs": 10.0,
+    "Previdência": 5.0
+  },
+  optimizationGain: 2.4,
+  summary: "Atualmente sua carteira está concentrada em renda fixa (45%) e ações brasileiras (25%), o que reflete seu perfil conservador. Como empreendedor, recomendamos diversificar com 15% em internacional e 10% em FIIs para melhor equilíbrio entre segurança e crescimento, especialmente considerando seus planos familiares futuros."
+};
+
+const mockWrappedData: WrappedData = {
+  biggestContribution: {
+    amount: 50000,
+    date: "2023-06-15"
+  },
+  longestPositiveStreak: 7,
+  largestDrawdown: {
+    percentage: 12.5,
+    period: "Mar-Abr 2023"
+  },
+  mostProfitableAsset: {
+    name: "WEGE3",
+    return: 32.4
+  },
+  summary: "2023 foi um ano positivo para sua carteira, com destaque para as ações do setor industrial. Seu padrão de aportes consistentes contribuiu para o bom desempenho, apesar da volatilidade no 2º trimestre."
+};
+
+const mockFinancialInsightData: FinancialInsightData = {
+  highestSpendingMonth: {
+    month: "Dezembro/2023",
+    amount: 15200,
+    categories: [
+      {name: "Presentes", amount: 4500},
+      {name: "Viagens", amount: 3800},
+      {name: "Alimentação", amount: 2200}
+    ]
+  },
+  wastedMoney: {
+    total: 12400,
+    categories: [
+      {name: "Taxas bancárias", amount: 4800},
+      {name: "Serviços não utilizados", amount: 3600},
+      {name: "Juros", amount: 2800}
+    ]
+  },
+  topCategories: {
+    categories: [
+      {name: "Moradia", amount: 42000, percentage: 28},
+      {name: "Alimentação", amount: 36000, percentage: 24},
+      {name: "Transporte", amount: 24000, percentage: 16}
+    ],
+    total: 150000
+  },
+  negativeMonths: {
+    count: 2,
+    months: ["Dezembro/2023", "Janeiro/2024"],
+    totalDeficit: 4500
+  },
+  investmentGrowth: {
+    annual: 11.2,
+    total: 65000,
+    bestAsset: {name: "Fundo Imobiliário XP", growth: 14.8}
+  },
+  potentialSavings: {
+    amount: 18600,
+    suggestions: [
+      "Renegociar contratos de serviços", 
+      "Consolidar dívidas para reduzir juros",
+      "Eliminar assinaturas redundantes"
+    ]
+  },
+  bestInvestment: {
+    name: "Tesouro IPCA+ 2035",
+    return: 12.4,
+    period: "últimos 12 meses"
+  },
+  retirementReadiness: {
+    score: 68,
+    years: 22,
+    monthlyNeeded: 15000
+  }
+};
+
+// Sample AI insights
+const sampleAIInsights: AIInsight[] = [
+  {
+    id: "1",
+    title: "Alto potencial para diversificação internacional",
+    description: "Sua carteira tem baixa exposição a mercados internacionais, o que representa uma oportunidade de diversificação.",
+    category: "allocation",
+    priority: "medium",
+    timestamp: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // 7 days ago
+  },
+  {
+    id: "2",
+    title: "Concentração em tecnologia",
+    description: "Seus investimentos em ações estão concentrados no setor de tecnologia, o que aumenta a volatilidade da carteira.",
+    category: "risk",
+    priority: "high",
+    isNew: true,
+    timestamp: new Date()
+  },
+  {
+    id: "3",
+    title: "Fluxo de caixa positivo",
+    description: "Sua taxa de poupança de 43% está acima da média para sua faixa etária e renda.",
+    category: "savings",
+    priority: "low",
+    timestamp: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000) // 14 days ago
+  },
+  {
+    id: "4",
+    title: "Oportunidade em renda fixa",
+    description: "Com a atual curva de juros, há oportunidade para aumentar sua alocação em títulos públicos de longo prazo.",
+    category: "opportunity",
+    priority: "medium",
+    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000) // 3 days ago
+  }
+];
 
 // Update the default context with the new properties
 const defaultContext: RaioXContextProps = {
@@ -187,12 +439,18 @@ const defaultContext: RaioXContextProps = {
         impact: "Médio"
       }
     ],
+    sentiment: mockSentimentData,
+    socialComparison: mockSocialComparison,
+    allocation: mockAllocationData,
+    wrapped: mockWrappedData,
+    hasOpenFinance: false,
     summary: "Seu portfólio está bem diversificado, mas poderia se beneficiar de maior exposição internacional. Sua saúde financeira está em ótimo estado, com fluxo de caixa positivo e bons índices de poupança."
   },
   hasOpenFinance: false,
   selectedClient: null,
   refreshAIAnalysis: () => {},
-  isAIAnalysisLoading: false
+  isAIAnalysisLoading: false,
+  aiInsights: sampleAIInsights
 };
 
 const RaioXContext = createContext<RaioXContextProps>(defaultContext);
@@ -210,6 +468,7 @@ export const RaioXProvider = ({
 }) => {
   const [data, setData] = useState<RaioXData>({...defaultContext.data});
   const [isAIAnalysisLoading, setIsAIAnalysisLoading] = useState<boolean>(false);
+  const [aiInsights, setAIInsights] = useState<AIInsight[]>(sampleAIInsights);
 
   // Function to refresh AI analysis
   const refreshAIAnalysis = () => {
@@ -297,6 +556,7 @@ export const RaioXProvider = ({
           realEstate: 5
         },
         openFinanceMonths: 12,
+        hasOpenFinance: true,
         lifeGoals: {
           goals: [
             {
@@ -372,6 +632,68 @@ export const RaioXProvider = ({
             impact: "Alto"
           }
         ],
+        sentiment: {
+          assets: [
+            {
+              ticker: "AAPL34",
+              sentiment: 82,
+              impact: 3.5,
+              recentNews: "Apple supera expectativas com lançamento do novo iPhone e expansão de serviços de IA"
+            },
+            {
+              ticker: "ITSA4",
+              sentiment: 65,
+              impact: 1.8,
+              recentNews: "Itaúsa reporta crescimento sólido com diversificação de investimentos não financeiros"
+            }
+          ],
+          summary: "O sentimento para suas principais posições está muito positivo, com destaque para o setor de tecnologia. Recomendamos manter e potencialmente aumentar exposição em empresas com forte integração de IA."
+        },
+        socialComparison: {
+          peerGroup: "30-40 anos | Moderado-Agressivo",
+          percentileRank: 85,
+          returnVsPeers: 4.7,
+          diversificationScore: 78,
+          summary: "Seu desempenho está entre os 15% melhores investidores com perfil similar. Sua maior alocação em ações growth está contribuindo para este resultado superior."
+        },
+        allocation: {
+          current: {
+            "Renda Fixa": 25.0,
+            "Ações BR": 40.0,
+            "Fundos": 15.0,
+            "Caixa": 5.0,
+            "Internacional": 10.0,
+            "FIIs": 5.0,
+            "Previdência": 0.0
+          },
+          recommended: {
+            "Renda Fixa": 20.0,
+            "Ações BR": 30.0,
+            "Fundos": 15.0,
+            "Caixa": 5.0,
+            "Internacional": 20.0,
+            "FIIs": 7.0,
+            "Previdência": 3.0
+          },
+          optimizationGain: 2.8,
+          summary: "Sua carteira está bem posicionada com forte exposição a renda variável, alinhada ao seu perfil. Recomendamos aumentar a diversificação internacional para reduzir risco-país e capturar oportunidades globais em tecnologia e healthcare."
+        },
+        wrapped: {
+          biggestContribution: {
+            amount: 120000,
+            date: "2023-08-22"
+          },
+          longestPositiveStreak: 9,
+          largestDrawdown: {
+            percentage: 8.2,
+            period: "Fev-Mar 2023"
+          },
+          mostProfitableAsset: {
+            name: "MGLU3",
+            return: 45.8
+          },
+          summary: "Em 2023 você demonstrou excelente disciplina nos aportes, com contribuições substanciais e regulares. Sua estratégia de compra em momentos de queda do mercado resultou em bons pontos de entrada."
+        },
         summary: "Seu portfólio tem excelente desempenho, mas há oportunidades para otimização. Considerando seu perfil moderado-agressivo, uma maior diversificação global e setorial pode melhorar o equilíbrio entre risco e retorno."
       };
     }
@@ -383,6 +705,10 @@ export const RaioXProvider = ({
     
     // Use the seed to create variation in the data
     const variationFactor = (seed % 20) / 10 + 0.5; // Range from 0.5 to 2.5
+    
+    // Generate mockup data for this client
+    const hasClientOpenFinance = hasOpenFinance && (seed % 3 !== 0); // 2/3 chance of having open finance if globally enabled
+    const openFinanceMonths = hasClientOpenFinance ? (seed % 12) : 0;
     
     return {
       clientName: `Cliente ${clientNumber}`,
@@ -409,7 +735,8 @@ export const RaioXProvider = ({
         cash: 10 - (riskProfileIndex * 1),
         realEstate: 5 + (riskProfileIndex * 1)
       },
-      openFinanceMonths: seed % 12,
+      openFinanceMonths,
+      hasOpenFinance: hasClientOpenFinance,
       lifeGoals: {
         goals: [
           {
@@ -472,6 +799,78 @@ export const RaioXProvider = ({
           impact: "Alto"
         }
       ],
+      sentiment: {
+        assets: [
+          {
+            ticker: riskProfileIndex < 2 ? "PETR4" : "MGLU3",
+            sentiment: 50 + (seed % 30),
+            impact: (seed % 5) * (Math.random() > 0.3 ? 1 : -1),
+            recentNews: riskProfileIndex < 2 
+              ? "Petrobras anuncia novos projetos de exploração sustentável"
+              : "Magazine Luiza expande operações de marketplace e logística"
+          },
+          {
+            ticker: riskProfileIndex < 2 ? "BBAS3" : "WEGE3",
+            sentiment: 40 + (seed % 40),
+            impact: (seed % 4) * (Math.random() > 0.4 ? 1 : -1),
+            recentNews: riskProfileIndex < 2 
+              ? "Banco do Brasil reporta aumento na carteira de crédito"
+              : "WEG apresenta forte crescimento em exportações no último trimestre"
+          }
+        ],
+        summary: riskProfileIndex < 2
+          ? "O sentimento para ativos de menor volatilidade está estável, mas atenção às mudanças na política monetária que podem impactar seus investimentos em renda fixa."
+          : "O mercado está otimista com alguns setores de crescimento que compõem sua carteira, mas mantenha diversificação para reduzir volatilidade."
+      },
+      socialComparison: {
+        peerGroup: `${25 + (seed % 10)}-${35 + (seed % 10)} anos | ${riskProfiles[riskProfileIndex]}`,
+        percentileRank: 50 + (seed % 40),
+        returnVsPeers: 0.5 + (seed % 30) / 10,
+        diversificationScore: 60 + (seed % 30),
+        summary: (50 + (seed % 40)) > 70
+          ? "Seu desempenho está entre os melhores da sua categoria de risco e faixa etária. Continue com a estratégia atual."
+          : "Sua performance está na média para seu perfil. Sugerimos revisar sua estratégia de diversificação para potencialmente melhorar resultados."
+      },
+      allocation: {
+        current: {
+          "Renda Fixa": 60 - (riskProfileIndex * 10),
+          "Ações BR": 20 + (riskProfileIndex * 5),
+          "Fundos": 10 + (riskProfileIndex * 2),
+          "Caixa": 10 - (riskProfileIndex * 1),
+          "Internacional": 0 + (riskProfileIndex * 2),
+          "FIIs": 0 + (riskProfileIndex * 1),
+          "Previdência": 0 + (riskProfileIndex * 1)
+        },
+        recommended: {
+          "Renda Fixa": 50 - (riskProfileIndex * 8),
+          "Ações BR": 25 + (riskProfileIndex * 3),
+          "Fundos": 10,
+          "Caixa": 5,
+          "Internacional": 5 + (riskProfileIndex * 2),
+          "FIIs": 3 + (riskProfileIndex * 1),
+          "Previdência": 2 + (riskProfileIndex * 1)
+        },
+        optimizationGain: 1.0 + (riskProfileIndex * 0.4),
+        summary: riskProfileIndex < 2
+          ? "Sua alocação atual está alinhada com seu perfil conservador, mas pequenos ajustes podem melhorar retornos sem aumentar significativamente o risco."
+          : "Considerando seu perfil mais dinâmico, recomendamos maior diversificação global e entre classes de ativos para otimizar o potencial de retorno."
+      },
+      wrapped: {
+        biggestContribution: {
+          amount: 10000 + (seed * 1000),
+          date: `2023-${(seed % 12) + 1}-${(seed % 28) + 1}`
+        },
+        longestPositiveStreak: 3 + (seed % 6),
+        largestDrawdown: {
+          percentage: 5 + (seed % 10),
+          period: seed % 2 === 0 ? "Jan-Fev 2023" : "Mai-Jun 2023" 
+        },
+        mostProfitableAsset: {
+          name: ["PETR4", "BBAS3", "ITUB4", "VALE3", "WEGE3"][seed % 5],
+          return: 10 + (seed % 20)
+        },
+        summary: "Seu portfólio demonstrou resistência à volatilidade do mercado em 2023. Seus aportes regulares contribuíram para um bom desempenho médio."
+      },
       summary: "Seu portfólio está alinhado com seu perfil de risco, mas há oportunidades para otimização e diversificação que podem melhorar seus resultados a longo prazo."
     };
   };
@@ -536,6 +935,7 @@ export const RaioXProvider = ({
                 realEstate: clientPortfolioData.real_estate_representation || 5
               },
               openFinanceMonths: hasOpenFinance ? (3 + (selectedClient % 9)) : 0,
+              hasOpenFinance: hasOpenFinance,
               lifeGoals: {
                 goals: [
                   {
@@ -596,6 +996,10 @@ export const RaioXProvider = ({
                   impact: "Alto"
                 }
               ],
+              sentiment: mockSentimentData,
+              socialComparison: mockSocialComparison,
+              allocation: mockAllocationData,
+              wrapped: mockWrappedData,
               summary: "Seu portfólio está bem estruturado, mas há oportunidades para otimização e diversificação."
             };
             
@@ -621,7 +1025,8 @@ export const RaioXProvider = ({
       selectedClient,
       refreshAIAnalysis,
       isAIAnalysisLoading,
-      financialSummary: data.financialSummary
+      financialSummary: data.financialSummary,
+      aiInsights
     }}>
       {children}
     </RaioXContext.Provider>

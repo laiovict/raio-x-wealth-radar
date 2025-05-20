@@ -1,6 +1,7 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, X } from "lucide-react";
+import { Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -22,7 +23,7 @@ import InvestmentPlanningModule from "./modules/InvestmentPlanningModule";
 import OnePageFinancialPlanModule from "./modules/OnePageFinancialPlanModule";
 import WholeBankingModule from "./modules/WholeBankingModule";
 import MeuFuturoFinanceiroModule from "./modules/MeuFuturoFinanceiroModule";
-import ChatInterface from "../ChatInterface";
+import ChatInterface from "./ChatInterface";
 import FamousInvestorsModule from "./modules/FamousInvestorsModule";
 import BehavioralFinanceModule from "./modules/BehavioralFinanceModule";
 
