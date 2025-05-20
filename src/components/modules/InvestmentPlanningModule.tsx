@@ -3,60 +3,79 @@ import React from "react";
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { AlertTriangle, RefreshCw, ArrowRight, ChevronRight } from "lucide-react";
+import { RefreshCw, ArrowRight, ChevronRight } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { formatCurrency } from "@/utils/raioXUtils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface InvestmentPlanningModuleProps {
   fullWidth?: boolean;
 }
 
+// Data source indicator component
+const DataSourceIndicator = ({ source }: { source?: 'supabase' | 'synthetic' }) => {
+  if (!source) return null;
+  
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className={`ml-1 ${source === 'supabase' ? 'text-green-400' : 'text-amber-400'}`}>
+            {source === 'supabase' ? <span className="inline-block h-3 w-3">✓</span> : '*'}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{source === 'supabase' ? 'Dados reais' : 'Dados estimados'}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
+
 const InvestmentPlanningModule = ({ fullWidth = false }: InvestmentPlanningModuleProps) => {
-  const { data, hasOpenFinance, isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
+  const { data, isAIAnalysisLoading, refreshAIAnalysis, portfolioSummary } = useRaioX();
 
-  // Function to handle OpenFinance activation button click
-  const handleActivateOpenFinance = () => {
-    const event = new CustomEvent('activate-openfinance');
-    document.dispatchEvent(event);
-  };
-
-  // Sample data for investment planning
-  const investmentPlan = {
-    targetAmount: 2500000,
-    currentAmount: data.portfolioSummary ? parseFloat(data.portfolioSummary.total_portfolio_value || "850000") : 850000,
-    monthlyContribution: 5000,
-    recommendedContribution: 7500,
-    yearsToGoal: 15,
-    expectedReturn: 8.5,
-    riskProfile: "Moderado",
-    assetAllocation: [
-      { class: "Renda Fixa", current: data.portfolioSummary ? data.portfolioSummary.fixed_income_representation || 60 : 60, recommended: 45, color: "from-blue-500 to-blue-600" },
-      { class: "Renda Variável (BR)", current: data.portfolioSummary ? parseFloat(data.portfolioSummary.stocks_representation || "25") : 25, recommended: 20, color: "from-green-500 to-green-600" },
-      { class: "Renda Variável (Int.)", current: data.portfolioSummary ? parseFloat(data.portfolioSummary.investment_international_representation || "10") : 10, recommended: 20, color: "from-purple-500 to-purple-600" },
-      { class: "Alternativos", current: data.portfolioSummary ? data.portfolioSummary.investment_fund_representation || 5 : 5, recommended: 15, color: "from-amber-500 to-amber-600" },
-    ],
-    recommendations: [
+  // Sample data for investment planning - will use Supabase data when available
+  const investmentPlan = React.useMemo(() => {
+    // Default values
+    let targetAmount = 2500000;
+    let currentAmount = portfolioSummary ? parseFloat(portfolioSummary.total_portfolio_value || "850000") : 850000;
+    let monthlyContribution = 5000;
+    let recommendedContribution = 7500;
+    let yearsToGoal = 15;
+    let expectedReturn = 8.5;
+    let riskProfile = "Moderado";
+    let assetAllocation = [
+      { class: "Renda Fixa", current: portfolioSummary ? portfolioSummary.fixed_income_representation || 60 : 60, recommended: 45, color: "from-blue-500 to-blue-600" },
+      { class: "Renda Variável (BR)", current: portfolioSummary ? parseFloat(portfolioSummary.stocks_representation || "25") : 25, recommended: 20, color: "from-green-500 to-green-600" },
+      { class: "Renda Variável (Int.)", current: portfolioSummary ? parseFloat(portfolioSummary.investment_international_representation || "10") : 10, recommended: 20, color: "from-purple-500 to-purple-600" },
+      { class: "Alternativos", current: portfolioSummary ? portfolioSummary.investment_fund_representation || 5 : 5, recommended: 15, color: "from-amber-500 to-amber-600" },
+    ];
+    let recommendations = [
       "Aumentar contribuição mensal para R$ 7.500",
       "Diversificar carteira com mais exposição internacional",
       "Reduzir concentração em renda fixa para melhorar retorno esperado",
       "Considerar investimentos alternativos para diversificação"
-    ],
-    dataSource: data.portfolioSummary ? 'supabase' : 'synthetic' as 'supabase' | 'synthetic'
-  };
-
-  // Format currency
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
-  // Calculate goal progress
-  const goalProgress = Math.round((investmentPlan.currentAmount / investmentPlan.targetAmount) * 100);
-
-  // Modified condition to show content even without OpenFinance
-  const showContent = isAIAnalysisLoading ? false : true;
+    ];
+    let dataSource = portfolioSummary ? 'supabase' : 'synthetic' as 'supabase' | 'synthetic';
+    
+    // Calculate goal progress
+    let goalProgress = Math.round((currentAmount / targetAmount) * 100);
+    
+    return {
+      targetAmount,
+      currentAmount,
+      monthlyContribution,
+      recommendedContribution,
+      yearsToGoal,
+      expectedReturn,
+      riskProfile,
+      assetAllocation,
+      recommendations,
+      dataSource,
+      goalProgress
+    };
+  }, [portfolioSummary]);
 
   if (isAIAnalysisLoading) {
     return (
@@ -76,45 +95,13 @@ const InvestmentPlanningModule = ({ fullWidth = false }: InvestmentPlanningModul
     );
   }
 
-  if (!showContent) {
-    return (
-      <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-            Planejamento de Investimentos
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <AlertTriangle className="w-16 h-16 text-amber-400 mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Planejamento Indisponível</h3>
-            <p className="text-gray-400 max-w-md mb-4">
-              Para acessar seu plano personalizado de investimentos, é necessário ativar o OpenFinance para permitir a análise completa de seus dados financeiros.
-            </p>
-            <Button 
-              variant="outline" 
-              className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800"
-              onClick={handleActivateOpenFinance}
-            >
-              Ativar OpenFinance
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
             Planejamento de Investimentos
-            {investmentPlan.dataSource === 'supabase' && (
-              <span className="ml-1 text-green-400">
-                <span className="inline-block h-3 w-3">✓</span>
-              </span>
-            )}
+            <DataSourceIndicator source={investmentPlan.dataSource} />
           </CardTitle>
           <Button variant="ghost" size="sm" onClick={refreshAIAnalysis} className="flex items-center gap-2">
             <RefreshCw className="h-4 w-4" />
@@ -130,9 +117,9 @@ const InvestmentPlanningModule = ({ fullWidth = false }: InvestmentPlanningModul
               <h3 className="text-lg font-medium text-white mb-2">Meta de Investimentos</h3>
               <div className="flex justify-between mb-2">
                 <span className="text-gray-400">Progresso:</span>
-                <span className="text-blue-400">{goalProgress}% completo</span>
+                <span className="text-blue-400">{investmentPlan.goalProgress}% completo</span>
               </div>
-              <Progress value={goalProgress} className="h-2 mb-4" />
+              <Progress value={investmentPlan.goalProgress} className="h-2 mb-4" />
               <div className="flex justify-between text-sm">
                 <span className="text-gray-400">Atual: {formatCurrency(investmentPlan.currentAmount)}</span>
                 <span className="text-gray-400">Meta: {formatCurrency(investmentPlan.targetAmount)}</span>
@@ -182,7 +169,7 @@ const InvestmentPlanningModule = ({ fullWidth = false }: InvestmentPlanningModul
               
               <div className="space-y-4">
                 <h4 className="text-sm font-medium text-gray-400">Alocação Atual</h4>
-                <div className="grid grid-cols-4 gap-1 mb-4">
+                <div className="flex gap-1 mb-4">
                   {investmentPlan.assetAllocation.map((asset, index) => (
                     <div 
                       key={`current-${index}`}
@@ -195,7 +182,7 @@ const InvestmentPlanningModule = ({ fullWidth = false }: InvestmentPlanningModul
                 </div>
                 
                 <h4 className="text-sm font-medium text-gray-400">Alocação Recomendada</h4>
-                <div className="grid grid-cols-4 gap-1 mb-2">
+                <div className="flex gap-1 mb-2">
                   {investmentPlan.assetAllocation.map((asset, index) => (
                     <div 
                       key={`recommended-${index}`}

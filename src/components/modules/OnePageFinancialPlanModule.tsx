@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, RefreshCw, Clock, ChevronDown, ChevronUp, ArrowRight, ChevronRight, Shield, TrendingUp } from "lucide-react";
 import { useState, useMemo } from "react";
+import { formatCurrency, formatDate } from "@/utils/raioXUtils";
 
 interface OnePageFinancialPlanModuleProps {
   fullWidth?: boolean;
@@ -69,7 +70,7 @@ const Users = (props: any) => (
 );
 
 const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanModuleProps) => {
-  const { hasOpenFinance, isAIAnalysisLoading, refreshAIAnalysis, portfolioSummary, profitability } = useRaioX();
+  const { isAIAnalysisLoading, refreshAIAnalysis, portfolioSummary, profitability, clientSummary } = useRaioX();
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     "cashFlow": true,
     "investments": false,
@@ -78,12 +79,6 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
     "taxes": false,
     "estate": false
   });
-
-  // Function to handle OpenFinance activation button click
-  const handleActivateOpenFinance = () => {
-    const event = new CustomEvent('activate-openfinance');
-    document.dispatchEvent(event);
-  };
 
   const toggleSection = (section: string) => {
     setExpandedSections(prev => ({
@@ -110,6 +105,7 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
     let alternativesPercentage = 0;
     let ytdReturn = 7.8;
     let benchmarkReturn = 8.5;
+    let dataSource = 'synthetic';
 
     // If we have real data from Supabase, use it
     if (portfolioSummary) {
@@ -139,12 +135,16 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
       // Here alternatives could include other asset types not explicitly categorized
       alternativesValue = 0; // Or calculate from other alternative assets if available
       alternativesPercentage = 0;
+      
+      // Set data source
+      dataSource = portfolioSummary.dataSource || 'synthetic';
     }
 
     // If we have profitability data, use it
     if (profitability) {
       ytdReturn = profitability.ytd || 7.8;
       // Benchmark is often not provided in the data, so we'll keep the default
+      dataSource = profitability.dataSource || dataSource;
     }
 
     return {
@@ -162,47 +162,17 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
       alternativesValue,
       alternativesPercentage,
       ytdReturn,
-      benchmarkReturn
+      benchmarkReturn,
+      dataSource
     };
   }, [portfolioSummary, profitability]);
 
-  // Format currency
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
-  if (!hasOpenFinance) {
-    return (
-      <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-            Plano Financeiro (One-Page)
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center justify-center py-8 text-center">
-            <AlertTriangle className="w-16 h-16 text-amber-400 mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Plano Financeiro Indisponível</h3>
-            <p className="text-gray-400 max-w-md mb-4">
-              Para acessar seu plano financeiro personalizado, é necessário ativar o OpenFinance para permitir a análise completa de seus dados financeiros.
-            </p>
-            <Button 
-              variant="outline" 
-              className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800"
-              onClick={handleActivateOpenFinance}
-            >
-              Ativar OpenFinance
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  // Data source indicator component
+  const DataSourceIndicator = ({ source }: { source: 'supabase' | 'synthetic' }) => (
+    <span className={`ml-1 ${source === 'supabase' ? 'text-green-400' : 'text-amber-400'}`}>
+      {source === 'supabase' ? '✓' : '*'}
+    </span>
+  );
 
   if (isAIAnalysisLoading) {
     return (
@@ -251,6 +221,7 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
         title: "Fluxo de Caixa",
         icon: <Clock className="h-5 w-5 text-green-500" />,
         summary: "Renda mensal líquida de R$ 12.500 com despesas fixas de R$ 8.750 (70% da renda).",
+        dataSource: investmentData.dataSource,
         details: [
           { label: "Receita total", value: "R$ 15.000/mês" },
           { label: "Impostos", value: "R$ 2.500 (16,7%)" },
@@ -269,6 +240,7 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
         title: "Investimentos",
         icon: <TrendingUp className="h-5 w-5 text-blue-500" />,
         summary: createInvestmentSummary(),
+        dataSource: investmentData.dataSource,
         details: [
           { label: "Valor total investido", value: formatCurrency(investmentData.totalValue) },
           { label: "Renda fixa", value: `${formatCurrency(investmentData.fixedIncomeValue)} (${Math.round(investmentData.fixedIncomePercentage)}%)` },
@@ -290,20 +262,21 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
         title: "Objetivos Financeiros",
         icon: <Target className="h-5 w-5 text-purple-500" />,
         summary: "3 objetivos principais definidos, com gap de 35% no financeiro para aposentadoria.",
+        dataSource: 'synthetic',
         details: [
           { 
             label: "Aposentadoria", 
-            value: "Meta: R$ 4,5M (2043) / Atual: R$ 250.000", 
+            value: `Meta: R$ 4,5M (2043) / Atual: ${formatCurrency(investmentData.totalValue * 0.6)}`, 
             progress: 35
           },
           { 
             label: "Educação filhos", 
-            value: "Meta: R$ 500.000 (2030) / Atual: R$ 125.000", 
+            value: `Meta: R$ 500.000 (2030) / Atual: ${formatCurrency(investmentData.totalValue * 0.1)}`, 
             progress: 60 
           },
           { 
             label: "Imóvel de veraneio", 
-            value: "Meta: R$ 800.000 (2027) / Atual: R$ 200.000", 
+            value: `Meta: R$ 800.000 (2027) / Atual: ${formatCurrency(investmentData.totalValue * 0.05)}`, 
             progress: 45
           }
         ],
@@ -317,10 +290,11 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
         title: "Proteção Patrimonial",
         icon: <Shield className="h-5 w-5 text-red-500" />,
         summary: "Cobertura básica de seguros, com gaps em seguro de vida e previdência.",
+        dataSource: 'synthetic',
         details: [
           { label: "Seguro de vida", value: "R$ 500.000 (recomendado: R$ 1,2M)" },
           { label: "Seguro saúde", value: "Plano empresarial completo" },
-          { label: "Seguro patrimonial", value: "Residência segurada (80% do valor)" },
+          { label: "Seguro patrimonial", value: `Residência segurada (80% do valor)` },
           { label: "Previdência privada", value: "Não possui" }
         ],
         actions: [
@@ -334,6 +308,7 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
         title: "Planejamento Tributário",
         icon: <FileClock className="h-5 w-5 text-amber-500" />,
         summary: "Potencial economia de R$ 9.500/ano com otimizações tributárias.",
+        dataSource: 'synthetic',
         details: [
           { label: "IR pessoa física", value: "Alíquota efetiva: 15,5%" },
           { label: "Declaração completa", value: "Sim (mais vantajosa)" },
@@ -351,6 +326,7 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
         title: "Planejamento Sucessório",
         icon: <Users className="h-5 w-5 text-indigo-500" />,
         summary: "Sem planejamento sucessório formal estabelecido.",
+        dataSource: 'synthetic',
         details: [
           { label: "Testamento", value: "Não possui" },
           { label: "Holding familiar", value: "Não possui" },
@@ -366,18 +342,6 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
     ]
   };
 
-  // Helper function to format date
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR', { 
-      day: '2-digit', 
-      month: '2-digit', 
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
       <CardHeader className="pb-2">
@@ -390,9 +354,21 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
             <span className="hidden md:inline">Atualizar</span>
           </Button>
         </div>
-        <p className="text-xs text-gray-400">
-          Última atualização: {formatDate(financialPlan.lastUpdated)}
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-gray-400">
+            Última atualização: {formatDate(financialPlan.lastUpdated, { 
+              day: '2-digit', 
+              month: '2-digit', 
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit'
+            })}
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-green-400">✓ Dados reais</span>
+            <span className="text-xs text-amber-400">* Dados estimados</span>
+          </div>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -410,7 +386,10 @@ const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanM
                   <span className="font-medium text-white">{section.title}</span>
                 </div>
                 <div className="flex items-center">
-                  <span className="text-sm text-gray-400 mr-3">{section.summary}</span>
+                  <span className="text-sm text-gray-400 mr-3">
+                    {section.summary}
+                    <DataSourceIndicator source={section.dataSource as 'supabase' | 'synthetic'} />
+                  </span>
                   {expandedSections[section.id] ? 
                     <ChevronUp className="h-5 w-5 text-gray-400" /> : 
                     <ChevronDown className="h-5 w-5 text-gray-400" />

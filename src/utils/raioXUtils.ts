@@ -1,109 +1,176 @@
 
-import { 
-  PortfolioSummary, 
-  FinancialSummary, 
-  DividendHistory 
-} from '@/types/raioXTypes';
+import { DividendHistory, FinancialSummary } from '@/types/raioXTypes';
 
 /**
- * Generates financial summary based on portfolio data
+ * Format currency values consistently
+ * @param value Number to format as currency
+ * @param minimumFractionDigits Minimum fraction digits
+ * @param maximumFractionDigits Maximum fraction digits
+ * @returns Formatted currency string
  */
-export const generateFinancialSummary = (
-  clientData: PortfolioSummary, 
-  dividendHistory?: DividendHistory[]
-): FinancialSummary => {
-  // Calculate dividends if we have dividend history
-  const divTotal = dividendHistory && dividendHistory.length ? calculateTotalDividends(dividendHistory) : 0;
-  const divMonthly = dividendHistory && dividendHistory.length ? calculateMonthlyAverageDividends(dividendHistory) : 0;
+export const formatCurrency = (value: number, minimumFractionDigits = 0, maximumFractionDigits = 0) => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    minimumFractionDigits,
+    maximumFractionDigits,
+  }).format(value);
+};
+
+/**
+ * Format percentage values consistently
+ * @param value Number to format as percentage
+ * @param digits Decimal digits to display
+ * @returns Formatted percentage string
+ */
+export const formatPercentage = (value: number, digits = 1) => {
+  return `${value.toFixed(digits)}%`;
+};
+
+/**
+ * Format date values consistently
+ * @param date Date to format
+ * @param options Intl.DateTimeFormatOptions
+ * @returns Formatted date string
+ */
+export const formatDate = (date: Date | string, options?: Intl.DateTimeFormatOptions) => {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  return dateObj.toLocaleDateString('pt-BR', options || {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
+};
+
+/**
+ * Parse string values to numbers (handling Brazilian currency format)
+ * @param value String value to parse
+ * @returns Number value
+ */
+export const parseValueToNumber = (value: string | number): number => {
+  if (typeof value === 'number') return value;
   
-  const summary: FinancialSummary = {
-    netWorth: parseFloat(clientData.total_portfolio_value || "0"),
-    totalAssets: parseFloat(clientData.total_portfolio_value || "0"),
-    totalLiabilities: 0, // Not provided in the data, could be fetched separately
-    liquidAssets: clientData.fixed_income_value || 0,
-    monthlyIncome: divMonthly > 0 ? divMonthly : parseFloat(clientData.total_portfolio_value || "0") * 0.005, // Use dividend data if available
-    monthlyExpenses: parseFloat(clientData.total_portfolio_value || "0") * 0.003, // Estimate monthly expenses as 0.3% of portfolio
-    savingsRate: 40, // Estimate savings rate
-    investmentBalance: parseFloat(clientData.total_portfolio_value || "0"),
-    cashReserves: clientData.fixed_income_value || 0,
-    debtTotal: 0, // Not provided in the data
-    riskProfile: "Moderado", // Default value, could be determined based on allocation
-    creditScore: 750, // Default value, not provided in the data
-    allocationSummary: {
-      stocks: parseFloat(clientData.stocks_representation || "0"),
-      bonds: clientData.fixed_income_representation || 0,
-      cash: 10, // Estimate
-      realEstate: clientData.real_estate_representation || 0,
-      alternatives: clientData.investment_fund_representation || 0
-    },
-    riskMetrics: [
-      { name: "Volatilidade", value: 45, color: "#4CAF50" },
-      { name: "Exposição a Renda Variável", value: 35, color: "#FFC107" },
-      { name: "Concentração", value: 25, color: "#2196F3" }
-    ],
-    topRisks: [
-      {
-        name: "Concentração em Poucos Ativos",
-        severity: "high",
-        impact: "68% do patrimônio em apenas 4 ativos"
-      },
-      {
-        name: "Baixa Reserva de Emergência",
-        severity: "medium",
-        impact: `Cobertura de ${(clientData.fixed_income_value / (parseFloat(clientData.total_portfolio_value || "0") * 0.003)).toFixed(1)} meses de despesas`
-      },
-      {
-        name: "Exposição Cambial",
-        severity: "medium",
-        impact: "30% do patrimônio sem proteção cambial"
-      }
-    ],
-    dataSource: 'supabase' // Mark this as real data from Supabase
-  };
-  
-  return summary;
+  // Handle Brazilian currency format and other formats
+  return Number(value.replace(/[^\d,-]/g, '').replace(',', '.')) || 0;
 };
 
 /**
  * Calculate total dividends from dividend history
+ * @param dividendHistory Array of dividend history entries
+ * @returns Total dividends
  */
-export const calculateTotalDividends = (dividendHistory: DividendHistory[]): number => {
-  try {
-    return dividendHistory.reduce((sum, dividend) => {
-      const value = parseFloat(dividend.value.replace(/[^\d.,]/g, '').replace(',', '.'));
-      return sum + (isNaN(value) ? 0 : value);
-    }, 0);
-  } catch (error) {
-    console.error("Error calculating total dividends:", error);
-    return 0;
-  }
+export const calculateTotalDividends = (dividendHistory: DividendHistory[] | undefined): number => {
+  if (!dividendHistory || dividendHistory.length === 0) return 0;
+  
+  return dividendHistory.reduce((total, item) => {
+    return total + parseValueToNumber(item.value || '0');
+  }, 0);
 };
 
 /**
- * Calculate monthly average dividends from dividend history
+ * Calculate monthly average dividends
+ * @param dividendHistory Array of dividend history entries
+ * @param monthsToConsider Number of months to consider
+ * @returns Monthly average dividends
  */
-export const calculateMonthlyAverageDividends = (dividendHistory: DividendHistory[]): number => {
-  try {
-    // Get total dividends
-    const total = calculateTotalDividends(dividendHistory);
+export const calculateMonthlyAverageDividends = (dividendHistory: DividendHistory[] | undefined, monthsToConsider = 12): number => {
+  if (!dividendHistory || dividendHistory.length === 0) return 0;
+  
+  // Group dividends by month
+  const dividendsByMonth: Record<string, number> = {};
+  
+  dividendHistory.forEach(item => {
+    if (!item.payment_date) return;
     
-    // Group dividends by month to find how many months we have data for
-    const months = new Set<string>();
-    dividendHistory.forEach(dividend => {
-      if (dividend.payment_date) {
-        const dateParts = dividend.payment_date.split('/');
-        if (dateParts.length >= 2) {
-          const monthYear = `${dateParts[1]}/${dateParts[2] || new Date().getFullYear()}`;
-          months.add(monthYear);
-        }
-      }
-    });
+    const paymentDate = item.payment_date.split(' ')[0]; // Format: "YYYY-MM-DD HH:MM:SS" or "YYYY-MM-DD"
+    const yearMonth = paymentDate.substring(0, 7); // "YYYY-MM"
     
-    // Calculate average (use at least 3 months even if we have less data)
-    const monthCount = Math.max(months.size, 3);
-    return total / monthCount;
-  } catch (error) {
-    console.error("Error calculating monthly average dividends:", error);
-    return 0;
+    if (!dividendsByMonth[yearMonth]) {
+      dividendsByMonth[yearMonth] = 0;
+    }
+    
+    dividendsByMonth[yearMonth] += parseValueToNumber(item.value || '0');
+  });
+  
+  const months = Object.keys(dividendsByMonth).sort().reverse();
+  const relevantMonths = months.slice(0, monthsToConsider);
+  const totalDividends = relevantMonths.reduce((total, month) => total + dividendsByMonth[month], 0);
+  
+  return relevantMonths.length === 0 ? 0 : totalDividends / Math.min(relevantMonths.length, monthsToConsider);
+};
+
+/**
+ * Generate a financial summary from portfolio data
+ * @param portfolioSummary Portfolio summary data
+ * @param dividendHistory Dividend history data
+ * @returns Financial summary object
+ */
+export const generateFinancialSummary = (
+  portfolioSummary: any,
+  dividendHistory: DividendHistory[] | undefined
+): FinancialSummary => {
+  // Parse total portfolio value
+  const totalAssets = parseValueToNumber(portfolioSummary?.total_portfolio_value || '0');
+  
+  // Calculate dividend metrics
+  const totalDividends = calculateTotalDividends(dividendHistory);
+  const monthlyDividendAvg = calculateMonthlyAverageDividends(dividendHistory);
+  
+  // Default monthly income (could be enhanced with more data)
+  const monthlyIncome = monthlyDividendAvg * 1.5; // Estimate income as slightly higher than dividends
+  
+  // Estimate monthly expenses (typically 60-80% of income for average investors)
+  const monthlyExpenses = monthlyIncome * 0.7;
+  
+  // Calculate savings rate
+  const savingsRate = totalAssets > 0 ? ((monthlyIncome - monthlyExpenses) / monthlyIncome) * 100 : 0;
+  
+  // Map asset allocation from portfolio summary
+  const stocksPercentage = parseValueToNumber(portfolioSummary?.stocks_representation || '0');
+  const bondsPercentage = portfolioSummary?.fixed_income_representation || 0;
+  const realEstatePercentage = portfolioSummary?.real_estate_representation || 0;
+  const alternativesPercentage = (
+    (portfolioSummary?.investment_fund_representation || 0) + 
+    parseValueToNumber(portfolioSummary?.investment_international_representation || '0')
+  );
+  const cashPercentage = parseValueToNumber(portfolioSummary?.total_balance_representation || '0');
+  
+  // Determine risk profile based on asset allocation
+  let riskProfile = 'Moderado';
+  if (stocksPercentage > 60) {
+    riskProfile = 'Agressivo';
+  } else if (stocksPercentage < 30) {
+    riskProfile = 'Conservador';
   }
+  
+  // Create risk metrics
+  const riskMetrics = [
+    { name: 'Concentração em Renda Variável', value: stocksPercentage, color: '#34d399' },
+    { name: 'Diversificação Internacional', value: parseValueToNumber(portfolioSummary?.investment_international_representation || '0'), color: '#60a5fa' },
+    { name: 'Exposição a Alternativos', value: portfolioSummary?.investment_fund_representation || 0, color: '#a78bfa' },
+  ];
+  
+  return {
+    totalAssets,
+    monthlyIncome,
+    monthlyExpenses,
+    savingsRate,
+    investmentBalance: totalAssets * 0.9, // Approximate investment balance
+    cashReserves: totalAssets * 0.1, // Approximate cash reserves
+    debtTotal: totalAssets * 0.2, // Approximate debt (placeholder)
+    netWorth: totalAssets * 0.8, // Net worth = assets - debts (approximation)
+    riskProfile,
+    allocationSummary: {
+      stocks: stocksPercentage,
+      bonds: bondsPercentage,
+      cash: cashPercentage,
+      realEstate: realEstatePercentage,
+      alternatives: alternativesPercentage
+    },
+    riskMetrics,
+    creditScore: 750, // Placeholder credit score
+    totalLiabilities: totalAssets * 0.2, // Same as debt total
+    liquidAssets: totalAssets * 0.3, // Approximate liquid assets
+    dataSource: portfolioSummary?.dataSource || 'synthetic',
+  };
 };
