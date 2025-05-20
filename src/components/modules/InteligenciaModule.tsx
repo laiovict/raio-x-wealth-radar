@@ -1,0 +1,414 @@
+
+import { useRaioX } from "@/context/RaioXContext";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  ArrowRight, 
+  AlertTriangle, 
+  CheckCircle, 
+  Clock, 
+  TrendingUp, 
+  Brain, 
+  Lightbulb,
+  BarChart,
+  Shield,
+  BadgePercent,
+  CheckCircle2,
+  Circle
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Tabs, 
+  TabsContent, 
+  TabsList, 
+  TabsTrigger 
+} from "@/components/ui/tabs";
+import { useLanguage } from "@/context/LanguageContext";
+import { useState } from "react";
+
+interface InteligenciaModuleProps {
+  fullWidth?: boolean;
+}
+
+const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
+  const { data, selectedClient } = useRaioX();
+  const { t } = useLanguage();
+  const [completedActions, setCompletedActions] = useState<string[]>([]);
+  
+  const toggleActionCompletion = (actionId: string) => {
+    if (completedActions.includes(actionId)) {
+      setCompletedActions(completedActions.filter((id) => id !== actionId));
+    } else {
+      setCompletedActions([...completedActions, actionId]);
+    }
+  };
+
+  // Function to handle recommendation execution
+  const handleExecute = (index: number) => {
+    console.log(`Executing recommendation at index: ${index}`);
+    // In a real implementation, this would execute the recommendation
+  };
+
+  const getUrgencyColor = (urgency: string) => {
+    switch (urgency.toLowerCase()) {
+      case "alto":
+        return "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200";
+      case "médio":
+        return "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200";
+      case "baixo":
+        return "bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200";
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
+    }
+  };
+
+  const getUrgencyIcon = (urgency: string) => {
+    switch (urgency.toLowerCase()) {
+      case "alto":
+        return <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />;
+      case "médio":
+        return <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />;
+      case "baixo":
+        return <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />;
+      default:
+        return null;
+    }
+  };
+
+  const getImpactColor = (impact: string) => {
+    switch (impact.toLowerCase()) {
+      case "alto":
+        return "bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200";
+      case "médio":
+        return "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200";
+      case "baixo":
+        return "bg-violet-100 text-violet-800 dark:bg-violet-900/50 dark:text-violet-200";
+      default:
+        return "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200";
+    }
+  };
+
+  // Get client-specific recommended actions
+  const getRecommendedActions = () => {
+    // Default actions for all clients
+    const defaultActions = [
+      {
+        id: "diversify-portfolio",
+        title: "Diversificar sua carteira",
+        description: "Seus investimentos estão concentrados em poucas classes de ativos. Considere diversificar para reduzir o risco.",
+        impact: "Alto",
+        effort: "Médio",
+        buttonText: "Ver sugestões",
+        buttonLink: "#diversification",
+        category: "investment",
+        icon: "TrendingUp"
+      },
+      {
+        id: "emergency-fund",
+        title: "Aumentar reserva de emergência",
+        description: "Sua reserva atual cobre apenas 3 meses de despesas. O ideal é ter pelo menos 6 meses.",
+        impact: "Alto",
+        effort: "Médio",
+        buttonText: "Planejar reserva",
+        buttonLink: "#emergency",
+        category: "planning",
+        icon: "Shield"
+      },
+      {
+        id: "tax-efficiency",
+        title: "Otimizar eficiência tributária",
+        description: "Existem oportunidades para reduzir sua carga tributária através de investimentos mais eficientes.",
+        impact: "Médio",
+        effort: "Baixo",
+        buttonText: "Ver estratégias",
+        buttonLink: "#tax",
+        category: "tax",
+        icon: "BadgePercent"
+      }
+    ];
+    
+    // Client-specific actions
+    if (selectedClient === 240275) {
+      return [
+        {
+          id: "rebalance-portfolio",
+          title: "Rebalancear alocação internacional",
+          description: "Laio, sua exposição a renda variável internacional está abaixo do ideal para seu perfil de investidor. Recomendamos aumentar para 20%.",
+          impact: "Alto",
+          effort: "Baixo",
+          buttonText: "Ver detalhes",
+          buttonLink: "#rebalance",
+          category: "investment",
+          icon: "BarChart"
+        },
+        {
+          id: "retirement-plan",
+          title: "Revisar plano de aposentadoria",
+          description: "Com base na sua meta de aposentadoria, o aporte menual atual não será suficiente. Considere aumentar as contribuições.",
+          impact: "Alto",
+          effort: "Médio",
+          buttonText: "Atualizar plano",
+          buttonLink: "#retirement",
+          category: "planning",
+          icon: "Shield"
+        },
+        ...defaultActions
+      ];
+    } else if (selectedClient === 12345678) {
+      return [
+        {
+          id: "risk-assessment",
+          title: "Reavaliar perfil de risco",
+          description: "Seus investimentos atuais têm risco maior que seu perfil declarado. Vamos revisar suas preferências?",
+          impact: "Alto",
+          effort: "Baixo",
+          buttonText: "Refazer perfil",
+          buttonLink: "#risk",
+          category: "planning",
+          icon: "AlertTriangle"
+        },
+        ...defaultActions
+      ];
+    }
+    
+    return defaultActions;
+  };
+
+  // Function to get appropriate icon component
+  const getIconComponent = (iconName?: string) => {
+    switch (iconName) {
+      case "TrendingUp":
+        return <TrendingUp className="h-5 w-5 text-blue-400" />;
+      case "Shield":
+        return <Shield className="h-5 w-5 text-green-400" />;
+      case "AlertTriangle":
+        return <AlertTriangle className="h-5 w-5 text-amber-400" />;
+      case "BadgePercent":
+        return <BadgePercent className="h-5 w-5 text-emerald-400" />;
+      case "BarChart":
+        return <BarChart className="h-5 w-5 text-indigo-400" />;
+      default:
+        return <Lightbulb className="h-5 w-5 text-blue-400" />;
+    }
+  };
+
+  const recommendedActions = getRecommendedActions();
+  const { recommendations } = data;
+  const insights = data.insights || [
+    {
+      id: "market-shift",
+      title: "Mudança de cenário macroeconômico",
+      description: "Com o Banco Central sinalizando cortes na taxa de juros, é momento de revisar sua alocação em renda fixa.",
+      category: "market",
+      date: "2025-05-15",
+      importance: "high"
+    },
+    {
+      id: "dividend-season",
+      title: "Temporada de dividendos se aproximando",
+      description: "Grandes empresas devem anunciar distribuição de dividendos no próximo mês, considere antecipar compras.",
+      category: "stocks",
+      date: "2025-05-10",
+      importance: "medium"
+    },
+    {
+      id: "inflation-rise",
+      title: "Inflação acima do esperado",
+      description: "Dados recentes mostram inflação acima da meta, o que pode impactar investimentos de renda fixa.",
+      category: "economy",
+      date: "2025-05-08",
+      importance: "high"
+    },
+    {
+      id: "sector-rotation",
+      title: "Rotação setorial em curso",
+      description: "Observamos movimento de saída do setor financeiro para tecnologia, avalie seu posicionamento.",
+      category: "market",
+      date: "2025-05-05",
+      importance: "medium"
+    }
+  ];
+
+  const getImportanceClass = (importance: string) => {
+    switch (importance) {
+      case "high":
+        return "border-l-4 border-red-500";
+      case "medium":
+        return "border-l-4 border-amber-500";
+      default:
+        return "border-l-4 border-blue-500";
+    }
+  };
+
+  return (
+    <Card className={`${fullWidth ? "w-full" : "w-full"} shadow-lg hover:shadow-xl transition-shadow`}>
+      <CardHeader className="bg-gradient-to-r from-indigo-900 to-purple-900 pb-4 rounded-t-lg border-b border-indigo-700">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Brain className="h-6 w-6 text-indigo-300" />
+            <CardTitle className="text-xl text-white">
+              Inteligência Financeira
+            </CardTitle>
+          </div>
+          <Badge className="bg-indigo-800/70 text-indigo-100 hover:bg-indigo-700">
+            Powered by AI
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-5 bg-gradient-to-b from-gray-900 to-gray-900/95 p-0">
+        <Tabs defaultValue="actions" className="w-full">
+          <TabsList className="w-full grid grid-cols-3 rounded-none border-b border-gray-800">
+            <TabsTrigger value="actions" className="data-[state=active]:bg-indigo-900/30 rounded-none border-b-2 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-300">
+              Ações Recomendadas
+            </TabsTrigger>
+            <TabsTrigger value="recommendations" className="data-[state=active]:bg-indigo-900/30 rounded-none border-b-2 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-300">
+              Prioridades
+            </TabsTrigger>
+            <TabsTrigger value="insights" className="data-[state=active]:bg-indigo-900/30 rounded-none border-b-2 data-[state=active]:border-indigo-500 data-[state=active]:text-indigo-300">
+              Insights de Mercado
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Tab 1: Ações Recomendadas */}
+          <TabsContent value="actions" className="p-4">
+            <ul className="space-y-4">
+              {recommendedActions.map((action) => (
+                <li 
+                  key={action.id} 
+                  className="bg-gray-800/40 rounded-lg p-4 border border-gray-700/50 hover:bg-gray-800/60 transition-colors"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="space-y-2 flex-1">
+                      <div className="flex items-center gap-2">
+                        {getIconComponent(action.icon)}
+                        <h3 className="font-semibold text-white">{action.title}</h3>
+                      </div>
+                      <p className="text-sm text-gray-400">{action.description}</p>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs text-blue-300">
+                          Impacto: {action.impact}
+                        </span>
+                        <span className="text-xs text-blue-300">
+                          Esforço: {action.effort}
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <button 
+                      onClick={() => toggleActionCompletion(action.id)}
+                      className="p-1 rounded-full hover:bg-gray-700/50 transition-colors ml-4"
+                      aria-label={completedActions.includes(action.id) ? "Marcar como não concluído" : "Marcar como concluído"}
+                    >
+                      {completedActions.includes(action.id) ? (
+                        <CheckCircle2 className="h-6 w-6 text-green-500" />
+                      ) : (
+                        <Circle className="h-6 w-6 text-gray-500" />
+                      )}
+                    </button>
+                  </div>
+                  
+                  <div className="mt-3 flex justify-end">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="bg-indigo-900/30 text-indigo-300 border-indigo-700/50 hover:bg-indigo-800/50"
+                      asChild
+                    >
+                      <a href={action.buttonLink}>
+                        {action.buttonText} <ArrowRight className="ml-2 h-4 w-4" />
+                      </a>
+                    </Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </TabsContent>
+
+          {/* Tab 2: Recomendações Prioritárias */}
+          <TabsContent value="recommendations" className="p-4">
+            <div className="space-y-4">
+              {recommendations?.map((recommendation, index) => (
+                <div 
+                  key={index} 
+                  className="bg-gray-800/40 rounded-lg border border-gray-700/50 overflow-hidden transition-all hover:bg-gray-800/60"
+                >
+                  <div className="p-4">
+                    <div className="flex justify-between items-start flex-wrap gap-2 mb-2">
+                      <div className="flex items-center">
+                        <span className="text-lg font-semibold text-white">
+                          {recommendation.action}
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        <Badge className={`flex items-center gap-1 px-2 py-1 ${getUrgencyColor(recommendation.urgency)}`}>
+                          {getUrgencyIcon(recommendation.urgency)}
+                          <span>Urgência: {recommendation.urgency}</span>
+                        </Badge>
+                        <Badge className={`px-2 py-1 ${getImpactColor(recommendation.impact)}`}>
+                          Impacto: {recommendation.impact}
+                        </Badge>
+                      </div>
+                    </div>
+                    <p className="text-gray-300 mb-4 leading-relaxed">
+                      {recommendation.description}
+                    </p>
+                    <div className="flex justify-end">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="bg-indigo-900/30 text-indigo-300 border-indigo-700/50 hover:bg-indigo-800/50"
+                        onClick={() => handleExecute(index)}
+                      >
+                        Executar <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Tab 3: Insights de Mercado */}
+          <TabsContent value="insights" className="p-4">
+            <div className="space-y-4">
+              {insights.map((insight) => (
+                <div 
+                  key={insight.id} 
+                  className={`bg-gray-800/40 rounded-lg p-4 ${getImportanceClass(insight.importance)} hover:bg-gray-800/60 transition-colors`}
+                >
+                  <div className="flex justify-between items-start">
+                    <h3 className="font-medium text-white mb-2">{insight.title}</h3>
+                    <Badge className="bg-gray-700 text-gray-300">
+                      {new Date(insight.date).toLocaleDateString('pt-BR', {day: '2-digit', month: 'short'})}
+                    </Badge>
+                  </div>
+                  <p className="text-sm text-gray-400 mb-3">{insight.description}</p>
+                  <div className="flex items-center justify-between">
+                    <Badge variant="outline" className="text-xs text-gray-400 border-gray-700">
+                      {insight.category}
+                    </Badge>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="text-indigo-400 hover:text-indigo-300 hover:bg-indigo-900/20"
+                    >
+                      Saiba mais <ArrowRight className="ml-1 h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        <div className="p-6 border-t border-gray-800">
+          <p className="text-sm text-gray-400">
+            As recomendações e insights são gerados com base na análise de seus dados financeiros, tendências de mercado e objetivos pessoais. Atualizamos estas informações regularmente para mantê-lo informado sobre as melhores decisões financeiras.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+export default InteligenciaModule;

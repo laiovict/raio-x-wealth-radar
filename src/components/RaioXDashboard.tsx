@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search } from "lucide-react";
@@ -12,21 +11,18 @@ import LifeGoalsModule from "./modules/LifeGoalsModule";
 import WrappedModule from "./modules/WrappedModule";
 import SocialComparisonModule from "./modules/SocialComparisonModule";
 import SentimentInsightsModule from "./modules/SentimentInsightsModule";
-import RecommendationsModule from "./modules/RecommendationsModule";
-import FinancialInsightsModule from "./modules/FinancialInsightsModule";
 import PersonalInsightsModule from "./modules/PersonalInsightsModule";
 import PdfPreview from "./PdfPreview";
 import FinancialOverviewModule from "./modules/FinancialOverviewModule";
-import AIInsightsHubModule from "./modules/AIInsightsHubModule";
-import RecommendedActionsModule from "./modules/RecommendedActionsModule";
+import MeuFuturoFinanceiroModule from "./modules/MeuFuturoFinanceiroModule";
 import InvestmentPlanningModule from "./modules/InvestmentPlanningModule";
 import OnePageFinancialPlanModule from "./modules/OnePageFinancialPlanModule";
 import WholeBankingModule from "./modules/WholeBankingModule";
-import MeuFuturoFinanceiroModule from "./modules/MeuFuturoFinanceiroModule";
 import ChatInterface from "./ChatInterface";
 import BehavioralFinanceModule from "./modules/BehavioralFinanceModule";
 import FamousInvestorsModule from "./modules/FamousInvestorsModule";
 import WelcomeBanner from "./WelcomeBanner";
+import InteligenciaModule from "./modules/InteligenciaModule";
 
 interface RaioXDashboardProps {
   showPdfPreview?: boolean;
@@ -160,7 +156,7 @@ const RaioXDashboard = ({
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <LifeGoalsModule />
-            <RecommendedActionsModule />
+            <InteligenciaModule />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -169,11 +165,9 @@ const RaioXDashboard = ({
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FinancialInsightsModule />
             <PersonalInsightsModule />
+            <InvestmentPlanningModule />
           </div>
-
-          <AIInsightsHubModule />
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <SocialComparisonModule />
@@ -181,8 +175,8 @@ const RaioXDashboard = ({
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <InvestmentPlanningModule />
             <WrappedModule />
+            <FamousInvestorsModule />
           </div>
 
           <OnePageFinancialPlanModule />
@@ -191,16 +185,11 @@ const RaioXDashboard = ({
             <MeuFuturoFinanceiroModule />
             <WholeBankingModule />
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <RecommendationsModule />
-            <FamousInvestorsModule />
-          </div>
         </TabsContent>
         
         {/* Tab 2: O que preciso mudar? - Recommendations and actions */}
         <TabsContent value="actions" className="space-y-6">
-          <RecommendedActionsModule fullWidth />
+          <InteligenciaModule fullWidth />
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <LifeGoalsModule />
@@ -211,20 +200,17 @@ const RaioXDashboard = ({
             <>
               <OnePageFinancialPlanModule fullWidth />
               <BehavioralFinanceModule />
-              <div className="grid grid-cols-1 gap-6">
-                <RecommendationsModule />
-              </div>
             </>
           )}
         </TabsContent>
         
         {/* Tab 3: O que está acontecendo? - Market insights */}
         <TabsContent value="market" className="space-y-6">
-          <AIInsightsHubModule fullWidth />
+          <InteligenciaModule fullWidth />
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <SentimentInsightsModule />
-            <FinancialInsightsModule />
+            <FamousInvestorsModule />
           </div>
           
           {hasOpenFinance && (
