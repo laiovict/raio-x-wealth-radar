@@ -5,7 +5,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { LogIn } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 import LanguageSelector from "@/components/LanguageSelector";
 
@@ -36,21 +35,25 @@ const Auth = () => {
     setLoading(true);
     
     try {
-      // For testing purposes, allow simple password login
-      if (password === "America123@") {
-        // Store a special flag in localStorage to indicate advisor mode
-        localStorage.setItem("userRole", "advisor");
-        toast({
-          title: t('loginSuccess'),
-          description: t('welcomeBack'),
-          variant: "default",
-        });
-        navigate("/");
-        return;
+      // For advisor login
+      if (showAdvisorLogin) {
+        if (password === "America123@") {
+          // Store a special flag in localStorage to indicate advisor mode
+          localStorage.setItem("userRole", "advisor");
+          toast({
+            title: t('loginSuccess'),
+            description: t('welcomeBack'),
+            variant: "default",
+          });
+          navigate("/");
+          return;
+        } else {
+          setError(t('invalidPassword'));
+          return;
+        }
       }
       
-      // For client login, check if password matches expected value
-      // This is simplified for demo purposes
+      // For client login
       if (password === "123456") {
         // Store client info in localStorage
         localStorage.setItem("userRole", "client");
@@ -83,6 +86,13 @@ const Auth = () => {
       "Setembro", "Outubro", "Novembro", "Dezembro"
     ];
     return months[new Date().getMonth()];
+  };
+
+  // Toggle between client and advisor login
+  const toggleAdvisorLogin = () => {
+    setShowAdvisorLogin(!showAdvisorLogin);
+    setPassword("");
+    setError(null);
   };
 
   return (
@@ -119,7 +129,7 @@ const Auth = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="bg-neutral-800/80 border-none rounded-full h-16 px-6 text-white placeholder-gray-500 w-full"
-              placeholder="Digite a senha"
+              placeholder={showAdvisorLogin ? "Digite a senha de advisor" : "Digite a senha"}
               required
             />
           </div>
@@ -131,6 +141,16 @@ const Auth = () => {
           >
             {loading ? "Processando..." : "Entrar"}
           </Button>
+          
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={toggleAdvisorLogin}
+              className="text-gray-400 hover:text-white text-sm underline transition-colors"
+            >
+              {showAdvisorLogin ? "Voltar para login de cliente" : "Sou um advisor"}
+            </button>
+          </div>
         </form>
         
         <div className="absolute bottom-4 left-4">
@@ -141,7 +161,7 @@ const Auth = () => {
       {/* Right side with background image */}
       <div 
         className="w-1/2 bg-cover bg-center" 
-        style={{ backgroundImage: "url('/lovable-uploads/2871ba5c-71e3-4373-978e-8cbbccf53f26.png')" }}
+        style={{ backgroundImage: "url('/lovable-uploads/28d0fefb-0481-49df-80f9-5b708d52358f.png')" }}
       />
     </div>
   );
