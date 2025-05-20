@@ -14,12 +14,17 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
   const hasOpenFinance = data.hasOpenFinance || false;
   
   return (
-    <Card className={`${fullWidth ? "w-full" : "w-full"} overflow-hidden border-none shadow-lg`}>
-      <div className="bg-gradient-to-r from-blue-700 to-indigo-700 p-6">
+    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full overflow-hidden border-none shadow-lg`}>
+      <CardHeader className="bg-gradient-to-r from-blue-700 to-indigo-700 pb-3">
         <div className="flex justify-between items-center">
-          <CardTitle className="text-2xl font-bold text-white">
-            O Que Sabemos Sobre Você
-          </CardTitle>
+          <div className="flex items-center gap-2">
+            <div className="rounded-lg bg-blue-600/50 p-2">
+              <Users className="h-5 w-5 text-blue-100" />
+            </div>
+            <CardTitle className="text-xl text-white">
+              O Que Sabemos Sobre Você
+            </CardTitle>
+          </div>
           {hasOpenFinance && (
             <div className="flex items-center bg-green-400/20 text-green-100 text-xs px-3 py-1.5 rounded-full border border-green-400/30">
               <ShieldCheck className="h-3.5 w-3.5 mr-1.5" />
@@ -27,17 +32,17 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
             </div>
           )}
         </div>
-        <p className="text-blue-100 mt-2 text-sm">
+        <p className="text-blue-200 mt-1 text-sm">
           Análise financeira personalizada baseada em seu perfil profissional e objetivos
         </p>
-      </div>
+      </CardHeader>
       
-      <CardContent className="p-0">
+      <CardContent className="bg-gradient-to-b from-gray-950 to-gray-900/95 p-0">
         <div className="space-y-0">
           {/* Client Profile */}
-          <div className="group hover:bg-blue-50/5 transition-colors">
+          <div className="group hover:bg-blue-900/10 transition-colors">
             <div className="p-6 flex items-start gap-5">
-              <div className="rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 p-3.5 shadow-md">
+              <div className="rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 p-3.5 shadow-md">
                 <Briefcase className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1">
@@ -59,9 +64,9 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
           </div>
           
           {/* Financial Profile */}
-          <div className="group hover:bg-green-50/5 transition-colors border-t border-white/5">
+          <div className="group hover:bg-green-900/10 transition-colors border-t border-white/5">
             <div className="p-6 flex items-start gap-5">
-              <div className="rounded-xl bg-gradient-to-br from-green-500 to-teal-600 p-3.5 shadow-md">
+              <div className="rounded-xl bg-gradient-to-br from-green-600 to-teal-700 p-3.5 shadow-md">
                 <Wallet className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1">
@@ -83,9 +88,9 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
           </div>
           
           {/* Assets and Investments */}
-          <div className="group hover:bg-blue-50/5 transition-colors border-t border-white/5">
+          <div className="group hover:bg-indigo-900/10 transition-colors border-t border-white/5">
             <div className="p-6 flex items-start gap-5">
-              <div className="rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 p-3.5 shadow-md">
+              <div className="rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-700 p-3.5 shadow-md">
                 <PiggyBank className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1">
@@ -107,7 +112,7 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
           </div>
           
           {/* Life Goals */}
-          <div className="group hover:bg-amber-50/5 transition-colors border-t border-white/5">
+          <div className="group hover:bg-amber-900/10 transition-colors border-t border-white/5">
             <div className="p-6 flex items-start gap-5">
               <div className="rounded-xl bg-gradient-to-br from-amber-500 to-amber-600 p-3.5 shadow-md">
                 <Target className="h-6 w-6 text-white" />
@@ -131,7 +136,7 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
           </div>
           
           {/* Age and Timeline */}
-          <div className="group hover:bg-indigo-50/5 transition-colors border-t border-white/5">
+          <div className="group hover:bg-indigo-900/10 transition-colors border-t border-white/5">
             <div className="p-6 flex items-start gap-5">
               <div className="rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 p-3.5 shadow-md">
                 <Calendar className="h-6 w-6 text-white" />
@@ -156,9 +161,9 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
           
           {/* Risk Profile */}
           {hasOpenFinance && (
-            <div className="group hover:bg-red-50/5 transition-colors border-t border-white/5">
+            <div className="group hover:bg-red-900/10 transition-colors border-t border-white/5">
               <div className="p-6 flex items-start gap-5">
-                <div className="rounded-xl bg-gradient-to-br from-red-500 to-red-600 p-3.5 shadow-md">
+                <div className="rounded-xl bg-gradient-to-br from-red-600 to-red-700 p-3.5 shadow-md">
                   <AlertTriangle className="h-6 w-6 text-white" />
                 </div>
                 <div className="flex-1">
@@ -174,7 +179,7 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
                         <span className="text-gray-400 font-medium">Conservador</span>
                         <span className="text-gray-400 font-medium">Agressivo</span>
                       </div>
-                      <div className="h-2.5 w-full bg-gray-700/50 rounded-full overflow-hidden">
+                      <div className="h-2.5 w-full bg-gray-800/50 rounded-full overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500" style={{width: "65%"}}></div>
                       </div>
                       <div className="flex justify-between mt-1.5">
@@ -184,7 +189,7 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
                     </div>
                     
                     <div>
-                      <div className="h-2.5 w-full bg-gray-700/50 rounded-full overflow-hidden">
+                      <div className="h-2.5 w-full bg-gray-800/50 rounded-full overflow-hidden">
                         <div className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500" style={{width: "42%"}}></div>
                       </div>
                       <div className="flex justify-between mt-1.5">
@@ -199,7 +204,7 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
           )}
 
           {/* Expectations */}
-          <div className="group hover:bg-teal-50/5 transition-colors border-t border-white/5">
+          <div className="group hover:bg-teal-900/10 transition-colors border-t border-white/5">
             <div className="p-6 flex items-start gap-5">
               <div className="rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 p-3.5 shadow-md">
                 <TrendingUp className="h-6 w-6 text-white" />
@@ -224,7 +229,7 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
           
           {hasOpenFinance && (
             <div className="border-t border-white/5 p-6">
-              <div className="bg-gradient-to-r from-blue-600/20 to-indigo-600/20 p-5 rounded-lg backdrop-blur-sm">
+              <div className="bg-gradient-to-r from-blue-800/20 to-indigo-800/20 p-5 rounded-lg backdrop-blur-sm border border-blue-700/20">
                 <h3 className="font-semibold text-lg text-blue-300 mb-2 flex items-center">
                   <ShieldCheck className="h-5 w-5 mr-2" />
                   Dados exclusivos via OpenFinance

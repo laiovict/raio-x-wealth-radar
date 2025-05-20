@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useMobileBreakpoint } from "@/hooks/use-mobile";
+import { TrendingUp } from "lucide-react";
 
 interface FutureProjectionModuleProps {
   fullWidth?: boolean;
@@ -57,19 +58,28 @@ const FutureProjectionModule = ({ fullWidth = false }: FutureProjectionModulePro
   };
 
   return (
-    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full shadow-md hover:shadow-lg transition-shadow`}>
-      <CardHeader className="bg-gradient-to-r from-blue-700 to-indigo-700 dark:from-blue-900 dark:to-indigo-900 pb-2 border-b border-gray-200 dark:border-gray-800">
-        <CardTitle className="text-xl text-white flex items-center justify-between flex-wrap">
-          <span>Projeção Futuro Próximo</span>
-          <div className="flex space-x-2">
-            <Badge variant="outline" className="bg-blue-600/20 text-blue-100 border-blue-400/30">
-              Aporte: {formatCurrency(projection.monthlyContribution)}/mês
-            </Badge>
+    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full overflow-hidden border-none shadow-lg`}>
+      <CardHeader className="bg-gradient-to-r from-indigo-700 to-blue-700 pb-3">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className="rounded-lg bg-indigo-600/50 p-2">
+              <TrendingUp className="h-5 w-5 text-indigo-100" />
+            </div>
+            <CardTitle className="text-xl text-white">
+              Projeção Futuro Próximo
+            </CardTitle>
           </div>
-        </CardTitle>
+          <Badge variant="outline" className="bg-indigo-600/30 text-indigo-100 border-indigo-500/40">
+            Aporte: {formatCurrency(projection.monthlyContribution)}/mês
+          </Badge>
+        </div>
+        <p className="text-indigo-200 mt-1 text-sm">
+          Estimativa de crescimento patrimonial baseado em diferentes cenários
+        </p>
       </CardHeader>
-      <CardContent className="bg-white dark:bg-gray-900 pt-4">
-        <div className={`${fullWidth && !isMobile ? "h-72" : isMobile ? "h-40" : "h-56"} mb-4`}>
+
+      <CardContent className="bg-gradient-to-b from-gray-950 to-gray-900/95 pt-4">
+        <div className={`${fullWidth && !isMobile ? "h-72" : isMobile ? "h-48" : "h-60"} mb-4`}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 5, right: 20, left: 5, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.2)" />
@@ -92,10 +102,10 @@ const FutureProjectionModule = ({ fullWidth = false }: FutureProjectionModulePro
                 formatter={(value) => formatCurrency(Number(value))}
                 contentStyle={{ 
                   fontSize: isMobile ? 10 : 12,
-                  backgroundColor: "rgba(255, 255, 255, 0.95)",
-                  borderRadius: "6px",
-                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-                  border: "1px solid rgba(226, 232, 240, 1)"
+                  backgroundColor: "rgba(15, 23, 42, 0.95)",
+                  borderRadius: "8px",
+                  boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+                  border: "1px solid rgba(66, 85, 122, 0.3)"
                 }}
               />
               <Legend 
@@ -105,7 +115,7 @@ const FutureProjectionModule = ({ fullWidth = false }: FutureProjectionModulePro
               <Line 
                 type="monotone" 
                 dataKey="base" 
-                stroke="#4f46e5" 
+                stroke="#6366f1" 
                 strokeWidth={2} 
                 name="Cenário Base" 
                 activeDot={{ r: isMobile ? 6 : 8 }} 
@@ -123,16 +133,16 @@ const FutureProjectionModule = ({ fullWidth = false }: FutureProjectionModulePro
           </ResponsiveContainer>
         </div>
         
-        <div className="grid grid-cols-2 gap-4 mt-2 mb-3">
-          <div className="bg-gradient-to-r from-green-50 to-emerald-50/70 dark:from-green-900/20 dark:to-emerald-900/10 p-3 rounded-lg border border-green-100 dark:border-green-800/30 shadow-sm">
-            <p className="text-sm font-medium text-green-800 dark:text-green-300 mb-1">Cenário Base (5 anos)</p>
-            <p className={`${isMobile ? "text-base" : "text-lg"} font-bold text-green-700 dark:text-green-200`}>
+        <div className="grid grid-cols-2 gap-4 mt-3">
+          <div className="bg-indigo-900/20 backdrop-blur-md p-4 rounded-lg border border-indigo-800/30">
+            <p className="text-sm font-medium text-indigo-300 mb-1">Cenário Base (5 anos)</p>
+            <p className="text-lg font-bold text-white">
               {formatCurrency(projection.scenarios.base["5 anos"])}
             </p>
           </div>
-          <div className="bg-gradient-to-r from-amber-50 to-yellow-50/70 dark:from-amber-900/20 dark:to-yellow-900/10 p-3 rounded-lg border border-amber-100 dark:border-amber-800/30 shadow-sm">
-            <p className="text-sm font-medium text-amber-800 dark:text-amber-300 mb-1">Cenário Stress (5 anos)</p>
-            <p className={`${isMobile ? "text-base" : "text-lg"} font-bold text-amber-700 dark:text-amber-200`}>
+          <div className="bg-amber-900/20 backdrop-blur-md p-4 rounded-lg border border-amber-800/30">
+            <p className="text-sm font-medium text-amber-300 mb-1">Cenário Stress (5 anos)</p>
+            <p className="text-lg font-bold text-white">
               {formatCurrency(projection.scenarios.stress["5 anos"])}
             </p>
           </div>

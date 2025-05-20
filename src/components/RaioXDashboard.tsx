@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Mic, Search } from "lucide-react";
@@ -142,7 +141,7 @@ const RaioXDashboard = ({
   }
 
   return (
-    <div className="space-y-6 pb-16 min-h-screen" ref={dashboardRef}>
+    <div className="space-y-8 pb-16 min-h-screen" ref={dashboardRef}>
       <div className="flex flex-col items-center justify-center mb-8">
         <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-300 to-indigo-400 bg-clip-text text-transparent mb-2">
           {t('welcomeMessage')} {getClientFirstName()}!
@@ -212,7 +211,7 @@ const RaioXDashboard = ({
       <WelcomeBanner selectedClient={selectedClient} />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-6 rounded-lg overflow-x-auto grid grid-cols-6 scrollbar-none bg-white/5 backdrop-blur-md border border-white/10">
+        <TabsList className="mb-8 rounded-lg overflow-x-auto grid grid-cols-6 scrollbar-none bg-white/5 backdrop-blur-md border border-white/10">
           <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Visão Geral</TabsTrigger>
           <TabsTrigger value="status" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('statusTab')}</TabsTrigger>
           <TabsTrigger value="actions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('planTab')}</TabsTrigger>
@@ -222,7 +221,7 @@ const RaioXDashboard = ({
         </TabsList>
 
         {/* Tab 1: Visão Geral - Optimized ordering for better UX */}
-        <TabsContent value="overview" className="space-y-6">
+        <TabsContent value="overview" className="space-y-8">
           {/* Starting with Financial Overview */}
           <div>
             <FinancialOverviewModule />
@@ -242,7 +241,7 @@ const RaioXDashboard = ({
           </div>
           
           {/* Moving these modules to the middle as requested */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <MeuFuturoFinanceiroModule />
               <FeedbackSection sectionId="meu-futuro" />
@@ -258,7 +257,7 @@ const RaioXDashboard = ({
             <FeedbackSection sectionId="famous-investors" />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <AllocationModule />
               <FeedbackSection sectionId="allocation" />
@@ -269,7 +268,7 @@ const RaioXDashboard = ({
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <InteligenciaModule />
               <FeedbackSection sectionId="inteligencia" />
@@ -280,7 +279,7 @@ const RaioXDashboard = ({
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <FutureProjectionModule />
               <FeedbackSection sectionId="future-projection" />
@@ -291,7 +290,7 @@ const RaioXDashboard = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <InvestmentPlanningModule />
               <FeedbackSection sectionId="investment-planning" />
@@ -302,7 +301,7 @@ const RaioXDashboard = ({
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <BehavioralFinanceModule />
               <FeedbackSection sectionId="behavioral-finance" />
@@ -320,13 +319,13 @@ const RaioXDashboard = ({
         </TabsContent>
         
         {/* Tab 2: Como Estou? - Status overview */}
-        <TabsContent value="status" className="space-y-6">
+        <TabsContent value="status" className="space-y-8">
           <div>
             <FinancialOverviewModule fullWidth />
             <FeedbackSection sectionId="status-financial-overview" />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <AllocationModule />
               <FeedbackSection sectionId="status-allocation" />
@@ -342,7 +341,7 @@ const RaioXDashboard = ({
             <FeedbackSection sectionId="status-sentiment" />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <PersonalInsightsModule />
               <FeedbackSection sectionId="status-personal-insights" />
@@ -360,13 +359,13 @@ const RaioXDashboard = ({
         </TabsContent>
         
         {/* Tab 3: O que preciso mudar? - Recommendations and actions */}
-        <TabsContent value="actions" className="space-y-6">
+        <TabsContent value="actions" className="space-y-8">
           <div>
             <InteligenciaModule fullWidth />
             <FeedbackSection sectionId="actions-inteligencia" />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <LifeGoalsModule />
               <FeedbackSection sectionId="actions-life-goals" />
@@ -394,13 +393,13 @@ const RaioXDashboard = ({
         </TabsContent>
         
         {/* Tab 4: O que está acontecendo? - Market insights */}
-        <TabsContent value="market" className="space-y-6">
+        <TabsContent value="market" className="space-y-8">
           <div>
             <InteligenciaModule fullWidth />
             <FeedbackSection sectionId="market-inteligencia" />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <SentimentInsightsModule />
               <FeedbackSection sectionId="market-sentiment" />
@@ -423,13 +422,13 @@ const RaioXDashboard = ({
         </TabsContent>
         
         {/* Tab 5: E meu futuro? - Future projections and planning */}
-        <TabsContent value="future" className="space-y-6">
+        <TabsContent value="future" className="space-y-8">
           <div>
             <MeuFuturoFinanceiroModule fullWidth />
             <FeedbackSection sectionId="future-meu-futuro" />
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <FutureProjectionModule />
               <FeedbackSection sectionId="future-projection-module" />
