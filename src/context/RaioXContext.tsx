@@ -1,8 +1,16 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { clientData } from '@/data/clientData';
 import { supabase } from "@/integrations/supabase/client";
-import { getClientPortfolioSummary, getClientFixedIncome, getClientInvestmentFunds, getClientRealEstate, getClientStocks, getClientProfitability } from '@/services/portfolioService';
+import { 
+  getClientPortfolioSummary, 
+  getClientFixedIncome, 
+  getClientInvestmentFunds, 
+  getClientRealEstate, 
+  getClientStocks, 
+  getClientProfitability,
+  getClientDividendHistory,
+  getClientSummary
+} from '@/services/portfolioService';
 
 // Define interfaces for our data structures
 export interface RiskItem {
@@ -196,6 +204,33 @@ export interface PortfolioSummary {
   dataSource?: 'supabase' | 'synthetic';
 }
 
+// Add interfaces for dividends and client summary
+export interface DividendHistory {
+  id: number;
+  investor_account_on_brokerage_house: number;
+  asset: string;
+  type: string;
+  payment_date: string;
+  value: string;
+  quantity: string;
+  created_at: string;
+  advisor_code?: number;
+  imported_at?: string;
+  dataSource?: 'supabase' | 'synthetic';
+}
+
+export interface ClientSummary {
+  summary_id: number;
+  investor_account_on_brokerage_house: number;
+  investor_name: string;
+  investor_copilotu_id?: string;
+  summary: string;
+  tags?: string;
+  created_at?: string;
+  updated_at?: string;
+  dataSource?: 'supabase' | 'synthetic';
+}
+
 export interface RaioXData {
   clientName: string;
   clientAge: number;
@@ -260,6 +295,8 @@ export interface RaioXData {
   realEstate?: any[];
   stocks?: any[];
   profitability?: any;
+  dividendHistory?: DividendHistory[];
+  clientSummary?: ClientSummary;
 }
 
 interface RaioXContextProps {
@@ -272,6 +309,8 @@ interface RaioXContextProps {
   aiInsights: AIInsight[];
   portfolioSummary?: PortfolioSummary;
   profitability?: any;
+  dividendHistory?: DividendHistory[];
+  clientSummary?: ClientSummary;
 }
 
 interface RaioXProviderProps {
@@ -597,7 +636,9 @@ const RaioXContext = createContext<RaioXContextProps>({
   selectedClient: null,
   aiInsights: sampleAIInsights,
   portfolioSummary: undefined,
-  profitability: undefined
+  profitability: undefined,
+  dividendHistory: undefined,
+  clientSummary: undefined
 });
 
 export const RaioXProvider = ({ 
@@ -630,18 +671,32 @@ export const RaioXProvider = ({
         const realEstate = await getClientRealEstate(selectedClient);
         const stocks = await getClientStocks(selectedClient);
         const profitability = await getClientProfitability(selectedClient);
+        const dividendHistory = await getClientDividendHistory(selectedClient);
+        const clientSummary = await getClientSummary(selectedClient);
         
         // Update portfolio data with real values from Supabase
-        if (summary || fixedIncome.length || investmentFunds.length || realEstate.length || stocks.length || profitability) {
-          setPortfolioData(prevData => ({
-            ...prevData,
-            portfolioSummary: summary,
-            fixedIncome: fixedIncome || [],
-            investmentFunds: investmentFunds || [],
-            realEstate: realEstate || [],
-            stocks: stocks || [],
-            profitability
-          }));
+        if (summary || fixedIncome.length || investmentFunds.length || realEstate.length || stocks.length || profitability || dividendHistory.length || clientSummary) {
+          setPortfolioData(prevData => {
+            // Update portfolio data
+            const newData = {
+              ...prevData,
+              portfolioSummary: summary,
+              fixedIncome: fixedIncome || [],
+              investmentFunds: investmentFunds || [],
+              realEstate: realEstate || [],
+              stocks: stocks || [],
+              profitability,
+              dividendHistory: dividendHistory || [],
+              clientSummary
+            };
+            
+            // If we have client summary data, update the client name
+            if (clientSummary && clientSummary.investor_name) {
+              newData.clientName = clientSummary.investor_name;
+            }
+            
+            return newData;
+          });
         }
         
         // Generate financial summary based on real data if available
@@ -720,7 +775,9 @@ export const RaioXProvider = ({
         refreshAIAnalysis,
         aiInsights: sampleAIInsights,
         portfolioSummary: portfolioData.portfolioSummary,
-        profitability: portfolioData.profitability
+        profitability: portfolioData.profitability,
+        dividendHistory: portfolioData.dividendHistory,
+        clientSummary: portfolioData.clientSummary
       }}
     >
       {children}

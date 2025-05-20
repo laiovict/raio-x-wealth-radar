@@ -2,16 +2,75 @@
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, Wine, Wallet, Plane, Home, Briefcase, Heart, ShieldCheck, Target, TrendingUp, AlertTriangle, Calendar, MapPin, Car, Award, PiggyBank } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface PersonalInsightsModuleProps {
   fullWidth?: boolean;
 }
 
+interface ClientProfile {
+  professionalProfile: string;
+  financialProfile: string;
+  assetsInvestments: string;
+  financialGoals: string;
+  investmentHorizon: string;
+  riskProfile?: string;
+  essentialServices?: string;
+  dataSource: 'supabase' | 'synthetic';
+}
+
 const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModuleProps) => {
   const { data } = useRaioX();
+  const [clientProfile, setClientProfile] = useState<ClientProfile>({
+    professionalProfile: "Médico oftalmologista com sociedade em três clínicas (Núcleo Oftalmológico em Valadares, Instituto de Olhos em Teófilo Otoni e Instituto de Olhos em Caratinga), com rotina de trabalho intenso de segunda a sábado. Formado em 2013 com participação recente nas sociedades (2 anos).",
+    financialProfile: "Investidor desde 2017, com carteira diversificada entre XP, Clear e Avenue (USD 43 mil). Gastos mensais de R$ 25 mil representam pequena fração da renda combinada com a esposa (R$ 30-35 mil adicionais), permitindo alta capacidade de poupança (R$ 50-100 mil/mês).",
+    assetsInvestments: "Patrimônio diversificado: participações nas clínicas oftalmológicas, investimentos na XP, ações na Clear, USD 43 mil na Avenue, R$ 8,5 mil na Inco, terreno em sociedade (R$ 200 mil) e veículo (R$ 220 mil) com financiamento sem juros (R$ 1.800/mês).",
+    financialGoals: "Meta de reduzir carga horária aos 45 anos com patrimônio de R$ 5-6 milhões. Plano de aposentadoria completa aos 50 anos com renda mensal projetada de R$ 35-40 mil.",
+    investmentHorizon: "Atual idade: 37 anos. Horizonte de investimento de médio prazo (8 anos) para primeira meta de redução de trabalho e longo prazo (13 anos) para aposentadoria completa, permitindo estratégia de investimentos escalonada.",
+    riskProfile: "Experiência com volatilidade durante a pandemia moldou percepção de risco. Alta capacidade de assumir riscos devido à elevada geração de caixa mensal, mas tolerância emocional à volatilidade moderada.",
+    essentialServices: "Necessita de visão clara e organizada da situação financeira mensal, com acompanhamento detalhado de investimentos e patrimônio para acompanhar o progresso em direção às metas de médio e longo prazo.",
+    dataSource: 'synthetic'
+  });
   
   // Check if OpenFinance is integrated
   const hasOpenFinance = data.hasOpenFinance || false;
+  
+  // Parse client summary from Supabase when available
+  useEffect(() => {
+    if (data.clientSummary?.summary) {
+      try {
+        // Try to parse JSON if the summary is in JSON format
+        let parsedSummary;
+        try {
+          parsedSummary = JSON.parse(data.clientSummary.summary);
+        } catch (e) {
+          // If not JSON, use the summary as a simple string for the professional profile
+          setClientProfile(prevProfile => ({
+            ...prevProfile,
+            professionalProfile: data.clientSummary?.summary || prevProfile.professionalProfile,
+            dataSource: 'supabase'
+          }));
+          return;
+        }
+        
+        // If we successfully parsed JSON, extract the sections
+        if (parsedSummary && typeof parsedSummary === 'object') {
+          setClientProfile({
+            professionalProfile: parsedSummary.professionalProfile || parsedSummary.professional_profile || clientProfile.professionalProfile,
+            financialProfile: parsedSummary.financialProfile || parsedSummary.financial_profile || clientProfile.financialProfile,
+            assetsInvestments: parsedSummary.assetsInvestments || parsedSummary.assets_investments || clientProfile.assetsInvestments,
+            financialGoals: parsedSummary.financialGoals || parsedSummary.financial_goals || clientProfile.financialGoals,
+            investmentHorizon: parsedSummary.investmentHorizon || parsedSummary.investment_horizon || clientProfile.investmentHorizon,
+            riskProfile: parsedSummary.riskProfile || parsedSummary.risk_profile || clientProfile.riskProfile,
+            essentialServices: parsedSummary.essentialServices || parsedSummary.essential_services || clientProfile.essentialServices,
+            dataSource: 'supabase'
+          });
+        }
+      } catch (error) {
+        console.error("Error parsing client summary:", error);
+      }
+    }
+  }, [data.clientSummary]);
   
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} h-full overflow-hidden border-none shadow-lg`}>
@@ -23,6 +82,11 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
             </div>
             <CardTitle className="text-xl text-white">
               O Que Sabemos Sobre Você
+              {clientProfile.dataSource === 'supabase' && (
+                <span className="ml-1 text-green-400">
+                  <span className="inline-block h-3 w-3">✓</span>
+                </span>
+              )}
             </CardTitle>
           </div>
           {hasOpenFinance && (
@@ -48,9 +112,14 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
               <div className="flex-1">
                 <h3 className="font-semibold text-xl text-gray-100 group-hover:text-blue-400 transition-colors flex items-center">
                   Perfil Profissional
+                  {clientProfile.dataSource === 'supabase' && (
+                    <span className="ml-1 text-green-400">
+                      <span className="inline-block h-3 w-3">✓</span>
+                    </span>
+                  )}
                 </h3>
                 <p className="text-gray-300 mt-2 leading-relaxed">
-                  Médico oftalmologista com sociedade em três clínicas (Núcleo Oftalmológico em Valadares, Instituto de Olhos em Teófilo Otoni e Instituto de Olhos em Caratinga), com rotina de trabalho intenso de segunda a sábado. Formado em 2013 com participação recente nas sociedades (2 anos).
+                  {clientProfile.professionalProfile}
                 </p>
                 {hasOpenFinance && (
                   <div className="mt-3 p-3.5 bg-blue-900/30 backdrop-blur-sm rounded-lg border border-blue-700/30">
@@ -72,9 +141,14 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
               <div className="flex-1">
                 <h3 className="font-semibold text-xl text-gray-100 group-hover:text-teal-400 transition-colors flex items-center">
                   Perfil Financeiro
+                  {clientProfile.dataSource === 'supabase' && (
+                    <span className="ml-1 text-green-400">
+                      <span className="inline-block h-3 w-3">✓</span>
+                    </span>
+                  )}
                 </h3>
                 <p className="text-gray-300 mt-2 leading-relaxed">
-                  Investidor desde 2017, com carteira diversificada entre XP, Clear e Avenue (USD 43 mil). Gastos mensais de R$ 25 mil representam pequena fração da renda combinada com a esposa (R$ 30-35 mil adicionais), permitindo alta capacidade de poupança (R$ 50-100 mil/mês).
+                  {clientProfile.financialProfile}
                 </p>
                 {hasOpenFinance && (
                   <div className="mt-3 p-3.5 bg-teal-900/30 backdrop-blur-sm rounded-lg border border-teal-700/30">
@@ -96,9 +170,14 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
               <div className="flex-1">
                 <h3 className="font-semibold text-xl text-gray-100 group-hover:text-indigo-400 transition-colors flex items-center">
                   Patrimônio e Investimentos
+                  {clientProfile.dataSource === 'supabase' && (
+                    <span className="ml-1 text-green-400">
+                      <span className="inline-block h-3 w-3">✓</span>
+                    </span>
+                  )}
                 </h3>
                 <p className="text-gray-300 mt-2 leading-relaxed">
-                  Patrimônio diversificado: participações nas clínicas oftalmológicas, investimentos na XP, ações na Clear, USD 43 mil na Avenue, R$ 8,5 mil na Inco, terreno em sociedade (R$ 200 mil) e veículo (R$ 220 mil) com financiamento sem juros (R$ 1.800/mês).
+                  {clientProfile.assetsInvestments}
                 </p>
                 {hasOpenFinance && (
                   <div className="mt-3 p-3.5 bg-indigo-900/30 backdrop-blur-sm rounded-lg border border-indigo-700/30">
@@ -120,9 +199,14 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
               <div className="flex-1">
                 <h3 className="font-semibold text-xl text-gray-100 group-hover:text-amber-400 transition-colors flex items-center">
                   Objetivos Financeiros
+                  {clientProfile.dataSource === 'supabase' && (
+                    <span className="ml-1 text-green-400">
+                      <span className="inline-block h-3 w-3">✓</span>
+                    </span>
+                  )}
                 </h3>
                 <p className="text-gray-300 mt-2 leading-relaxed">
-                  Meta de reduzir carga horária aos 45 anos com patrimônio de R$ 5-6 milhões. Plano de aposentadoria completa aos 50 anos com renda mensal projetada de R$ 35-40 mil.
+                  {clientProfile.financialGoals}
                 </p>
                 {hasOpenFinance && (
                   <div className="mt-3 p-3.5 bg-amber-900/30 backdrop-blur-sm rounded-lg border border-amber-700/30">
@@ -144,9 +228,14 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
               <div className="flex-1">
                 <h3 className="font-semibold text-xl text-gray-100 group-hover:text-blue-400 transition-colors flex items-center">
                   Horizonte de Investimentos
+                  {clientProfile.dataSource === 'supabase' && (
+                    <span className="ml-1 text-green-400">
+                      <span className="inline-block h-3 w-3">✓</span>
+                    </span>
+                  )}
                 </h3>
                 <p className="text-gray-300 mt-2 leading-relaxed">
-                  Atual idade: 37 anos. Horizonte de investimento de médio prazo (8 anos) para primeira meta de redução de trabalho e longo prazo (13 anos) para aposentadoria completa, permitindo estratégia de investimentos escalonada.
+                  {clientProfile.investmentHorizon}
                 </p>
                 {hasOpenFinance && (
                   <div className="mt-3 p-3.5 bg-blue-900/30 backdrop-blur-sm rounded-lg border border-blue-700/30">
@@ -160,7 +249,7 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
           </div>
           
           {/* Risk Profile */}
-          {hasOpenFinance && (
+          {clientProfile.riskProfile && (hasOpenFinance || clientProfile.dataSource === 'supabase') && (
             <div className="group hover:bg-red-900/10 transition-colors border-t border-white/5">
               <div className="p-6 flex items-start gap-5">
                 <div className="rounded-xl bg-gradient-to-br from-red-600 to-red-700 p-3.5 shadow-md">
@@ -169,9 +258,14 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
                 <div className="flex-1">
                   <h3 className="font-semibold text-xl text-gray-100 group-hover:text-red-400 transition-colors flex items-center">
                     Perfil de Risco
+                    {clientProfile.dataSource === 'supabase' && (
+                      <span className="ml-1 text-green-400">
+                        <span className="inline-block h-3 w-3">✓</span>
+                      </span>
+                    )}
                   </h3>
                   <p className="text-gray-300 mt-2 leading-relaxed">
-                    Experiência com volatilidade durante a pandemia moldou percepção de risco. Alta capacidade de assumir riscos devido à elevada geração de caixa mensal, mas tolerância emocional à volatilidade moderada.
+                    {clientProfile.riskProfile}
                   </p>
                   <div className="mt-4 space-y-3">
                     <div>
@@ -204,28 +298,35 @@ const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModulePro
           )}
 
           {/* Expectations */}
-          <div className="group hover:bg-teal-900/10 transition-colors border-t border-white/5">
-            <div className="p-6 flex items-start gap-5">
-              <div className="rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 p-3.5 shadow-md">
-                <TrendingUp className="h-6 w-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-xl text-gray-100 group-hover:text-teal-400 transition-colors flex items-center">
-                  Serviços Financeiros Essenciais
-                </h3>
-                <p className="text-gray-300 mt-2 leading-relaxed">
-                  Necessita de visão clara e organizada da situação financeira mensal, com acompanhamento detalhado de investimentos e patrimônio para acompanhar o progresso em direção às metas de médio e longo prazo.
-                </p>
-                {hasOpenFinance && (
-                  <div className="mt-3 p-3.5 bg-teal-900/30 backdrop-blur-sm rounded-lg border border-teal-700/30">
-                    <p className="text-sm text-teal-200 leading-relaxed">
-                      <strong className="font-semibold text-teal-100">Proposta de Valor:</strong> Visão consolidada de ativos, passivos e fluxo de caixa em todas as instituições financeiras, com relatórios mensais detalhados de evolução patrimonial e projeção atualizada para metas de 45 e 50 anos.
-                    </p>
-                  </div>
-                )}
+          {clientProfile.essentialServices && (
+            <div className="group hover:bg-teal-900/10 transition-colors border-t border-white/5">
+              <div className="p-6 flex items-start gap-5">
+                <div className="rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 p-3.5 shadow-md">
+                  <TrendingUp className="h-6 w-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-xl text-gray-100 group-hover:text-teal-400 transition-colors flex items-center">
+                    Serviços Financeiros Essenciais
+                    {clientProfile.dataSource === 'supabase' && (
+                      <span className="ml-1 text-green-400">
+                        <span className="inline-block h-3 w-3">✓</span>
+                      </span>
+                    )}
+                  </h3>
+                  <p className="text-gray-300 mt-2 leading-relaxed">
+                    {clientProfile.essentialServices}
+                  </p>
+                  {hasOpenFinance && (
+                    <div className="mt-3 p-3.5 bg-teal-900/30 backdrop-blur-sm rounded-lg border border-teal-700/30">
+                      <p className="text-sm text-teal-200 leading-relaxed">
+                        <strong className="font-semibold text-teal-100">Proposta de Valor:</strong> Visão consolidada de ativos, passivos e fluxo de caixa em todas as instituições financeiras, com relatórios mensais detalhados de evolução patrimonial e projeção atualizada para metas de 45 e 50 anos.
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
           
           {hasOpenFinance && (
             <div className="border-t border-white/5 p-6">

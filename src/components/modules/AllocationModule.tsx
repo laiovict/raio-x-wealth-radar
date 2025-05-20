@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Legend } from "recharts";
@@ -34,7 +35,8 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
       "Previdência": 5.0,
       "Alternativos": 0.0
     },
-    optimizationGain: 2.4
+    optimizationGain: 2.4,
+    dataSource: 'synthetic' as const
   });
 
   useEffect(() => {
@@ -51,10 +53,12 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
             "Ações BR": summary.stocks_representation ? parseFloat(summary.stocks_representation) : 0,
             "Fundos": summary.investment_fund_representation || 0,
             "FIIs": summary.real_estate_representation || 0,
-            "Internacional": summary.investment_international_representation ? parseFloat(summary.investment_international_representation) : 0,
+            "Internacional": summary.investment_international_representation 
+              ? parseFloat(summary.investment_international_representation) 
+              : 0,
             "Caixa": 5.0, // Estimate or could be calculated from another source
             "Previdência": summary.private_pension_representation || 0,
-            "Alternativos": 0.0 // Setting this to 0 since we're now separating FIIs and International
+            "Alternativos": 0.0 // Now this is a separate category
           };
           
           // Create client-specific recommended allocation based on current allocation
@@ -88,7 +92,8 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
           setAllocationData({
             current: currentAllocation,
             recommended: recommendedAllocation,
-            optimizationGain
+            optimizationGain,
+            dataSource: 'supabase' as const
           });
         }
       } catch (error) {
@@ -121,7 +126,8 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
                 "Previdência": 3.0,
                 "Alternativos": 0.0
               },
-              optimizationGain: 3.2
+              optimizationGain: 3.2,
+              dataSource: 'synthetic' as const
             });
             break;
           // Add more client-specific allocations as needed
@@ -158,6 +164,17 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
     return `${name} ${(percent * 100).toFixed(0)}%`;
   };
 
+  // Generate descriptive text based on actual allocation data
+  const generateAllocationDescription = () => {
+    const { current, recommended } = allocationData;
+    
+    if (allocationData.optimizationGain > 3) {
+      return `Sua carteira mostra um bom equilíbrio entre renda fixa (${current["Renda Fixa"].toFixed(1)}%) e renda variável (${current["Ações BR"].toFixed(1)}%), mas poderia se beneficiar de maior diversificação internacional. Recomendamos aumentar sua exposição internacional para ${recommended["Internacional"].toFixed(1)}% e FIIs para ${recommended["FIIs"].toFixed(1)}% para melhor proteção contra volatilidade do mercado local.`;
+    } else {
+      return `Atualmente sua carteira está concentrada em renda fixa (${current["Renda Fixa"].toFixed(1)}%) e ações brasileiras (${current["Ações BR"].toFixed(1)}%), o que reflete seu perfil moderado. Recomendamos diversificar com ${recommended["Internacional"].toFixed(1)}% em internacional e ${recommended["FIIs"].toFixed(1)}% em FIIs para melhor equilíbrio entre segurança e crescimento.`;
+    }
+  };
+
   return (
     <Card className={fullWidth ? "w-full" : "w-full"}>
       <CardHeader className="pb-2">
@@ -165,6 +182,11 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
           <span>Alocação & Diversificação 360°</span>
           <span className="text-sm font-normal text-green-600 dark:text-green-400">
             +{allocationData.optimizationGain}% potencial
+            {allocationData.dataSource === 'supabase' && (
+              <span className="ml-1 text-green-400">
+                <span className="inline-block h-3 w-3">✓</span>
+              </span>
+            )}
           </span>
         </CardTitle>
       </CardHeader>
@@ -189,7 +211,14 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
             <div className={`${isMobile ? "h-52" : "h-64 md:h-52"}`}>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <p className="text-sm font-medium text-center mb-2">Alocação Atual</p>
+                  <p className="text-sm font-medium text-center mb-2">
+                    Alocação Atual
+                    {allocationData.dataSource === 'supabase' && (
+                      <span className="ml-1 text-green-400">
+                        <span className="inline-block h-3 w-3">✓</span>
+                      </span>
+                    )}
+                  </p>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -210,7 +239,14 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
                   </ResponsiveContainer>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-center mb-2">Alocação Recomendada</p>
+                  <p className="text-sm font-medium text-center mb-2">
+                    Alocação Recomendada
+                    {allocationData.dataSource === 'supabase' && (
+                      <span className="ml-1 text-green-400">
+                        <span className="inline-block h-3 w-3">✓</span>
+                      </span>
+                    )}
+                  </p>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -235,10 +271,7 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
             
             <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg">
               <p className="text-sm text-gray-700 dark:text-gray-200">
-                {allocationData.optimizationGain > 3 ? 
-                  `Sua carteira mostra um bom equilíbrio entre renda fixa (${allocationData.current["Renda Fixa"]}%) e renda variável (${allocationData.current["Ações BR"]}%), mas poderia se beneficiar de maior diversificação internacional. Recomendamos aumentar sua exposição internacional para ${allocationData.recommended["Internacional"]}% e FIIs para ${allocationData.recommended["FIIs"]}% para melhor proteção contra volatilidade do mercado local.` :
-                  `Atualmente sua carteira está concentrada em renda fixa (${allocationData.current["Renda Fixa"]}%) e ações brasileiras (${allocationData.current["Ações BR"]}%), o que reflete seu perfil moderado. Recomendamos diversificar com ${allocationData.recommended["Internacional"]}% em internacional e ${allocationData.recommended["FIIs"]}% em FIIs para melhor equilíbrio entre segurança e crescimento.`
-                }
+                {generateAllocationDescription()}
               </p>
             </div>
           </div>

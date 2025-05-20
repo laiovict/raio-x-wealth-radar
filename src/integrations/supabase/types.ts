@@ -270,6 +270,39 @@ export type Database = {
         }
         Relationships: []
       }
+      investors_summaries: {
+        Row: {
+          created_at: string | null
+          investor_account_on_brokerage_house: number | null
+          investor_copilotu_id: string | null
+          investor_name: string | null
+          summary: string | null
+          summary_id: number
+          tags: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          investor_account_on_brokerage_house?: number | null
+          investor_copilotu_id?: string | null
+          investor_name?: string | null
+          summary?: string | null
+          summary_id: number
+          tags?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          investor_account_on_brokerage_house?: number | null
+          investor_copilotu_id?: string | null
+          investor_name?: string | null
+          summary?: string | null
+          summary_id?: number
+          tags?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       open_finance_investments: {
         Row: {
           amount_original: number | null

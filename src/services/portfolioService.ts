@@ -164,3 +164,59 @@ export const getClientProfitability = async (clientId: number | null) => {
     return null;
   }
 };
+
+/**
+ * Fetches client's dividend history
+ * @param clientId Client account ID
+ * @returns Dividend history data
+ */
+export const getClientDividendHistory = async (clientId: number | null) => {
+  if (!clientId) return [];
+  
+  try {
+    const { data, error } = await supabase
+      .from('portfolio_earnings_history')
+      .select('*')
+      .eq('investor_account_on_brokerage_house', clientId)
+      .order('payment_date', { ascending: false });
+    
+    if (error) {
+      console.error("Error fetching dividend history:", error);
+      return [];
+    }
+    
+    // Add dataSource metadata to each item
+    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as const })) : [];
+  } catch (error) {
+    console.error("Error in dividend history fetch:", error);
+    return [];
+  }
+};
+
+/**
+ * Fetches client's summary information
+ * @param clientId Client account ID
+ * @returns Client summary data
+ */
+export const getClientSummary = async (clientId: number | null) => {
+  if (!clientId) return null;
+  
+  try {
+    const { data, error } = await supabase
+      .from('investors_summaries')
+      .select('*')
+      .eq('investor_account_on_brokerage_house', clientId)
+      .maybeSingle();
+    
+    if (error) {
+      console.error("Error fetching client summary:", error);
+      return null;
+    }
+    
+    // Add dataSource metadata to indicate this is from Supabase
+    return data ? { ...data, dataSource: 'supabase' as const } : null;
+  } catch (error) {
+    console.error("Error in client summary fetch:", error);
+    return null;
+  }
+};
