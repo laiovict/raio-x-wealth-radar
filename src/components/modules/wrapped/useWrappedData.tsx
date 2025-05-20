@@ -1,7 +1,7 @@
 
 import { useCallback, useMemo } from 'react';
 import { useRaioX } from '@/context/RaioXContext';
-import { toNumber, toString } from '@/utils/typeConversionHelpers';
+import { toNumber, toString, ensureString } from '@/utils/typeConversionHelpers';
 import { 
   INVESTMENT_SONGS, 
   UNUSUAL_INVESTMENTS, 

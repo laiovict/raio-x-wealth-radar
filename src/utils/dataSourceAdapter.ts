@@ -99,3 +99,45 @@ export const hasActualValue = (value: any): boolean => {
   if (typeof value === 'number' && value === 0) return false;
   return true;
 };
+
+/**
+ * Get a user-friendly display name for a data source
+ * @param sourceType The data source type
+ * @returns A user-friendly name for the data source
+ */
+export const getDataSourceDisplayName = (sourceType?: DataSourceType | string): string => {
+  if (!sourceType) return 'Dados sintéticos';
+  
+  switch (sourceType) {
+    case 'xp':
+      return 'Dados XP';
+    case 'openfinance':
+      return 'Open Finance';
+    case 'supabase':
+      return 'Dados reais';
+    case 'synthetic':
+    default:
+      return 'Dados sintéticos';
+  }
+};
+
+/**
+ * Merge data sources, prioritizing real data over synthetic
+ * @param sources Array of data sources to merge
+ * @returns The most reliable data source
+ */
+export const mergeDataSources = (sources: Array<DataSourceType | string | undefined>): DataSourceType => {
+  // Filter out undefined values
+  const validSources = sources.filter(source => source !== undefined) as DataSourceType[];
+  
+  // If no valid sources, return synthetic
+  if (validSources.length === 0) return 'synthetic';
+  
+  // Priority: xp > openfinance > supabase > synthetic
+  if (validSources.includes('xp')) return 'xp';
+  if (validSources.includes('openfinance')) return 'openfinance';
+  if (validSources.includes('supabase')) return 'supabase';
+  
+  // Default to synthetic if no real data sources found
+  return 'synthetic';
+};

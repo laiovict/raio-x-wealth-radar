@@ -1,4 +1,3 @@
-
 /**
  * Utility functions to help with type conversions
  * consistently across the application
@@ -109,7 +108,7 @@ export const ensureNumber = (value: string | number | undefined | null): number 
  */
 export const ensureString = (value: string | number | undefined | null): string => {
   if (value === undefined || value === null) return '';
-  return typeof value === 'string' ? value : value.toString();
+  return toString(value);
 };
 
 /**

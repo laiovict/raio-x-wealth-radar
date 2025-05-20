@@ -10,11 +10,13 @@ import {
 import { 
   Lightbulb
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import InsightsTabContent from "./inteligencia/InsightsTabContent";
 import ActionsTabContent from "./inteligencia/ActionsTabContent";
 import RecommendationsTabContent from "./inteligencia/RecommendationsTabContent";
 import { getRecommendedActions, getDefaultInsights } from "./inteligencia/helpers";
+import { generatePortfolioInsights } from '@/services/insightGeneratorService';
+import { DataSourceType } from '@/types/raioXTypes';
 
 interface InteligenciaModuleProps {
   fullWidth?: boolean;
@@ -52,8 +54,38 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
   // Define a safe way to access recommendations
   const recommendations = data?.recommendations || [];
   
-  // Define insights using data.financialInsightData or fallback to default insights
-  const insights = data.financialInsightData ? data.financialInsightData.insights || [] : getDefaultInsights();
+  // Generate insights based on real data when available
+  const insights = useMemo(() => {
+    // If we have AI insights from context, use them
+    if (data.financialInsightData?.insights && data.financialInsightData.insights.length > 0) {
+      return data.financialInsightData.insights;
+    }
+    
+    // If we have portfolio data, generate insights based on real data
+    if (data.portfolioSummary || data.stocks?.length > 0 || data.dividendHistory?.length > 0) {
+      return generatePortfolioInsights(
+        data.portfolioSummary,
+        data.stocks,
+        data.fixedIncome,
+        data.investmentFunds,
+        data.realEstate,
+        data.profitability,
+        data.dividendHistory
+      );
+    }
+    
+    // Fall back to default insights if no real data is available
+    return getDefaultInsights();
+  }, [
+    data.financialInsightData, 
+    data.portfolioSummary,
+    data.stocks,
+    data.fixedIncome,
+    data.investmentFunds,
+    data.realEstate,
+    data.profitability,
+    data.dividendHistory
+  ]);
 
   return (
     <Card className={fullWidth ? "w-full" : "w-full"}>

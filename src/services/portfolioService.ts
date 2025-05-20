@@ -519,19 +519,9 @@ export const generateFinancialSummary = (
  * @param value The value to format
  * @returns The formatted currency string
  */
-const formatValue = (value: any): string => {
-  if (!value) return "R$ 0,00";
-  return typeof value === 'number' ? value.toString() : value;
-};
-
-/**
- * Format a value to a currency string
- * @param value The value to format
- * @returns The formatted currency string
- */
 const formatCurrency = (value: any): string => {
   if (!value) return "R$ 0,00";
-  return typeof value === 'number' ? value.toString() : value;
+  return typeof value === 'string' ? value : String(value);
 };
 
 /**

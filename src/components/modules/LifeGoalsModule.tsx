@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -8,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import { formatCurrency } from '@/utils/formattingUtils';
-import { toNumber, toString } from '@/utils/typeConversionHelpers';
+import { toNumber, toString, ensureString } from '@/utils/typeConversionHelpers';
 import DataSourceTag from '@/components/common/DataSourceTag';
 import { DataSourceType } from '@/types/raioXTypes';
 import { toLimitedDataSource } from '@/utils/dataSourceAdapter';
@@ -153,17 +152,17 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
               />
               <div className="flex justify-between items-center text-xs text-gray-400">
                 <span>
-                  {`Atual: ${formatCurrency(goal.currentAmount.toString())}`}
+                  {`Atual: ${formatCurrency(ensureString(goal.currentAmount))}`}
                 </span>
                 <span>
-                  {`Meta: ${formatCurrency(goal.targetAmount.toString())}`}
+                  {`Meta: ${formatCurrency(ensureString(goal.targetAmount))}`}
                 </span>
               </div>
               {goal.adjustmentNeeded > 0 && (
                 <div className="mt-2 text-xs text-amber-400 flex items-center">
                   <ArrowUp className="h-3.5 w-3.5 mr-1" />
                   <span>
-                    {`Sugestão: Aumentar aportes em ${formatCurrency(((goal.targetAmount * goal.adjustmentNeeded / 100) / 12).toString())} mensais`}
+                    {`Sugestão: Aumentar aportes em ${formatCurrency(ensureString((goal.targetAmount * goal.adjustmentNeeded / 100) / 12))} mensais`}
                   </span>
                 </div>
               )}
