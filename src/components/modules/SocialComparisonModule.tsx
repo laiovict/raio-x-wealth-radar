@@ -1,12 +1,14 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
 import { formatCurrency, formatPercentage } from "@/utils/formattingUtils";
-import { toNumber, compareToNumber } from '@/utils/typeConversionHelpers';
+import { toNumber, compareToNumber, toString } from '@/utils/typeConversionHelpers';
 import DataSourceTag from '@/components/common/DataSourceTag';
 import { DataSourceType } from '@/types/raioXTypes';
+import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 
 interface SocialComparisonModuleProps {
   fullWidth?: boolean;
@@ -24,12 +26,18 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
     return "Abaixo da média";
   };
 
+  // Ensure we have string values for formatting functions
+  const ensureString = (value: any): string => {
+    if (value === undefined || value === null) return '';
+    return typeof value === 'string' ? value : value.toString();
+  };
+
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
       <CardHeader className="flex flex-row justify-between items-center pb-2">
         <CardTitle className="text-xl text-blue-800 dark:text-blue-200 flex items-center">
           Comparação Social
-          <DataSourceTag source={socialComparison?.dataSource as DataSourceType} />
+          <TypeSafeDataSourceTag source={socialComparison?.dataSource} />
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -56,7 +64,7 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
                 Retorno vs. Pares
               </span>
               <span className="text-lg font-semibold">
-                {formatCurrency(socialComparison.returnVsPeers)}
+                {formatCurrency(ensureString(socialComparison?.returnVsPeers))}
               </span>
             </div>
             <div className="flex justify-between items-center">

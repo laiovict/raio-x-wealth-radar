@@ -1,7 +1,7 @@
 
 import { useCallback, useMemo } from 'react';
 import { useRaioX } from '@/context/RaioXContext';
-import { toNumber } from '@/utils/typeConversionHelpers';
+import { toNumber, toString } from '@/utils/typeConversionHelpers';
 import { 
   INVESTMENT_SONGS, 
   UNUSUAL_INVESTMENTS, 
@@ -59,7 +59,10 @@ export const useWrappedData = () => {
             name: largestDividend.asset || "",
             return: Math.round(largestDividend.value / 100) / 10 * 100 // Convert to percentage with rounding
           };
-          defaultWrapped.dataSource = 'supabase' as const;
+          return {
+            ...defaultWrapped,
+            dataSource: 'supabase' as const
+          };
         }
       } catch (error) {
         console.error("Error processing dividend history:", error);

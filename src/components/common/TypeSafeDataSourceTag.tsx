@@ -2,7 +2,7 @@
 import React from 'react';
 import DataSourceTag from '@/components/common/DataSourceTag';
 import { DataSourceType } from '@/types/raioXTypes';
-import { toCompatibleDataSource } from '@/utils/dataSourceAdapter';
+import { toLimitedDataSource } from '@/utils/dataSourceAdapter';
 
 /**
  * A wrapper component for DataSourceTag that ensures type compatibility
@@ -18,7 +18,7 @@ const TypeSafeDataSourceTag: React.FC<TypeSafeDataSourceTagProps> = ({ source, c
   if (!source) return null;
   
   // Convert any DataSourceType to the limited types expected by DataSourceTag
-  const compatibleSource = toCompatibleDataSource(source as DataSourceType);
+  const compatibleSource = toLimitedDataSource(source as DataSourceType);
   
   return <DataSourceTag source={compatibleSource} className={className} />;
 };

@@ -521,7 +521,7 @@ export const generateFinancialSummary = (
  */
 const formatValue = (value: any): string => {
   if (!value) return "R$ 0,00";
-  return toFormattableString(value);
+  return typeof value === 'number' ? value.toString() : value;
 };
 
 /**
@@ -531,7 +531,7 @@ const formatValue = (value: any): string => {
  */
 const formatCurrency = (value: any): string => {
   if (!value) return "R$ 0,00";
-  return toFormattableString(value);
+  return typeof value === 'number' ? value.toString() : value;
 };
 
 /**
@@ -564,11 +564,15 @@ export const getStyledPortfolioSummaryData = (portfolioSummary: any, colorScale:
                 parseFloat(portfolioSummary.stocks_representation || "0") : 
                 portfolioSummary.stocks_representation || 0;
   
-  // Format values for display (using toString to ensure we have strings)
-  const fixedIncomeValue = formatCurrency(portfolioSummary.fixed_income_value ? portfolioSummary.fixed_income_value.toString() : "0");
-  const fundsValue = formatCurrency(portfolioSummary.investment_fund_value ? portfolioSummary.investment_fund_value.toString() : "0");
-  const realEstateValue = formatCurrency(portfolioSummary.real_estate_value ? portfolioSummary.real_estate_value.toString() : "0");
-  const stocksValue = formatCurrency(portfolioSummary.stocks_value ? portfolioSummary.stocks_value.toString() : "0");
+  // Format values for display (ensuring they are strings)
+  const fixedIncomeValue = formatCurrency(portfolioSummary.fixed_income_value ? 
+    String(portfolioSummary.fixed_income_value) : "0");
+  const fundsValue = formatCurrency(portfolioSummary.investment_fund_value ? 
+    String(portfolioSummary.investment_fund_value) : "0");
+  const realEstateValue = formatCurrency(portfolioSummary.real_estate_value ? 
+    String(portfolioSummary.real_estate_value) : "0");
+  const stocksValue = formatCurrency(portfolioSummary.stocks_value ? 
+    String(portfolioSummary.stocks_value) : "0");
   
   // Return the formatted data
   return [

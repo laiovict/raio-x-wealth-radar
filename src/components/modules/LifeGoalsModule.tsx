@@ -8,10 +8,11 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import { formatCurrency } from '@/utils/formattingUtils';
-import { toNumber } from '@/utils/typeConversionHelpers';
+import { toNumber, toString } from '@/utils/typeConversionHelpers';
 import DataSourceTag from '@/components/common/DataSourceTag';
 import { DataSourceType } from '@/types/raioXTypes';
 import { toLimitedDataSource } from '@/utils/dataSourceAdapter';
+import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 
 interface LifeGoalsModuleProps {
   fullWidth?: boolean;
@@ -20,7 +21,7 @@ interface LifeGoalsModuleProps {
 // Data source indicator component
 const DataSourceIndicator = ({ source }: { source?: DataSourceType | string }) => {
   if (!source) return null;
-  return <DataSourceTag source={toLimitedDataSource(source as DataSourceType)} />;
+  return <TypeSafeDataSourceTag source={source} />;
 };
 
 const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
