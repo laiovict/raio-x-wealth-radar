@@ -62,13 +62,15 @@ const agentQuotes = [
 
 interface LoadingScreenProps {
   message?: string;
+  forceShow?: boolean;
 }
 
-const LoadingScreen: React.FC<LoadingScreenProps> = ({ message = "Carregando..." }) => {
+const LoadingScreen: React.FC<LoadingScreenProps> = ({ message = "Carregando...", forceShow = false }) => {
   const [currentAgent, setCurrentAgent] = useState(0);
   const [currentQuote, setCurrentQuote] = useState(0);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [logoVisible, setLogoVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     // Inicialmente, mostrar apenas o logo
@@ -99,12 +101,26 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ message = "Carregando..."
         });
       }, 3000);
 
-      return () => {
-        clearInterval(quoteInterval);
-        clearInterval(progressInterval);
-      };
+      // Só oculta a tela de carregamento caso não tenha a propriedade forceShow
+      if (!forceShow) {
+        // Após 7 segundos completos, esconder a tela de carregamento
+        const hideTimeout = setTimeout(() => {
+          setIsVisible(false);
+        }, 7000);
+        
+        return () => {
+          clearTimeout(hideTimeout);
+          clearInterval(quoteInterval);
+          clearInterval(progressInterval);
+        };
+      } else {
+        return () => {
+          clearInterval(quoteInterval);
+          clearInterval(progressInterval);
+        };
+      }
     }, 2000);
-  }, [currentAgent]);
+  }, [currentAgent, forceShow]);
 
   const agent = agentQuotes[currentAgent];
 
@@ -138,6 +154,10 @@ const LoadingScreen: React.FC<LoadingScreenProps> = ({ message = "Carregando..."
       <div className="absolute inset-0 border-4 border-t-blue-500 border-r-transparent border-b-transparent border-l-transparent rounded-full animate-spin"></div>
     </div>
   );
+
+  if (!isVisible && !forceShow) {
+    return null;
+  }
 
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-95 backdrop-blur-md z-50">

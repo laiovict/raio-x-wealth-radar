@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -65,10 +66,10 @@ const Index = () => {
       navigate("/auth");
     }
     
-    // Simulate loading time for the agent screen
+    // Garantir que a tela de loading seja exibida por completo (7 segundos)
     setTimeout(() => {
       setLoading(false);
-    }, 1000);
+    }, 7000);
     
     // Make sure body and main container have proper overflow settings
     document.body.style.overflow = "hidden";
@@ -178,7 +179,7 @@ const Index = () => {
   };
 
   if (loading) {
-    return <LoadingScreen />;
+    return <LoadingScreen forceShow={true} />;
   }
 
   // Redirect to auth if not logged in
