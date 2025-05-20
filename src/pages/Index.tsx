@@ -208,14 +208,17 @@ const Index = () => {
           </div>
           
           <div className="flex flex-wrap items-center gap-3">
-            <Button 
-              variant="outline" 
-              className="bg-indigo-500/30 hover:bg-indigo-500/50 border-indigo-400/30 text-indigo-200 rounded-full text-sm font-normal px-5"
-              onClick={() => navigate("/api-docs")}
-            >
-              <Code className="mr-2 h-4 w-4" />
-              API Docs
-            </Button>
+            {/* Only show API Docs button for advisors */}
+            {userRole === "advisor" && (
+              <Button 
+                variant="outline" 
+                className="bg-indigo-500/30 hover:bg-indigo-500/50 border-indigo-400/30 text-indigo-200 rounded-full text-sm font-normal px-5"
+                onClick={() => navigate("/api-docs")}
+              >
+                <Code className="mr-2 h-4 w-4" />
+                API Docs
+              </Button>
+            )}
           
             {selectedClient && (
               <Button 
