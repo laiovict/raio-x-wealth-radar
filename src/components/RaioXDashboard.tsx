@@ -25,6 +25,8 @@ import WholeBankingModule from "./modules/WholeBankingModule";
 import MeuFuturoFinanceiroModule from "./modules/MeuFuturoFinanceiroModule";
 import ChatInterface from "./ChatInterface";
 import BehavioralFinanceModule from "./modules/BehavioralFinanceModule";
+import FamousInvestorsModule from "./modules/FamousInvestorsModule";
+import WelcomeBanner from "./WelcomeBanner";
 
 interface RaioXDashboardProps {
   showPdfPreview?: boolean;
@@ -129,6 +131,8 @@ const RaioXDashboard = ({
         </div>
       </div>
 
+      <WelcomeBanner selectedClient={selectedClient} />
+
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-6 glass-morphism rounded-lg overflow-x-auto grid grid-cols-5 scrollbar-none">
           <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Visão Geral</TabsTrigger>
@@ -138,7 +142,7 @@ const RaioXDashboard = ({
           <TabsTrigger value="chat" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('chatTab')}</TabsTrigger>
         </TabsList>
 
-        {/* Tab 1: Visão Geral - Overview of all important information */}
+        {/* Tab 1: Visão Geral - Comprehensive overview of all 18 sections */}
         <TabsContent value="overview" className="space-y-6">
           <FinancialOverviewModule />
           
@@ -152,12 +156,39 @@ const RaioXDashboard = ({
             <RecommendedActionsModule />
           </div>
           
-          {hasOpenFinance && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <SentimentInsightsModule />
-              <FutureProjectionModule />
-            </div>
-          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SentimentInsightsModule />
+            <FutureProjectionModule />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FinancialInsightsModule />
+            <PersonalInsightsModule />
+          </div>
+
+          <AIInsightsHubModule />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <SocialComparisonModule />
+            <BehavioralFinanceModule />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <InvestmentPlanningModule />
+            <WrappedModule />
+          </div>
+
+          <OnePageFinancialPlanModule />
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <MeuFuturoFinanceiroModule />
+            <WholeBankingModule />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <RecommendationsModule />
+            <FamousInvestorsModule />
+          </div>
         </TabsContent>
         
         {/* Tab 2: O que preciso mudar? - Recommendations and actions */}
