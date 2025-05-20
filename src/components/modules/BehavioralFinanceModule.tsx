@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { useLanguage } from "@/context/LanguageContext";
 import { useRaioX } from "@/context/RaioXContext";
-import { Brain, AlertTriangle, TrendingUp, TrendingDown, Lock, Calendar } from "lucide-react";
+import { Brain, AlertTriangle, TrendingUp, TrendingDown, Lock, Calendar, LineChart } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 
@@ -45,10 +45,11 @@ const BehavioralFinanceModule = ({ fullWidth = false }) => {
       icon: <TrendingUp className="h-5 w-5 text-blue-400" />
     },
   ];
-
-  // Special customized content for client 240275 (Laio Santos)
-  const customizedClientData = selectedClient === 240275 ? {
-    traits: [
+  
+  // Enhanced behavioral traits for different client personas
+  const clientTraitsMap: Record<number, BehaviorTrait[]> = {
+    // Laio Santos (240275) - Existing customization
+    240275: [
       {
         name: t('emotionalInvesting'),
         score: 81,
@@ -57,11 +58,70 @@ const BehavioralFinanceModule = ({ fullWidth = false }) => {
         icon: <Brain className="h-5 w-5 text-purple-400" />
       },
       ...behaviorTraits
+    ],
+    
+    // Ana Oliveira - Client with arrojado profile
+    316982: [
+      {
+        name: "Risco Elevado",
+        score: 88,
+        description: "Você tende a buscar riscos elevados em seus investimentos, muitas vezes ignorando sinais de alerta. Nos últimos 3 meses, aumentou posições em ativos voláteis mesmo em momentos de instabilidade do mercado.",
+        recommendation: "Defina limites claros para exposição a alto risco (máximo 30% da carteira) e estipule stop loss para proteger seu patrimônio de quedas acentuadas.",
+        icon: <AlertTriangle className="h-5 w-5 text-orange-400" />
+      },
+      {
+        name: "Performance Chasing",
+        score: 75,
+        description: "Identificamos que você frequentemente investe em fundos e ações com base apenas no desempenho recente, sem analisar os fundamentos. Esta tendência foi observada em 8 de suas 12 últimas operações.",
+        recommendation: "Antes de investir em um ativo com alto rendimento recente, analise seu histórico de longo prazo e os fundamentos que justifiquem a continuidade desse desempenho.",
+        icon: <TrendingUp className="h-5 w-5 text-fuchsia-400" />
+      },
+      {
+        name: "Diversificação Seletiva",
+        score: 40,
+        description: "Você mantém boa diversificação em renda variável, mas ignora completamente classes como renda fixa internacional e multimercados.",
+        recommendation: "Mesmo com perfil arrojado, mantenha ao menos 15% em ativos descorrelacionados para proteger sua carteira em momentos de estresse de mercado.",
+        icon: <LineChart className="h-5 w-5 text-blue-400" />
+      }
+    ],
+    
+    // Marcos Santos - Cliente com perfil conservador
+    327272: [
+      {
+        name: "Aversão Extrema a Perdas",
+        score: 91,
+        description: "Você demonstra forte resistência a qualquer oscilação negativa, mesmo momentânea, resgatando investimentos ao menor sinal de queda. Em 2024, realizou 6 resgates em momentos de baixa, cristalizando perdas desnecessárias.",
+        recommendation: "Estabeleça um horizonte mínimo para avaliação de investimentos (sugerimos 6 meses) antes de tomar decisões baseadas em oscilações de curto prazo.",
+        icon: <TrendingDown className="h-5 w-5 text-red-500" />
+      },
+      {
+        name: "Concentração em Poupança",
+        score: 84,
+        description: "Mesmo com perfil conservador, a concentração de 68% dos recursos em poupança representa perda significativa de rentabilidade. Esta escolha custou aproximadamente R$ 24.000 em rendimentos nos últimos 2 anos.",
+        recommendation: "Migre gradualmente para produtos conservadores de maior rentabilidade como CDBs de bancos grandes, Tesouro Selic e fundos DI, mantendo a segurança que valoriza.",
+        icon: <Lock className="h-5 w-5 text-gray-400" />
+      },
+      {
+        name: "Status Quo Bias",
+        score: 77,
+        description: "Identificamos resistência a mudanças em sua carteira. Você mantém os mesmos investimentos há mais de 5 anos sem reavaliações, mesmo com mudanças significativas no cenário econômico.",
+        recommendation: "Estabeleça revisões semestrais da carteira, mesmo que seja para confirmar que deseja manter a estratégia atual. Consulte seu assessor para estas revisões.",
+        icon: <AlertTriangle className="h-5 w-5 text-amber-400" />
+      }
     ]
-  } : {
-    traits: behaviorTraits
   };
-  
+
+  // Determine which traits to display based on the selected client
+  const getClientTraits = () => {
+    // If a client is selected and we have specific traits for them
+    if (selectedClient && clientTraitsMap[selectedClient]) {
+      return clientTraitsMap[selectedClient];
+    }
+    
+    // Default traits if no specific client is selected or no custom traits available
+    return behaviorTraits;
+  };
+
   // Check if OpenFinance is active but client has less than 6 months of history
   if (hasOpenFinance && !hasOpenFinanceSixMonths) {
     return (
@@ -114,7 +174,7 @@ const BehavioralFinanceModule = ({ fullWidth = false }) => {
       <p className="text-gray-300 mb-6">{t('behavioralFinanceDesc')}</p>
       
       <div className="space-y-6">
-        {customizedClientData.traits.map((trait, index) => (
+        {getClientTraits().map((trait, index) => (
           <div key={index} className="bg-gray-800/40 rounded-lg p-4 border border-gray-700/50">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center">
