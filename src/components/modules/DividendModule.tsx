@@ -2,7 +2,7 @@
 import React from 'react';
 import { useRaioX } from '@/context/RaioXContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CoinIcon, TrendingUp, Calendar, LineChart } from 'lucide-react';
+import { CoinsIcon, TrendingUp, Calendar, LineChart } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 interface DividendModuleProps {
