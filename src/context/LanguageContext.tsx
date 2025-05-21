@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 // Define types for our translations
@@ -80,6 +81,11 @@ type TranslationKeys = {
   welcomeBack: string;
   invalidPassword: string;
   loginError: string;
+  
+  // New keys for RaioXDashboard tabs
+  chatModuleContent: string;
+  openFinanceModuleContent: string;
+  defaultTabContent: string;
 };
 
 type Translations = {
@@ -178,7 +184,12 @@ const translations: Translations = {
     loginSuccess: "Login bem-sucedido",
     welcomeBack: "Bem-vindo de volta",
     invalidPassword: "Senha inválida",
-    loginError: "Erro de login"
+    loginError: "Erro de login",
+    
+    // New keys for RaioXDashboard tabs
+    chatModuleContent: "Converse diretamente com seu gerente de relacionamento para tirar dúvidas ou solicitar assistência personalizada.",
+    openFinanceModuleContent: "Ative o Open Finance para visualizar dados consolidados de suas contas e investimentos em outras instituições.",
+    defaultTabContent: "Selecione uma das abas para visualizar informações financeiras específicas."
   },
 };
 

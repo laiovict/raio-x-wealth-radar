@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent } from "@/components/ui/card";
@@ -180,7 +179,7 @@ const getRealClientProfileData = (props: ClientProfileModuleProps) => {
       : (Array.isArray(clientSummary.tags) ? clientSummary.tags : []);
     
     const investor_name = clientSummary.investor_name || '';
-    const clientAge = clientSummary.client_age || '';
+    const clientAge = clientSummary.clientAge || ''; // Updated property name to match type
     
     // Extract profile sections
     const { currentStatus, ambitions, needs } = extractProfileSections(summary);

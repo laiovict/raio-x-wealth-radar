@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -125,7 +126,7 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
         return (
           <Card className="glass-morphism p-6">
             <CardContent>
-              {t('chatModuleContent')}
+              {t("chatModuleContent")}
             </CardContent>
           </Card>
         );
@@ -133,7 +134,7 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
         return (
           <Card className="glass-morphism p-6">
             <CardContent>
-              {t('openFinanceModuleContent')}
+              {t("openFinanceModuleContent")}
             </CardContent>
           </Card>
         );
@@ -141,7 +142,7 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
         return (
           <Card className="glass-morphism p-6">
             <CardContent>
-              {t('defaultTabContent')}
+              {t("defaultTabContent")}
             </CardContent>
           </Card>
         );
@@ -171,7 +172,7 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
             </div>
             <CardContent className="flex-grow overflow-hidden">
               <embed
-                src={getMonthlyReportUrl(selectedClient)}
+                src={getMonthlyReportUrl(Number(selectedClient))}
                 type={`application/${mediaType}`}
                 className="w-full h-full"
               />
