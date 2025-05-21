@@ -5,6 +5,7 @@ import { Mic, Search, Share2, Download } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge"; // Added missing Badge import
 import { useFeatureFlags } from "@/context/FeatureFlagContext";
 import { toNumber } from "@/utils/typeConversionHelpers";
 
