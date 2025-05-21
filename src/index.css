@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -42,6 +43,11 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    
+    /* Reinvent brand colors */
+    --reinvent-blue: 224 100% 69%;
+    --reinvent-dark: 240 14% 11%;
+    --reinvent-light: 0 0% 100%;
   }
 }
 
@@ -94,6 +100,43 @@
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  
+  /* Reinvent specific styles */
+  .reinvent-card {
+    @apply bg-gradient-to-br from-[#121218] to-[#1a1a24] border border-white/10 rounded-xl shadow-lg;
+  }
+  
+  .reinvent-header {
+    @apply bg-gradient-to-br from-[#1a1a24] to-[#121218] border-b border-white/5 p-4 rounded-t-xl;
+  }
+  
+  .reinvent-content {
+    @apply p-4;
+  }
+  
+  .reinvent-title {
+    @apply text-lg font-medium text-white;
+  }
+  
+  .reinvent-subtitle {
+    @apply text-sm text-blue-400;
+  }
+  
+  .reinvent-text {
+    @apply text-gray-300;
+  }
+  
+  .reinvent-highlight {
+    @apply text-blue-400;
+  }
+  
+  .reinvent-stat-card {
+    @apply bg-black/30 border border-white/10 rounded-lg p-3;
+  }
+  
+  .reinvent-button {
+    @apply bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg px-4 py-2 transition-colors;
+  }
 }
 
 /* Jony Ive design styling */
@@ -129,4 +172,73 @@
 .jony-ive-design [class*="CardHeader"] {
   background: var(--gradient-white);
   border-radius: var(--card-radius) var(--card-radius) 0 0;
+}
+
+/* Responsive layout styles */
+@media (max-width: 640px) {
+  .grid {
+    grid-gap: 0.75rem;
+  }
+  
+  .p-4 {
+    padding: 0.75rem;
+  }
+  
+  .text-lg {
+    font-size: 1rem;
+  }
+  
+  .text-xl {
+    font-size: 1.1rem;
+  }
+  
+  .text-2xl {
+    font-size: 1.25rem;
+  }
+}
+
+/* Module card consistent styling */
+.module-card {
+  @apply bg-gradient-to-br from-gray-900 to-gray-800 border border-white/10 rounded-xl overflow-hidden shadow-lg;
+}
+
+.module-header {
+  @apply bg-gradient-to-r from-gray-800 to-gray-900 p-4 border-b border-white/5;
+}
+
+.module-content {
+  @apply p-4;
+}
+
+.module-title {
+  @apply text-lg font-medium text-white flex items-center gap-2;
+}
+
+.module-icon {
+  @apply text-blue-400;
+}
+
+/* Stats styling */
+.stat-grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4;
+}
+
+.stat-card {
+  @apply bg-black/20 border border-white/5 rounded-lg p-4;
+}
+
+.stat-label {
+  @apply text-xs text-gray-400;
+}
+
+.stat-value {
+  @apply text-xl font-bold text-white;
+}
+
+.stat-trend-up {
+  @apply text-xs text-green-400 flex items-center;
+}
+
+.stat-trend-down {
+  @apply text-xs text-red-400 flex items-center;
 }

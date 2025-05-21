@@ -1,10 +1,11 @@
 
 import React from 'react';
-import { ArrowUp, ArrowDown } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { formatCurrency } from "@/utils/raioXUtils";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import DataSourceTag from './DataSourceTag';
 import { ensureString } from '@/utils/typeConversionHelpers';
+import { cssClasses } from '@/utils/style-themes';
 
 interface NetWorthSectionProps {
   finData: any;
@@ -36,9 +37,9 @@ const NetWorthSection = ({ finData, netWorthHistory, getPortfolioSummary, defaul
         </div>
       </div>
       
-      <div className="h-40">
+      <div className="h-40 w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={netWorthHistory}>
+          <LineChart data={netWorthHistory} margin={{ top: 5, right: 5, bottom: 5, left: 5 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#333" />
             <XAxis dataKey="month" stroke="#666" />
             <YAxis 
@@ -53,7 +54,7 @@ const NetWorthSection = ({ finData, netWorthHistory, getPortfolioSummary, defaul
               content={({ active, payload, label }) => {
                 if (active && payload && payload.length) {
                   return (
-                    <div className="bg-gray-800 p-2 border border-gray-700 rounded-md">
+                    <div className="reinvent-stat-card p-2">
                       <p className="text-gray-300">{`Mês: ${label}`}</p>
                       <p className="text-white font-medium">{`Valor: ${formatCurrency(payload[0].value as number)}`}</p>
                       <p className="text-amber-400 text-xs">* Dados sintéticos</p>
@@ -66,7 +67,7 @@ const NetWorthSection = ({ finData, netWorthHistory, getPortfolioSummary, defaul
             <Line 
               type="monotone" 
               dataKey="amount" 
-              stroke="#8884d8" 
+              stroke="#6680FF" 
               dot={false}
               strokeWidth={3}
             />

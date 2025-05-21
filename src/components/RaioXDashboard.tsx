@@ -11,6 +11,7 @@ import { useFeatureFlags } from "@/context/FeatureFlagContext";
 import { getMonthlyReportUrl } from "@/utils/reportUtils";
 import { generatePdf } from "@/utils/pdfGenerator";
 import { LayoutDashboard, Download, XCircle } from "lucide-react";
+import { useSteveJobsUI } from "@/hooks/useSteveJobsUI";
 
 // Import static components
 import FinancialOverviewModule from "@/components/modules/FinancialOverviewModule";
@@ -32,7 +33,6 @@ const LifeGoalsModule = lazy(() => import("@/components/modules/LifeGoalsModule"
 const WrappedModule = lazy(() => import("@/components/modules/WrappedModule"));
 const FutureProjectionModule = lazy(() => import("@/components/modules/FutureProjectionModule"));
 const OnePageFinancialPlanModule = lazy(() => import("@/components/modules/OnePageFinancialPlanModule"));
-const SteveJobsReportModule = lazy(() => import("@/components/modules/SteveJobsReportModule"));
 const WholeBankingModule = lazy(() => import("@/components/modules/WholeBankingModule"));
 const BehavioralFinanceModule = lazy(() => import("@/components/modules/BehavioralFinanceModule"));
 const MeuFuturoFinanceiroModule = lazy(() => import("@/components/modules/MeuFuturoFinanceiroModule"));
@@ -71,6 +71,7 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
   const { flags } = useFeatureFlags();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<string | null>(null);
+  const { theme } = useSteveJobsUI();
 
   useEffect(() => {
     // Set initial tab from URL params
@@ -158,7 +159,7 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
     </div>
   );
 
-  // Define RaioX Full tab content
+  // Define RaioX Full tab content with consistent styling and no duplicates
   const FullTabContent = () => (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-6">
       <div className="lg:col-span-1">
@@ -201,13 +202,10 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
           <WrappedModule />
         </Suspense>
         <Suspense fallback={<LoadingComponent />}>
-          <SteveJobsReportModule />
+          <WholeBankingModule />
         </Suspense>
         <Suspense fallback={<LoadingComponent />}>
           <MeuFuturoFinanceiroModule />
-        </Suspense>
-        <Suspense fallback={<LoadingComponent />}>
-          <WholeBankingModule />
         </Suspense>
         <Suspense fallback={<LoadingComponent />}>
           <PersonalInsightsModule />
@@ -216,7 +214,7 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
     </div>
   );
 
-  // Define RaioX Full v2 (Jony Ive design) tab content
+  // Define RaioX Full v2 (Jony Ive design) tab content with better organization
   const FullV2TabContent = () => (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6 jony-ive-design">
       <ClientProfileModule fullWidth={false} />
@@ -228,7 +226,10 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
           <InteligenciaModule />
         </Suspense>
       </div>
-      <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="lg:col-span-2">
+        <FinancialOverviewModule fullWidth={true} />
+      </div>
+      <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
         <Suspense fallback={<LoadingComponent />}>
           <RecommendationsModule />
         </Suspense>
@@ -249,12 +250,20 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
         <Suspense fallback={<LoadingComponent />}>
           <BehavioralFinanceModule />
         </Suspense>
-        <FinancialOverviewModule />
         <Suspense fallback={<LoadingComponent />}>
           <OnePageFinancialPlanModule />
         </Suspense>
         <SentimentInsightsModule />
         <FamousInvestorsModule />
+        <Suspense fallback={<LoadingComponent />}>
+          <WholeBankingModule />
+        </Suspense>
+        <Suspense fallback={<LoadingComponent />}>
+          <MeuFuturoFinanceiroModule />
+        </Suspense>
+        <Suspense fallback={<LoadingComponent />}>
+          <PersonalInsightsModule />
+        </Suspense>
       </div>
     </div>
   );
