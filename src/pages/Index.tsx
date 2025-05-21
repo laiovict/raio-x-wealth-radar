@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import ClientSelector from "@/components/ClientSelector";
@@ -57,7 +58,7 @@ const Index = () => {
   const handleLogoClick = () => {
     // Reset to default view
     document.dispatchEvent(new CustomEvent('navigate-to-tab', {
-      detail: { tabId: 'overview' }
+      detail: { tabId: 'raiox-beta' }
     }));
     
     // Scroll to top

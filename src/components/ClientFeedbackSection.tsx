@@ -1,6 +1,8 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import FeedbackForm from "./FeedbackForm";
 import FeedbackList from "./FeedbackList";
+import { toNumber } from "@/utils/typeConversionHelpers";
 
 interface ClientFeedbackSectionProps {
   isAdvisorView?: boolean;
@@ -19,12 +21,12 @@ const ClientFeedbackSection = ({ isAdvisorView = false }: ClientFeedbackSectionP
         <>
           {/* Advisors see the list of all feedback */}
           <FeedbackList clientId={null} />
-          <FeedbackForm clientId={selectedClient} isAdvisor={true} />
+          <FeedbackForm clientId={selectedClient ? toNumber(selectedClient) : null} isAdvisor={true} />
         </>
       ) : (
         <>
           {/* Clients only see their feedback form without the list */}
-          <FeedbackForm clientId={selectedClient} />
+          <FeedbackForm clientId={selectedClient ? toNumber(selectedClient) : null} />
         </>
       )}
     </div>

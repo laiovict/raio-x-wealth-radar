@@ -1,126 +1,206 @@
 
-import { PortfolioSummary, DividendHistory, AIInsight, DataSourceType } from '@/types/raioXTypes';
-import { formatCurrency } from '@/utils/formattingUtils';
-import { deepClone } from '@/utils/portfolioHelpers';
+import { PortfolioSummary, DividendHistory, AIInsight } from '@/types/raioXTypes';
+import { v4 as uuidv4 } from 'uuid';
+import { ensureNumber } from '@/utils/typeConversionHelpers';
 
-/**
- * Generates insights based on portfolio data
- */
+// Deep clone utility function for objects
+export const deepClone = <T>(obj: T): T => {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(deepClone) as unknown as T;
+  }
+  
+  const clonedObj = {} as T;
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      clonedObj[key] = deepClone(obj[key]);
+    }
+  }
+  
+  return clonedObj;
+};
+
+// Generate insights based on portfolio data
 export const generateAIInsights = (
-  portfolioSummary: PortfolioSummary | null,
-  dividendHistory: DividendHistory[] | null,
-  useSynthetic = false
+  portfolioSummary?: PortfolioSummary,
+  dividendHistory?: DividendHistory[]
 ): AIInsight[] => {
-  // If using synthetic data, return pre-defined insights
-  if (useSynthetic) {
-    return generateSyntheticInsights();
-  }
-  
-  // Initialize insights array
   const insights: AIInsight[] = [];
-  
-  // If no real data, return empty array
-  if (!portfolioSummary && (!dividendHistory || dividendHistory.length === 0)) {
-    return [];
-  }
-  
-  // Generate insights based on portfolio composition
+
+  // Example insight based on asset allocation
   if (portfolioSummary) {
-    const fixedIncomeValue = Number(portfolioSummary.fixed_income_value);
-    const totalValue = Number(portfolioSummary.total_portfolio_value);
+    const fixedIncomeRatio = ensureNumber(portfolioSummary.fixed_income_representation || 0);
+    const stocksRatio = ensureNumber(portfolioSummary.stocks_representation || 0);
     
-    // Check portfolio diversification
-    if (totalValue > 0 && fixedIncomeValue / totalValue > 0.7) {
+    if (fixedIncomeRatio > 70) {
       insights.push({
-        id: 'real-insight-1',
-        title: 'Alta concentração em renda fixa',
-        description: `${Math.round((fixedIncomeValue / totalValue) * 100)}% da sua carteira está em renda fixa. Considere diversificar para alcançar melhores retornos a longo prazo.`,
-        category: 'allocation',
-        priority: 'medium',
+        id: uuidv4(),
+        title: "Alta concentração em renda fixa",
+        description: "Seu portfólio está muito concentrado em renda fixa (mais de 70%). Considere diversificar para buscar melhores retornos de longo prazo.",
+        category: "allocation",
+        priority: "medium",
+        isNew: true,
         timestamp: new Date(),
-        agent: 'investor',
-        impact: 'medium',
-        type: 'insight',
-        dataSource: 'supabase'
+        agent: "investor",
+        type: "risk",
+        impact: "medium",
+        dataSource: "calculated"
       });
     }
     
-    // Add more real data insights here
+    if (stocksRatio > 80) {
+      insights.push({
+        id: uuidv4(),
+        title: "Alta exposição à renda variável",
+        description: "Sua carteira está fortemente posicionada em ações (mais de 80%). Verifique se este nível de risco está alinhado com seus objetivos.",
+        category: "risk",
+        priority: "high",
+        isNew: true,
+        timestamp: new Date(),
+        agent: "investor",
+        type: "risk",
+        impact: "high",
+        dataSource: "calculated"
+      });
+    }
   }
-  
-  // Generate insights based on dividend history
+
+  // Example insight based on dividends
   if (dividendHistory && dividendHistory.length > 0) {
-    // Calculate average dividend
-    const totalDividends = dividendHistory.reduce((sum, div) => {
-      const value = typeof div.value === 'string' ? parseFloat(div.value) : div.value;
-      return sum + (isNaN(value) ? 0 : value);
+    const totalDividends = dividendHistory.reduce((sum, dividend) => {
+      return sum + ensureNumber(dividend.value);
     }, 0);
     
-    const averageDividend = totalDividends / dividendHistory.length;
-    
-    insights.push({
-      id: 'real-insight-dividend-1',
-      title: 'Análise de dividendos',
-      description: `Seus investimentos geraram ${formatCurrency(totalDividends)} em dividendos, com média de ${formatCurrency(averageDividend)} por pagamento.`,
-      category: 'income',
-      priority: 'low',
-      timestamp: new Date(),
-      agent: 'farmer',
-      impact: 'low',
-      type: 'insight',
-      dataSource: 'supabase'
-    });
+    if (totalDividends > 5000) {
+      insights.push({
+        id: uuidv4(),
+        title: "Fluxo significativo de dividendos",
+        description: `Seus investimentos estão gerando mais de R$ 5.000 em dividendos. Uma estratégia de reinvestimento pode potencializar seus retornos.`,
+        category: "income",
+        priority: "medium",
+        isNew: false,
+        timestamp: new Date(),
+        agent: "farmer",
+        type: "opportunity",
+        impact: "medium",
+        dataSource: "calculated"
+      });
+    }
   }
-  
+
   return insights;
 };
 
-/**
- * Generate synthetic insights for demo purposes
- */
-const generateSyntheticInsights = (): AIInsight[] => {
-  const now = new Date();
+// Alias for generateAIInsights for backward compatibility
+export const generatePortfolioInsights = (
+  portfolioSummary?: any,
+  stocks?: any[],
+  fixedIncome?: any[],
+  investmentFunds?: any[],
+  realEstate?: any[],
+  profitability?: any,
+  dividendHistory?: DividendHistory[]
+): AIInsight[] => {
+  // Start with basic insights based on portfolio summary and dividends
+  const baseInsights = generateAIInsights(portfolioSummary, dividendHistory);
   
-  return [
-    {
-      id: 'synthetic-1',
-      title: 'Oportunidade em fundos imobiliários',
-      description: 'Com a queda recente das taxas de juros, fundos imobiliários tendem a se valorizar. Considere aumentar sua exposição nesta classe de ativos.',
-      category: 'opportunity',
-      priority: 'high',
-      timestamp: now,
-      agent: 'investor',
-      isSynthetic: true,
-      type: 'opportunity',
-      impact: 'high',
-      dataSource: 'synthetic'
-    },
-    {
-      id: 'synthetic-2',
-      title: 'Concentração excessiva em tecnologia',
-      description: 'Sua carteira possui 47% de concentração em empresas de tecnologia, o que aumenta o risco setorial. Considere diversificar para setores mais defensivos.',
-      category: 'risk',
-      priority: 'medium',
-      timestamp: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000),
-      agent: 'planner',
-      isSynthetic: true,
-      type: 'risk',
-      impact: 'medium',
-      dataSource: 'synthetic'
-    },
-    {
-      id: 'synthetic-3',
-      title: 'Reserva de emergência abaixo do ideal',
-      description: 'Sua reserva atual cobre apenas 3 meses de despesas. O ideal seria aumentar para 6 meses, considerando seu perfil de renda.',
-      category: 'planning',
-      priority: 'high',
-      timestamp: new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000),
-      agent: 'planner',
-      isSynthetic: true,
-      type: 'risk',
-      impact: 'high',
-      dataSource: 'synthetic'
-    },
-    // Add more synthetic insights as needed
-  ];
+  // Add more specific insights based on the additional parameters
+  const insights = [...baseInsights];
+  
+  // Check for high concentration in specific stocks
+  if (stocks && stocks.length > 0) {
+    const totalStocksValue = stocks.reduce((sum, stock) => sum + ensureNumber(stock.total_value), 0);
+    
+    // Find any single stock that represents more than 20% of the stock portfolio
+    const highConcentrationStocks = stocks.filter(stock => 
+      (ensureNumber(stock.total_value) / totalStocksValue) > 0.2
+    );
+    
+    if (highConcentrationStocks.length > 0) {
+      highConcentrationStocks.forEach(stock => {
+        insights.push({
+          id: uuidv4(),
+          title: `Alta concentração em ${stock.asset}`,
+          description: `${stock.asset} representa mais de 20% da sua carteira de ações. Considere diversificar para reduzir o risco.`,
+          category: "concentration",
+          priority: "medium",
+          isNew: true,
+          timestamp: new Date(),
+          agent: "investor",
+          type: "risk",
+          impact: "medium",
+          dataSource: "calculated"
+        });
+      });
+    }
+  }
+  
+  // Add insights about fixed income if applicable
+  if (fixedIncome && fixedIncome.length > 0) {
+    // Check for short-term fixed income allocation
+    const shortTermCount = fixedIncome.filter(fi => {
+      const maturityDate = new Date(fi.maturity_date);
+      const today = new Date();
+      const diffTime = maturityDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return diffDays < 180; // Less than 6 months
+    }).length;
+    
+    if (shortTermCount > 3) {
+      insights.push({
+        id: uuidv4(),
+        title: "Concentração em renda fixa de curto prazo",
+        description: "Você tem várias aplicações de renda fixa com vencimento próximo. Planeje a reinvestimento desses recursos.",
+        category: "planning",
+        priority: "low",
+        isNew: true,
+        timestamp: new Date(),
+        agent: "planner",
+        type: "opportunity",
+        impact: "low",
+        dataSource: "calculated"
+      });
+    }
+  }
+  
+  // Add profitability insights if available
+  if (profitability) {
+    const ytdReturn = ensureNumber(profitability.ytd);
+    const sixMonthReturn = ensureNumber(profitability.six_months);
+    
+    if (ytdReturn < 0) {
+      insights.push({
+        id: uuidv4(),
+        title: "Retorno negativo no ano",
+        description: "Sua carteira está com rendimento negativo no ano corrente. Considere uma revisão da alocação.",
+        category: "performance",
+        priority: "high",
+        isNew: true,
+        timestamp: new Date(),
+        agent: "investor",
+        type: "risk",
+        impact: "high",
+        dataSource: "calculated"
+      });
+    } else if (ytdReturn > 12) {
+      insights.push({
+        id: uuidv4(),
+        title: "Excelente performance no ano",
+        description: "Seus investimentos estão performando muito bem este ano, com retorno acima de 12%.",
+        category: "performance",
+        priority: "low",
+        isNew: true,
+        timestamp: new Date(),
+        agent: "investor",
+        type: "opportunity",
+        impact: "medium",
+        dataSource: "calculated"
+      });
+    }
+  }
+
+  return insights;
 };

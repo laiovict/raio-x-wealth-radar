@@ -16,12 +16,29 @@ const InsightsTabContent: React.FC<InsightsTabContentProps> = ({
   loadingStates, 
   financialInsightData 
 }) => {
+  // Helper function to adapt AIInsight to the format expected by InsightCard
+  const adaptInsightForCard = (insight: AIInsight) => {
+    return {
+      id: insight.id || '',
+      title: insight.title,
+      description: insight.description,
+      type: insight.type || 'insight',
+      category: insight.category || '',
+      impact: insight.impact || 'medium',
+      actions: [],
+      dataSource: insight.dataSource || 'synthetic',
+      agent: insight.agent || '',
+      priority: insight.priority || 'medium',
+      isNew: insight.isNew || false
+    };
+  };
+  
   return (
     <div className="p-4 space-y-4">
       {financialInsightData && financialInsightData.insights ? (
         <div className="space-y-4">
-          {(financialInsightData.insights || []).map((insight: AIInsight, index: number) => (
-            <InsightCard key={index} insight={insight} />
+          {(financialInsightData.insights || []).map((insight: any, index: number) => (
+            <InsightCard key={index} insight={adaptInsightForCard(insight)} />
           ))}
         </div>
       ) : (
@@ -43,7 +60,7 @@ const InsightsTabContent: React.FC<InsightsTabContentProps> = ({
           ) : (
             <div className="space-y-4">
               {insights.map((insight, index) => (
-                <InsightCard key={index} insight={insight} />
+                <InsightCard key={index} insight={adaptInsightForCard(insight)} />
               ))}
             </div>
           )}

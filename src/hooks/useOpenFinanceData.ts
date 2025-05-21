@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { toNumber } from '@/utils/typeConversionHelpers';
 import { 
   getClientOpenFinanceAccounts,
   getClientOpenFinanceInvestments,
@@ -22,7 +23,7 @@ interface UseOpenFinanceDataReturn {
 /**
  * Custom hook to fetch all Open Finance data for a client
  */
-export const useOpenFinanceData = (clientId: number | null): UseOpenFinanceDataReturn => {
+export const useOpenFinanceData = (clientId: number | string | null): UseOpenFinanceDataReturn => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [hasOpenFinanceData, setHasOpenFinanceData] = useState<boolean>(false);
@@ -44,13 +45,17 @@ export const useOpenFinanceData = (clientId: number | null): UseOpenFinanceDataR
       setError(null);
       
       try {
+        // Convert clientId to number
+        const numClientId = toNumber(clientId);
+        
         // First, check if the client has any Open Finance accounts
-        const accounts = await getClientOpenFinanceAccounts(clientId);
+        const accounts = await getClientOpenFinanceAccounts(numClientId);
         setOpenFinanceAccounts(accounts);
         
         // If no accounts, there's no Open Finance data
         if (!accounts || accounts.length === 0) {
           setHasOpenFinanceData(false);
+          setIsLoading(false);
           return;
         }
         
@@ -61,10 +66,10 @@ export const useOpenFinanceData = (clientId: number | null): UseOpenFinanceDataR
           insights,
           report
         ] = await Promise.all([
-          getClientOpenFinanceInvestments(clientId),
-          getClientOpenFinanceTransactions(clientId, 500),
-          generateOpenFinanceInsights(clientId),
-          generateConsolidatedFinancialReport(clientId)
+          getClientOpenFinanceInvestments(numClientId),
+          getClientOpenFinanceTransactions(numClientId, 500),
+          generateOpenFinanceInsights(numClientId),
+          generateConsolidatedFinancialReport(numClientId)
         ]);
         
         setOpenFinanceInvestments(investments || []);
@@ -75,7 +80,7 @@ export const useOpenFinanceData = (clientId: number | null): UseOpenFinanceDataR
         // Set flag based on whether we actually got data
         setHasOpenFinanceData(
           accounts.length > 0 && 
-          (investments.length > 0 || transactions.length > 0)
+          (investments?.length > 0 || transactions?.length > 0)
         );
         
       } catch (err) {

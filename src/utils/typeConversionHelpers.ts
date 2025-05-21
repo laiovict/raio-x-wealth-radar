@@ -57,3 +57,36 @@ export const toParseableString = (value: string | number | null | undefined): st
   }
   return '0';
 };
+
+/**
+ * Format a number as currency (BRL)
+ */
+export const formatCurrency = (value: number | string | null | undefined): string => {
+  const numValue = toNumber(value);
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+    maximumFractionDigits: 0,
+  }).format(numValue);
+};
+
+/**
+ * Format a number as percentage
+ */
+export const formatPercentage = (value: number | string | null | undefined, digits: number = 1): string => {
+  const numValue = toNumber(value);
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'percent',
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(numValue / 100);
+};
+
+/**
+ * Convert a number to a format that can be used for calculations and presentation
+ */
+export const toFormattableString = (value: number | string | null | undefined): string => {
+  if (value === null || value === undefined) return '0';
+  const numValue = toNumber(value);
+  return numValue.toString();
+};

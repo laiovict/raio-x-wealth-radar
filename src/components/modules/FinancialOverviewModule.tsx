@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Info, RefreshCw } from "lucide-react";
+import { toNumber } from "@/utils/typeConversionHelpers";
 
 // Import sub-components
 import DataSourceInfoPanel from "./financialOverview/DataSourceInfoPanel";
@@ -29,9 +30,10 @@ import {
 interface FinancialOverviewModuleProps {
   fullWidth?: boolean;
   useSyntheticData?: boolean; // New prop to control data source
+  steveJobsMode?: boolean; // Added for Steve Jobs UI
 }
 
-const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false }: FinancialOverviewModuleProps) => {
+const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false, steveJobsMode = false }: FinancialOverviewModuleProps) => {
   const { data, hasOpenFinance, financialSummary, isAIAnalysisLoading, refreshAIAnalysis, selectedClient } = useRaioX();
   const [showBehavioralInsights, setShowBehavioralInsights] = useState(false);
   const [showDataSourceInfo, setShowDataSourceInfo] = useState(false);
@@ -46,7 +48,7 @@ const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false }
   // otherwise use synthetic data
   const finData = (hasOpenFinance && financialSummary && !useSyntheticData)
     ? financialSummary
-    : getSyntheticData(selectedClient, getPortfolioSummary());
+    : getSyntheticData(selectedClient ? toNumber(selectedClient) : null, getPortfolioSummary());
     
   // Get historical net worth data
   const netWorthHistory = generateNetWorthHistory(finData.netWorth);
@@ -110,7 +112,7 @@ const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false }
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-            {isFullVersion ? "Meu Panorama Financeiro (Versão Full)" : "Meu Panorama Financeiro"}
+            {useSyntheticData ? "Meu Panorama Financeiro (Versão Full)" : "Meu Panorama Financeiro"}
           </CardTitle>
           <div className="flex gap-2">
             <Button 
@@ -122,7 +124,7 @@ const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false }
               <Info className="h-4 w-4" />
               <span className="text-xs">Legenda</span>
             </Button>
-            {isFullVersion && (
+            {useSyntheticData && (
               <Button variant="ghost" size="sm" onClick={refreshAIAnalysis} className="flex items-center gap-2">
                 <RefreshCw className="h-4 w-4" />
                 <span className="hidden md:inline">Atualizar</span>
@@ -135,7 +137,7 @@ const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false }
       <CardContent>
         <div className="space-y-6">
           {/* Main Financial Overview Section - Full version only */}
-          {isFullVersion && (
+          {useSyntheticData && (
             <MainFinancialOverview 
               finData={finData} 
               hasOpenFinance={hasOpenFinance || useSyntheticData} 
@@ -165,7 +167,7 @@ const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false }
           />
           
           {/* OpenFinance Insights Section - Full version only */}
-          {isFullVersion && (
+          {useSyntheticData && (
             <div className="mt-6">
               <div className="mb-4 border-b border-white/10 pb-2">
                 <div className="flex items-center text-lg font-medium text-white gap-2">
@@ -186,7 +188,7 @@ const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false }
           )}
           
           {/* Financial History Highlights - Full version only */}
-          {isFullVersion && (
+          {useSyntheticData && (
             <div className="mt-6">
               <div className="mb-4 flex justify-between items-center">
                 <div className="text-lg font-medium text-white">
@@ -211,10 +213,10 @@ const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false }
           )}
           
           {/* Recommended Next Steps - Full version only */}
-          {isFullVersion && <RecommendedSteps useSyntheticData={useSyntheticData} />}
+          {useSyntheticData && <RecommendedSteps useSyntheticData={useSyntheticData} />}
           
           {/* Top Risks - Full version only */}
-          {isFullVersion && <TopRisks finData={finData} useSyntheticData={useSyntheticData} />}
+          {useSyntheticData && <TopRisks finData={finData} useSyntheticData={useSyntheticData} />}
         </div>
       </CardContent>
     </Card>

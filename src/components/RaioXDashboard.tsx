@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Mic, Search, Share2, Download } from "lucide-react";
@@ -6,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { useFeatureFlags } from "@/context/FeatureFlagContext";
+import { toNumber } from "@/utils/typeConversionHelpers";
 
 // Import modules
 import AllocationModule from "./modules/AllocationModule";
@@ -51,7 +51,7 @@ const RaioXDashboard = ({
   onOpenFinanceActivate,
   userRole
 }: RaioXDashboardProps) => {
-  const { data, hasOpenFinance, selectedClient } = useRaioX();
+  const { data, hasOpenFinance, selectedClient, hasOpenFinanceData } = useRaioX();
   const [searchQuery, setSearchQuery] = useState("");
   // Set default tab to "raiox-beta"
   const [activeTab, setActiveTab] = useState("raiox-beta");
@@ -201,6 +201,11 @@ const RaioXDashboard = ({
     }, 2000);
   };
 
+  // Function to check if the full tab should be enabled
+  const isFullTabEnabled = () => {
+    return hasOpenFinance || hasOpenFinanceData;
+  };
+
   if (showPdfPreview) {
     return (
       <PdfPreview 
@@ -213,6 +218,22 @@ const RaioXDashboard = ({
       />
     );
   }
+
+  // Function to handle clicking on the Full Version tab when OpenFinance is not active
+  const handleFullTabClick = () => {
+    if (!isFullTabEnabled()) {
+      // Show toast notification
+      toast({
+        title: "OpenFinance não ativado",
+        description: "Ative o OpenFinance para acessar a versão completa do RaioX.",
+      });
+      
+      // Trigger OpenFinance activation if callback exists
+      if (onOpenFinanceActivate) {
+        onOpenFinanceActivate();
+      }
+    }
+  };
 
   return (
     <div className="space-y-8 pb-16 min-h-screen" ref={dashboardRef}>
@@ -255,7 +276,7 @@ const RaioXDashboard = ({
         </div>
       </div>
 
-      <WelcomeBanner selectedClient={selectedClient} />
+      <WelcomeBanner selectedClient={selectedClient ? toNumber(selectedClient) : null} />
       
       {/* Moved InteligenciaModule to the top for greater prominence */}
       <InteligenciaModule fullWidth />
@@ -266,7 +287,12 @@ const RaioXDashboard = ({
           <TabsTrigger value="raiox-beta" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">
             RaioX Beta
           </TabsTrigger>
-          <TabsTrigger value="versao-full" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">
+          <TabsTrigger 
+            value="versao-full" 
+            className={`data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white ${!isFullTabEnabled() ? 'opacity-50' : ''}`}
+            onClick={handleFullTabClick}
+            disabled={!isFullTabEnabled()}
+          >
             Versão Full
           </TabsTrigger>
           {/* Added "Por Steve Jobs" tab with special styling */}
@@ -312,81 +338,101 @@ const RaioXDashboard = ({
         
         {/* Tab 2: Versão Full - Full version with all features */}
         <TabsContent value="versao-full" className="space-y-8">
-          {/* Starting with Financial Overview with synthetic data explicitly enabled */}
-          <div>
-            <FinancialOverviewModule useSyntheticData={flags.synthetic_data} />
-            <FeedbackSection sectionId="full-financial-overview" />
-          </div>
-          
-          {/* The rest of the full content, always with synthetic data */}
-          <div>
-            <OnePageFinancialPlanModule useSyntheticData={flags.synthetic_data} />
-            <FeedbackSection sectionId="full-financial-plan" />
-          </div>
-          
-          <div>
-            <DividendModule fullWidth useSyntheticData={flags.synthetic_data} />
-            <FeedbackSection sectionId="full-dividends" />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <AllocationModule useSyntheticData={flags.synthetic_data} />
-              <FeedbackSection sectionId="full-allocation" />
+          {/* Only show OpenFinance CTA when Full is being viewed but not enabled */}
+          {!isFullTabEnabled() ? (
+            <div className="p-6 border border-blue-500/20 rounded-lg bg-blue-900/10 text-center">
+              <h3 className="text-xl font-medium text-white mb-3">Versão completa indisponível</h3>
+              <p className="text-gray-300 mb-4">
+                Para acessar a versão completa do RaioX com insights mais profundos e uma visão 360° das suas finanças,
+                é necessário ativar o OpenFinance.
+              </p>
+              <Button 
+                variant="purpleGradient"
+                className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white hover:from-blue-700 hover:to-indigo-800"
+                onClick={onOpenFinanceActivate}
+              >
+                Ativar OpenFinance
+              </Button>
             </div>
-            <div>
-              <LiquidityReserveModule useSyntheticData={flags.synthetic_data} />
-              <FeedbackSection sectionId="full-liquidity" />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <BehavioralFinanceModule useSyntheticData={flags.synthetic_data} />
-              <FeedbackSection sectionId="full-behavioral-finance" />
-            </div>
-            <div>
-              <SentimentInsightsModule useSyntheticData={flags.synthetic_data} />
-              <FeedbackSection sectionId="full-sentiment" />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <FutureProjectionModule useSyntheticData={flags.synthetic_data} />
-              <FeedbackSection sectionId="full-future-projection" />
-            </div>
-            <div>
-              <InvestmentPlanningModule useSyntheticData={flags.synthetic_data} />
-              <FeedbackSection sectionId="full-investment-planning" />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <SocialComparisonModule useSyntheticData={flags.synthetic_data} />
-              <FeedbackSection sectionId="full-social-comparison" />
-            </div>
-            <div>
-              <PersonalInsightsModule useSyntheticData={flags.synthetic_data} />
-              <FeedbackSection sectionId="full-personal-insights" />
-            </div>
-          </div>
-          
-          <div>
-            <LifeGoalsModule useSyntheticData={flags.synthetic_data} />
-            <FeedbackSection sectionId="full-life-goals" />
-          </div>
-          
-          {/* Add the feedback section at the end of the full version tab */}
-          <div>
-            <ClientFeedbackSection isAdvisorView={userRole === "advisor"} />
-          </div>
-          
-          {/* Footer for this tab */}
-          <div className="w-full py-10 text-center border-t border-white/10 mt-12">
-            <p className="text-gray-400">Fim da seção - Versão Full</p>
-          </div>
+          ) : (
+            <>
+              {/* Starting with Financial Overview with synthetic data explicitly enabled */}
+              <div>
+                <FinancialOverviewModule useSyntheticData={flags.synthetic_data} />
+                <FeedbackSection sectionId="full-financial-overview" />
+              </div>
+              
+              {/* The rest of the full content, always with synthetic data */}
+              <div>
+                <OnePageFinancialPlanModule useSyntheticData={flags.synthetic_data} />
+                <FeedbackSection sectionId="full-financial-plan" />
+              </div>
+              
+              <div>
+                <DividendModule fullWidth useSyntheticData={flags.synthetic_data} />
+                <FeedbackSection sectionId="full-dividends" />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <AllocationModule useSyntheticData={flags.synthetic_data} />
+                  <FeedbackSection sectionId="full-allocation" />
+                </div>
+                <div>
+                  <LiquidityReserveModule useSyntheticData={flags.synthetic_data} />
+                  <FeedbackSection sectionId="full-liquidity" />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <BehavioralFinanceModule useSyntheticData={flags.synthetic_data} />
+                  <FeedbackSection sectionId="full-behavioral-finance" />
+                </div>
+                <div>
+                  <SentimentInsightsModule useSyntheticData={flags.synthetic_data} />
+                  <FeedbackSection sectionId="full-sentiment" />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <FutureProjectionModule useSyntheticData={flags.synthetic_data} />
+                  <FeedbackSection sectionId="full-future-projection" />
+                </div>
+                <div>
+                  <InvestmentPlanningModule useSyntheticData={flags.synthetic_data} />
+                  <FeedbackSection sectionId="full-investment-planning" />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <SocialComparisonModule useSyntheticData={flags.synthetic_data} />
+                  <FeedbackSection sectionId="full-social-comparison" />
+                </div>
+                <div>
+                  <PersonalInsightsModule useSyntheticData={flags.synthetic_data} />
+                  <FeedbackSection sectionId="full-personal-insights" />
+                </div>
+              </div>
+              
+              <div>
+                <LifeGoalsModule useSyntheticData={flags.synthetic_data} />
+                <FeedbackSection sectionId="full-life-goals" />
+              </div>
+              
+              {/* Add the feedback section at the end of the full version tab */}
+              <div>
+                <ClientFeedbackSection isAdvisorView={userRole === "advisor"} />
+              </div>
+              
+              {/* Footer for this tab */}
+              <div className="w-full py-10 text-center border-t border-white/10 mt-12">
+                <p className="text-gray-400">Fim da seção - Versão Full</p>
+              </div>
+            </>
+          )}
         </TabsContent>
         
         {/* Tab 3: Steve Jobs - The reimagined financial diagnostic */}
@@ -396,24 +442,24 @@ const RaioXDashboard = ({
           
           {/* Steve Jobs Implementation of the RaioX based on the mandate */}
           <div className="space-y-8">
-            <FinancialOverviewModule useSyntheticData={true} steveJobsMode={true} />
+            <FinancialOverviewModule useSyntheticData={true} />
             <FeedbackSection sectionId="steve-jobs-financial-overview" />
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
-                <LiquidityReserveModule useSyntheticData={true} steveJobsMode={true} />
+                <LiquidityReserveModule useSyntheticData={true} />
                 <FeedbackSection sectionId="steve-jobs-liquidity" />
               </div>
               <div>
-                <AllocationModule useSyntheticData={true} steveJobsMode={true} />
+                <AllocationModule useSyntheticData={true} />
                 <FeedbackSection sectionId="steve-jobs-allocation" />
               </div>
             </div>
             
-            <DividendModule fullWidth useSyntheticData={true} steveJobsMode={true} />
+            <DividendModule fullWidth useSyntheticData={true} />
             <FeedbackSection sectionId="steve-jobs-dividends" />
             
-            <BehavioralFinanceModule useSyntheticData={true} steveJobsMode={true} />
+            <BehavioralFinanceModule useSyntheticData={true} />
             <FeedbackSection sectionId="steve-jobs-behavioral" />
           </div>
           

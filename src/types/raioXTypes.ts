@@ -57,6 +57,7 @@ export interface RaioXData {
   profitability?: any;
   clientSummary?: ClientSummary;
   marketSentiment?: any;
+  monthlyExpenses?: number; // Added to fix BehavioralFinanceModule error
 }
 
 // Types for financial data and insights
@@ -71,6 +72,8 @@ export interface FinancialSummary {
   dataSource?: DataSourceType;
   fixedIncomePercent?: number;
   investmentBalance?: number;
+  cashReserves?: number; // Added for portfolioService
+  variableIncomePercent?: number; // Added for raioXUtils
 }
 
 export interface PortfolioSummary {

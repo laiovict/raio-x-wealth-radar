@@ -15,7 +15,7 @@ type SteveJobsTheme = {
 };
 
 // Hook to get steve jobs UI settings
-export const useSteveJobsUI = (steveJobsMode = false) => {
+export const useSteveJobsUI = (steveJobsMode: boolean = false) => {
   const { flags } = useFeatureFlags();
 
   const isEnabled = useMemo(() => {

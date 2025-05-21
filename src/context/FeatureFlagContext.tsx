@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 // Define the structure of our feature flags
 export interface FeatureFlags {
@@ -34,8 +35,38 @@ const FeatureFlagContext = createContext<FeatureFlagContextProps>({
 });
 
 // Provider component that wraps the app and provides the flag context
-export const FeatureFlagProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [flags, setFlags] = useState<FeatureFlags>(defaultFlags);
+interface FeatureFlagProviderProps {
+  children: React.ReactNode;
+  initialFlags?: Partial<FeatureFlags>;
+}
+
+export const FeatureFlagProvider: React.FC<FeatureFlagProviderProps> = ({ 
+  children, 
+  initialFlags 
+}) => {
+  // Initialize state with default flags and any initial flags passed in
+  const [flags, setFlags] = useState<FeatureFlags>({
+    ...defaultFlags,
+    ...(initialFlags || {})
+  });
+
+  // Load flags from localStorage on mount
+  useEffect(() => {
+    const loadedFlags: Partial<FeatureFlags> = {};
+    let hasChanges = false;
+    
+    (Object.keys(defaultFlags) as Array<keyof FeatureFlags>).forEach(flag => {
+      const savedValue = localStorage.getItem(`featureFlag_${flag}`);
+      if (savedValue) {
+        loadedFlags[flag] = savedValue === 'enabled';
+        hasChanges = true;
+      }
+    });
+    
+    if (hasChanges) {
+      setFlags(prevFlags => ({ ...prevFlags, ...loadedFlags }));
+    }
+  }, []);
 
   // Enable a feature flag
   const enableFlag = useCallback((flag: keyof FeatureFlags) => {
