@@ -14,7 +14,7 @@ import { useEffect, useState, useMemo } from "react";
 import InsightsTabContent from "./inteligencia/InsightsTabContent";
 import ActionsTabContent from "./inteligencia/ActionsTabContent";
 import RecommendationsTabContent from "./inteligencia/RecommendationsTabContent";
-import { getRecommendedActions, getDefaultInsights } from "./inteligencia/helpers";
+import { getRecommendedActions } from "./inteligencia/helpers";
 import { generatePortfolioInsights } from '@/services/insightGeneratorService';
 import { DataSourceType } from '@/types/raioXTypes';
 
@@ -61,21 +61,16 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
       return data.financialInsightData.insights;
     }
     
-    // If we have portfolio data, generate insights based on real data
-    if (data.portfolioSummary || data.stocks?.length > 0 || data.dividendHistory?.length > 0) {
-      return generatePortfolioInsights(
-        data.portfolioSummary,
-        data.stocks,
-        data.fixedIncome,
-        data.investmentFunds,
-        data.realEstate,
-        data.profitability,
-        data.dividendHistory
-      );
-    }
-    
-    // Fall back to default insights if no real data is available
-    return getDefaultInsights();
+    // Generate insights based on available portfolio data
+    return generatePortfolioInsights(
+      data.portfolioSummary,
+      data.stocks,
+      data.fixedIncome,
+      data.investmentFunds,
+      data.realEstate,
+      data.profitability,
+      data.dividendHistory
+    );
   }, [
     data.financialInsightData, 
     data.portfolioSummary,

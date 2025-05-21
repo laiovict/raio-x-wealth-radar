@@ -1,66 +1,133 @@
 
 import React from 'react';
-import { PieChart, BarChart3, LineChart, ArrowDown, BadgeCheck, ArrowUp, Lightbulb } from 'lucide-react';
+import { 
+  Card, 
+  CardContent 
+} from '@/components/ui/card';
+import { 
+  ArrowUp, 
+  AlertTriangle, 
+  Lightbulb, 
+  Info, 
+  CheckCircle
+} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 
-interface InsightCardProps {
+export interface InsightCardProps {
   insight: {
     id?: string;
     title: string;
     description: string;
-    category: string;
+    type?: string;
+    category?: string;
+    impact?: string;
+    actions?: string[];
+    dataSource?: 'synthetic' | 'supabase' | 'xp' | 'openfinance';
+    agent?: string;
     priority?: string;
-  };
+    isNew?: boolean;
+  }
 }
 
 const InsightCard: React.FC<InsightCardProps> = ({ insight }) => {
-  const getIconForInsight = (category: string) => {
-    switch (category.toLowerCase()) {
-      case 'allocation':
-        return <PieChart className="h-10 w-10 text-blue-500 dark:text-blue-300 p-2 bg-blue-100 dark:bg-blue-900/50 rounded-md" />;
-      case 'risk':
-        return <BarChart3 className="h-10 w-10 text-red-500 dark:text-red-300 p-2 bg-red-100 dark:bg-red-900/50 rounded-md" />;
+  // Define icon based on insight type
+  const getIcon = () => {
+    switch(insight.type) {
       case 'opportunity':
-        return <LineChart className="h-10 w-10 text-green-500 dark:text-green-300 p-2 bg-green-100 dark:bg-green-900/50 rounded-md" />;
-      case 'budget':
-        return <ArrowDown className="h-10 w-10 text-amber-500 dark:text-amber-300 p-2 bg-amber-100 dark:bg-amber-900/50 rounded-md" />;
-      case 'tax':
-        return <BadgeCheck className="h-10 w-10 text-purple-500 dark:text-purple-300 p-2 bg-purple-100 dark:bg-purple-900/50 rounded-md" />;
-      case 'savings':
-        return <ArrowUp className="h-10 w-10 text-emerald-500 dark:text-emerald-300 p-2 bg-emerald-100 dark:bg-emerald-900/50 rounded-md" />;
+        return <ArrowUp className="h-5 w-5 text-emerald-400" />;
+      case 'risk':
+        return <AlertTriangle className="h-5 w-5 text-amber-400" />;
+      case 'alert':
+        return <AlertTriangle className="h-5 w-5 text-red-400" />;
       default:
-        return <Lightbulb className="h-10 w-10 text-indigo-500 dark:text-indigo-300 p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-md" />;
+        return <Lightbulb className="h-5 w-5 text-blue-400" />;
+    }
+  };
+
+  // Define badge color based on impact
+  const getBadgeClass = () => {
+    switch(insight.impact) {
+      case 'high':
+        return 'bg-red-500 hover:bg-red-600';
+      case 'medium':
+        return 'bg-amber-500 hover:bg-amber-600';
+      case 'low':
+      default:
+        return 'bg-blue-500 hover:bg-blue-600';
     }
   };
   
-  const getBackgroundForInsight = (category: string) => {
-    switch (category.toLowerCase()) {
-      case 'allocation':
-        return 'border-blue-300 dark:border-blue-700 bg-white/80 dark:bg-slate-800/80';
-      case 'risk':
-        return 'border-red-300 dark:border-red-700 bg-white/80 dark:bg-slate-800/80';
+  // Define background gradient and styling based on insight type
+  const getCardStyle = () => {
+    switch(insight.type) {
       case 'opportunity':
-        return 'border-green-300 dark:border-green-700 bg-white/80 dark:bg-slate-800/80';
-      case 'budget':
-        return 'border-amber-300 dark:border-amber-700 bg-white/80 dark:bg-slate-800/80';
-      case 'tax':
-        return 'border-purple-300 dark:border-purple-700 bg-white/80 dark:bg-slate-800/80';
-      case 'savings':
-        return 'border-emerald-300 dark:border-emerald-700 bg-white/80 dark:bg-slate-800/80';
+        return 'bg-gradient-to-br from-emerald-900/10 to-emerald-700/5 border-emerald-800/30';
+      case 'risk':
+        return 'bg-gradient-to-br from-amber-900/10 to-amber-700/5 border-amber-800/30';
+      case 'alert':
+        return 'bg-gradient-to-br from-red-900/10 to-red-700/5 border-red-800/30';
       default:
-        return 'border-indigo-300 dark:border-indigo-700 bg-white/80 dark:bg-slate-800/80';
+        return 'bg-gradient-to-br from-indigo-900/10 to-blue-900/5 border-blue-800/30';
     }
   };
 
   return (
-    <div className={`p-4 border ${getBackgroundForInsight(insight.category)} rounded-lg shadow-sm`}>
-      <div className="flex items-start gap-4">
-        {getIconForInsight(insight.category)}
-        <div className="flex-1">
-          <h3 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-1">{insight.title}</h3>
-          <p className="text-sm text-gray-700 dark:text-gray-300">{insight.description}</p>
+    <Card className={`overflow-hidden border ${getCardStyle()}`}>
+      <CardContent className="p-4">
+        <div className="flex items-start gap-3">
+          <div className={`p-2 rounded-full ${
+            insight.type === 'opportunity' ? 'bg-emerald-900/50' :
+            insight.type === 'risk' ? 'bg-amber-900/50' :
+            insight.type === 'alert' ? 'bg-red-900/50' :
+            'bg-blue-900/50'
+          }`}>
+            {getIcon()}
+          </div>
+          
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <h3 className={`font-medium ${
+                  insight.type === 'opportunity' ? 'text-emerald-400' :
+                  insight.type === 'risk' ? 'text-amber-400' :
+                  insight.type === 'alert' ? 'text-red-400' :
+                  'text-blue-400'
+                }`}>
+                  {insight.title}
+                </h3>
+                {insight.isNew && (
+                  <Badge className="bg-purple-500 hover:bg-purple-600 text-xs">Novo</Badge>
+                )}
+                <TypeSafeDataSourceTag source={insight.dataSource} />
+              </div>
+              
+              {insight.impact && (
+                <Badge className={getBadgeClass()}>
+                  {insight.impact === 'high' ? 'Alto Impacto' :
+                   insight.impact === 'medium' ? 'Médio Impacto' :
+                   'Baixo Impacto'}
+                </Badge>
+              )}
+            </div>
+            
+            <p className="text-sm text-gray-300 mb-3">{insight.description}</p>
+            
+            {insight.actions && insight.actions.length > 0 && (
+              <div className="space-y-1.5 mt-3">
+                <h4 className="text-xs font-medium text-gray-400">AÇÕES RECOMENDADAS</h4>
+                {insight.actions.map((action, i) => (
+                  <div key={i} className="flex items-start gap-1.5">
+                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
+                    <span className="text-xs text-gray-300">{action}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

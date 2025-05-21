@@ -2,6 +2,7 @@
 import { DataSourceType, PortfolioSummary, DividendHistory, AIInsight } from '@/types/raioXTypes';
 import { toNumber, ensureNumber } from '@/utils/typeConversionHelpers';
 import { formatCurrency, formatPercentage } from '@/utils/formattingUtils';
+import { calculateDiversificationScore } from '@/utils/financialMetricsUtils';
 
 /**
  * Generate insights based on portfolio data
@@ -37,6 +38,34 @@ export const generatePortfolioInsights = (
     const stocksPerc = toNumber(portfolioSummary.stocks_representation);
     const fundsPerc = toNumber(portfolioSummary.investment_fund_representation);
     const realEstatePerc = toNumber(portfolioSummary.real_estate_representation);
+    
+    // Calculate diversification score
+    const { score: diversificationScore } = calculateDiversificationScore(portfolioSummary);
+    
+    // Add diversification score insight
+    insights.push({
+      id: 'diversification-score',
+      title: 'Score de Diversificação',
+      description: `Sua carteira tem um score de diversificação de ${diversificationScore}/100. ${
+        diversificationScore > 75 ? 'Excelente diversificação entre classes de ativos.' :
+        diversificationScore > 50 ? 'Boa diversificação, mas pode melhorar em algumas áreas.' :
+        'Considere diversificar mais sua carteira para reduzir riscos.'
+      }`,
+      type: 'insight',
+      category: 'diversificação',
+      impact: diversificationScore > 70 ? 'low' : diversificationScore > 40 ? 'medium' : 'high',
+      actions: [
+        diversificationScore > 75 ? 'Manter a estratégia atual de diversificação' :
+        'Avaliar exposição a diferentes classes de ativos',
+        diversificationScore < 60 ? 'Considerar reduzir concentração em renda fixa' : 
+        'Continuar monitorando a alocação entre classes de ativos'
+      ],
+      agent: 'financial-advisor',
+      priority: diversificationScore > 70 ? 'low' : diversificationScore > 40 ? 'medium' : 'high',
+      isNew: false,
+      timestamp: currentDate,
+      dataSource: dataSource
+    });
     
     // Check for over-concentration in fixed income
     if (fixedIncomePerc > 70) {
@@ -148,6 +177,28 @@ export const generatePortfolioInsights = (
         agent: 'financial-advisor',
         priority: 'medium',
         isNew: true,
+        timestamp: currentDate,
+        dataSource
+      });
+    }
+    
+    // Calculate passive income potential
+    const monthlyAverage = totalDividends / 12;
+    if (monthlyAverage > 0) {
+      insights.push({
+        id: 'passive-income',
+        title: 'Renda Passiva',
+        description: `Seus investimentos geram aproximadamente ${formatCurrency(String(monthlyAverage))} por mês em dividendos. Continue ampliando sua carteira de proventos para aumentar sua renda passiva.`,
+        type: 'insight',
+        category: 'renda-passiva',
+        impact: 'medium',
+        actions: [
+          'Analisar ativos com maior dividend yield',
+          'Estabelecer metas para renda passiva'
+        ],
+        agent: 'financial-advisor',
+        priority: 'low',
+        isNew: false,
         timestamp: currentDate,
         dataSource
       });
@@ -287,12 +338,135 @@ export const generatePortfolioInsights = (
         }
       }
     }
+    
+    // Check for sector concentration
+    const sectors = {
+      financials: { count: 0, value: 0 },
+      energy: { count: 0, value: 0 },
+      materials: { count: 0, value: 0 },
+      consumer: { count: 0, value: 0 },
+      other: { count: 0, value: 0 }
+    };
+    
+    // Simple sector categorization based on stock tickers (simplified)
+    stocks.forEach(stock => {
+      const ticker = String(stock.asset || '').toUpperCase();
+      const value = toNumber(stock.total_value);
+      
+      if (/BB[AS][34]|ITUB[34]|ITSA[34]|SANB11/.test(ticker)) {
+        sectors.financials.count++;
+        sectors.financials.value += value;
+      } else if (/PETR[34]|UGPA3|CSAN3/.test(ticker)) {
+        sectors.energy.count++;
+        sectors.energy.value += value;
+      } else if (/VALE3|GGBR[34]|CSNA3/.test(ticker)) {
+        sectors.materials.count++;
+        sectors.materials.value += value;
+      } else if (/ABEV3|MGLU3|LREN3|VVAR3/.test(ticker)) {
+        sectors.consumer.count++;
+        sectors.consumer.value += value;
+      } else {
+        sectors.other.count++;
+        sectors.other.value += value;
+      }
+    });
+    
+    // Calculate total stocks value
+    const totalStocksValue = Object.values(sectors).reduce((total, sector) => total + sector.value, 0);
+    
+    // Check for sector concentration
+    for (const [sector, data] of Object.entries(sectors)) {
+      const percentage = totalStocksValue > 0 ? (data.value / totalStocksValue) * 100 : 0;
+      
+      if (percentage > 50 && data.count >= 2) {
+        const sectorNames = {
+          financials: "Financeiro",
+          energy: "Energia",
+          materials: "Materiais",
+          consumer: "Consumo",
+          other: "Outros"
+        };
+        
+        insights.push({
+          id: `sector-concentration-${sector}`,
+          title: `Concentração Setorial: ${sectorNames[sector as keyof typeof sectorNames]}`,
+          description: `${formatPercentage(String(percentage))} de suas ações estão concentradas no setor ${sectorNames[sector as keyof typeof sectorNames]}. Considere diversificar em outros setores para reduzir o risco setorial.`,
+          type: 'risk',
+          category: 'diversificação',
+          impact: 'medium',
+          actions: [
+            'Avaliar exposição a outros setores da economia',
+            'Considerar ETFs setoriais para diversificação'
+          ],
+          agent: 'financial-advisor',
+          priority: 'medium',
+          isNew: true,
+          timestamp: currentDate,
+          dataSource
+        });
+        
+        // Only show one sector concentration insight
+        break;
+      }
+    }
   }
   
   // If we have fixed income investments, check for maturity distribution
   if (fixedIncome && fixedIncome.length > 0) {
     // Todo: Add fixed income specific insights
     // This is a placeholder for future implementation
+    
+    // Example: Check maturity profile
+    const currentYear = new Date().getFullYear();
+    const shortTermCount = fixedIncome.filter(fi => {
+      if (!fi.maturity_date) return false;
+      const maturityYear = parseInt(fi.maturity_date.split('/')[2] || '0');
+      return maturityYear > 0 && maturityYear <= currentYear + 2;
+    }).length;
+    
+    const longTermCount = fixedIncome.filter(fi => {
+      if (!fi.maturity_date) return false;
+      const maturityYear = parseInt(fi.maturity_date.split('/')[2] || '0');
+      return maturityYear > currentYear + 5;
+    }).length;
+    
+    if (shortTermCount > fixedIncome.length * 0.7 && fixedIncome.length >= 3) {
+      insights.push({
+        id: 'fixed-income-short-term',
+        title: 'Renda Fixa de Curto Prazo',
+        description: 'A maioria dos seus investimentos em renda fixa tem vencimento no curto prazo. Considere escalonar vencimentos para otimizar retornos.',
+        type: 'opportunity',
+        category: 'renda-fixa',
+        impact: 'medium',
+        actions: [
+          'Avaliar títulos com vencimentos mais longos',
+          'Implementar estratégia de escalonamento de vencimentos'
+        ],
+        agent: 'financial-advisor',
+        priority: 'medium',
+        isNew: true,
+        timestamp: currentDate,
+        dataSource
+      });
+    } else if (longTermCount > fixedIncome.length * 0.7 && fixedIncome.length >= 3) {
+      insights.push({
+        id: 'fixed-income-long-term',
+        title: 'Renda Fixa de Longo Prazo',
+        description: 'A maioria dos seus investimentos em renda fixa tem vencimento no longo prazo. Considere manter alguma liquidez para oportunidades.',
+        type: 'insight',
+        category: 'renda-fixa',
+        impact: 'low',
+        actions: [
+          'Avaliar necessidade de liquidez',
+          'Considerar alocação parcial em títulos mais líquidos'
+        ],
+        agent: 'financial-advisor',
+        priority: 'low',
+        isNew: true,
+        timestamp: currentDate,
+        dataSource
+      });
+    }
   }
   
   // Return all generated insights
