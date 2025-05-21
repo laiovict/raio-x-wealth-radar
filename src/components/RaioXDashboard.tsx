@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Mic, Search, Share2, Download } from "lucide-react";
@@ -53,11 +54,17 @@ const RaioXDashboard = ({
 }: RaioXDashboardProps) => {
   const { data, hasOpenFinance, selectedClient } = useRaioX();
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState("raiox-beta"); // Changed default tab to raiox-beta
   const { t } = useLanguage();
   const dashboardRef = useRef<HTMLDivElement>(null);
+  
+  // State to track if we're showing synthetic data (full version) or just real data (beta)
+  const [showSyntheticData, setShowSyntheticData] = useState(false);
 
   useEffect(() => {
+    // Update the showSyntheticData state based on the active tab
+    setShowSyntheticData(activeTab === "versao-full");
+    
     const handleActivateOpenFinance = () => {
       if (onOpenFinanceActivate) {
         onOpenFinanceActivate();
@@ -67,6 +74,8 @@ const RaioXDashboard = ({
     const handleTabNavigation = (event: CustomEvent) => {
       if (event.detail?.tabId) {
         setActiveTab(event.detail.tabId);
+        // Update synthetic data state when changing tabs
+        setShowSyntheticData(event.detail.tabId === "versao-full");
         // Scroll to top when changing tabs
         if (dashboardRef.current) {
           dashboardRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -87,10 +96,12 @@ const RaioXDashboard = ({
       document.removeEventListener('activate-openfinance', handleActivateOpenFinance);
       document.removeEventListener('navigate-to-tab', handleTabNavigation as EventListener);
     };
-  }, [onOpenFinanceActivate]);
+  }, [onOpenFinanceActivate, activeTab]);
 
   const handleQuickNavClick = (tabId: string) => {
     setActiveTab(tabId);
+    // Update synthetic data state when changing tabs
+    setShowSyntheticData(tabId === "versao-full");
     // Scroll to top when changing tabs
     if (dashboardRef.current) {
       dashboardRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -269,122 +280,59 @@ const RaioXDashboard = ({
       <FeedbackSection sectionId="top-inteligencia" />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-8 rounded-lg overflow-x-auto grid grid-cols-6 scrollbar-none bg-white/5 backdrop-blur-md border border-white/10">
-          <TabsTrigger value="overview" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">Visão Geral</TabsTrigger>
+        <TabsList className="mb-8 rounded-lg overflow-x-auto grid grid-cols-7 scrollbar-none bg-white/5 backdrop-blur-md border border-white/10">
+          {/* New "RaioX Beta" tab as the first tab */}
+          <TabsTrigger value="raiox-beta" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">
+            RaioX Beta
+          </TabsTrigger>
           <TabsTrigger value="status" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('statusTab')}</TabsTrigger>
           <TabsTrigger value="actions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('planTab')}</TabsTrigger>
           <TabsTrigger value="market" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('aiTab')}</TabsTrigger>
           <TabsTrigger value="future" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('futureTab')}</TabsTrigger>
           <TabsTrigger value="chat" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('chatTab')}</TabsTrigger>
+          {/* Former "overview" tab moved to the end and renamed "Versão Full" */}
+          <TabsTrigger value="versao-full" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">
+            Versão Full
+          </TabsTrigger>
         </TabsList>
 
-        {/* Tab 1: Visão Geral - Optimized ordering for better UX */}
-        <TabsContent value="overview" className="space-y-8">
-          {/* Starting with Financial Overview */}
+        {/* Tab 1: RaioX Beta - Only showing components with real data */}
+        <TabsContent value="raiox-beta" className="space-y-8">
           <div>
-            <FinancialOverviewModule />
-            <FeedbackSection sectionId="financial-overview" />
+            {/* Financial Overview with useSyntheticData={false} */}
+            <FinancialOverviewModule useSyntheticData={false} />
+            <FeedbackSection sectionId="beta-financial-overview" />
           </div>
           
-          {/* Followed by One Page Financial Plan - Always show regardless of OpenFinance */}
-          <div>
-            <OnePageFinancialPlanModule />
-            <FeedbackSection sectionId="financial-plan" />
-          </div>
-          
-          {/* Add dividend module here */}
+          {/* Add dividend module - real data only */}
           <div>
             <DividendModule fullWidth />
-            <FeedbackSection sectionId="dividends" />
+            <FeedbackSection sectionId="beta-dividends" />
           </div>
           
-          {/* Then Life Goals */}
-          <div>
-            <LifeGoalsModule />
-            <FeedbackSection sectionId="life-goals" />
-          </div>
-          
-          {/* Moving these modules to the middle as requested */}
+          {/* Allocation module - real data */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <MeuFuturoFinanceiroModule />
-              <FeedbackSection sectionId="meu-futuro" />
+              <AllocationModule useSyntheticData={false} />
+              <FeedbackSection sectionId="beta-allocation" />
             </div>
             <div>
-              <WholeBankingModule />
-              <FeedbackSection sectionId="whole-banking" />
+              <LiquidityReserveModule useSyntheticData={false} />
+              <FeedbackSection sectionId="beta-liquidity" />
             </div>
-          </div>
-          
-          <div>
-            <FamousInvestorsModule fullWidth />
-            <FeedbackSection sectionId="famous-investors" />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <AllocationModule />
-              <FeedbackSection sectionId="allocation" />
-            </div>
-            <div>
-              <LiquidityReserveModule />
-              <FeedbackSection sectionId="liquidity" />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <SentimentInsightsModule />
-              <FeedbackSection sectionId="sentiment" />
-            </div>
-            <div>
-              <PersonalInsightsModule />
-              <FeedbackSection sectionId="personal-insights" />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <FutureProjectionModule />
-              <FeedbackSection sectionId="future-projection" />
-            </div>
-            <div>
-              <InvestmentPlanningModule />
-              <FeedbackSection sectionId="investment-planning" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <SocialComparisonModule />
-              <FeedbackSection sectionId="social-comparison" />
-            </div>
-            <div>
-              <BehavioralFinanceModule />
-              <FeedbackSection sectionId="behavioral-finance" />
-            </div>
-          </div>
-          
-          <div>
-            <WrappedModule fullWidth />
-            <FeedbackSection sectionId="wrapped" />
-          </div>
-          
-          {/* Add the feedback section at the end of the overview tab */}
-          <div>
-            <ClientFeedbackSection isAdvisorView={userRole === "advisor"} />
           </div>
           
           {/* Footer for this tab */}
           <div className="w-full py-10 text-center border-t border-white/10 mt-12">
-            <p className="text-gray-400">Fim da seção - Visão Geral</p>
+            <p className="text-gray-400">Fim da seção - RaioX Beta</p>
           </div>
         </TabsContent>
         
+        {/* The rest of the tabs */}
         {/* Tab 2: Como Estou? - Status overview */}
         <TabsContent value="status" className="space-y-8">
           <div>
-            <FinancialOverviewModule fullWidth />
+            <FinancialOverviewModule useSyntheticData={showSyntheticData} fullWidth />
             <FeedbackSection sectionId="status-financial-overview" />
           </div>
           
@@ -492,7 +440,7 @@ const RaioXDashboard = ({
         {/* Tab 5: E meu futuro? - Future projections and planning */}
         <TabsContent value="future" className="space-y-8">
           <div>
-            <MeuFuturoFinanceiroModule fullWidth />
+            <MeuFuturoFinanceiroModule fullWidth useSyntheticData={showSyntheticData} />
             <FeedbackSection sectionId="future-meu-futuro" />
           </div>
           
@@ -540,6 +488,106 @@ const RaioXDashboard = ({
           {/* Footer for this tab */}
           <div className="w-full py-10 text-center border-t border-white/10 mt-12">
             <p className="text-gray-400">Fim da seção - Fale com RM</p>
+          </div>
+        </TabsContent>
+
+        {/* Tab 7: Versão Full - Former overview tab moved to the end */}
+        <TabsContent value="versao-full" className="space-y-8">
+          {/* Starting with Financial Overview with synthetic data explicitly enabled */}
+          <div>
+            <FinancialOverviewModule useSyntheticData={true} />
+            <FeedbackSection sectionId="full-financial-overview" />
+          </div>
+          
+          {/* The rest of the full content, always with synthetic data */}
+          <div>
+            <OnePageFinancialPlanModule useSyntheticData={true} />
+            <FeedbackSection sectionId="full-financial-plan" />
+          </div>
+          
+          <div>
+            <DividendModule fullWidth useSyntheticData={true} />
+            <FeedbackSection sectionId="full-dividends" />
+          </div>
+          
+          <div>
+            <LifeGoalsModule useSyntheticData={true} />
+            <FeedbackSection sectionId="full-life-goals" />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <MeuFuturoFinanceiroModule useSyntheticData={true} />
+              <FeedbackSection sectionId="full-meu-futuro" />
+            </div>
+            <div>
+              <WholeBankingModule useSyntheticData={true} />
+              <FeedbackSection sectionId="full-whole-banking" />
+            </div>
+          </div>
+          
+          <div>
+            <FamousInvestorsModule fullWidth useSyntheticData={true} />
+            <FeedbackSection sectionId="full-famous-investors" />
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <AllocationModule useSyntheticData={true} />
+              <FeedbackSection sectionId="full-allocation" />
+            </div>
+            <div>
+              <LiquidityReserveModule useSyntheticData={true} />
+              <FeedbackSection sectionId="full-liquidity" />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <SentimentInsightsModule useSyntheticData={true} />
+              <FeedbackSection sectionId="full-sentiment" />
+            </div>
+            <div>
+              <PersonalInsightsModule useSyntheticData={true} />
+              <FeedbackSection sectionId="full-personal-insights" />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <FutureProjectionModule useSyntheticData={true} />
+              <FeedbackSection sectionId="full-future-projection" />
+            </div>
+            <div>
+              <InvestmentPlanningModule useSyntheticData={true} />
+              <FeedbackSection sectionId="full-investment-planning" />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <SocialComparisonModule useSyntheticData={true} />
+              <FeedbackSection sectionId="full-social-comparison" />
+            </div>
+            <div>
+              <BehavioralFinanceModule useSyntheticData={true} />
+              <FeedbackSection sectionId="full-behavioral-finance" />
+            </div>
+          </div>
+          
+          <div>
+            <WrappedModule fullWidth useSyntheticData={true} />
+            <FeedbackSection sectionId="full-wrapped" />
+          </div>
+          
+          {/* Add the feedback section at the end of the overview tab */}
+          <div>
+            <ClientFeedbackSection isAdvisorView={userRole === "advisor"} />
+          </div>
+          
+          {/* Footer for this tab */}
+          <div className="w-full py-10 text-center border-t border-white/10 mt-12">
+            <p className="text-gray-400">Fim da seção - Versão Full</p>
           </div>
         </TabsContent>
       </Tabs>

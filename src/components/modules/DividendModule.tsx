@@ -14,9 +14,10 @@ import { groupDividendsByMonth } from './dividends/dividendUtils';
 
 interface DividendModuleProps {
   fullWidth?: boolean;
+  useSyntheticData?: boolean;
 }
 
-const DividendModule = ({ fullWidth = false }: DividendModuleProps) => {
+const DividendModule = ({ fullWidth = false, useSyntheticData = false }: DividendModuleProps) => {
   const { dividendHistory, totalDividends, averageMonthlyDividends } = useRaioX();
   
   // Get recent dividends (limited to 5)
@@ -28,14 +29,15 @@ const DividendModule = ({ fullWidth = false }: DividendModuleProps) => {
   const chartData = groupDividendsByMonth(dividendHistory || []);
 
   // Check if we have real data from Supabase
-  const hasRealData = dividendHistory && dividendHistory.length > 0;
+  const hasRealData = !useSyntheticData && dividendHistory && dividendHistory.length > 0;
   
   // Determine data source
   const dataSource = hasRealData && dividendHistory && dividendHistory[0]?.dataSource === 'supabase' 
     ? 'supabase' 
     : 'synthetic';
   
-  if (!hasRealData) {
+  // For Beta version with no real data, show empty state
+  if (!hasRealData && !useSyntheticData) {
     return (
       <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
         <CardHeader className="pb-2">
@@ -50,6 +52,7 @@ const DividendModule = ({ fullWidth = false }: DividendModuleProps) => {
     );
   }
 
+  // For Beta version with real data or Full version with synthetic data
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
       <CardHeader className="pb-2">

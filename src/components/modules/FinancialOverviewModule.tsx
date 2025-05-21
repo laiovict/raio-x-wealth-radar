@@ -28,9 +28,10 @@ import {
 
 interface FinancialOverviewModuleProps {
   fullWidth?: boolean;
+  useSyntheticData?: boolean; // New prop to control data source
 }
 
-const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleProps) => {
+const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false }: FinancialOverviewModuleProps) => {
   const { data, hasOpenFinance, financialSummary, isAIAnalysisLoading, refreshAIAnalysis, selectedClient } = useRaioX();
   const [showBehavioralInsights, setShowBehavioralInsights] = useState(false);
   const [showDataSourceInfo, setShowDataSourceInfo] = useState(false);
@@ -41,9 +42,10 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
   // Helper function to get client portfolio summary from real data if available
   const getPortfolioSummary = () => getPortfolioSummaryHelper(data);
 
-  // Use real data when financial summary is available, otherwise use synthetic data
-  const finData = hasOpenFinance 
-    ? financialSummary || getSyntheticData(selectedClient, getPortfolioSummary()) 
+  // Use real data when financial summary is available and not forced to use synthetic,
+  // otherwise use synthetic data
+  const finData = (hasOpenFinance && financialSummary && !useSyntheticData)
+    ? financialSummary
     : getSyntheticData(selectedClient, getPortfolioSummary());
     
   // Get historical net worth data
@@ -54,8 +56,8 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
     return <LoadingView fullWidth={fullWidth} />;
   }
 
-  // Display limited view if OpenFinance is not activated
-  if (!hasOpenFinance) {
+  // Display limited view if OpenFinance is not activated and not using the full synthetic version
+  if (!hasOpenFinance && !useSyntheticData) {
     return (
       <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
         <CardHeader className="pb-2">
@@ -100,13 +102,15 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
     );
   }
 
-  // Full OpenFinance-powered view
+  // Determine what sections to show based on if we're in Beta or Full mode
+  const isFullVersion = useSyntheticData;
+
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-            Meu Panorama Financeiro
+            {isFullVersion ? "Meu Panorama Financeiro (Versão Full)" : "Meu Panorama Financeiro"}
           </CardTitle>
           <div className="flex gap-2">
             <Button 
@@ -118,24 +122,28 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
               <Info className="h-4 w-4" />
               <span className="text-xs">Legenda</span>
             </Button>
-            <Button variant="ghost" size="sm" onClick={refreshAIAnalysis} className="flex items-center gap-2">
-              <RefreshCw className="h-4 w-4" />
-              <span className="hidden md:inline">Atualizar</span>
-            </Button>
+            {isFullVersion && (
+              <Button variant="ghost" size="sm" onClick={refreshAIAnalysis} className="flex items-center gap-2">
+                <RefreshCw className="h-4 w-4" />
+                <span className="hidden md:inline">Atualizar</span>
+              </Button>
+            )}
           </div>
         </div>
         <DataSourceInfoPanel showDataSourceInfo={showDataSourceInfo} />
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {/* Main Financial Overview Section */}
-          <MainFinancialOverview 
-            finData={finData} 
-            hasOpenFinance={hasOpenFinance} 
-            getPortfolioSummary={getPortfolioSummary} 
-          />
+          {/* Main Financial Overview Section - Full version only */}
+          {isFullVersion && (
+            <MainFinancialOverview 
+              finData={finData} 
+              hasOpenFinance={hasOpenFinance || useSyntheticData} 
+              getPortfolioSummary={getPortfolioSummary} 
+            />
+          )}
           
-          {/* Net Worth Section */}
+          {/* Net Worth Section - Always show */}
           <NetWorthSection 
             finData={finData} 
             netWorthHistory={netWorthHistory} 
@@ -143,62 +151,70 @@ const FinancialOverviewModule = ({ fullWidth = false }: FinancialOverviewModuleP
             defaultTrend={defaultTrend}
           />
           
-          {/* Assets & Liabilities Summary */}
+          {/* Assets & Liabilities Summary - Always show */}
           <AssetsLiabilitiesGrid 
             finData={finData} 
             getPortfolioSummary={getPortfolioSummary} 
           />
           
-          {/* Financial Health Indicators */}
+          {/* Financial Health Indicators - Always show */}
           <FinancialHealthIndicators 
             finData={finData} 
-            getPortfolioSummary={getPortfolioSummary} 
+            getPortfolioSummary={getPortfolioSummary}
+            useSyntheticData={useSyntheticData}
           />
           
-          {/* OpenFinance Insights Section */}
-          <div className="mt-6">
-            <div className="mb-4 border-b border-white/10 pb-2">
-              <div className="flex items-center text-lg font-medium text-white gap-2">
-                <Shield className="h-5 w-5 text-green-400" />
-                <span>Dados OpenFinance</span>
-                <TypeSafeDataSourceTag source="synthetic" />
+          {/* OpenFinance Insights Section - Full version only */}
+          {isFullVersion && (
+            <div className="mt-6">
+              <div className="mb-4 border-b border-white/10 pb-2">
+                <div className="flex items-center text-lg font-medium text-white gap-2">
+                  <Shield className="h-5 w-5 text-green-400" />
+                  <span>Dados OpenFinance</span>
+                  <TypeSafeDataSourceTag source="synthetic" />
+                </div>
               </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Financial Behavior */}
-              <FinancialBehaviorSection />
               
-              {/* Cross-Institutional Analysis */}
-              <CrossInstitutionalAnalysis />
-            </div>
-          </div>
-          
-          {/* Financial History Highlights */}
-          <div className="mt-6">
-            <div className="mb-4 flex justify-between items-center">
-              <div className="text-lg font-medium text-white">
-                Sua história financeira em 2025
-                <TypeSafeDataSourceTag source="synthetic" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Financial Behavior */}
+                <FinancialBehaviorSection useSyntheticData={useSyntheticData} />
+                
+                {/* Cross-Institutional Analysis */}
+                <CrossInstitutionalAnalysis useSyntheticData={useSyntheticData} />
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="text-blue-400" 
-                onClick={() => setShowBehavioralInsights(!showBehavioralInsights)}
-              >
-                {showBehavioralInsights ? "Mostrar menos" : "Mostrar mais"}
-              </Button>
             </div>
-            
-            <FinancialHistoryHighlights showBehavioralInsights={showBehavioralInsights} />
-          </div>
+          )}
           
-          {/* Recommended Next Steps */}
-          <RecommendedSteps />
+          {/* Financial History Highlights - Full version only */}
+          {isFullVersion && (
+            <div className="mt-6">
+              <div className="mb-4 flex justify-between items-center">
+                <div className="text-lg font-medium text-white">
+                  Sua história financeira em 2025
+                  <TypeSafeDataSourceTag source="synthetic" />
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-blue-400" 
+                  onClick={() => setShowBehavioralInsights(!showBehavioralInsights)}
+                >
+                  {showBehavioralInsights ? "Mostrar menos" : "Mostrar mais"}
+                </Button>
+              </div>
+              
+              <FinancialHistoryHighlights 
+                showBehavioralInsights={showBehavioralInsights} 
+                useSyntheticData={useSyntheticData} 
+              />
+            </div>
+          )}
           
-          {/* Top Risks */}
-          <TopRisks finData={finData} />
+          {/* Recommended Next Steps - Full version only */}
+          {isFullVersion && <RecommendedSteps useSyntheticData={useSyntheticData} />}
+          
+          {/* Top Risks - Full version only */}
+          {isFullVersion && <TopRisks finData={finData} useSyntheticData={useSyntheticData} />}
         </div>
       </CardContent>
     </Card>

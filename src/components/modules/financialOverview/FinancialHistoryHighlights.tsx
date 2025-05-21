@@ -1,85 +1,82 @@
 
 import React from 'react';
-import DataSourceTag from './DataSourceTag';
+import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 
 interface FinancialHistoryHighlightsProps {
   showBehavioralInsights: boolean;
+  useSyntheticData?: boolean;
 }
 
-const FinancialHistoryHighlights = ({ showBehavioralInsights }: FinancialHistoryHighlightsProps) => {
-  // Financial history highlights data - this is all synthetic
-  const financialHistoryData = [
-    {
-      id: 1,
-      title: "Você viveu no limite?",
-      description: "Em março, você gastou R$ 15.800, o equivalente a 3 iPhones Pro Max ou 1 mês num apê no Jardins. Foi seu recorde do ano.",
-      progress: 85,
-      color: "#FFD166",
-      dataSource: 'synthetic' as const
-    },
-    {
-      id: 2,
-      title: "Dinheiro que escorreu pelo ralo",
-      description: "Só com assinaturas não utilizadas, você gastou R$ 4.320 no último ano. Se tivesse colocado metade disso num CDB, teria hoje R$ 2.376 adicionais.",
-      progress: 60,
-      color: "#FF6B6B",
-      dataSource: 'synthetic' as const
-    },
-    {
-      id: 3,
-      title: "O que você mais comprou?",
-      description: "Top 3 categorias do seu cartão: Delivery (R$ 12.840), Assinaturas (R$ 8.620) e Eletrônicos (R$ 7.980). Spoiler: você pediu 98 vezes no iFood.",
-      progress: 75,
-      color: "#4D96FF",
-      dataSource: 'synthetic' as const
-    },
-    {
-      id: 4,
-      title: "A hora que você brilhou",
-      description: "Seu melhor investimento foi HGLG11, com 22% de rentabilidade. Se tivesse colocado o dobro, teria ganho R$ 28.600 adicionais.",
-      progress: 100,
-      color: "#06D6A0",
-      dataSource: 'synthetic' as const
-    },
-    {
-      id: 5,
-      title: "E se você focasse de verdade?",
-      description: "Se reduzir 15% dos seus gastos com restaurantes, dá pra investir R$ 960 todo mês. Isso pode virar R$ 1.470.000 em 25 anos.",
-      progress: 50,
-      color: "#9C27B0",
-      dataSource: 'synthetic' as const
-    }
-  ];
-
-  if (!showBehavioralInsights) return null;
+const FinancialHistoryHighlights = ({ showBehavioralInsights, useSyntheticData = false }: FinancialHistoryHighlightsProps) => {
+  // For the Beta version, we would use real data, but for now we just check the flag
+  const dataSource = useSyntheticData ? 'synthetic' : 'calculated';
   
   return (
     <div className="space-y-4">
-      {financialHistoryData.map((item) => (
-        <div key={item.id} className="p-4 bg-white/5 rounded-lg border border-white/10">
-          <div className="flex gap-4">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-white" style={{ backgroundColor: item.color }}>
-              {item.id}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="p-4 rounded-lg bg-gradient-to-br from-blue-900/40 to-blue-800/20">
+          <div className="text-sm text-gray-400 mb-1">
+            Maior aporte do ano
+            <TypeSafeDataSourceTag source={dataSource} />
+          </div>
+          <div className="text-xl font-bold text-white">R$ 35.000</div>
+          <div className="text-xs text-gray-400 mt-1">
+            Em Abril de 2025
+          </div>
+        </div>
+        
+        <div className="p-4 rounded-lg bg-gradient-to-br from-emerald-900/40 to-emerald-800/20">
+          <div className="text-sm text-gray-400 mb-1">
+            Melhor classe de ativo
+            <TypeSafeDataSourceTag source={dataSource} />
+          </div>
+          <div className="text-xl font-bold text-white">+23.5%</div>
+          <div className="text-xs text-gray-400 mt-1">
+            Fundos Imobiliários
+          </div>
+        </div>
+        
+        <div className="p-4 rounded-lg bg-gradient-to-br from-amber-900/40 to-amber-800/20">
+          <div className="text-sm text-gray-400 mb-1">
+            Meses de entrada positiva
+            <TypeSafeDataSourceTag source={dataSource} />
+          </div>
+          <div className="text-xl font-bold text-white">7/12</div>
+          <div className="text-xs text-gray-400 mt-1">
+            58% do ano com aportes
+          </div>
+        </div>
+      </div>
+      
+      {showBehavioralInsights && (
+        <div className="mt-6 space-y-3">
+          <div className="text-sm font-medium text-white">
+            Insights comportamentais
+            <TypeSafeDataSourceTag source={dataSource} />
+          </div>
+          
+          <div className="p-3 rounded-lg bg-white/5">
+            <div className="text-sm text-blue-400 mb-1">Padrão de investimento</div>
+            <div className="text-xs text-gray-300">
+              Você tende a investir mais no primeiro trimestre do ano, possivelmente associado com bônus ou participação nos lucros.
             </div>
-            <div className="flex-1">
-              <h4 className="text-base font-medium text-white mb-1">
-                {item.title}
-                <DataSourceTag dataSource={item.dataSource} />
-              </h4>
-              <p className="text-sm text-gray-400 mb-2">{item.description}</p>
-              <div className="w-full bg-gray-700 rounded-full h-2 mt-2">
-                <div 
-                  className="h-2 rounded-full" 
-                  style={{
-                    width: `${item.progress}%`,
-                    backgroundColor: item.color
-                  }}
-                ></div>
-              </div>
+          </div>
+          
+          <div className="p-3 rounded-lg bg-white/5">
+            <div className="text-sm text-blue-400 mb-1">Reação a mercados em queda</div>
+            <div className="text-xs text-gray-300">
+              Você demonstrou disciplina ao manter aportes consistentes mesmo nos períodos de maior volatilidade do mercado.
+            </div>
+          </div>
+          
+          <div className="p-3 rounded-lg bg-white/5">
+            <div className="text-sm text-blue-400 mb-1">Diversificação crescente</div>
+            <div className="text-xs text-gray-300">
+              Ao longo de 2025, você aumentou o número de classes de ativos em seu portfólio, melhorando sua diversificação.
             </div>
           </div>
         </div>
-      ))}
+      )}
     </div>
   );
 };

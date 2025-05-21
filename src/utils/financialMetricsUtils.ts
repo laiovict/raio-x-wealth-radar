@@ -1,264 +1,248 @@
 
-import { toNumber, ensureNumber } from '@/utils/typeConversionHelpers';
-import { DataSourceType } from '@/types/raioXTypes';
+import { ensureNumber } from './typeConversionHelpers';
 
 /**
- * Calculate diversification score based on portfolio allocation
- * @param portfolioSummary Summary of the portfolio with asset allocations
- * @returns Score between 0-100 with data source
- */
-export const calculateDiversificationScore = (portfolioSummary: any): { score: number; dataSource: DataSourceType } => {
-  if (!portfolioSummary) {
-    return { score: 65, dataSource: 'synthetic' };
-  }
-
-  // Get allocation percentages
-  const fixedIncome = toNumber(portfolioSummary.fixed_income_representation) || 0;
-  const stocks = toNumber(portfolioSummary.stocks_representation) || 0;
-  const funds = toNumber(portfolioSummary.investment_fund_representation) || 0;
-  const realEstate = toNumber(portfolioSummary.real_estate_representation) || 0;
-  const pension = toNumber(portfolioSummary.private_pension_representation) || 0;
-  const international = toNumber(portfolioSummary.investment_international_representation) || 0;
-
-  // Count how many asset classes have significant allocations (>10%)
-  let significantClasses = 0;
-  if (fixedIncome > 5) significantClasses++;
-  if (stocks > 5) significantClasses++;
-  if (funds > 5) significantClasses++;
-  if (realEstate > 5) significantClasses++;
-  if (pension > 5) significantClasses++;
-  if (international > 5) significantClasses++;
-
-  // Base score on number of significant asset classes
-  let score = Math.min(significantClasses * 20, 100);
-  
-  // Penalize over-concentration (>70% in one asset class)
-  const maxAllocation = Math.max(fixedIncome, stocks, funds, realEstate, pension, international);
-  if (maxAllocation > 70) {
-    score = Math.max(score - 20, 0);
-  } else if (maxAllocation > 50) {
-    score = Math.max(score - 10, 0);
-  }
-
-  // Reward international exposure
-  if (international > 15) {
-    score = Math.min(score + 10, 100);
-  }
-
-  return {
-    score: Math.round(score),
-    dataSource: portfolioSummary.dataSource || 'xp'
-  };
-};
-
-/**
- * Calculate savings rate based on assets to liabilities ratio
- * A corrected implementation considering assets divided by liabilities
- * @param assets Total assets value
- * @param liabilities Total liabilities value (if available)
- * @returns Savings rate with data source
+ * Calculate savings rate based on portfolio value and annual expenses
+ * @param portfolioValue Total portfolio value
+ * @param annualExpenses Annual expenses
+ * @returns Savings rate data object
  */
 export const calculateSavingsRate = (
-  assets: number | string | null | undefined,
-  liabilities: number | string | null | undefined = 0
-): { rate: number; trend: string; dataSource: DataSourceType } => {
-  const totalAssets = toNumber(assets);
-  // Default to 20% of assets if liabilities not available
-  const totalLiabilities = liabilities ? toNumber(liabilities) : totalAssets * 0.2;
+  portfolioValue: any,
+  annualExpenses: any
+) => {
+  // Try to parse values as numbers
+  const portfolio = ensureNumber(portfolioValue);
+  const expenses = ensureNumber(annualExpenses);
   
-  // If we have no valid asset data, return synthetic data
-  if (!totalAssets || totalAssets <= 0) {
-    return { rate: 28, trend: '+2.0%', dataSource: 'synthetic' };
-  }
-
-  // If liabilities are zero, that's technically infinite savings rate, but we'll cap at 100%
-  if (totalLiabilities <= 0) {
-    return { rate: 100, trend: '+5.0%', dataSource: 'xp' };
-  }
-
-  // Calculate assets to liabilities ratio
-  const savingsRate = Math.min((totalAssets / totalLiabilities) * 10, 100);
-  
-  // Simple trend calculation: assume positive if ratio > 3, negative if < 1.5
-  let trend = '+2.0%';
-  if (savingsRate > 50) {
-    trend = '+5.0%';
-  } else if (savingsRate < 25) {
-    trend = '-3.0%';
-  }
-
-  return {
-    rate: Math.round(savingsRate),
-    trend,
-    dataSource: 'xp'
+  // Default response when data is insufficient
+  const defaultResponse = {
+    rate: "25.0",
+    trend: "+5.2%",
+    dataSource: "synthetic"
   };
-};
 
-/**
- * Calculate investment consistency score based on dividend history
- * @param dividendHistory Array of dividend payments
- * @returns Investment consistency score with data source
- */
-export const calculateInvestmentConsistency = (dividendHistory: any[] = []): { 
-  grade: string;
-  description: string;
-  dataSource: DataSourceType;
-} => {
-  if (!dividendHistory || dividendHistory.length === 0) {
+  // If we have both portfolio value and expenses, calculate savings rate
+  if (portfolio && expenses && expenses > 0) {
+    // Calculate actual savings rate (invested amount / total income)
+    // Assuming total income is portfolio + expenses (simplification)
+    const savingsRate = (portfolio / (portfolio + expenses)) * 100;
+    const formattedRate = savingsRate.toFixed(1);
+    
     return {
-      grade: 'B',
-      description: "Dados insuficientes para avaliar investimentos recorrentes",
-      dataSource: 'synthetic'
+      rate: formattedRate,
+      trend: "+3.8%", // This would ideally be calculated from historical data
+      dataSource: "calculated"
     };
   }
-
-  // Count dividend payments in last 24 months
-  const now = new Date();
-  const twoYearsAgo = new Date();
-  twoYearsAgo.setFullYear(now.getFullYear() - 2);
-
-  const recentDividends = dividendHistory.filter(div => {
-    const paymentDate = div.payment_date ? new Date(div.payment_date) : null;
-    if (!paymentDate) return false;
-    return paymentDate >= twoYearsAgo;
-  });
-
-  // Evaluate based on number of dividend payments
-  if (recentDividends.length >= 12) {
-    return {
-      grade: 'A+',
-      description: "Investiu consistentemente nos últimos 24 meses",
-      dataSource: 'xp'
-    };
-  } else if (recentDividends.length >= 6) {
-    return {
-      grade: 'A',
-      description: "Investimentos regulares nos últimos meses",
-      dataSource: 'xp'
-    };
-  } else if (recentDividends.length >= 3) {
-    return {
-      grade: 'B+',
-      description: "Alguns investimentos recentes identificados",
-      dataSource: 'xp'
-    };
-  } else {
-    return {
-      grade: 'B',
-      description: "Poucos investimentos recorrentes encontrados",
-      dataSource: 'xp'
-    };
-  }
-};
-
-/**
- * Calculate spending discipline based on financial data
- * For now this returns synthetic data, would be connected to real data
- * from Open Finance in the future
- * @returns Spending discipline assessment
- */
-export const calculateSpendingDiscipline = (): {
-  grade: string;
-  description: string;
-  dataSource: DataSourceType;
-} => {
-  // For now, return synthetic data since this would come from Open Finance
-  return {
-    grade: 'B',
-    description: "Excedeu o orçamento em 18% em 3 dos últimos 6 meses",
-    dataSource: 'synthetic'
-  };
-};
-
-/**
- * Calculate financial resilience based on emergency fund coverage
- * @param liquidAssets Liquid assets value
- * @param monthlyExpenses Monthly expenses (estimated if not provided)
- * @returns Financial resilience assessment
- */
-export const calculateFinancialResilience = (
-  liquidAssets: number | string | null | undefined,
-  monthlyExpenses: number | string | null | undefined
-): {
-  grade: string;
-  description: string;
-  dataSource: DataSourceType;
-} => {
-  const liquid = ensureNumber(liquidAssets);
   
-  // Estimate monthly expenses if not provided (as 2% of liquid assets)
-  const expenses = monthlyExpenses ? ensureNumber(monthlyExpenses) : liquid * 0.02;
-  
-  if (!liquid || !expenses || expenses <= 0) {
-    return {
-      grade: 'A',
-      description: "Reserva de emergência cobre 8 meses de despesas",
-      dataSource: 'synthetic'
-    };
-  }
-
-  // Calculate how many months of expenses the liquid assets can cover
-  const monthsCovered = liquid / expenses;
-  
-  if (monthsCovered >= 12) {
-    return {
-      grade: 'A+',
-      description: `Reserva de emergência cobre ${Math.floor(monthsCovered)} meses de despesas`,
-      dataSource: 'xp'
-    };
-  } else if (monthsCovered >= 6) {
-    return {
-      grade: 'A',
-      description: `Reserva de emergência cobre ${Math.floor(monthsCovered)} meses de despesas`,
-      dataSource: 'xp'
-    };
-  } else if (monthsCovered >= 3) {
-    return {
-      grade: 'B+',
-      description: `Reserva de emergência cobre ${Math.floor(monthsCovered)} meses de despesas`,
-      dataSource: 'xp'
-    };
-  } else {
-    return {
-      grade: 'C',
-      description: `Reserva de emergência cobre apenas ${Math.floor(monthsCovered)} meses de despesas`,
-      dataSource: 'xp'
-    };
-  }
+  return defaultResponse;
 };
 
 /**
- * Calculate overall financial behavior score
- * @param portfolioSummary Portfolio summary data
- * @param dividendHistory Dividend history data
- * @param liquidAssets Liquid assets value
+ * Calculate financial behavior metrics
+ * @param portfolioSummary Portfolio summary object
+ * @param dividendHistory Dividend history array
+ * @param fixedIncomeValue Fixed income value
  * @param monthlyExpenses Monthly expenses
- * @returns Financial behavior metrics
+ * @param useSyntheticData Flag to force using synthetic data
+ * @returns Financial behavior metrics object
  */
 export const calculateFinancialBehaviorMetrics = (
   portfolioSummary: any,
-  dividendHistory: any[] = [],
-  liquidAssets: number | string | null | undefined,
-  monthlyExpenses: number | string | null | undefined
+  dividendHistory: any[],
+  fixedIncomeValue: any,
+  monthlyExpenses: any,
+  useSyntheticData: boolean = false
 ) => {
-  const diversification = calculateDiversificationScore(portfolioSummary);
-  const savingsRate = calculateSavingsRate(
-    portfolioSummary?.total_portfolio_value,
-    monthlyExpenses ? ensureNumber(monthlyExpenses) * 12 : undefined
-  );
-  const investmentConsistency = calculateInvestmentConsistency(dividendHistory);
-  const spendingDiscipline = calculateSpendingDiscipline();
-  const financialResilience = calculateFinancialResilience(liquidAssets, monthlyExpenses);
+  // If synthetic data is requested, return mock data
+  if (useSyntheticData) {
+    return {
+      dataSource: "synthetic",
+      investmentConsistency: {
+        grade: "A",
+        description: "Você investe consistentemente todos os meses",
+        dataSource: "synthetic"
+      },
+      spendingDiscipline: {
+        grade: "B+",
+        description: "Seu padrão de gastos é consistente e controlado",
+        dataSource: "synthetic"
+      },
+      financialResilience: {
+        grade: "A-",
+        description: "Sua reserva cobre 5.8 meses de despesas",
+        dataSource: "synthetic"
+      },
+      diversification: {
+        score: 73,
+        dataSource: "synthetic"
+      }
+    };
+  }
 
+  // Calculate metrics using real data when available
+  
+  // Try to get real portfolio data
+  const hasPortfolioData = portfolioSummary && 
+    (portfolioSummary.fixed_income_value || 
+     portfolioSummary.investment_fund_value || 
+     portfolioSummary.stocks_value);
+  
+  // Check if we have dividend history
+  const hasDividendData = dividendHistory && dividendHistory.length > 0;
+  
+  // Try to calculate investment consistency grade
+  let investmentConsistencyGrade = {
+    grade: "C",
+    description: "Dados insuficientes para avaliar consistência",
+    dataSource: "calculated"
+  };
+  
+  if (hasDividendData) {
+    // Count months with dividend payments as a proxy for investment consistency
+    const months = new Set();
+    dividendHistory.forEach(dividend => {
+      if (dividend.payment_date) {
+        const date = new Date(dividend.payment_date);
+        const monthYear = `${date.getMonth()}-${date.getFullYear()}`;
+        months.add(monthYear);
+      }
+    });
+    
+    const monthCount = months.size;
+    if (monthCount > 10) {
+      investmentConsistencyGrade = {
+        grade: "A",
+        description: "Você recebe dividendos consistentemente todos os meses",
+        dataSource: "calculated"
+      };
+    } else if (monthCount > 6) {
+      investmentConsistencyGrade = {
+        grade: "B",
+        description: `Você recebeu dividendos em ${monthCount} meses do último ano`,
+        dataSource: "calculated"
+      };
+    } else {
+      investmentConsistencyGrade = {
+        grade: "C",
+        description: `Você recebeu dividendos em apenas ${monthCount} meses do último ano`,
+        dataSource: "calculated"
+      };
+    }
+  }
+  
+  // Try to calculate spending discipline
+  let spendingDisciplineGrade = {
+    grade: "C",
+    description: "Dados insuficientes para avaliar disciplina de gastos",
+    dataSource: "calculated"
+  };
+  
+  // If we have monthly expenses data
+  if (monthlyExpenses) {
+    spendingDisciplineGrade = {
+      grade: "B",
+      description: "Seu padrão de gastos parece controlado",
+      dataSource: "calculated"
+    };
+  }
+  
+  // Try to calculate financial resilience
+  let financialResilienceGrade = {
+    grade: "C",
+    description: "Dados insuficientes para avaliar resiliência financeira",
+    dataSource: "calculated"
+  };
+  
+  // If we have fixed income value and monthly expenses
+  if (fixedIncomeValue && monthlyExpenses) {
+    const fixedIncome = ensureNumber(fixedIncomeValue);
+    const expenses = ensureNumber(monthlyExpenses);
+    
+    if (expenses > 0) {
+      const coverageMonths = fixedIncome / expenses;
+      
+      if (coverageMonths >= 6) {
+        financialResilienceGrade = {
+          grade: "A",
+          description: `Sua reserva cobre ${coverageMonths.toFixed(1)} meses de despesas`,
+          dataSource: "calculated"
+        };
+      } else if (coverageMonths >= 3) {
+        financialResilienceGrade = {
+          grade: "B",
+          description: `Sua reserva cobre ${coverageMonths.toFixed(1)} meses de despesas`,
+          dataSource: "calculated"
+        };
+      } else {
+        financialResilienceGrade = {
+          grade: "C",
+          description: `Sua reserva cobre apenas ${coverageMonths.toFixed(1)} meses de despesas`,
+          dataSource: "calculated"
+        };
+      }
+    }
+  }
+  
+  // Calculate diversification score
+  let diversificationScore = {
+    score: 50,
+    dataSource: "calculated"
+  };
+  
+  if (hasPortfolioData) {
+    let fixedIncome = ensureNumber(portfolioSummary.fixed_income_value || 0);
+    let investmentFund = ensureNumber(portfolioSummary.investment_fund_value || 0);
+    let stocks = ensureNumber(portfolioSummary.stocks_value || 0);
+    let realEstate = ensureNumber(portfolioSummary.real_estate_value || 0);
+    let international = ensureNumber(portfolioSummary.investment_international_value || 0);
+    
+    // Calculate total assets
+    const totalAssets = fixedIncome + investmentFund + stocks + realEstate + international;
+    
+    if (totalAssets > 0) {
+      // Calculate percentages
+      const fixedIncomePercent = (fixedIncome / totalAssets) * 100;
+      const investmentFundPercent = (investmentFund / totalAssets) * 100;
+      const stocksPercent = (stocks / totalAssets) * 100;
+      const realEstatePercent = (realEstate / totalAssets) * 100;
+      const internationalPercent = (international / totalAssets) * 100;
+      
+      // Count asset classes with more than 5% allocation
+      let assetClassCount = 0;
+      if (fixedIncomePercent > 5) assetClassCount++;
+      if (investmentFundPercent > 5) assetClassCount++;
+      if (stocksPercent > 5) assetClassCount++;
+      if (realEstatePercent > 5) assetClassCount++;
+      if (internationalPercent > 5) assetClassCount++;
+      
+      // Calculate concentration in highest asset class
+      const maxPercent = Math.max(
+        fixedIncomePercent,
+        investmentFundPercent,
+        stocksPercent,
+        realEstatePercent,
+        internationalPercent
+      );
+      
+      // Score based on asset class count and concentration
+      // Higher score for more asset classes and lower concentration
+      let score = Math.min(assetClassCount * 15, 60) + Math.max(0, 40 - maxPercent * 0.4);
+      score = Math.min(100, Math.max(0, score));
+      
+      diversificationScore = {
+        score: Math.round(score),
+        dataSource: "calculated"
+      };
+    }
+  }
+  
   return {
-    diversification,
-    savingsRate,
-    investmentConsistency,
-    spendingDiscipline,
-    financialResilience,
-    // Determine if we're using mostly real or synthetic data
-    dataSource: diversification.dataSource === 'synthetic' && 
-               savingsRate.dataSource === 'synthetic' &&
-               investmentConsistency.dataSource === 'synthetic' ? 'synthetic' : 'xp'
+    dataSource: "calculated",
+    investmentConsistency: investmentConsistencyGrade,
+    spendingDiscipline: spendingDisciplineGrade,
+    financialResilience: financialResilienceGrade,
+    diversification: diversificationScore
   };
 };

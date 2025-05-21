@@ -5,7 +5,11 @@ import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 import { useRaioX } from "@/context/RaioXContext";
 import { calculateFinancialBehaviorMetrics } from "@/utils/financialMetricsUtils";
 
-const FinancialBehaviorSection = () => {
+interface FinancialBehaviorSectionProps {
+  useSyntheticData?: boolean;
+}
+
+const FinancialBehaviorSection = ({ useSyntheticData = false }: FinancialBehaviorSectionProps) => {
   const { 
     data, 
     portfolioSummary, 
@@ -21,7 +25,8 @@ const FinancialBehaviorSection = () => {
     portfolioSummary?.fixed_income_value,
     hasOpenFinanceData && openFinanceInsights?.monthlyExpenses
       ? openFinanceInsights.monthlyExpenses
-      : undefined
+      : undefined,
+    useSyntheticData // Pass the synthetic data flag
   );
 
   return (
