@@ -103,7 +103,7 @@
   
   /* Reinvent specific styles */
   .reinvent-card {
-    @apply bg-gradient-to-br from-[#121218] to-[#1a1a24] border border-white/10 rounded-xl shadow-lg;
+    @apply bg-gradient-to-br from-[#121218] to-[#1a1a24] border border-white/10 rounded-xl shadow-lg overflow-hidden;
   }
   
   .reinvent-header {
@@ -139,12 +139,12 @@
   }
 }
 
-/* Jony Ive design styling */
+/* Jony Ive design styling - enhanced for better readability and consistency */
 .jony-ive-design {
-  --card-shadow: rgba(255, 255, 255, 0.1) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 4px 16px;
-  --card-radius: 16px;
-  --gradient-white: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
-  --card-bg: rgba(255, 255, 255, 0.03);
+  --card-shadow: rgba(255, 255, 255, 0.05) 0 0 0 1px, rgba(0, 0, 0, 0.3) 0 8px 20px;
+  --card-radius: 18px;
+  --gradient-white: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.03));
+  --card-bg: rgba(20, 20, 30, 0.4);
 }
 
 .jony-ive-design [class*="Card"] {
@@ -153,6 +153,7 @@
   box-shadow: var(--card-shadow);
   backdrop-filter: blur(20px);
   border: none;
+  overflow: hidden;
 }
 
 .jony-ive-design h2, 
@@ -161,6 +162,11 @@
 .jony-ive-design .text-lg {
   font-weight: 300;
   letter-spacing: -0.02em;
+}
+
+.jony-ive-design .text-sm {
+  font-weight: 300;
+  letter-spacing: 0.01em;
 }
 
 .jony-ive-design button {
@@ -172,12 +178,26 @@
 .jony-ive-design [class*="CardHeader"] {
   background: var(--gradient-white);
   border-radius: var(--card-radius) var(--card-radius) 0 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 1.25rem 1.5rem;
 }
 
-/* Responsive layout styles */
+.jony-ive-design [class*="CardContent"] {
+  padding: 1.5rem;
+}
+
+.jony-ive-design [class*="CardTitle"] {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Enhanced responsive layout styles */
 @media (max-width: 640px) {
   .grid {
-    grid-gap: 0.75rem;
+    grid-gap: 1rem;
+  }
+  
+  .p-6 {
+    padding: 1rem;
   }
   
   .p-4 {
@@ -195,9 +215,32 @@
   .text-2xl {
     font-size: 1.25rem;
   }
+  
+  /* Improve readability on small screens */
+  .reinvent-stat-card {
+    padding: 0.75rem;
+  }
+  
+  /* Single column for mobile */
+  .grid-cols-2, 
+  .grid-cols-3, 
+  .md\:grid-cols-2, 
+  .md\:grid-cols-3 {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Reduce card border radius on mobile */
+  .rounded-xl {
+    border-radius: 0.75rem;
+  }
+  
+  /* Ensure headers are not too tall */
+  .p-6 {
+    padding: 1rem;
+  }
 }
 
-/* Module card consistent styling */
+/* Improved module card consistent styling */
 .module-card {
   @apply bg-gradient-to-br from-gray-900 to-gray-800 border border-white/10 rounded-xl overflow-hidden shadow-lg;
 }
@@ -218,7 +261,7 @@
   @apply text-blue-400;
 }
 
-/* Stats styling */
+/* Improved stats styling */
 .stat-grid {
   @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4;
 }

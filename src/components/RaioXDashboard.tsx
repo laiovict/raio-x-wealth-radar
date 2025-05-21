@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, lazy, Suspense } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -159,111 +158,106 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
     </div>
   );
 
-  // Define RaioX Full tab content with consistent styling and no duplicates
+  // Define RaioX Full tab content with improved, consistent layout
   const FullTabContent = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-6">
-      <div className="lg:col-span-1">
-        <ClientProfileModule />
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-6">
+      {/* Sidebar with client profile (1/3 width) */}
+      <div className="lg:col-span-4 space-y-6">
+        <ClientProfileModule fullWidth={true} />
+        <Suspense fallback={<LoadingComponent />}>
+          <RecommendationsModule fullWidth={true} />
+        </Suspense>
+        <Suspense fallback={<LoadingComponent />}>
+          <BehavioralFinanceModule fullWidth={true} />
+        </Suspense>
       </div>
-      <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      {/* Main content area (2/3 width) */}
+      <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <FinancialOverviewModule fullWidth={false} />
         <Suspense fallback={<LoadingComponent />}>
-          <RecommendationsModule />
+          <InteligenciaModule fullWidth={false} />
+        </Suspense>
+        
+        <DividendModule fullWidth={false} />
+        <AllocationModule fullWidth={false} />
+        
+        <Suspense fallback={<LoadingComponent />}>
+          <InvestmentPlanningModule fullWidth={false} />
+        </Suspense>
+        <LiquidityReserveModule fullWidth={false} />
+        
+        <AIInsightsHubModule fullWidth={false} />
+        <SentimentInsightsModule fullWidth={false} />
+        
+        <Suspense fallback={<LoadingComponent />}>
+          <RecommendedActionsModule fullWidth={false} />
         </Suspense>
         <Suspense fallback={<LoadingComponent />}>
-          <RecommendedActionsModule />
+          <LifeGoalsModule fullWidth={false} />
+        </Suspense>
+        
+        <SocialComparisonModule fullWidth={false} />
+        <FamousInvestorsModule fullWidth={false} />
+        
+        <Suspense fallback={<LoadingComponent />}>
+          <FutureProjectionModule fullWidth={false} />
         </Suspense>
         <Suspense fallback={<LoadingComponent />}>
-          <InteligenciaModule />
-        </Suspense>
-        <Suspense fallback={<LoadingComponent />}>
-          <InvestmentPlanningModule />
-        </Suspense>
-        <Suspense fallback={<LoadingComponent />}>
-          <LifeGoalsModule />
-        </Suspense>
-        <DividendModule />
-        <AllocationModule />
-        <LiquidityReserveModule />
-        <Suspense fallback={<LoadingComponent />}>
-          <FutureProjectionModule />
-        </Suspense>
-        <SocialComparisonModule />
-        <AIInsightsHubModule />
-        <Suspense fallback={<LoadingComponent />}>
-          <BehavioralFinanceModule />
-        </Suspense>
-        <FinancialOverviewModule />
-        <Suspense fallback={<LoadingComponent />}>
-          <OnePageFinancialPlanModule />
-        </Suspense>
-        <SentimentInsightsModule />
-        <FamousInvestorsModule />
-        <Suspense fallback={<LoadingComponent />}>
-          <WrappedModule />
-        </Suspense>
-        <Suspense fallback={<LoadingComponent />}>
-          <WholeBankingModule />
-        </Suspense>
-        <Suspense fallback={<LoadingComponent />}>
-          <MeuFuturoFinanceiroModule />
-        </Suspense>
-        <Suspense fallback={<LoadingComponent />}>
-          <PersonalInsightsModule />
+          <OnePageFinancialPlanModule fullWidth={false} />
         </Suspense>
       </div>
     </div>
   );
 
-  // Define RaioX Full v2 (Jony Ive design) tab content with better organization
+  // Define RaioX Full v2 (Jony Ive design) tab content with improved organization
   const FullV2TabContent = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6 jony-ive-design">
-      <ClientProfileModule fullWidth={false} />
-      <div className="grid grid-cols-1 gap-6">
-        <Suspense fallback={<LoadingComponent />}>
-          <InvestmentPlanningModule />
-        </Suspense>
-        <Suspense fallback={<LoadingComponent />}>
-          <InteligenciaModule />
-        </Suspense>
+    <div className="jony-ive-design">
+      {/* Header row - key overview components */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+        <div className="lg:col-span-4">
+          <ClientProfileModule fullWidth={true} />
+        </div>
+        <div className="lg:col-span-8">
+          <FinancialOverviewModule fullWidth={true} />
+        </div>
       </div>
-      <div className="lg:col-span-2">
-        <FinancialOverviewModule fullWidth={true} />
+      
+      {/* Main content grid - organized by categories */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-6">
+        {/* Investment Management Section */}
+        <div className="lg:col-span-6 space-y-6">
+          <h3 className="text-xl font-light text-white/80 px-2">Gestão de Investimentos</h3>
+          <div className="grid grid-cols-1 gap-6">
+            <AllocationModule fullWidth={true} />
+            <DividendModule fullWidth={true} />
+            <Suspense fallback={<LoadingComponent />}>
+              <InvestmentPlanningModule fullWidth={true} />
+            </Suspense>
+            <LiquidityReserveModule fullWidth={true} />
+          </div>
+        </div>
+        
+        {/* Insights and Planning Section */}
+        <div className="lg:col-span-6 space-y-6">
+          <h3 className="text-xl font-light text-white/80 px-2">Insights e Planejamento</h3>
+          <div className="grid grid-cols-1 gap-6">
+            <Suspense fallback={<LoadingComponent />}>
+              <RecommendationsModule fullWidth={true} />
+            </Suspense>
+            <AIInsightsHubModule fullWidth={true} />
+            <SentimentInsightsModule fullWidth={true} />
+            <Suspense fallback={<LoadingComponent />}>
+              <InteligenciaModule fullWidth={true} />
+            </Suspense>
+          </div>
+        </div>
       </div>
-      <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Suspense fallback={<LoadingComponent />}>
-          <RecommendationsModule />
-        </Suspense>
-        <Suspense fallback={<LoadingComponent />}>
-          <RecommendedActionsModule />
-        </Suspense>
-        <Suspense fallback={<LoadingComponent />}>
-          <LifeGoalsModule />
-        </Suspense>
-        <DividendModule />
-        <AllocationModule />
-        <LiquidityReserveModule />
-        <Suspense fallback={<LoadingComponent />}>
-          <FutureProjectionModule />
-        </Suspense>
-        <SocialComparisonModule />
-        <AIInsightsHubModule />
-        <Suspense fallback={<LoadingComponent />}>
-          <BehavioralFinanceModule />
-        </Suspense>
-        <Suspense fallback={<LoadingComponent />}>
-          <OnePageFinancialPlanModule />
-        </Suspense>
-        <SentimentInsightsModule />
-        <FamousInvestorsModule />
-        <Suspense fallback={<LoadingComponent />}>
-          <WholeBankingModule />
-        </Suspense>
-        <Suspense fallback={<LoadingComponent />}>
-          <MeuFuturoFinanceiroModule />
-        </Suspense>
-        <Suspense fallback={<LoadingComponent />}>
-          <PersonalInsightsModule />
-        </Suspense>
+      
+      {/* Social and Personalized Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6">
+        <SocialComparisonModule fullWidth={false} />
+        <FamousInvestorsModule fullWidth={false} />
       </div>
     </div>
   );

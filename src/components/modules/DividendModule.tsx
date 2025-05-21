@@ -37,7 +37,7 @@ const DividendModule = ({ fullWidth = false, useSyntheticData = false }: Dividen
   // If we have no real data and synthetic data is not allowed, show empty state
   if (!hasRealData && !useSyntheticData) {
     return (
-      <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
+      <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism h-full`}>
         <CardHeader className="pb-2">
           <CardTitle className="text-xl bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
             Histórico de Dividendos
@@ -52,7 +52,7 @@ const DividendModule = ({ fullWidth = false, useSyntheticData = false }: Dividen
 
   // For real data or synthetic data
   return (
-    <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
+    <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism h-full`}>
       <CardHeader className="pb-2">
         <CardTitle className="text-xl bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent flex items-center justify-between flex-wrap">
           <span>Histórico de Dividendos</span>
