@@ -1,4 +1,3 @@
-
 // Define the AIInsight type for Raio-X insights
 export interface AIInsight {
   id: string;
@@ -245,7 +244,7 @@ export interface FinancialInsightData {
   dataSource?: DataSourceType;
 }
 
-// Complete Raio-X data structure for easy access to all client information
+// Add marketSentiment to RaioXData interface
 export interface RaioXData {
   clientName: string;
   clientSummary?: ClientSummary;
@@ -277,6 +276,13 @@ export interface RaioXData {
   wrapped?: WrappedData; // Added for WrappedModule
   openFinanceMonths?: number;
   hasOpenFinance?: boolean;
+  marketSentiment?: {
+    currentSentiment: string;
+    historicalSentiment: Array<{ date: string; value: number }>;
+    insights: string[];
+    dataSource?: DataSourceType;
+  };
+  monthlyExpenses?: number;
 }
 
 // Props for the Raio-X context provider

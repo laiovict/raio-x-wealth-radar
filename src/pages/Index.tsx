@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import ClientSelector from "@/components/ClientSelector";
@@ -10,6 +9,7 @@ import TopNavigation from "@/components/TopNavigation";
 import TopControls from "@/components/TopControls";
 import { useAuthentication } from "@/hooks/useAuthentication";
 import { getMonthlyReportUrl } from "@/utils/reportUtils";
+import { FeatureFlagProvider } from "@/context/FeatureFlagContext";
 
 const Index = () => {
   // States
@@ -75,50 +75,56 @@ const Index = () => {
   }
 
   return (
-    <RaioXProvider 
-      hasOpenFinance={hasOpenFinance}
-      selectedClient={selectedClient}
-    >
-      <div className="min-h-screen h-screen flex flex-col bg-gradient-to-br from-[#0f0f11] to-[#1a1a2e] text-white">
-        <TopNavigation 
-          selectedClient={selectedClient}
-          userData={userData}
-          handleLogout={handleLogout}
-          handleLogoClick={handleLogoClick}
-          getMonthlyReportUrl={() => getMonthlyReportUrl(selectedClient)}
-        />
-        
-        <div className="flex-grow overflow-auto">
-          <div className="container mx-auto px-3 sm:px-6 pt-4">
-            <div className="mb-6">
-              {userRole === "advisor" && <ClientSelector onClientSelect={handleClientSelect} />}
-              
-              {selectedClient && (
-                <TopControls 
-                  isAdvisor={userRole === "advisor"} 
-                  onOpenFinanceToggle={() => setHasOpenFinance(!hasOpenFinance)} 
-                  hasOpenFinance={hasOpenFinance}
-                />
-              )}
-            </div>
+    <FeatureFlagProvider initialFlags={{
+      synthetic_data: false,
+      openfinance: hasOpenFinance,
+      beta_features: true
+    }}>
+      <RaioXProvider 
+        hasOpenFinance={hasOpenFinance}
+        selectedClient={selectedClient}
+      >
+        <div className="min-h-screen h-screen flex flex-col bg-gradient-to-br from-[#0f0f11] to-[#1a1a2e] text-white">
+          <TopNavigation 
+            selectedClient={selectedClient}
+            userData={userData}
+            handleLogout={handleLogout}
+            handleLogoClick={handleLogoClick}
+            getMonthlyReportUrl={() => getMonthlyReportUrl(selectedClient)}
+          />
+          
+          <div className="flex-grow overflow-auto">
+            <div className="container mx-auto px-3 sm:px-6 pt-4">
+              <div className="mb-6">
+                {userRole === "advisor" && <ClientSelector onClientSelect={handleClientSelect} />}
+                
+                {selectedClient && (
+                  <TopControls 
+                    isAdvisor={userRole === "advisor"} 
+                    onOpenFinanceToggle={() => setHasOpenFinance(!hasOpenFinance)} 
+                    hasOpenFinance={hasOpenFinance}
+                  />
+                )}
+              </div>
 
-            <RaioXDashboard
-              showPdfPreview={showPdfPreview}
-              onClosePdfPreview={() => setShowPdfPreview(false)}
-              mediaType={mediaType}
-              isClientFull={hasOpenFinance}
-              onOpenFinanceActivate={() => setHasOpenFinance(true)}
-              userRole={userRole}
-            />
+              <RaioXDashboard
+                showPdfPreview={showPdfPreview}
+                onClosePdfPreview={() => setShowPdfPreview(false)}
+                mediaType={mediaType}
+                isClientFull={hasOpenFinance}
+                onOpenFinanceActivate={() => setHasOpenFinance(true)}
+                userRole={userRole}
+              />
+            </div>
           </div>
+          
+          <OpenFinanceControl
+            hasOpenFinance={hasOpenFinance}
+            setHasOpenFinance={setHasOpenFinance}
+          />
         </div>
-        
-        <OpenFinanceControl
-          hasOpenFinance={hasOpenFinance}
-          setHasOpenFinance={setHasOpenFinance}
-        />
-      </div>
-    </RaioXProvider>
+      </RaioXProvider>
+    </FeatureFlagProvider>
   );
 };
 

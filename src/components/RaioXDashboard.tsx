@@ -1,10 +1,10 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Mic, Search, Share2, Download } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
+import { useFeatureFlags } from "@/context/FeatureFlagContext";
 
 import AllocationModule from "./modules/AllocationModule";
 import FutureProjectionModule from "./modules/FutureProjectionModule";
@@ -61,6 +61,9 @@ const RaioXDashboard = ({
   // State to track if we're showing synthetic data (full version) or just real data (beta)
   const [showSyntheticData, setShowSyntheticData] = useState(false);
 
+  // Get feature flags to control module behavior
+  const { flags, enableFlag, disableFlag } = useFeatureFlags();
+  
   useEffect(() => {
     // Update the showSyntheticData state based on the active tab
     setShowSyntheticData(activeTab === "versao-full");
@@ -96,7 +99,7 @@ const RaioXDashboard = ({
       document.removeEventListener('activate-openfinance', handleActivateOpenFinance);
       document.removeEventListener('navigate-to-tab', handleTabNavigation as EventListener);
     };
-  }, [onOpenFinanceActivate, activeTab]);
+  }, [onOpenFinanceActivate, activeTab, enableFlag, disableFlag]);
 
   const handleQuickNavClick = (tabId: string) => {
     setActiveTab(tabId);
@@ -495,88 +498,88 @@ const RaioXDashboard = ({
         <TabsContent value="versao-full" className="space-y-8">
           {/* Starting with Financial Overview with synthetic data explicitly enabled */}
           <div>
-            <FinancialOverviewModule useSyntheticData={true} />
+            <FinancialOverviewModule useSyntheticData={flags.synthetic_data} />
             <FeedbackSection sectionId="full-financial-overview" />
           </div>
           
           {/* The rest of the full content, always with synthetic data */}
           <div>
-            <OnePageFinancialPlanModule useSyntheticData={true} />
+            <OnePageFinancialPlanModule useSyntheticData={flags.synthetic_data} />
             <FeedbackSection sectionId="full-financial-plan" />
           </div>
           
           <div>
-            <DividendModule fullWidth useSyntheticData={true} />
+            <DividendModule fullWidth useSyntheticData={flags.synthetic_data} />
             <FeedbackSection sectionId="full-dividends" />
           </div>
           
           <div>
-            <LifeGoalsModule useSyntheticData={true} />
+            <LifeGoalsModule useSyntheticData={flags.synthetic_data} />
             <FeedbackSection sectionId="full-life-goals" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <MeuFuturoFinanceiroModule useSyntheticData={true} />
+              <MeuFuturoFinanceiroModule useSyntheticData={flags.synthetic_data} />
               <FeedbackSection sectionId="full-meu-futuro" />
             </div>
             <div>
-              <WholeBankingModule useSyntheticData={true} />
+              <WholeBankingModule useSyntheticData={flags.synthetic_data} />
               <FeedbackSection sectionId="full-whole-banking" />
             </div>
           </div>
           
           <div>
-            <FamousInvestorsModule fullWidth useSyntheticData={true} />
+            <FamousInvestorsModule fullWidth useSyntheticData={flags.synthetic_data} />
             <FeedbackSection sectionId="full-famous-investors" />
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <AllocationModule useSyntheticData={true} />
+              <AllocationModule useSyntheticData={flags.synthetic_data} />
               <FeedbackSection sectionId="full-allocation" />
             </div>
             <div>
-              <LiquidityReserveModule useSyntheticData={true} />
+              <LiquidityReserveModule useSyntheticData={flags.synthetic_data} />
               <FeedbackSection sectionId="full-liquidity" />
             </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <SentimentInsightsModule useSyntheticData={true} />
+              <SentimentInsightsModule useSyntheticData={flags.synthetic_data} />
               <FeedbackSection sectionId="full-sentiment" />
             </div>
             <div>
-              <PersonalInsightsModule useSyntheticData={true} />
+              <PersonalInsightsModule useSyntheticData={flags.synthetic_data} />
               <FeedbackSection sectionId="full-personal-insights" />
             </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <FutureProjectionModule useSyntheticData={true} />
+              <FutureProjectionModule useSyntheticData={flags.synthetic_data} />
               <FeedbackSection sectionId="full-future-projection" />
             </div>
             <div>
-              <InvestmentPlanningModule useSyntheticData={true} />
+              <InvestmentPlanningModule useSyntheticData={flags.synthetic_data} />
               <FeedbackSection sectionId="full-investment-planning" />
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <SocialComparisonModule useSyntheticData={true} />
+              <SocialComparisonModule useSyntheticData={flags.synthetic_data} />
               <FeedbackSection sectionId="full-social-comparison" />
             </div>
             <div>
-              <BehavioralFinanceModule useSyntheticData={true} />
+              <BehavioralFinanceModule useSyntheticData={flags.synthetic_data} />
               <FeedbackSection sectionId="full-behavioral-finance" />
             </div>
           </div>
           
           <div>
-            <WrappedModule fullWidth useSyntheticData={true} />
+            <WrappedModule fullWidth useSyntheticData={flags.synthetic_data} />
             <FeedbackSection sectionId="full-wrapped" />
           </div>
           

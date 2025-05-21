@@ -7,15 +7,23 @@ import PlanSection from './financialPlan/PlanSection';
 import PlanHeader from './financialPlan/PlanHeader';
 import PlanFooter from './financialPlan/PlanFooter';
 import { usePlanData } from './financialPlan/usePlanData';
+import { BaseModuleProps } from '@/types/moduleTypes';
+import { withSafeData } from '@/components/hoc/withSafeData';
 
-interface OnePageFinancialPlanModuleProps {
-  fullWidth?: boolean;
-  useSyntheticData?: boolean;
+// Extending the BaseModuleProps interface ensures consistency across modules
+interface OnePageFinancialPlanModuleProps extends BaseModuleProps {
+  // Any additional props specific to this module
 }
 
-const OnePageFinancialPlanModule = ({ fullWidth = false, useSyntheticData = false }: OnePageFinancialPlanModuleProps) => {
+// Component without safe data
+const OnePageFinancialPlanModuleBase = ({ 
+  fullWidth = false, 
+  dataState 
+}: OnePageFinancialPlanModuleProps & { 
+  dataState: any // We'll type this properly in a complete implementation
+}) => {
   const { isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
-  const { financialPlan, expandedSections, toggleSection } = usePlanData();
+  const { financialPlan, expandedSections, toggleSection } = usePlanData(dataState.isSynthetic);
 
   if (isAIAnalysisLoading) {
     return <LoadingView fullWidth={fullWidth} />;
@@ -26,6 +34,7 @@ const OnePageFinancialPlanModule = ({ fullWidth = false, useSyntheticData = fals
       <PlanHeader 
         lastUpdated={financialPlan.lastUpdated}
         onRefresh={refreshAIAnalysis}
+        dataSource={dataState.dataSource}
       />
       <CardContent>
         <div className="space-y-4">
@@ -36,7 +45,7 @@ const OnePageFinancialPlanModule = ({ fullWidth = false, useSyntheticData = fals
               title={section.title}
               icon={section.icon}
               summary={section.summary}
-              dataSource={section.dataSource}
+              dataSource={section.dataSource || dataState.dataSource}
               details={section.details}
               actions={section.actions}
               isExpanded={expandedSections[section.id]}
@@ -50,5 +59,28 @@ const OnePageFinancialPlanModule = ({ fullWidth = false, useSyntheticData = fals
     </Card>
   );
 };
+
+// Get real data function for withSafeData HOC
+const getRealFinancialPlanData = (props: OnePageFinancialPlanModuleProps) => {
+  // Here we would extract real data from the RaioX context
+  // For now just return null as a placeholder
+  return null;
+};
+
+// Get synthetic data function for withSafeData HOC
+const getSyntheticFinancialPlanData = (props: OnePageFinancialPlanModuleProps) => {
+  // Return synthetic data
+  return {
+    // Synthetic data structure would go here
+    isSynthetic: true
+  };
+};
+
+// Create the safe module using the HOC
+const OnePageFinancialPlanModule = withSafeData(
+  OnePageFinancialPlanModuleBase,
+  getRealFinancialPlanData,
+  getSyntheticFinancialPlanData
+);
 
 export default OnePageFinancialPlanModule;

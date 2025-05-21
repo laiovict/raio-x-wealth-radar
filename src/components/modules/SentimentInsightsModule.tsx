@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,41 +8,35 @@ import { useMobileBreakpoint } from "@/hooks/use-mobile";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 import { DataSourceType } from '@/types/raioXTypes';
+import { BaseModuleProps } from '@/types/moduleTypes';
+import { withSafeData } from '@/components/hoc/withSafeData';
 
-interface SentimentInsightsModuleProps {
-  fullWidth?: boolean;
-  useSyntheticData?: boolean;
+// Type for sentiment data
+interface SentimentData {
+  currentSentiment: string;
+  historicalSentiment: Array<{ date: string; value: number }>;
+  insights: string[];
+  dataSource: DataSourceType;
 }
 
-const SentimentInsightsModule = ({ fullWidth = false, useSyntheticData = false }: SentimentInsightsModuleProps) => {
-  const { data } = useRaioX();
-  const isMobile = useMobileBreakpoint();
-  
-  // Use synthetic data if requested or if real data is not available
-  const marketSentiment = data?.marketSentiment || {
-    currentSentiment: "neutral",
-    historicalSentiment: [
-      { date: "Jan", value: 65 },
-      { date: "Fev", value: 70 },
-      { date: "Mar", value: 60 },
-      { date: "Abr", value: 45 },
-      { date: "Mai", value: 50 },
-      { date: "Jun", value: 55 },
-      { date: "Jul", value: 40 },
-      { date: "Ago", value: 45 },
-      { date: "Set", value: 60 },
-      { date: "Out", value: 65 },
-      { date: "Nov", value: 70 },
-      { date: "Dez", value: 75 },
-    ],
-    insights: [
-      "Mercado em tendência de alta após período de consolidação",
-      "Expectativa de redução da taxa de juros nos próximos meses",
-      "Setores defensivos perdendo força relativa"
-    ],
-    dataSource: useSyntheticData ? 'synthetic' : 'calculated'
-  };
+interface SentimentInsightsModuleProps extends BaseModuleProps {
+  // Additional props specific to this module
+}
 
+// Base component implementation
+const SentimentInsightsModuleBase = ({ 
+  fullWidth = false, 
+  dataState 
+}: SentimentInsightsModuleProps & { 
+  dataState: { 
+    data: SentimentData; 
+    dataSource: DataSourceType; 
+    isSynthetic: boolean; 
+  } 
+}) => {
+  const isMobile = useMobileBreakpoint();
+  const marketSentiment = dataState.data;
+  
   // Determine sentiment color and icon
   const getSentimentColor = (sentiment: string) => {
     switch (sentiment.toLowerCase()) {
@@ -77,7 +72,7 @@ const SentimentInsightsModule = ({ fullWidth = false, useSyntheticData = false }
         <div className="flex justify-between items-center">
           <CardTitle className="text-xl bg-gradient-to-r from-purple-400 to-indigo-500 bg-clip-text text-transparent flex items-center gap-2">
             Sentimento de Mercado
-            <TypeSafeDataSourceTag source={marketSentiment.dataSource as DataSourceType} />
+            <TypeSafeDataSourceTag source={marketSentiment.dataSource} />
           </CardTitle>
           <Badge 
             variant="outline" 
@@ -143,5 +138,45 @@ const SentimentInsightsModule = ({ fullWidth = false, useSyntheticData = false }
     </Card>
   );
 };
+
+// Create synthetic data for sentiment
+const getSyntheticSentimentData = (): SentimentData => {
+  return {
+    currentSentiment: "neutral",
+    historicalSentiment: [
+      { date: "Jan", value: 65 },
+      { date: "Fev", value: 70 },
+      { date: "Mar", value: 60 },
+      { date: "Abr", value: 45 },
+      { date: "Mai", value: 50 },
+      { date: "Jun", value: 55 },
+      { date: "Jul", value: 40 },
+      { date: "Ago", value: 45 },
+      { date: "Set", value: 60 },
+      { date: "Out", value: 65 },
+      { date: "Nov", value: 70 },
+      { date: "Dez", value: 75 },
+    ],
+    insights: [
+      "Mercado em tendência de alta após período de consolidação",
+      "Expectativa de redução da taxa de juros nos próximos meses",
+      "Setores defensivos perdendo força relativa"
+    ],
+    dataSource: 'synthetic'
+  };
+};
+
+// Get real sentiment data from context
+const getRealSentimentData = (props: SentimentInsightsModuleProps) => {
+  const { data } = useRaioX();
+  return data.marketSentiment || null;
+};
+
+// Create the safe module using the HOC
+const SentimentInsightsModule = withSafeData<SentimentInsightsModuleProps, SentimentData>(
+  SentimentInsightsModuleBase,
+  getRealSentimentData,
+  getSyntheticSentimentData
+);
 
 export default SentimentInsightsModule;

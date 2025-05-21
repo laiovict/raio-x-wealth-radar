@@ -1,18 +1,26 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui";
+import { Badge } from "@/components/ui";
 import { Brain, TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
+import { SafeProgress } from "@/components/ui";
 import { calculateFinancialBehaviorMetrics } from "@/utils/financialMetricsUtils";
 import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
+import { BaseModuleProps } from '@/types/moduleTypes';
+import { withSafeData } from '@/components/hoc/withSafeData';
 
-interface BehavioralFinanceModuleProps {
-  fullWidth?: boolean;
-  useSyntheticData?: boolean;
+interface BehavioralFinanceModuleProps extends BaseModuleProps {
+  // Additional props specific to this module
 }
 
-const BehavioralFinanceModule = ({ fullWidth = false, useSyntheticData = false }: BehavioralFinanceModuleProps) => {
+// The base component implementation
+const BehavioralFinanceModuleBase = ({ 
+  fullWidth = false, 
+  dataState 
+}: BehavioralFinanceModuleProps & { 
+  dataState: any // We'll type this properly in a complete implementation
+}) => {
   const { data } = useRaioX();
   
   // Get behavioral metrics from real data or synthetic data
@@ -20,8 +28,8 @@ const BehavioralFinanceModule = ({ fullWidth = false, useSyntheticData = false }
     data.portfolioSummary,
     data.dividendHistory,
     data.portfolioSummary?.fixed_income_value,
-    data.monthlyExpenses,
-    useSyntheticData
+    data.monthlyExpenses || 0, // Use 0 as default if undefined
+    dataState.isSynthetic
   );
   
   // Helper function to get color based on grade
@@ -115,7 +123,7 @@ const BehavioralFinanceModule = ({ fullWidth = false, useSyntheticData = false }
               <h3 className="font-medium text-white">Pontuação de Diversificação</h3>
               <span className="text-blue-400 font-medium">{behaviorMetrics.diversification.score}/100</span>
             </div>
-            <Progress 
+            <SafeProgress 
               value={behaviorMetrics.diversification.score} 
               className="h-2 mb-2"
               indicatorClassName={
@@ -155,5 +163,28 @@ const BehavioralFinanceModule = ({ fullWidth = false, useSyntheticData = false }
     </Card>
   );
 };
+
+// Get real data function for withSafeData HOC
+const getRealBehaviorData = (props: BehavioralFinanceModuleProps) => {
+  // Here we would extract real data from the RaioX context
+  // For now just return null as a placeholder
+  return null;
+};
+
+// Get synthetic data function for withSafeData HOC
+const getSyntheticBehaviorData = (props: BehavioralFinanceModuleProps) => {
+  // Return synthetic data
+  return {
+    // Synthetic data structure would go here
+    isSynthetic: true
+  };
+};
+
+// Create the safe module using the HOC
+const BehavioralFinanceModule = withSafeData(
+  BehavioralFinanceModuleBase,
+  getRealBehaviorData,
+  getSyntheticBehaviorData
+);
 
 export default BehavioralFinanceModule;
