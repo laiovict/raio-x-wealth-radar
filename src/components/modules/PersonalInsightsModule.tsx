@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -413,7 +412,7 @@ const getRealPersonalInsightsData = (props: PersonalInsightsModuleProps) => {
     const summary = clientSummary.summary;
     // Handle tags which could be either a string or an array
     const tags = typeof clientSummary.tags === 'string' 
-      ? clientSummary.tags.split(',').map(tag => tag.trim()) 
+      ? (clientSummary.tags as string).split(',').map(tag => tag.trim()) 
       : (Array.isArray(clientSummary.tags) ? clientSummary.tags : []);
     
     const investor_name = clientSummary.investor_name || '';
