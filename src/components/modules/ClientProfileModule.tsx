@@ -53,57 +53,60 @@ const ClientProfileModuleBase = ({ fullWidth = false, dataState }: ClientProfile
   const clientData = dataState?.data;
   const dataSource = dataState?.dataSource || 'synthetic';
   
-  // More strict conditions to not render with synthetic data:
+  // Even more strict conditions to not render:
   // 1. Don't render if we don't have client data 
   // 2. Don't render if the data is synthetic but no client is selected
-  // 3. Don't render if the investor_name is "Cliente Exemplo" 
+  // 3. Don't render if the investor_name is "Cliente Exemplo" or "Cliente Padrão"
   // 4. Don't render if the data is synthetic and we have the default name pattern
+  // 5. Don't render for client ID 240275 specifically
   if (!clientData || 
       (dataSource === 'synthetic' && !selectedClient) || 
       clientData.investor_name === "Cliente Exemplo" ||
-      (dataSource === 'synthetic' && clientData.investor_name === `Cliente ${selectedClient}`)) {
+      clientData.investor_name === "Cliente Padrão" ||
+      (dataSource === 'synthetic' && clientData.investor_name === `Cliente ${selectedClient}`) ||
+      selectedClient === 240275 || selectedClient === "240275") {
     return null;
   }
   
   return (
-    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full overflow-hidden border-none bg-slate-900/80 dark:bg-slate-900`}>
+    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full overflow-hidden border-none bg-gradient-to-br from-slate-900/90 to-slate-800/90 shadow-xl`}>
       <CardContent className="p-0 h-full">
         <div className="relative h-full">
-          {/* Glass-styled overlay - updated to match dark theme */}
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 to-slate-800/80 backdrop-blur-sm z-10"></div>
+          {/* Glass-styled overlay - improved dark theme */}
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900/80 to-indigo-900/10 backdrop-blur-sm z-10"></div>
           
-          {/* Background elements - updated for dark theme */}
+          {/* Background elements - enhanced for dark theme */}
           <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -right-20 -top-20 w-64 h-64 rounded-full bg-gradient-to-br from-blue-900/30 to-indigo-900/30 blur-3xl"></div>
-            <div className="absolute -left-20 -bottom-20 w-64 h-64 rounded-full bg-gradient-to-br from-indigo-900/30 to-purple-900/30 blur-3xl"></div>
+            <div className="absolute -right-20 -top-20 w-80 h-80 rounded-full bg-gradient-to-br from-blue-900/20 to-indigo-900/20 blur-3xl"></div>
+            <div className="absolute -left-20 -bottom-20 w-80 h-80 rounded-full bg-gradient-to-br from-indigo-900/20 to-purple-900/20 blur-3xl"></div>
           </div>
           
           {/* Content */}
           <div className="relative z-20 h-full flex flex-col">
-            {/* Header - updated styling for dark theme */}
+            {/* Header - enhanced styling for dark theme */}
             <div className="bg-gradient-to-r from-slate-900 to-slate-800 py-8 px-10 border-b border-slate-700/50">
               <div className="flex justify-center">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-xl">
-                  <User className="h-8 w-8 text-white" strokeWidth={1.5} />
+                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-xl">
+                  <User className="h-10 w-10 text-white" strokeWidth={1.5} />
                 </div>
               </div>
               
-              <div className="mt-4 text-center">
+              <div className="mt-5 text-center">
                 <h2 className="text-2xl font-light text-white tracking-wide">
                   {clientData.investor_name}
                 </h2>
                 {clientData.clientAge && (
-                  <div className="mt-1 text-slate-400">
+                  <div className="mt-2 text-slate-400">
                     {clientData.clientAge} anos
                   </div>
                 )}
                 
                 {dataSource === 'supabase' && (
-                  <div className="flex justify-center gap-2 mt-3">
+                  <div className="flex justify-center gap-2 mt-4">
                     {clientData.tags && clientData.tags.slice(0, 3).map((tag, index) => (
                       <Badge 
                         key={index} 
-                        className="bg-gradient-to-r from-blue-900/50 to-indigo-900/50 text-blue-300 border border-blue-800/50"
+                        className="bg-gradient-to-r from-blue-900/50 to-indigo-900/50 text-blue-300 border border-blue-800/50 px-3 py-1"
                       >
                         {tag}
                       </Badge>
@@ -113,18 +116,18 @@ const ClientProfileModuleBase = ({ fullWidth = false, dataState }: ClientProfile
               </div>
             </div>
             
-            {/* Profile Summary */}
-            <div className="flex-1 p-10 flex flex-col justify-center">
+            {/* Profile Summary - enhanced spacing and visuals */}
+            <div className="flex-1 p-8 flex flex-col justify-center">
               <div className="space-y-8">
                 {/* Current Status */}
                 <div className="relative">
-                  <div className="flex items-center mb-2 gap-2">
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
+                  <div className="flex items-center mb-3 gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
                       <User className="h-4 w-4 text-white" strokeWidth={1.5} />
                     </div>
                     <h3 className="text-lg font-medium text-blue-300">Situação Atual</h3>
                   </div>
-                  <div className="pl-9">
+                  <div className="pl-11">
                     <p className="text-slate-300 text-lg font-light leading-relaxed">
                       {clientData.currentStatus || "Informação não disponível."}
                     </p>
@@ -133,13 +136,13 @@ const ClientProfileModuleBase = ({ fullWidth = false, dataState }: ClientProfile
                 
                 {/* Ambitions */}
                 <div className="relative">
-                  <div className="flex items-center mb-2 gap-2">
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-md">
+                  <div className="flex items-center mb-3 gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-md">
                       <Star className="h-4 w-4 text-white" strokeWidth={1.5} />
                     </div>
                     <h3 className="text-lg font-medium text-purple-300">Ambições</h3>
                   </div>
-                  <div className="pl-9">
+                  <div className="pl-11">
                     <p className="text-slate-300 text-lg font-light leading-relaxed">
                       {clientData.ambitions || "Informação não disponível."}
                     </p>
@@ -148,13 +151,13 @@ const ClientProfileModuleBase = ({ fullWidth = false, dataState }: ClientProfile
                 
                 {/* Needs */}
                 <div className="relative">
-                  <div className="flex items-center mb-2 gap-2">
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-md">
+                  <div className="flex items-center mb-3 gap-3">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-md">
                       <Target className="h-4 w-4 text-white" strokeWidth={1.5} />
                     </div>
                     <h3 className="text-lg font-medium text-amber-300">Necessidades</h3>
                   </div>
-                  <div className="pl-9">
+                  <div className="pl-11">
                     <p className="text-slate-300 text-lg font-light leading-relaxed">
                       {clientData.needs || "Informação não disponível."}
                     </p>

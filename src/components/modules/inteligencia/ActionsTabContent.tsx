@@ -17,16 +17,16 @@ const ActionsTabContent: React.FC<ActionsTabContentProps> = ({
   actionStatuses 
 }) => {
   return (
-    <div className="p-4 space-y-3">
+    <div className="p-6 space-y-6">
       <div className="space-y-4">
         {getRecommendedActions().map((action) => (
           <ActionCard key={action.id} action={action} />
         ))}
       </div>
       
-      <div className="pt-4">
-        <h3 className="text-base font-medium text-gray-900 dark:text-gray-100 mb-3">Status do plano</h3>
-        <div className="space-y-3">
+      <div className="pt-4 mt-4 border-t border-white/5">
+        <h3 className="text-lg font-light text-white mb-4">Status do plano</h3>
+        <div className="space-y-4">
           {actionStatuses.map((status) => (
             <ActionStatusCard key={status.id} status={status} />
           ))}

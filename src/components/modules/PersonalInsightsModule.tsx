@@ -66,24 +66,26 @@ const PersonalInsightsModule: React.FC<PersonalInsightsModuleProps> = ({ fullWid
   // 1. Don't show if no client summary and client name is default OR no selected client
   // 2. Don't show if client name is "Cliente Padrão"
   // 3. Don't show if no sections
+  // 4. Don't show for specific client ID 240275
   if (
     (!clientSummary || !clientSummary.summary) && 
     (data.clientName === "Cliente Padrão" || !selectedClient) ||
     data.clientName === "Cliente Padrão" ||
-    sections.length === 0
+    sections.length === 0 ||
+    selectedClient === 240275 || selectedClient === "240275"
   ) {
     return null;
   }
   
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism h-full`}>
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-3 bg-gradient-to-r from-slate-900/80 to-slate-800/80 border-b border-white/5">
         <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
           Insights Personalizados
         </CardTitle>
       </CardHeader>
       
-      <CardContent className="pt-0">
+      <CardContent className="pt-6 space-y-6">
         {/* Profile Header Component */}
         <ProfileHeader
           clientSummary={clientSummary}
@@ -100,7 +102,7 @@ const PersonalInsightsModule: React.FC<PersonalInsightsModuleProps> = ({ fullWid
         )}
         
         {/* Profile Sections */}
-        <div className="space-y-4 mt-4">
+        <div className="space-y-6 mt-6">
           {sections.map((section, index) => (
             <ProfileSection
               key={index}

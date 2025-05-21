@@ -9,7 +9,7 @@ interface RecommendationsTabContentProps {
 
 const RecommendationsTabContent: React.FC<RecommendationsTabContentProps> = ({ recommendations }) => {
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-6 space-y-6">
       {recommendations && recommendations.length > 0 ? (
         <div className="space-y-4">
           {recommendations.map((recommendation, index) => (
