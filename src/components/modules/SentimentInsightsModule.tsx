@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,13 +13,13 @@ interface SentimentInsightsModuleProps {
   fullWidth?: boolean;
 }
 
-// Define a specific type for asset data
+// Define a specific type for asset data - changed the dataSource type to be optional to match its usage
 interface SentimentAsset {
   ticker: string;
   sentiment: number;
   impact: number;
   recentNews: string;
-  dataSource: DataSourceType | 'synthetic' | 'supabase';
+  dataSource?: DataSourceType | 'synthetic' | 'supabase'; // Made optional with "?"
 }
 
 // Define the structure of sentiment data
