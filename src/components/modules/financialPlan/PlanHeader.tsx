@@ -1,40 +1,35 @@
 
-import React from 'react';
+import React from "react";
+import { CardHeader, CardTitle, Button } from "@/components/ui";
 import { RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { CardHeader, CardTitle } from "@/components/ui/card";
-import { formatDate } from "@/utils/raioXUtils";
+import TypeSafeDataSourceTag from "@/components/common/TypeSafeDataSourceTag";
+import { DataSourceType } from "@/types/raioXTypes";
 
-interface PlanHeaderProps {
+export interface PlanHeaderProps {
   lastUpdated: string;
   onRefresh: () => void;
+  dataSource: DataSourceType;
 }
 
-const PlanHeader = ({ lastUpdated, onRefresh }: PlanHeaderProps) => {
+const PlanHeader: React.FC<PlanHeaderProps> = ({ lastUpdated, onRefresh, dataSource }) => {
   return (
     <CardHeader className="pb-2">
       <div className="flex items-center justify-between">
         <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
-          Plano Financeiro (One-Page)
+          Plano Financeiro Simplificado
+          <TypeSafeDataSourceTag source={dataSource} />
         </CardTitle>
-        <Button variant="ghost" size="sm" onClick={onRefresh} className="flex items-center gap-2">
-          <RefreshCw className="h-4 w-4" />
-          <span className="hidden md:inline">Atualizar</span>
-        </Button>
-      </div>
-      <div className="flex items-center justify-between">
-        <p className="text-xs text-gray-400">
-          Última atualização: {formatDate(lastUpdated, { 
-            day: '2-digit', 
-            month: '2-digit', 
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          })}
-        </p>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-green-400">✓ Dados reais</span>
-          <span className="text-xs text-amber-400">* Dados estimados</span>
+          <span className="text-xs text-gray-400">Atualizado: {lastUpdated}</span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onRefresh}
+            className="h-8 px-2 border-gray-700 bg-transparent hover:bg-gray-800"
+          >
+            <RefreshCw className="h-3 w-3 mr-1" />
+            <span className="text-xs">Atualizar</span>
+          </Button>
         </div>
       </div>
     </CardHeader>

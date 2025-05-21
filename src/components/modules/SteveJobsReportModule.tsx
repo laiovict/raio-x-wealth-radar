@@ -446,6 +446,7 @@ const getRealSteveJobsData = (props: SteveJobsReportModuleProps) => {
 // Get synthetic data function for withSafeData HOC
 const getSyntheticSteveJobsData = (props: SteveJobsReportModuleProps) => {
   return {
+    isReal: false,
     isSynthetic: true
   };
 };

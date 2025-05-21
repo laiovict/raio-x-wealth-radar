@@ -167,7 +167,7 @@ const getSyntheticSentimentData = (): SentimentData => {
 };
 
 // Get real sentiment data from context
-const getRealSentimentData = (props: SentimentInsightsModuleProps) => {
+const getRealSentimentData = (props: SentimentInsightsModuleProps): SentimentData | null => {
   const { data } = useRaioX();
   return data.marketSentiment || null;
 };

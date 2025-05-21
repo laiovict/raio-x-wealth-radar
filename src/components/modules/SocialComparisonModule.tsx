@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import React from "react";
 import { 
@@ -6,8 +5,7 @@ import {
   CardHeader, 
   CardContent, 
   CardTitle, 
-  Badge,
-  Progress
+  Badge
 } from "@/components/ui";
 import { 
   Users, 
@@ -20,12 +18,8 @@ import { withSafeData } from '@/components/hoc/withSafeData';
 import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 import { DataSourceType } from "@/types/raioXTypes";
 import { useLegacyComponentAdapter } from "@/hooks/useLegacyComponentsAdapter";
-import { toNumber } from '@/utils/typeConversionHelpers';
+import { SafeProgress } from "@/components/ui/safe-progress";
 import { formatCurrency } from '@/utils/formattingUtils';
-
-interface SocialComparisonModuleProps extends BaseModuleProps {
-  // Additional props specific to this module
-}
 
 // Helper function for comparison metrics
 const compareToNumber = (userValue: number, avgValue: number): string => {
@@ -35,6 +29,17 @@ const compareToNumber = (userValue: number, avgValue: number): string => {
   if (userValue < avgValue * 0.5) return "muito abaixo";
   return "similar";
 };
+
+// Helper for number conversion
+const toNumber = (value: any): number => {
+  if (typeof value === 'number') return value;
+  if (typeof value === 'string') return parseFloat(value) || 0;
+  return 0;
+};
+
+interface SocialComparisonModuleProps extends BaseModuleProps {
+  // Additional props specific to this module
+}
 
 const SocialComparisonModuleBase = ({ fullWidth = false, dataState }: SocialComparisonModuleProps & { dataState: any }) => {
   const { data } = useRaioX();
@@ -152,7 +157,7 @@ const SocialComparisonModuleBase = ({ fullWidth = false, dataState }: SocialComp
                 <span className="text-gray-300">{formatCurrency(comparisonData.netWorthComparison.avgValue)}</span>
               </div>
               <div className="mt-3">
-                <Progress 
+                <SafeProgress 
                   value={comparisonData.netWorthComparison.percentile} 
                   className="h-2 bg-gray-700"
                   indicatorClassName="bg-green-500"
@@ -180,7 +185,7 @@ const SocialComparisonModuleBase = ({ fullWidth = false, dataState }: SocialComp
                 <span className="text-gray-300">{comparisonData.savingsRateComparison.avgValue}%</span>
               </div>
               <div className="mt-3">
-                <Progress 
+                <SafeProgress 
                   value={comparisonData.savingsRateComparison.percentile} 
                   className="h-2 bg-gray-700"
                   indicatorClassName="bg-green-500"
@@ -212,7 +217,7 @@ const SocialComparisonModuleBase = ({ fullWidth = false, dataState }: SocialComp
                 </Badge>
               </div>
               <div className="mt-3">
-                <Progress 
+                <SafeProgress 
                   value={comparisonData.investmentComparison.percentile} 
                   className="h-2 bg-gray-700"
                   indicatorClassName="bg-blue-500"
@@ -237,7 +242,7 @@ const SocialComparisonModuleBase = ({ fullWidth = false, dataState }: SocialComp
                 <span className="text-gray-300">{comparisonData.diversificationComparison.avgValue}/100</span>
               </div>
               <div className="mt-3">
-                <Progress 
+                <SafeProgress 
                   value={comparisonData.diversificationComparison.percentile} 
                   className="h-2 bg-gray-700"
                   indicatorClassName="bg-purple-500"

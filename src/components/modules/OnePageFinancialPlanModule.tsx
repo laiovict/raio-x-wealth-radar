@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
@@ -23,7 +22,7 @@ const OnePageFinancialPlanModuleBase = ({
   dataState: any // We'll type this properly in a complete implementation
 }) => {
   const { isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
-  const { financialPlan, expandedSections, toggleSection } = usePlanData(dataState.isSynthetic);
+  const { financialPlan, expandedSections, toggleSection } = usePlanData();
 
   if (isAIAnalysisLoading) {
     return <LoadingView fullWidth={fullWidth} />;

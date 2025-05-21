@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 // Define the available feature flags
@@ -8,7 +7,8 @@ export type FeatureFlag =
   | 'beta_features'
   | 'advanced_insights'
   | 'financial_plan'
-  | 'behavioral_finance';
+  | 'behavioral_finance'
+  | 'steve_jobs';
 
 interface FeatureFlagContextType {
   flags: Record<FeatureFlag, boolean>;
@@ -25,7 +25,8 @@ const defaultFlags: Record<FeatureFlag, boolean> = {
   beta_features: true,
   advanced_insights: false,
   financial_plan: false,
-  behavioral_finance: false
+  behavioral_finance: false,
+  steve_jobs: false
 };
 
 // Create the context

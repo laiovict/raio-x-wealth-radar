@@ -6,23 +6,15 @@ import { useLanguage } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { useFeatureFlags } from "@/context/FeatureFlagContext";
 
+// Import modules
 import AllocationModule from "./modules/AllocationModule";
-import FutureProjectionModule from "./modules/FutureProjectionModule";
 import LiquidityReserveModule from "./modules/LiquidityReserveModule";
-import LifeGoalsModule from "./modules/LifeGoalsModule";
-import WrappedModule from "./modules/WrappedModule";
-import SocialComparisonModule from "./modules/SocialComparisonModule";
 import SentimentInsightsModule from "./modules/SentimentInsightsModule";
-import PersonalInsightsModule from "./modules/PersonalInsightsModule";
 import PdfPreview from "./PdfPreview";
 import FinancialOverviewModule from "./modules/FinancialOverviewModule";
-import MeuFuturoFinanceiroModule from "./modules/MeuFuturoFinanceiroModule";
-import InvestmentPlanningModule from "./modules/InvestmentPlanningModule";
 import OnePageFinancialPlanModule from "./modules/OnePageFinancialPlanModule";
-import WholeBankingModule from "./modules/WholeBankingModule";
 import ChatInterface from "./ChatInterface";
 import BehavioralFinanceModule from "./modules/BehavioralFinanceModule";
-import FamousInvestorsModule from "./modules/FamousInvestorsModule";
 import WelcomeBanner from "./WelcomeBanner";
 import InteligenciaModule from "./modules/InteligenciaModule";
 import DividendModule from "./modules/DividendModule";
@@ -101,16 +93,6 @@ const RaioXDashboard = ({
       document.removeEventListener('navigate-to-tab', handleTabNavigation as EventListener);
     };
   }, [onOpenFinanceActivate, activeTab, enableFlag, disableFlag]);
-
-  const handleQuickNavClick = (tabId: string) => {
-    setActiveTab(tabId);
-    // Update synthetic data state when changing tabs
-    setShowSyntheticData(tabId === "versao-full" || tabId === "steve-jobs");
-    // Scroll to top when changing tabs
-    if (dashboardRef.current) {
-      dashboardRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   // Extract the first name from data.clientName
   const getClientFirstName = () => {
@@ -284,7 +266,7 @@ const RaioXDashboard = ({
       <FeedbackSection sectionId="top-inteligencia" />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-8 rounded-lg overflow-x-auto grid grid-cols-8 scrollbar-none bg-white/5 backdrop-blur-md border border-white/10">
+        <TabsList className="mb-8 rounded-lg overflow-x-auto grid grid-cols-3 scrollbar-none bg-white/5 backdrop-blur-md border border-white/10">
           {/* Added new "By Steve Jobs" tab with special styling */}
           <TabsTrigger 
             value="steve-jobs" 
@@ -296,17 +278,12 @@ const RaioXDashboard = ({
           <TabsTrigger value="raiox-beta" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">
             RaioX Beta
           </TabsTrigger>
-          <TabsTrigger value="status" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('statusTab')}</TabsTrigger>
-          <TabsTrigger value="actions" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('planTab')}</TabsTrigger>
-          <TabsTrigger value="market" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('aiTab')}</TabsTrigger>
-          <TabsTrigger value="future" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('futureTab')}</TabsTrigger>
-          <TabsTrigger value="chat" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('chatTab')}</TabsTrigger>
           <TabsTrigger value="versao-full" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">
             Versão Full
           </TabsTrigger>
         </TabsList>
 
-        {/* New Tab: "By Steve Jobs" - The reimagined financial diagnostic */}
+        {/* Tab 1: Steve Jobs - The reimagined financial diagnostic */}
         <TabsContent value="steve-jobs" className="space-y-8">
           <SteveJobsReportModule fullWidth />
           <FeedbackSection sectionId="steve-jobs-report" />
@@ -317,7 +294,7 @@ const RaioXDashboard = ({
           </div>
         </TabsContent>
 
-        {/* Tab 1: RaioX Beta - Only showing components with real data */}
+        {/* Tab 2: RaioX Beta - Only showing components with real data */}
         <TabsContent value="raiox-beta" className="space-y-8">
           <div>
             {/* Financial Overview with useSyntheticData={false} */}
@@ -349,170 +326,7 @@ const RaioXDashboard = ({
           </div>
         </TabsContent>
         
-        {/* The rest of the tabs */}
-        {/* Tab 2: Como Estou? - Status overview */}
-        <TabsContent value="status" className="space-y-8">
-          <div>
-            <FinancialOverviewModule useSyntheticData={showSyntheticData} fullWidth />
-            <FeedbackSection sectionId="status-financial-overview" />
-          </div>
-          
-          <div>
-            <DividendModule fullWidth />
-            <FeedbackSection sectionId="status-dividends" />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <AllocationModule />
-              <FeedbackSection sectionId="status-allocation" />
-            </div>
-            <div>
-              <LiquidityReserveModule />
-              <FeedbackSection sectionId="status-liquidity" />
-            </div>
-          </div>
-          
-          <div>
-            <SentimentInsightsModule fullWidth />
-            <FeedbackSection sectionId="status-sentiment" />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <PersonalInsightsModule />
-              <FeedbackSection sectionId="status-personal-insights" />
-            </div>
-            <div>
-              <SocialComparisonModule />
-              <FeedbackSection sectionId="status-social-comparison" />
-            </div>
-          </div>
-          
-          {/* Footer for this tab */}
-          <div className="w-full py-10 text-center border-t border-white/10 mt-12">
-            <p className="text-gray-400">Fim da seção - Como Estou?</p>
-          </div>
-        </TabsContent>
-        
-        {/* Tab 3: O que preciso mudar? - Recommendations and actions */}
-        <TabsContent value="actions" className="space-y-8">
-          <div>
-            <InteligenciaModule fullWidth />
-            <FeedbackSection sectionId="actions-inteligencia" />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <LifeGoalsModule />
-              <FeedbackSection sectionId="actions-life-goals" />
-            </div>
-            <div>
-              <PersonalInsightsModule />
-              <FeedbackSection sectionId="actions-personal-insights" />
-            </div>
-          </div>
-          
-          <div>
-            <OnePageFinancialPlanModule fullWidth />
-            <FeedbackSection sectionId="actions-financial-plan" />
-          </div>
-          
-          <div>
-            <BehavioralFinanceModule fullWidth />
-            <FeedbackSection sectionId="actions-behavioral-finance" />
-          </div>
-          
-          {/* Footer for this tab */}
-          <div className="w-full py-10 text-center border-t border-white/10 mt-12">
-            <p className="text-gray-400">Fim da seção - O que preciso mudar?</p>
-          </div>
-        </TabsContent>
-        
-        {/* Tab 4: O que está acontecendo? - Market insights */}
-        <TabsContent value="market" className="space-y-8">
-          <div>
-            <InteligenciaModule fullWidth />
-            <FeedbackSection sectionId="market-inteligencia" />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <SentimentInsightsModule />
-              <FeedbackSection sectionId="market-sentiment" />
-            </div>
-            <div>
-              <FamousInvestorsModule />
-              <FeedbackSection sectionId="market-famous-investors" />
-            </div>
-          </div>
-          
-          <div>
-            <SocialComparisonModule fullWidth />
-            <FeedbackSection sectionId="market-social-comparison" />
-          </div>
-          
-          {/* Footer for this tab */}
-          <div className="w-full py-10 text-center border-t border-white/10 mt-12">
-            <p className="text-gray-400">Fim da seção - O que está acontecendo?</p>
-          </div>
-        </TabsContent>
-        
-        {/* Tab 5: E meu futuro? - Future projections and planning */}
-        <TabsContent value="future" className="space-y-8">
-          <div>
-            <MeuFuturoFinanceiroModule fullWidth useSyntheticData={showSyntheticData} />
-            <FeedbackSection sectionId="future-meu-futuro" />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <FutureProjectionModule />
-              <FeedbackSection sectionId="future-projection-module" />
-            </div>
-            <div>
-              <InvestmentPlanningModule />
-              <FeedbackSection sectionId="future-investment-planning" />
-            </div>
-          </div>
-          
-          <div>
-            <WrappedModule fullWidth />
-            <FeedbackSection sectionId="future-wrapped" />
-          </div>
-          
-          <div>
-            <WholeBankingModule fullWidth />
-            <FeedbackSection sectionId="future-whole-banking" />
-          </div>
-          
-          {/* Footer for this tab */}
-          <div className="w-full py-10 text-center border-t border-white/10 mt-12">
-            <p className="text-gray-400">Fim da seção - E meu futuro?</p>
-          </div>
-        </TabsContent>
-        
-        {/* Tab 6: Fale com RM - Chat interface with voice button */}
-        <TabsContent value="chat">
-          <div className="relative mb-4">
-            <Button
-              variant="gradient"
-              className="absolute right-4 top-4 z-10 flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white"
-              onClick={handleVoiceSearch}
-            >
-              <Mic className="h-5 w-5" />
-              Falar com RM
-            </Button>
-            <ChatInterface />
-          </div>
-          
-          {/* Footer for this tab */}
-          <div className="w-full py-10 text-center border-t border-white/10 mt-12">
-            <p className="text-gray-400">Fim da seção - Fale com RM</p>
-          </div>
-        </TabsContent>
-
-        {/* Tab 7: Versão Full - Former overview tab moved to the end */}
+        {/* Tab 3: Versão Full - Full version with all features */}
         <TabsContent value="versao-full" className="space-y-8">
           {/* Starting with Financial Overview with synthetic data explicitly enabled */}
           <div>
@@ -531,27 +345,6 @@ const RaioXDashboard = ({
             <FeedbackSection sectionId="full-dividends" />
           </div>
           
-          <div>
-            <LifeGoalsModule useSyntheticData={flags.synthetic_data} />
-            <FeedbackSection sectionId="full-life-goals" />
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <MeuFuturoFinanceiroModule useSyntheticData={flags.synthetic_data} />
-              <FeedbackSection sectionId="full-meu-futuro" />
-            </div>
-            <div>
-              <WholeBankingModule useSyntheticData={flags.synthetic_data} />
-              <FeedbackSection sectionId="full-whole-banking" />
-            </div>
-          </div>
-          
-          <div>
-            <FamousInvestorsModule fullWidth useSyntheticData={flags.synthetic_data} />
-            <FeedbackSection sectionId="full-famous-investors" />
-          </div>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
               <AllocationModule useSyntheticData={flags.synthetic_data} />
@@ -565,43 +358,16 @@ const RaioXDashboard = ({
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div>
-              <SentimentInsightsModule useSyntheticData={flags.synthetic_data} />
-              <FeedbackSection sectionId="full-sentiment" />
-            </div>
-            <div>
-              <PersonalInsightsModule useSyntheticData={flags.synthetic_data} />
-              <FeedbackSection sectionId="full-personal-insights" />
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <FutureProjectionModule useSyntheticData={flags.synthetic_data} />
-              <FeedbackSection sectionId="full-future-projection" />
-            </div>
-            <div>
-              <InvestmentPlanningModule useSyntheticData={flags.synthetic_data} />
-              <FeedbackSection sectionId="full-investment-planning" />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div>
-              <SocialComparisonModule useSyntheticData={flags.synthetic_data} />
-              <FeedbackSection sectionId="full-social-comparison" />
-            </div>
-            <div>
               <BehavioralFinanceModule useSyntheticData={flags.synthetic_data} />
               <FeedbackSection sectionId="full-behavioral-finance" />
             </div>
+            <div>
+              <SentimentInsightsModule useSyntheticData={flags.synthetic_data} />
+              <FeedbackSection sectionId="full-sentiment" />
+            </div>
           </div>
           
-          <div>
-            <WrappedModule fullWidth useSyntheticData={flags.synthetic_data} />
-            <FeedbackSection sectionId="full-wrapped" />
-          </div>
-          
-          {/* Add the feedback section at the end of the overview tab */}
+          {/* Add the feedback section at the end of the full version tab */}
           <div>
             <ClientFeedbackSection isAdvisorView={userRole === "advisor"} />
           </div>
