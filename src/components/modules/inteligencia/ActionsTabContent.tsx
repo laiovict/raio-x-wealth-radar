@@ -2,14 +2,11 @@
 import React from 'react';
 import ActionCard from './ActionCard';
 import ActionStatusCard from './ActionStatusCard';
+import { Action, ActionStatus } from '@/types/goalTypes';
 
 interface ActionsTabContentProps {
-  getRecommendedActions: () => any[];
-  actionStatuses: {
-    id: string;
-    label: string;
-    status: string;
-  }[];
+  getRecommendedActions: () => Action[];
+  actionStatuses: ActionStatus[];
 }
 
 const ActionsTabContent: React.FC<ActionsTabContentProps> = ({ 

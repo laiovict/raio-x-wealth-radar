@@ -36,3 +36,22 @@ export interface GoalsSummary {
   nearestDeadline: FinancialGoal | null;
   dataSource: DataSourceType;
 }
+
+// Define the action interface for consistency
+export interface Action {
+  id: string;
+  title: string;
+  description: string;
+  potentialImpact?: string;
+  urgency?: string;
+  iconType: string;
+  iconColor: string;
+  dataSource?: string;
+}
+
+// Define the action status for consistency
+export interface ActionStatus {
+  id: string;
+  label: string;
+  status: string;
+}

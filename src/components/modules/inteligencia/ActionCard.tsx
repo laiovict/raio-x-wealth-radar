@@ -41,9 +41,10 @@ const ActionCard: React.FC<ActionCardProps> = ({ action }) => {
     }
   };
 
-  // Define card style based on urgency
+  // Define card style based on urgency - Adding null check
   const getCardStyle = () => {
-    switch(action.urgency.toLowerCase()) {
+    const urgency = action.urgency?.toLowerCase() || 'default';
+    switch(urgency) {
       case 'alto':
         return 'bg-gradient-to-br from-amber-900/10 to-amber-700/5 border-amber-800/30';
       case 'médio':
@@ -55,9 +56,10 @@ const ActionCard: React.FC<ActionCardProps> = ({ action }) => {
     }
   };
 
-  // Define impact badge color
+  // Define impact badge color - Adding null check
   const getImpactBadgeClass = () => {
-    switch(action.potentialImpact.toLowerCase()) {
+    const impact = action.potentialImpact?.toLowerCase() || 'default';
+    switch(impact) {
       case 'alto':
         return 'bg-blue-500 hover:bg-blue-600';
       case 'médio':
@@ -69,9 +71,10 @@ const ActionCard: React.FC<ActionCardProps> = ({ action }) => {
     }
   };
 
-  // Define urgency badge color
+  // Define urgency badge color - Adding null check
   const getUrgencyBadgeClass = () => {
-    switch(action.urgency.toLowerCase()) {
+    const urgency = action.urgency?.toLowerCase() || 'default';
+    switch(urgency) {
       case 'alto':
         return 'bg-amber-500 hover:bg-amber-600';
       case 'médio':
@@ -109,10 +112,10 @@ const ActionCard: React.FC<ActionCardProps> = ({ action }) => {
               
               <div className="flex gap-2">
                 <Badge className={getUrgencyBadgeClass()}>
-                  Urgência: {action.urgency}
+                  Urgência: {action.urgency || 'N/A'}
                 </Badge>
                 <Badge className={getImpactBadgeClass()}>
-                  Impacto: {action.potentialImpact}
+                  Impacto: {action.potentialImpact || 'N/A'}
                 </Badge>
               </div>
             </div>
