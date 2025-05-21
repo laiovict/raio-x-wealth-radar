@@ -1,56 +1,24 @@
 
-import { ReactNode } from 'react';
-import { DataSourceType } from './raioXTypes';
+import { DataSourceType } from '@/types/raioXTypes';
 
 /**
- * Base interface for all module components
- * Ensures all modules have a consistent prop interface
+ * Base props interface for all module components
  */
 export interface BaseModuleProps {
-  /** Controls if the module renders in full width */
+  /** Whether the module should take full width */
   fullWidth?: boolean;
-  /** Controls if synthetic data should be used */
+  /** Whether to use synthetic data instead of real data */
   useSyntheticData?: boolean;
-  /** Optional custom className */
-  className?: string;
-  /** Optional children nodes */
-  children?: ReactNode;
 }
 
 /**
- * Interface for module data state
+ * The state of data for a module, including source information
  */
 export interface ModuleDataState<T> {
-  /** The data being displayed */
+  /** The actual data for the module */
   data: T;
-  /** Source of the data */
+  /** The source of the data (supabase, synthetic, calculated, etc) */
   dataSource: DataSourceType;
-  /** Whether this is real or synthetic data */
+  /** Flag indicating if synthetic data is being used */
   isSynthetic: boolean;
-}
-
-/**
- * Interface for savings rate data returned by calculateSavingsRate
- */
-export interface SavingsRateData {
-  /** The savings rate as a formatted string (with decimal places) */
-  rate: string;
-  /** The trend compared to a previous period */
-  trend: string;
-  /** The source of this data */
-  dataSource: DataSourceType;
-}
-
-/**
- * Interface for sentiment data
- */
-export interface SentimentData {
-  /** The current sentiment description */
-  currentSentiment: string;
-  /** Historical sentiment data points */
-  historicalSentiment: Array<{ date: string; value: number }>;
-  /** List of insights about the sentiment */
-  insights: string[];
-  /** The source of this data */
-  dataSource: DataSourceType;
 }

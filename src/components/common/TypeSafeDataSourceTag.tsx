@@ -1,73 +1,64 @@
 
 import React from 'react';
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle, Database, BeakerIcon, Calculator } from "lucide-react";
+
+// Import the DataSourceType
 import { DataSourceType } from '@/types/raioXTypes';
-import { Badge } from '@/components/ui';
-import { Database, Award, Sparkles } from 'lucide-react';
 
 interface TypeSafeDataSourceTagProps {
-  source?: DataSourceType;
-  size?: 'sm' | 'md' | 'lg';
-  showText?: boolean;
+  source: DataSourceType;
+  showLabel?: boolean;
+  className?: string;
 }
 
 /**
- * A component that renders a badge with an icon representing the data source.
- * This provides a consistent way to show data sources across the application.
+ * Component to display a visual indicator of data source
  */
-const TypeSafeDataSourceTag: React.FC<TypeSafeDataSourceTagProps> = ({ 
-  source = 'synthetic',
-  size = 'sm',
-  showText = false
+const TypeSafeDataSourceTag: React.FC<TypeSafeDataSourceTagProps> = ({
+  source,
+  showLabel = false,
+  className = ""
 }) => {
-  // Define styles based on size
-  const getSizeStyles = () => {
-    switch (size) {
-      case 'lg': return "ml-2 px-2.5 py-1";
-      case 'md': return "ml-2 px-2 py-0.5 text-xs";
-      case 'sm': 
-      default: return "ml-2 px-1.5 py-0.5 text-xs";
+  // Define appearance based on data source
+  const tagConfig = {
+    supabase: {
+      icon: <Database className="h-3 w-3" />,
+      label: "Dados Reais",
+      className: "bg-green-900/20 text-green-400 border-green-800/30"
+    },
+    synthetic: {
+      icon: <BeakerIcon className="h-3 w-3" />,
+      label: "Dados Sintéticos",
+      className: "bg-amber-900/20 text-amber-400 border-amber-800/30"
+    },
+    xp: {
+      icon: <CheckCircle className="h-3 w-3" />,
+      label: "XP",
+      className: "bg-blue-900/20 text-blue-400 border-blue-800/30" 
+    },
+    openfinance: {
+      icon: <CheckCircle className="h-3 w-3" />,
+      label: "Open Finance",
+      className: "bg-indigo-900/20 text-indigo-400 border-indigo-800/30"
+    },
+    calculated: {
+      icon: <Calculator className="h-3 w-3" />,
+      label: "Calculado",
+      className: "bg-purple-900/20 text-purple-400 border-purple-800/30"
     }
   };
   
-  // Define content based on source
-  const getSourceContent = () => {
-    switch (source) {
-      case 'supabase':
-        return {
-          icon: <Database className="h-3 w-3 mr-1" />,
-          text: "Real",
-          className: "bg-green-900/30 hover:bg-green-800/40 text-green-400 border-green-500/30"
-        };
-      case 'openfinance':
-        return {
-          icon: <Award className="h-3 w-3 mr-1" />,
-          text: "Open Finance",
-          className: "bg-blue-900/30 hover:bg-blue-800/40 text-blue-400 border-blue-500/30"
-        };
-      case 'xp':
-        return {
-          icon: <Award className="h-3 w-3 mr-1" />,
-          text: "XP",
-          className: "bg-yellow-900/30 hover:bg-yellow-800/40 text-yellow-400 border-yellow-500/30"
-        };
-      case 'synthetic':
-      default:
-        return {
-          icon: <Sparkles className="h-3 w-3 mr-1" />,
-          text: "Simulado",
-          className: "bg-purple-900/30 hover:bg-purple-800/40 text-purple-400 border-purple-500/30"
-        };
-    }
-  };
-  
-  const sourceContent = getSourceContent();
+  // Use supabase as default if source is not recognized
+  const config = tagConfig[source] || tagConfig.synthetic;
   
   return (
-    <Badge variant="outline" className={`${getSizeStyles()} ${sourceContent.className}`}>
-      <div className="flex items-center">
-        {sourceContent.icon}
-        {showText && <span>{sourceContent.text}</span>}
-      </div>
+    <Badge 
+      variant="outline" 
+      className={`${config.className} ${className} flex items-center gap-1 px-1.5 py-0.5`}
+    >
+      {config.icon}
+      {showLabel && <span className="text-xs">{config.label}</span>}
     </Badge>
   );
 };

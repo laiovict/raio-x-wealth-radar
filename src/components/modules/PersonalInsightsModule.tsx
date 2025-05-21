@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,20 +8,35 @@ import {
   Shield, ChartBar, Tag, BookOpen, User
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { ModuleDataState, BaseModuleProps } from '@/types/moduleTypes';
+import { withSafeData } from '@/components/hoc/withSafeData';
+import { DataSourceType } from '@/types/raioXTypes';
 
-interface PersonalInsightsModuleProps {
-  fullWidth?: boolean;
-  useSyntheticData?: boolean;  // Adding this prop
+interface PersonalInsightsModuleProps extends BaseModuleProps {
+  dataState?: ModuleDataState<{
+    summary: string;
+    tags: string[];
+    investor_name: string;
+    sections: {
+      professional: string;
+      financial: string;
+      assets: string;
+      goals: string;
+      timeline: string;
+      risk: string;
+    };
+    clientAge: string;
+  }>;
 }
 
 // Key sections we want to identify in the summary text
 const TOPIC_KEYWORDS = {
-  professional: ['profissão', 'carreira', 'trabalho', 'emprego', 'formado', 'formação', 'profissional'],
-  financial: ['investidor', 'investimento', 'renda', 'salário', 'financeiro', 'despesas', 'gastos'],
-  assets: ['patrimônio', 'imóveis', 'ativos', 'investimentos', 'carteira', 'ações'],
-  goals: ['objetivo', 'meta', 'plano', 'aposentadoria', 'futuro', 'sonho'],
-  timeline: ['idade', 'anos', 'horizonte', 'prazo', 'tempo'],
-  risk: ['risco', 'perfil', 'tolerância', 'volatilidade', 'conservador', 'moderado', 'agressivo']
+  professional: ['profissão', 'carreira', 'trabalho', 'emprego', 'formado', 'formação', 'profissional', 'empreendendo', 'empresário'],
+  financial: ['investidor', 'investimento', 'renda', 'salário', 'financeiro', 'despesas', 'gastos', 'financeira', 'dinheiro'],
+  assets: ['patrimônio', 'imóveis', 'ativos', 'investimentos', 'carteira', 'ações', 'casa', 'apartamento'],
+  goals: ['objetivo', 'meta', 'plano', 'aposentadoria', 'futuro', 'sonho', 'anjo', 'filho', 'pretende'],
+  timeline: ['idade', 'anos', 'horizonte', 'prazo', 'tempo', 'período'],
+  risk: ['risco', 'perfil', 'tolerância', 'volatilidade', 'conservador', 'moderado', 'agressivo', 'arrojado']
 };
 
 // Helper function to extract sections from the plain text summary
@@ -81,7 +97,7 @@ const enhanceText = (text: string): React.ReactNode => {
         }
         
         // Highlight key terms
-        const keyTerms = ['meta', 'objetivo', 'financeiro', 'investimento', 'risco', 'perfil'];
+        const keyTerms = ['meta', 'objetivo', 'financeiro', 'investimento', 'risco', 'perfil', 'anjo', 'empreendendo', 'tenis'];
         let highlightedPart = part;
         
         keyTerms.forEach(term => {
@@ -120,119 +136,14 @@ const extractAge = (text: string): string => {
   return "";
 };
 
-const PersonalInsightsModule = ({ fullWidth = false, useSyntheticData = false }: PersonalInsightsModuleProps) => {
-  const { data, clientSummary } = useRaioX();
-  const [parsedSummary, setParsedSummary] = useState<string>("");
-  const [clientAge, setClientAge] = useState<string>("");
-  const [sections, setSections] = useState<{
-    professional: string;
-    financial: string;
-    assets: string;
-    goals: string;
-    timeline: string;
-    risk: string;
-  }>({
-    professional: "",
-    financial: "",
-    assets: "",
-    goals: "",
-    timeline: "",
-    risk: ""
-  });
-  
-  const [dataSource, setDataSource] = useState<'supabase' | 'synthetic'>('synthetic');
-  
-  // Process client summary from Supabase when available
-  useEffect(() => {
-    if (clientSummary?.summary) {
-      try {
-        console.log("Processing client summary:", clientSummary);
-        
-        // Use the summary as a text string
-        const summaryText = clientSummary.summary;
-        setParsedSummary(summaryText);
-        setDataSource('supabase');
-        
-        // Extract age
-        const age = extractAge(summaryText);
-        if (age) {
-          setClientAge(age);
-        }
-        
-        // Extract sections using keyword matching
-        const extractedSections = {
-          professional: extractSectionFromText(summaryText, TOPIC_KEYWORDS.professional),
-          financial: extractSectionFromText(summaryText, TOPIC_KEYWORDS.financial),
-          assets: extractSectionFromText(summaryText, TOPIC_KEYWORDS.assets),
-          goals: extractSectionFromText(summaryText, TOPIC_KEYWORDS.goals),
-          timeline: extractSectionFromText(summaryText, TOPIC_KEYWORDS.timeline),
-          risk: extractSectionFromText(summaryText, TOPIC_KEYWORDS.risk)
-        };
-        
-        console.log("Extracted sections:", extractedSections);
-        setSections(extractedSections);
-      } catch (error) {
-        console.error("Error processing client summary:", error);
-        
-        // Even if there's an error, we still have the summary data from Supabase
-        // So we'll use a fallback approach but maintain the dataSource as 'supabase'
-        setDataSource('supabase');
-        
-        // Try to use the entire summary text for all sections as a fallback
-        if (clientSummary?.summary) {
-          const generalSummary = clientSummary.summary;
-          setSections({
-            professional: generalSummary,
-            financial: generalSummary,
-            assets: generalSummary,
-            goals: generalSummary,
-            timeline: generalSummary,
-            risk: generalSummary
-          });
-        }
-      }
-    } else {
-      // No client summary available
-      console.log("No client summary available, using default data");
-      
-      // Check if we have the client summary in data.clientSummary as a fallback
-      if (data.clientSummary?.summary) {
-        try {
-          console.log("Using fallback client summary from data.clientSummary");
-          const summaryText = data.clientSummary.summary;
-          setParsedSummary(summaryText);
-          setDataSource('supabase');
-          
-          // Extract age
-          const age = extractAge(summaryText);
-          if (age) {
-            setClientAge(age);
-          }
-          
-          // Extract sections using keyword matching
-          setSections({
-            professional: extractSectionFromText(summaryText, TOPIC_KEYWORDS.professional),
-            financial: extractSectionFromText(summaryText, TOPIC_KEYWORDS.financial),
-            assets: extractSectionFromText(summaryText, TOPIC_KEYWORDS.assets),
-            goals: extractSectionFromText(summaryText, TOPIC_KEYWORDS.goals),
-            timeline: extractSectionFromText(summaryText, TOPIC_KEYWORDS.timeline),
-            risk: extractSectionFromText(summaryText, TOPIC_KEYWORDS.risk)
-          });
-        } catch (e) {
-          console.error("Error processing fallback client summary:", e);
-          setDataSource('supabase'); // Still maintain it's from Supabase
-        }
-      } else {
-        setDataSource('synthetic');
-      }
-    }
-  }, [clientSummary, data.clientSummary]);
+const PersonalInsightsModuleBase = ({ fullWidth = false, dataState }: PersonalInsightsModuleProps) => {
+  const clientData = dataState?.data;
+  const dataSource = dataState?.dataSource || 'synthetic';
   
   // Return appropriate section text, falling back if empty
-  const getSectionContent = (section: keyof typeof sections): string => {
-    // Always return the section content if it exists (even if empty)
-    // This ensures we use the actual Supabase data
-    return sections[section] || "Informação não disponível no momento.";
+  const getSectionContent = (section: keyof typeof clientData.sections): string => {
+    if (!clientData || !clientData.sections) return "Informação não disponível no momento.";
+    return clientData.sections[section] || "Informação não disponível no momento.";
   };
   
   return (
@@ -285,10 +196,10 @@ const PersonalInsightsModule = ({ fullWidth = false, useSyntheticData = false }:
                   {enhanceText(getSectionContent('professional'))}
                 </div>
                 
-                {dataSource === 'supabase' && (
+                {dataSource === 'supabase' && clientData?.tags && (
                   <div className="mt-3 flex flex-wrap gap-2">
-                    {/* Extract key terms as tags */}
-                    {['Experiência', 'Qualificação', 'Setor'].map(tag => (
+                    {/* Show extracted tags as badges */}
+                    {clientData.tags.filter(tag => tag.trim()).map(tag => (
                       <Badge key={tag} variant="outline" className="bg-blue-900/30 text-blue-300 border-blue-700/30">
                         <Tag className="h-3 w-3 mr-1.5" />
                         {tag}
@@ -421,11 +332,11 @@ const PersonalInsightsModule = ({ fullWidth = false, useSyntheticData = false }:
                   {enhanceText(getSectionContent('timeline'))}
                 </div>
                 
-                {(dataSource === 'supabase' && clientAge) && (
+                {(dataSource === 'supabase' && clientData?.clientAge) && (
                   <div className="mt-3 flex items-center">
                     <div className="rounded-full bg-blue-900/30 border border-blue-700/30 px-4 py-2 flex items-center">
                       <User className="h-5 w-5 text-blue-400 mr-2" />
-                      <span className="text-blue-300">Idade atual: <strong className="text-blue-200">{clientAge} anos</strong></span>
+                      <span className="text-blue-300">Idade atual: <strong className="text-blue-200">{clientData.clientAge} anos</strong></span>
                     </div>
                   </div>
                 )}
@@ -472,7 +383,7 @@ const PersonalInsightsModule = ({ fullWidth = false, useSyntheticData = false }:
                       <div className="h-full bg-gradient-to-r from-green-500 via-yellow-500 to-red-500" style={{width: "42%"}}></div>
                     </div>
                     <div className="flex justify-between mt-1.5">
-                      <span className="text-sm text-gray-400">Tolerância Emocional</span>
+                      <span className="text-sm text-gray-400">Tolerância a Risco</span>
                       <span className="text-sm font-medium text-gray-300">42%</span>
                     </div>
                   </div>
@@ -480,52 +391,80 @@ const PersonalInsightsModule = ({ fullWidth = false, useSyntheticData = false }:
               </div>
             </div>
           </div>
-          
-          {/* Expectations */}
-          <div className="group hover:bg-teal-900/10 transition-colors border-t border-white/5">
-            <div className="p-6 flex items-start gap-5">
-              <div className="rounded-xl bg-gradient-to-br from-teal-500 to-teal-600 p-3.5 shadow-md">
-                <TrendingUp className="h-6 w-6 text-white" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-xl text-gray-100 group-hover:text-teal-400 transition-colors flex items-center">
-                  Serviços Financeiros Essenciais
-                </h3>
-                <div className="text-gray-300 mt-2 leading-relaxed">
-                  Visualização consolidada de seus ativos, passivos e fluxo de caixa em todas as instituições financeiras, com relatórios mensais detalhados de evolução patrimonial e projeção atualizada para suas metas de curto, médio e longo prazo.
-                </div>
-                
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {['Consolidação', 'Relatórios', 'Projeções'].map(tag => (
-                    <Badge key={tag} variant="outline" className="bg-teal-900/30 text-teal-300 border-teal-700/30">
-                      <BookOpen className="h-3 w-3 mr-1.5" />
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {dataSource === 'supabase' && (
-            <div className="border-t border-white/5 p-6">
-              <div className="bg-gradient-to-r from-blue-800/20 to-indigo-800/20 p-5 rounded-lg backdrop-blur-sm border border-blue-700/20">
-                <h3 className="font-semibold text-lg text-blue-300 mb-2 flex items-center">
-                  <Shield className="h-5 w-5 mr-2" />
-                  Dados validados com sua autorização
-                </h3>
-                <p className="text-gray-300 leading-relaxed">
-                  Visualizando insights baseados em seus dados financeiros completos,
-                  permitindo análise de comportamento financeiro para recomendações
-                  mais precisas e personalizadas.
-                </p>
-              </div>
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>
   );
 };
+
+// Get real data from the RaioX context
+const getRealPersonalInsightsData = (props: PersonalInsightsModuleProps) => {
+  // Extract data from context
+  const { clientSummary } = useRaioX();
+
+  // If there's no client summary, return null to use synthetic data
+  if (!clientSummary || !clientSummary.summary) {
+    console.log("No client summary available, using default data");
+    return null;
+  }
+  
+  try {
+    // Extract data from client summary
+    const summary = clientSummary.summary;
+    const tags = clientSummary.tags ? clientSummary.tags.split(',').map(tag => tag.trim()) : [];
+    const investor_name = clientSummary.investor_name || '';
+    const clientAge = extractAge(summary);
+    
+    // Extract sections using keyword matching
+    const sections = {
+      professional: extractSectionFromText(summary, TOPIC_KEYWORDS.professional),
+      financial: extractSectionFromText(summary, TOPIC_KEYWORDS.financial),
+      assets: extractSectionFromText(summary, TOPIC_KEYWORDS.assets),
+      goals: extractSectionFromText(summary, TOPIC_KEYWORDS.goals),
+      timeline: extractSectionFromText(summary, TOPIC_KEYWORDS.timeline),
+      risk: extractSectionFromText(summary, TOPIC_KEYWORDS.risk)
+    };
+    
+    console.log("Processing client summary:", clientSummary);
+    console.log("Extracted sections:", sections);
+    
+    return {
+      summary,
+      tags,
+      investor_name,
+      sections,
+      clientAge
+    };
+  } catch (error) {
+    console.error("Error processing client summary:", error);
+    return null;
+  }
+};
+
+// Get synthetic data as a fallback
+const getSyntheticPersonalInsightsData = (props: PersonalInsightsModuleProps) => {
+  return {
+    summary: "Cliente com perfil conservador, busca estabilidade financeira e renda passiva. Trabalha no setor de tecnologia com planos de aposentadoria em 15 anos.",
+    tags: ["Tecnologia", "Conservador", "Renda Passiva"],
+    investor_name: "Cliente Exemplo",
+    sections: {
+      professional: "Trabalha no setor de tecnologia como desenvolvedor sênior. Busca equilibrar carreira e qualidade de vida.",
+      financial: "Perfil financeiro conservador, priorizando segurança e fluxo de caixa sustentável.",
+      assets: "Carteira diversificada com foco em renda fixa e dividendos, começando a explorar renda variável.",
+      goals: "Planeja aposentadoria antecipada e deseja manter padrão de vida atual com renda passiva.",
+      timeline: "Horizonte de investimento de longo prazo, com planos para independência financeira em 15 anos.",
+      risk: "Perfil conservador a moderado, com tolerância limitada a volatilidade de curto prazo."
+    },
+    clientAge: "35"
+  };
+};
+
+// Create the enhanced module with data safety
+const PersonalInsightsModule = withSafeData(
+  PersonalInsightsModuleBase,
+  getRealPersonalInsightsData,
+  getSyntheticPersonalInsightsData,
+  'supabase'
+);
 
 export default PersonalInsightsModule;
