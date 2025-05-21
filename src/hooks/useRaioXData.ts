@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { 
   calculateTotalDividends,
@@ -8,7 +7,7 @@ import {
 import { defaultRaioXData } from '@/data/mockRaioXData';
 import { toNumber, ensureNumber } from '@/utils/typeConversionHelpers';
 import { removeDuplicateDividends } from '@/utils/portfolioHelpers';
-import { RaioXData } from '@/types/raioXTypes';
+import { RaioXData, DividendHistory } from '@/types/raioXTypes';
 import { useClientData } from '@/hooks/useClientData';
 import { useOpenFinanceData } from '@/hooks/useOpenFinanceData';
 
@@ -17,6 +16,7 @@ interface UseRaioXDataReturn {
   isLoading: boolean;
   totalDividends: number;
   averageMonthlyDividends: number;
+  annualDividendsThisYear: number;
   stocks: any[];
   hasOpenFinanceData: boolean;
   openFinanceAccounts: string[];
@@ -26,6 +26,17 @@ interface UseRaioXDataReturn {
   consolidatedFinancialReport: any;
   error: string | null;
 }
+
+const getYearFromPaymentDate = (paymentDateStr: string | null | undefined): number | null => {
+  if (!paymentDateStr) return null;
+  const datePart = paymentDateStr.split(' ')[0];
+  const parts = datePart.split('-');
+  if (parts.length === 3) {
+    const year = parseInt(parts[0], 10);
+    return isNaN(year) ? null : year;
+  }
+  return null;
+};
 
 /**
  * Custom hook to fetch all Raio-X data from Supabase
@@ -37,7 +48,8 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
   const [portfolioData, setPortfolioData] = useState<RaioXData>(defaultRaioXData);
   const [totalDividends, setTotalDividends] = useState<number>(0);
   const [averageMonthlyDividends, setAverageMonthlyDividends] = useState<number>(0);
-  
+  const [annualDividendsThisYear, setAnnualDividendsThisYear] = useState<number>(0);
+
   // Use our refactored hooks to fetch data
   const {
     clientPortfolioSummary,
@@ -81,10 +93,22 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
           
           setTotalDividends(ensureNumber(totalDivs));
           setAverageMonthlyDividends(ensureNumber(avgMonthlyDivs));
+
+          // Calculate annual dividends for the current year
+          const currentYear = new Date().getFullYear();
+          const currentYearDividends = dedupedDividendHistory.reduce((sum, dividend) => {
+            const paymentYear = getYearFromPaymentDate(dividend.payment_date);
+            if (paymentYear === currentYear) {
+              return sum + ensureNumber(dividend.value);
+            }
+            return sum;
+          }, 0);
+          setAnnualDividendsThisYear(currentYearDividends);
           
           console.log("Dividend calculations:", {
             totalDividends: totalDivs,
-            avgMonthlyDividends: avgMonthlyDivs,
+            avgMonthlyDividends: avgMonthlyDividends,
+            annualDividendsThisYear: currentYearDividends,
             dividendCount: dedupedDividendHistory.length
           });
         } catch (error) {
@@ -92,7 +116,12 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
           // Use default values if calculation fails
           setTotalDividends(0);
           setAverageMonthlyDividends(0);
+          setAnnualDividendsThisYear(0);
         }
+      } else {
+        setTotalDividends(0);
+        setAverageMonthlyDividends(0);
+        setAnnualDividendsThisYear(0);
       }
       
       // Check if we have any real data from Supabase
@@ -192,6 +221,7 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
     isLoading,
     totalDividends,
     averageMonthlyDividends,
+    annualDividendsThisYear,
     stocks: clientStocks || [],
     hasOpenFinanceData,
     openFinanceAccounts,

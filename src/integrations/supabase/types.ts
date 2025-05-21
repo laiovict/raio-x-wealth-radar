@@ -192,6 +192,51 @@ export type Database = {
         }
         Relationships: []
       }
+      investor_deposit_summary: {
+        Row: {
+          advisor_code: number | null
+          avg_gap_days: number | null
+          avg_value: number | null
+          cadence: string | null
+          created_at: string | null
+          days_since_first_deposit: number | null
+          days_since_last_deposit: number | null
+          deposits: number | null
+          history_id: number
+          investor_account_on_brokerage_house: number | null
+          most_common_days_range: string | null
+          total_value: number | null
+        }
+        Insert: {
+          advisor_code?: number | null
+          avg_gap_days?: number | null
+          avg_value?: number | null
+          cadence?: string | null
+          created_at?: string | null
+          days_since_first_deposit?: number | null
+          days_since_last_deposit?: number | null
+          deposits?: number | null
+          history_id: number
+          investor_account_on_brokerage_house?: number | null
+          most_common_days_range?: string | null
+          total_value?: number | null
+        }
+        Update: {
+          advisor_code?: number | null
+          avg_gap_days?: number | null
+          avg_value?: number | null
+          cadence?: string | null
+          created_at?: string | null
+          days_since_first_deposit?: number | null
+          days_since_last_deposit?: number | null
+          deposits?: number | null
+          history_id?: number
+          investor_account_on_brokerage_house?: number | null
+          most_common_days_range?: string | null
+          total_value?: number | null
+        }
+        Relationships: []
+      }
       investor_portfolio_summary: {
         Row: {
           coe_representation: string | null

@@ -1,10 +1,9 @@
-
 import React, { createContext, useContext, useState } from 'react';
 import { 
   RaioXData, 
   RaioXContextProps, 
   RaioXProviderProps,
-  FinancialSummary,
+  FinancialSummary, // Keep existing import
   Allocation,
   Liquidity,
   AIInsight,
@@ -17,7 +16,12 @@ import { generateFinancialSummary } from '@/utils/raioXUtils';
 import { useRaioXData } from '@/hooks/useRaioXData';
 
 // Export necessary types for modules to use
-export type { FinancialSummary, AIInsight, PortfolioSummary, DividendHistory, ClientSummary, Allocation, Liquidity } from '@/types/raioXTypes';
+export type { FinancialSummary as FinancialSummaryType, AIInsight, PortfolioSummary, DividendHistory, ClientSummary, Allocation, Liquidity } from '@/types/raioXTypes'; // Renamed to avoid conflict
+
+// Define an extended FinancialSummary type locally if raioXTypes.ts is read-only
+interface ExtendedFinancialSummary extends FinancialSummary {
+  annualDividendsThisYear?: number;
+}
 
 // Ensure sample AI insights have the required properties for timestamp
 const enhancedAIInsights: AIInsight[] = sampleAIInsights.map(insight => ({
@@ -83,7 +87,7 @@ const extendedDefaultData: RaioXData = {
 };
 
 // Create context with default values
-const RaioXContext = createContext<RaioXContextProps>({
+const RaioXContext = createContext<RaioXContextProps & { annualDividendsThisYear?: number }>({
   data: extendedDefaultData,
   hasOpenFinance: false,
   selectedClient: null,
@@ -94,6 +98,7 @@ const RaioXContext = createContext<RaioXContextProps>({
   clientSummary: undefined,
   totalDividends: 0,
   averageMonthlyDividends: 0,
+  annualDividendsThisYear: 0,
   stocks: [],
   hasOpenFinanceData: false,
   openFinanceAccounts: [],
@@ -110,13 +115,14 @@ export const RaioXProvider = ({
 }: RaioXProviderProps) => {
   // State management for AI analysis
   const [isAIAnalysisLoading, setIsAIAnalysisLoading] = useState(false);
-  const [financialSummary, setFinancialSummary] = useState<FinancialSummary | null>(null);
+  const [financialSummary, setFinancialSummary] = useState<ExtendedFinancialSummary | null>(null);
   
   // Use our new custom hook to fetch all data
   const { 
     portfolioData, 
     totalDividends, 
-    averageMonthlyDividends, 
+    averageMonthlyDividends,
+    annualDividendsThisYear,
     stocks,
     hasOpenFinanceData,
     openFinanceAccounts,
@@ -143,19 +149,36 @@ export const RaioXProvider = ({
       );
 
       // Add missing properties required for FinancialOverviewModule
-      const enhancedFinancialSummary: FinancialSummary = {
+      const enhancedFinancialSummary: ExtendedFinancialSummary = {
         ...newFinancialSummary,
         netWorth: parseFloat(String(portfolioData.portfolioSummary?.total_portfolio_value || "0")) - 0,
         monthlyIncome: 12000,
         monthlyExpenses: 8000,
         totalLiabilities: 0,
         savingsRate: 25,
-        liquidAssets: parseFloat(String(portfolioData.portfolioSummary?.fixed_income_value || "0")) * 0.5
+        liquidAssets: parseFloat(String(portfolioData.portfolioSummary?.fixed_income_value || "0")) * 0.5,
+        annualDividendsThisYear: annualDividendsThisYear
       };
       
       setFinancialSummary(enhancedFinancialSummary);
+    } else {
+      // If no portfolio summary, create a basic summary with annual dividends
+      setFinancialSummary({
+        totalAssets: 0,
+        totalLiabilities: 0,
+        netWorth: 0,
+        monthlyIncome: 0,
+        monthlyExpenses: 0,
+        savingsRate: 0,
+        liquidAssets: 0,
+        debtToIncomeRatio: 0,
+        emergencyFundCoverage: 0,
+        investmentGrowthRate: 0,
+        annualDividendsThisYear: annualDividendsThisYear,
+        dataSource: 'synthetic'
+      });
     }
-  }, [portfolioData.portfolioSummary, portfolioData.dividendHistory]);
+  }, [portfolioData.portfolioSummary, portfolioData.dividendHistory, annualDividendsThisYear]);
 
   // Ensure portfolioData includes all required properties
   const enhancedPortfolioData: RaioXData = {
@@ -192,6 +215,7 @@ export const RaioXProvider = ({
         clientSummary: portfolioData.clientSummary,
         totalDividends,
         averageMonthlyDividends,
+        annualDividendsThisYear,
         stocks,
         hasOpenFinanceData,
         openFinanceAccounts,
