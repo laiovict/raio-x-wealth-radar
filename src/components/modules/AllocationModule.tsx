@@ -5,12 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { ModuleDataState, BaseModuleProps } from '@/types/moduleTypes';
 import { withSafeData } from '@/components/hoc/withSafeData';
-// formatPercentage is not used here, but raioXUtils might have other useful functions.
-// import { formatPercentage } from '@/utils/raioXUtils';
 import { Allocation, DataSourceType } from '@/types/raioXTypes';
 import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
-import { ensureNumber } from '@/utils/typeConversionHelpers'; // Added for parsing
-import { defaultRaioXData } from '@/data/mockRaioXData'; // For default recommended allocation
+import { ensureNumber } from '@/utils/typeConversionHelpers';
+import { defaultRaioXData } from '@/data/mockRaioXData';
 
 // Define the props for the base component
 interface AllocationModuleProps extends BaseModuleProps {
@@ -28,7 +26,7 @@ const AllocationModuleBase = ({ fullWidth = false, dataState }: AllocationModule
   const prepareChartData = (allocationData: Allocation | undefined) => {
     if (!allocationData || !allocationData.current) return [];
     
-    // Filter out the 'total' property if it exists (it won't with the new logic for current)
+    // Filter out the 'total' property if it exists
     return Object.entries(allocationData.current)
       .filter(([key]) => key !== 'total')
       .map(([key, value]) => ({

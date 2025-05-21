@@ -24,6 +24,7 @@ import FamousInvestorsModule from "@/components/modules/FamousInvestorsModule";
 import ClientProfileModule from "@/components/modules/ClientProfileModule";
 import InteligenciaModule from "@/components/modules/InteligenciaModule";
 import WholeBankingModule from "@/components/modules/WholeBankingModule";
+import FinancialGoalsModule from "@/components/modules/FinancialGoalsModule";
 
 // Lazy-load less frequently used components
 const RecommendationsModule = lazy(() => import("@/components/modules/RecommendationsModule"));
@@ -142,13 +143,16 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
     setSearchParams({ tab: value });
   };
 
-  // Define RaioX Beta tab content - moved InteligenciaModule to top
+  // Define RaioX Beta tab content - now with FinancialGoalsModule
   const BetaTabContent = () => (
     <div className="grid grid-cols-1 gap-8 pb-6">
       {/* Visão Geral section */}
       <FinancialOverviewModule fullWidth={true} />
 
-      {/* Inteligência Financeira section - Moved to top */}
+      {/* Financial Goals section - Add this new section */}
+      <FinancialGoalsModule fullWidth={true} />
+
+      {/* Inteligência Financeira section */}
       <InteligenciaModule fullWidth={true} />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -176,11 +180,12 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
     </div>
   );
 
-  // Define RaioX Full tab content - improved layout with consistent 2-column grid
+  // Define RaioX Full tab content - also with FinancialGoalsModule
   const FullTabContent = () => (
     <div className="grid grid-cols-1 gap-8 pb-6">
       {/* Main content area first (full width) */}
       <FinancialOverviewModule fullWidth={true} />
+      <FinancialGoalsModule fullWidth={true} />
       <InteligenciaModule fullWidth={true} />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -238,11 +243,12 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
     </div>
   );
 
-  // Define RaioX Full v2 (Jony Ive design) tab content - completely restructured for clarity
+  // Define RaioX Full v2 (Jony Ive design) tab content - with Financial Goals section
   const FullV2TabContent = () => (
     <div className="jony-ive-design space-y-8">
       {/* Top Priority Modules - Full Width */}
       <FinancialOverviewModule fullWidth={true} />
+      <FinancialGoalsModule fullWidth={true} />
       <InteligenciaModule fullWidth={true} />
       
       {/* Investment Management Section */}
