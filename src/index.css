@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -95,4 +94,39 @@
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
+}
+
+/* Jony Ive design styling */
+.jony-ive-design {
+  --card-shadow: rgba(255, 255, 255, 0.1) 0 0 0 1px, rgba(0, 0, 0, 0.2) 0 4px 16px;
+  --card-radius: 16px;
+  --gradient-white: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+  --card-bg: rgba(255, 255, 255, 0.03);
+}
+
+.jony-ive-design [class*="Card"] {
+  background: var(--card-bg);
+  border-radius: var(--card-radius);
+  box-shadow: var(--card-shadow);
+  backdrop-filter: blur(20px);
+  border: none;
+}
+
+.jony-ive-design h2, 
+.jony-ive-design h3, 
+.jony-ive-design .text-xl,
+.jony-ive-design .text-lg {
+  font-weight: 300;
+  letter-spacing: -0.02em;
+}
+
+.jony-ive-design button {
+  border-radius: 12px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.jony-ive-design [class*="CardHeader"] {
+  background: var(--gradient-white);
+  border-radius: var(--card-radius) var(--card-radius) 0 0;
 }

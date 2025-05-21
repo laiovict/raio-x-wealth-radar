@@ -10,7 +10,7 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useFeatureFlags } from "@/context/FeatureFlagContext";
 import { getMonthlyReportUrl } from "@/utils/reportUtils";
 import { generatePdf } from "@/utils/pdfGenerator";
-import { Eye, Download, XCircle, LayoutDashboard, BrainCircuit, LineChart, Calendar, Sparkles, Book } from "lucide-react";
+import { LayoutDashboard, Download, XCircle } from "lucide-react";
 
 // Import Module Components
 import PersonalInsightsModule from "@/components/modules/PersonalInsightsModule";
@@ -63,7 +63,7 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
   useEffect(() => {
     // Set initial tab from URL params
     const tabFromUrl = searchParams.get("tab");
-    if (tabFromUrl) {
+    if (tabFromUrl && ["raiox-beta", "raiox-full", "raiox-full-v2"].includes(tabFromUrl)) {
       setActiveTab(tabFromUrl);
     } else {
       // Set default tab
@@ -72,8 +72,11 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
 
     // Listen for custom event to navigate to tab
     const handleNavigateToTab = (event: any) => {
-      setActiveTab(event.detail.tabId);
-      setSearchParams({ tab: event.detail.tabId });
+      const newTabId = event.detail.tabId;
+      if (["raiox-beta", "raiox-full", "raiox-full-v2"].includes(newTabId)) {
+        setActiveTab(newTabId);
+        setSearchParams({ tab: newTabId });
+      }
     };
 
     document.addEventListener('navigate-to-tab', handleNavigateToTab);
@@ -126,10 +129,22 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
       case 'raiox-beta':
         return (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
-            <PersonalInsightsModule fullWidth={true} />
+            {/* Visão Geral section */}
+            <FinancialOverviewModule fullWidth={true} />
             <div className="grid grid-cols-1 gap-6">
-              <RecommendationsModule fullWidth={true} />
-              <RecommendedActionsModule fullWidth={true} />
+              <AllocationModule />
+              <LiquidityReserveModule />
+            </div>
+            
+            {/* Insights AI section */}
+            <AIInsightsHubModule fullWidth={false} />
+            <SentimentInsightsModule />
+            
+            {/* Investimentos section */}
+            <DividendModule fullWidth={false} />
+            <div className="grid grid-cols-1 gap-6">
+              <SocialComparisonModule />
+              <FamousInvestorsModule />
             </div>
           </div>
         );
@@ -140,6 +155,7 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
               <ClientProfileModule />
             </div>
             <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* All modules */}
               <RecommendationsModule />
               <RecommendedActionsModule />
               <InteligenciaModule />
@@ -152,90 +168,42 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
               <SocialComparisonModule />
               <AIInsightsHubModule />
               <BehavioralFinanceModule />
+              <FinancialOverviewModule />
+              <OnePageFinancialPlanModule />
+              <SentimentInsightsModule />
+              <FamousInvestorsModule />
+              <WrappedModule />
+              <SteveJobsReportModule />
+              <MeuFuturoFinanceiroModule />
+              <WholeBankingModule />
+              <PersonalInsightsModule />
             </div>
           </div>
         );
       case 'raiox-full-v2':
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6 jony-ive-design">
             <ClientProfileModule fullWidth={false} />
             <div className="grid grid-cols-1 gap-6">
               <InvestmentPlanningModule />
               <InteligenciaModule />
             </div>
-          </div>
-        );
-      case 'visao-geral':
-        return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
-            <FinancialOverviewModule />
-            <div className="grid grid-cols-1 gap-6">
+            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <RecommendationsModule />
+              <RecommendedActionsModule />
+              <LifeGoalsModule />
+              <DividendModule />
               <AllocationModule />
               <LiquidityReserveModule />
-            </div>
-          </div>
-        );
-      case 'insights-ai':
-        return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
-            <AIInsightsHubModule fullWidth={false} />
-            <SentimentInsightsModule />
-          </div>
-        );
-      case 'investimentos':
-        return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
-            <DividendModule fullWidth={false} />
-            <div className="grid grid-cols-1 gap-6">
+              <FutureProjectionModule />
               <SocialComparisonModule />
+              <AIInsightsHubModule />
+              <BehavioralFinanceModule />
+              <FinancialOverviewModule />
+              <OnePageFinancialPlanModule />
+              <SentimentInsightsModule />
               <FamousInvestorsModule />
             </div>
-          </div>
-        );
-      case 'planejamento':
-        return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
-            <OnePageFinancialPlanModule />
-            <div className="grid grid-cols-1 gap-6">
-              <LifeGoalsModule />
-              <FutureProjectionModule />
-            </div>
-          </div>
-        );
-      case 'especiais':
-        return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
-            <SteveJobsReportModule />
-            <WrappedModule />
-          </div>
-        );
-      case 'comportamento':
-        return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
-            <BehavioralFinanceModule />
-            <MeuFuturoFinanceiroModule />
-          </div>
-        );
-      case 'chat':
-        return (
-          <Card className="glass-morphism p-6">
-            <CardContent>
-              {t("chatModuleContent")}
-            </CardContent>
-          </Card>
-        );
-      case 'openfinance':
-        return (
-          <Card className="glass-morphism p-6">
-            <CardContent>
-              {t("openFinanceModuleContent")}
-            </CardContent>
-          </Card>
-        );
-      case 'banking':
-        return (
-          <div className="grid grid-cols-1 gap-6 pb-6">
-            <WholeBankingModule />
           </div>
         );
       default:
@@ -281,7 +249,7 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
         </div>
       )}
 
-      {/* Tab Navigation */}
+      {/* Tab Navigation - Simplified to only 3 tabs */}
       <div className="mb-6">
         <ScrollArea className="w-full whitespace-nowrap rounded-md border">
           <Tabs
@@ -309,49 +277,7 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
                 className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-600 data-[state=active]:text-white"
               >
                 <LayoutDashboard className="w-4 h-4 mr-2" />
-                RaioX Full v2
-              </TabsTrigger>
-              <TabsTrigger 
-                value="visao-geral"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-violet-600 data-[state=active]:text-white"
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                Visão Geral
-              </TabsTrigger>
-              <TabsTrigger 
-                value="insights-ai"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-violet-600 data-[state=active]:text-white"
-              >
-                <BrainCircuit className="w-4 h-4 mr-2" />
-                Insights AI
-              </TabsTrigger>
-              <TabsTrigger 
-                value="investimentos"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-600 data-[state=active]:to-teal-600 data-[state=active]:text-white"
-              >
-                <LineChart className="w-4 h-4 mr-2" />
-                Investimentos
-              </TabsTrigger>
-              <TabsTrigger 
-                value="planejamento"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-amber-600 data-[state=active]:to-orange-600 data-[state=active]:text-white"
-              >
-                <Calendar className="w-4 h-4 mr-2" />
-                Planejamento
-              </TabsTrigger>
-              <TabsTrigger 
-                value="especiais"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-600 data-[state=active]:to-rose-600 data-[state=active]:text-white"
-              >
-                <Sparkles className="w-4 h-4 mr-2" />
-                Especiais
-              </TabsTrigger>
-              <TabsTrigger 
-                value="comportamento"
-                className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-600 data-[state=active]:to-sky-600 data-[state=active]:text-white"
-              >
-                <Book className="w-4 h-4 mr-2" />
-                Comportamento
+                RaioX Full v2 (Jony Ive)
               </TabsTrigger>
             </TabsList>
 
@@ -364,33 +290,6 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
             </TabsContent>
             <TabsContent value="raiox-full-v2">
               {renderTabContent('raiox-full-v2')}
-            </TabsContent>
-            <TabsContent value="visao-geral">
-              {renderTabContent('visao-geral')}
-            </TabsContent>
-            <TabsContent value="insights-ai">
-              {renderTabContent('insights-ai')}
-            </TabsContent>
-            <TabsContent value="investimentos">
-              {renderTabContent('investimentos')}
-            </TabsContent>
-            <TabsContent value="planejamento">
-              {renderTabContent('planejamento')}
-            </TabsContent>
-            <TabsContent value="especiais">
-              {renderTabContent('especiais')}
-            </TabsContent>
-            <TabsContent value="comportamento">
-              {renderTabContent('comportamento')}
-            </TabsContent>
-            <TabsContent value="banking">
-              {renderTabContent('banking')}
-            </TabsContent>
-            <TabsContent value="chat">
-              {renderTabContent('chat')}
-            </TabsContent>
-            <TabsContent value="openfinance">
-              {renderTabContent('openfinance')}
             </TabsContent>
           </Tabs>
         </ScrollArea>
