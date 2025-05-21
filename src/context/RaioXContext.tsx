@@ -171,7 +171,6 @@ export const RaioXProvider = ({
         monthlyExpenses: 0,
         savingsRate: 0,
         liquidAssets: 0,
-        debtToIncomeRatio: 0,
         emergencyFundCoverage: 0,
         investmentGrowthRate: 0,
         annualDividendsThisYear: annualDividendsThisYear,

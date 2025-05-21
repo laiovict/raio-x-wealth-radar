@@ -107,7 +107,7 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
           
           console.log("Dividend calculations:", {
             totalDividends: totalDivs,
-            avgMonthlyDividends: avgMonthlyDividends,
+            avgMonthlyDividends: avgMonthlyDivs,
             annualDividendsThisYear: currentYearDividends,
             dividendCount: dedupedDividendHistory.length
           });
