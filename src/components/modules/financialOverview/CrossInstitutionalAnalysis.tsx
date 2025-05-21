@@ -13,43 +13,43 @@ const CrossInstitutionalAnalysis = ({ useSyntheticData = false }: CrossInstituti
   const dataSource = useSyntheticData ? 'synthetic' : 'openfinance';
   
   return (
-    <div className="space-y-4">
-      <h4 className="text-base font-medium text-white">
+    <div className="space-y-5">
+      <h4 className="text-lg font-medium text-white">
         Sua Distribuição Entre Instituições
         <TypeSafeDataSourceTag source={dataSource} />
       </h4>
       
-      <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+      <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
         <div>
           <div className="text-sm font-medium text-white">
             Exposição em 4 bancos
             <TypeSafeDataSourceTag source={dataSource} />
           </div>
-          <div className="text-xs text-gray-400">Bom nível de diversificação entre instituições</div>
+          <div className="text-xs text-gray-400 mt-1">Bom nível de diversificação entre instituições</div>
         </div>
-        <Badge className="bg-green-600 hover:bg-green-700">A+</Badge>
+        <Badge className="bg-green-600 hover:bg-green-700 ml-2">A+</Badge>
       </div>
       
-      <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+      <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
         <div>
           <div className="text-sm font-medium text-white">
             Concentração máxima em banco
             <TypeSafeDataSourceTag source={dataSource} />
           </div>
-          <div className="text-xs text-gray-400">38% de seus ativos estão em uma única instituição</div>
+          <div className="text-xs text-gray-400 mt-1">38% de seus ativos estão em uma única instituição</div>
         </div>
-        <Badge className="bg-yellow-600 hover:bg-yellow-700">B</Badge>
+        <Badge className="bg-yellow-600 hover:bg-yellow-700 ml-2">B</Badge>
       </div>
       
-      <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+      <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg">
         <div>
           <div className="text-sm font-medium text-white">
             Potencial de economia
             <TypeSafeDataSourceTag source={dataSource} />
           </div>
-          <div className="text-xs text-gray-400">Economize até R$ 2.500/ano consolidando serviços</div>
+          <div className="text-xs text-gray-400 mt-1">Economize até R$ 2.500/ano consolidando serviços</div>
         </div>
-        <Badge className="bg-blue-600 hover:bg-blue-700">↓ 18%</Badge>
+        <Badge className="bg-blue-600 hover:bg-blue-700 ml-2">↓ 18%</Badge>
       </div>
     </div>
   );

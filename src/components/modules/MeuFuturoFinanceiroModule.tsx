@@ -157,7 +157,7 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false, useSyntheticData = false
 
   return (
     <Card className="overflow-hidden shadow-lg border-0 bg-gradient-to-br from-slate-900/90 to-slate-800/80 backdrop-blur-md">
-      <CardHeader className="bg-gradient-to-r from-blue-900/80 to-indigo-900/80 border-b border-white/10 pb-3">
+      <CardHeader className="bg-gradient-to-r from-blue-900/80 to-indigo-900/80 border-b border-white/10 pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-blue-300" />
@@ -191,29 +191,29 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false, useSyntheticData = false
       </CardHeader>
       <CardContent className="p-0">
         {/* Financial Diagnostic Summary - Top Section */}
-        <div className="p-5 bg-gradient-to-br from-slate-800/80 to-blue-900/30 backdrop-blur-md">
-          <h3 className="font-bold text-lg mb-4 text-blue-300 border-b pb-2 border-blue-800/50">
+        <div className="p-6 bg-gradient-to-br from-slate-800/80 to-blue-900/30 backdrop-blur-md">
+          <h3 className="font-bold text-xl mb-6 text-blue-300 border-b pb-3 border-blue-800/50">
             DIAGNÓSTICO FINANCEIRO
           </h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Left Column - Financial Summary */}
-            <div className="space-y-4">
-              <div className="bg-slate-800/80 rounded-lg p-4 shadow-md border border-white/5 backdrop-blur-sm">
-                <h4 className="font-semibold text-blue-400 mb-3 text-sm uppercase flex items-center gap-2">
-                  <div className="h-1.5 w-1.5 bg-blue-500 rounded-full"></div>
+            <div className="space-y-6">
+              <div className="bg-slate-800/80 rounded-lg p-5 shadow-md border border-white/5 backdrop-blur-sm">
+                <h4 className="font-semibold text-blue-400 mb-4 text-base uppercase flex items-center gap-2">
+                  <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
                   Resumo Financeiro
                 </h4>
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center py-1.5">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center py-2">
                     <span className="text-gray-300">Renda Mensal</span>
                     <span className="font-semibold text-green-400">{formatCurrency(diagnostic.finances.totalMonthlyIncome)}</span>
                   </div>
-                  <div className="flex justify-between items-center py-1.5">
+                  <div className="flex justify-between items-center py-2">
                     <span className="text-gray-300">Gastos Mensais</span>
                     <span className="font-semibold text-red-400">{formatCurrency(diagnostic.finances.monthlyExpenses)}</span>
                   </div>
-                  <div className="h-px bg-gray-700 my-1"></div>
+                  <div className="h-px bg-gray-700 my-2"></div>
                   <div className="flex justify-between items-center pt-1">
                     <span className="font-medium text-gray-200">Saldo</span>
                     <span className={`font-bold ${diagnostic.finances.surplus > 0 ? 'text-green-400' : 'text-red-400'}`}>
@@ -223,21 +223,21 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false, useSyntheticData = false
                 </div>
               </div>
               
-              <div className="bg-slate-800/80 rounded-lg p-4 shadow-md border border-white/5 backdrop-blur-sm">
-                <h4 className="font-semibold text-blue-400 mb-3 text-sm uppercase flex items-center gap-2">
-                  <div className="h-1.5 w-1.5 bg-blue-500 rounded-full"></div>
+              <div className="bg-slate-800/80 rounded-lg p-5 shadow-md border border-white/5 backdrop-blur-sm">
+                <h4 className="font-semibold text-blue-400 mb-4 text-base uppercase flex items-center gap-2">
+                  <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
                   Patrimônio Atual
                 </h4>
-                <ul className="space-y-2">
-                  <li className="flex justify-between py-1">
+                <ul className="space-y-3">
+                  <li className="flex justify-between py-2">
                     <span className="text-gray-300">Imóvel</span>
                     <span className="font-medium text-gray-100">{formatCurrency(diagnostic.assets.property)}</span>
                   </li>
-                  <li className="flex justify-between py-1">
+                  <li className="flex justify-between py-2">
                     <span className="text-gray-300">Investimentos</span>
                     <span className="font-medium text-gray-100">{formatCurrency(diagnostic.assets.investments)}</span>
                   </li>
-                  <li className="flex justify-between py-1">
+                  <li className="flex justify-between py-2">
                     <span className="text-gray-300">Veículos</span>
                     <span className="font-medium text-gray-100">{formatCurrency(diagnostic.assets.vehicles.reduce((acc, vehicle) => acc + vehicle.value, 0))}</span>
                   </li>
@@ -246,36 +246,36 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false, useSyntheticData = false
             </div>
             
             {/* Right Column - Strengths and Alerts */}
-            <div className="space-y-4">
-              <div className="bg-slate-800/80 rounded-lg p-4 shadow-md border border-white/5 backdrop-blur-sm">
-                <div className="flex items-center mb-3">
-                  <Shield className="h-4 w-4 text-blue-400 mr-2" />
-                  <h4 className="font-semibold text-blue-400 text-sm uppercase">
+            <div className="space-y-6">
+              <div className="bg-slate-800/80 rounded-lg p-5 shadow-md border border-white/5 backdrop-blur-sm">
+                <div className="flex items-center mb-4">
+                  <Shield className="h-5 w-5 text-blue-400 mr-2" />
+                  <h4 className="font-semibold text-blue-400 text-base uppercase">
                     Pontos Fortes
                   </h4>
                 </div>
-                <ul className="space-y-1.5">
+                <ul className="space-y-3">
                   {diagnostic.strengths.map((strength, index) => (
-                    <li key={index} className="flex items-start">
-                      <div className="h-1.5 w-1.5 rounded-full bg-blue-400 mt-1.5 mr-2"></div>
-                      <span className="text-sm text-gray-300">{strength}</span>
+                    <li key={index} className="flex items-start py-1">
+                      <div className="h-2 w-2 rounded-full bg-blue-400 mt-1.5 mr-3"></div>
+                      <span className="text-gray-300">{strength}</span>
                     </li>
                   ))}
                 </ul>
               </div>
               
-              <div className="bg-slate-800/80 rounded-lg p-4 shadow-md border border-white/5 backdrop-blur-sm">
-                <div className="flex items-center mb-3">
-                  <AlertTriangle className="h-4 w-4 text-amber-400 mr-2" />
-                  <h4 className="font-semibold text-amber-400 text-sm uppercase">
+              <div className="bg-slate-800/80 rounded-lg p-5 shadow-md border border-white/5 backdrop-blur-sm">
+                <div className="flex items-center mb-4">
+                  <AlertTriangle className="h-5 w-5 text-amber-400 mr-2" />
+                  <h4 className="font-semibold text-amber-400 text-base uppercase">
                     Alertas Críticos
                   </h4>
                 </div>
-                <ul className="space-y-1.5">
+                <ul className="space-y-3">
                   {diagnostic.alerts.map((alert, index) => (
-                    <li key={index} className="flex items-start">
-                      <div className="h-1.5 w-1.5 rounded-full bg-amber-400 mt-1.5 mr-2"></div>
-                      <span className="text-sm text-gray-300">{alert}</span>
+                    <li key={index} className="flex items-start py-1">
+                      <div className="h-2 w-2 rounded-full bg-amber-400 mt-1.5 mr-3"></div>
+                      <span className="text-gray-300">{alert}</span>
                     </li>
                   ))}
                 </ul>
@@ -285,20 +285,20 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false, useSyntheticData = false
         </div>
         
         {/* Plan Phases - Bottom Section */}
-        <div className="p-5 bg-slate-900/80 backdrop-blur-md">
-          <h3 className="font-bold text-lg mb-4 text-blue-300 border-b pb-2 border-blue-800/50">
+        <div className="p-6 bg-slate-900/80 backdrop-blur-md">
+          <h3 className="font-bold text-xl mb-6 text-blue-300 border-b pb-3 border-blue-800/50">
             CRONOGRAMA DE MELHORIA
           </h3>
           
-          <div className="space-y-4">
+          <div className="space-y-6">
             {diagnostic.phases.map((phase, index) => (
               <div 
                 key={index} 
                 className="bg-slate-800/70 border border-white/5 rounded-lg shadow-md overflow-hidden"
               >
-                <div className="bg-blue-900/30 border-b border-blue-800/50 p-3">
-                  <div className="flex flex-wrap justify-between items-center gap-2">
-                    <h4 className="font-semibold text-blue-300">
+                <div className="bg-blue-900/30 border-b border-blue-800/50 p-4">
+                  <div className="flex flex-wrap justify-between items-center gap-3">
+                    <h4 className="font-semibold text-blue-300 text-lg">
                       {phase.name}
                     </h4>
                     <Badge 
@@ -309,12 +309,12 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false, useSyntheticData = false
                     </Badge>
                   </div>
                 </div>
-                <div className="p-4">
-                  <ul className="space-y-2">
+                <div className="p-5">
+                  <ul className="space-y-3">
                     {phase.actions.map((action, actionIndex) => (
-                      <li key={actionIndex} className="flex items-start">
-                        <ChevronRight className="h-4 w-4 mt-1 mr-2 text-blue-400 flex-shrink-0" />
-                        <span className="text-gray-300 text-sm">{action}</span>
+                      <li key={actionIndex} className="flex items-start py-1">
+                        <ChevronRight className="h-5 w-5 mt-0.5 mr-3 text-blue-400 flex-shrink-0" />
+                        <span className="text-gray-300">{action}</span>
                       </li>
                     ))}
                   </ul>
@@ -324,13 +324,13 @@ const MeuFuturoFinanceiroModule = ({ fullWidth = false, useSyntheticData = false
           </div>
         </div>
         
-        <div className="p-5 bg-gradient-to-b from-slate-900/80 to-slate-800/80 backdrop-blur-md flex justify-center">
+        <div className="p-6 bg-gradient-to-b from-slate-900/80 to-slate-800/80 backdrop-blur-md flex justify-center">
           <Button 
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all"
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-lg hover:shadow-xl transition-all px-6 py-6 text-base"
             onClick={() => handleAction("ViewCompletePlan")}
           >
             Ver Plano Financeiro Completo
-            <ArrowRight className="ml-2 h-4 w-4" />
+            <ArrowRight className="ml-3 h-5 w-5" />
           </Button>
         </div>
       </CardContent>

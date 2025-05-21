@@ -137,32 +137,43 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
 
   // Define RaioX Beta tab content
   const BetaTabContent = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-6">
       {/* Visão Geral section */}
-      <FinancialOverviewModule fullWidth={true} />
-      <div className="grid grid-cols-1 gap-6">
-        <AllocationModule />
-        <LiquidityReserveModule />
+      <div className="lg:col-span-2">
+        <FinancialOverviewModule fullWidth={true} />
+      </div>
+      
+      <div>
+        <AllocationModule fullWidth={true} />
+      </div>
+      <div>
+        <LiquidityReserveModule fullWidth={true} />
       </div>
       
       {/* Insights AI section */}
-      <AIInsightsHubModule fullWidth={false} />
-      <SentimentInsightsModule />
+      <div>
+        <AIInsightsHubModule fullWidth={true} />
+      </div>
+      <div>
+        <SentimentInsightsModule fullWidth={true} />
+      </div>
       
       {/* Investimentos section */}
-      <DividendModule fullWidth={false} />
-      <div className="grid grid-cols-1 gap-6">
-        <SocialComparisonModule />
-        <FamousInvestorsModule />
+      <div>
+        <DividendModule fullWidth={true} />
+      </div>
+      <div className="grid grid-cols-1 gap-8">
+        <SocialComparisonModule fullWidth={true} />
+        <FamousInvestorsModule fullWidth={true} />
       </div>
     </div>
   );
 
   // Define RaioX Full tab content with improved, consistent layout
   const FullTabContent = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-6">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-6">
       {/* Sidebar with client profile (1/3 width) */}
-      <div className="lg:col-span-4 space-y-6">
+      <div className="lg:col-span-4 space-y-8">
         <ClientProfileModule fullWidth={true} />
         <Suspense fallback={<LoadingComponent />}>
           <RecommendationsModule fullWidth={true} />
@@ -173,48 +184,60 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
       </div>
       
       {/* Main content area (2/3 width) */}
-      <div className="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <FinancialOverviewModule fullWidth={false} />
+      <div className="lg:col-span-8 space-y-8">
+        <FinancialOverviewModule fullWidth={true} />
         <Suspense fallback={<LoadingComponent />}>
-          <InteligenciaModule fullWidth={false} />
+          <InteligenciaModule fullWidth={true} />
         </Suspense>
         
-        <DividendModule fullWidth={false} />
-        <AllocationModule fullWidth={false} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <DividendModule fullWidth={true} />
+          <AllocationModule fullWidth={true} />
+        </div>
         
-        <Suspense fallback={<LoadingComponent />}>
-          <InvestmentPlanningModule fullWidth={false} />
-        </Suspense>
-        <LiquidityReserveModule fullWidth={false} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Suspense fallback={<LoadingComponent />}>
+            <InvestmentPlanningModule fullWidth={true} />
+          </Suspense>
+          <LiquidityReserveModule fullWidth={true} />
+        </div>
         
-        <AIInsightsHubModule fullWidth={false} />
-        <SentimentInsightsModule fullWidth={false} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <AIInsightsHubModule fullWidth={true} />
+          <SentimentInsightsModule fullWidth={true} />
+        </div>
         
-        <Suspense fallback={<LoadingComponent />}>
-          <RecommendedActionsModule fullWidth={false} />
-        </Suspense>
-        <Suspense fallback={<LoadingComponent />}>
-          <LifeGoalsModule fullWidth={false} />
-        </Suspense>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Suspense fallback={<LoadingComponent />}>
+            <RecommendedActionsModule fullWidth={true} />
+          </Suspense>
+          <Suspense fallback={<LoadingComponent />}>
+            <LifeGoalsModule fullWidth={true} />
+          </Suspense>
+        </div>
         
-        <SocialComparisonModule fullWidth={false} />
-        <FamousInvestorsModule fullWidth={false} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <SocialComparisonModule fullWidth={true} />
+          <FamousInvestorsModule fullWidth={true} />
+        </div>
         
-        <Suspense fallback={<LoadingComponent />}>
-          <FutureProjectionModule fullWidth={false} />
-        </Suspense>
-        <Suspense fallback={<LoadingComponent />}>
-          <OnePageFinancialPlanModule fullWidth={false} />
-        </Suspense>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Suspense fallback={<LoadingComponent />}>
+            <FutureProjectionModule fullWidth={true} />
+          </Suspense>
+          <Suspense fallback={<LoadingComponent />}>
+            <OnePageFinancialPlanModule fullWidth={true} />
+          </Suspense>
+        </div>
       </div>
     </div>
   );
 
   // Define RaioX Full v2 (Jony Ive design) tab content with improved organization
   const FullV2TabContent = () => (
-    <div className="jony-ive-design">
+    <div className="jony-ive-design space-y-12">
       {/* Header row - key overview components */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <div className="lg:col-span-4">
           <ClientProfileModule fullWidth={true} />
         </div>
@@ -224,40 +247,54 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
       </div>
       
       {/* Main content grid - organized by categories */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-12">
         {/* Investment Management Section */}
-        <div className="lg:col-span-6 space-y-6">
-          <h3 className="text-xl font-light text-white/80 px-2">Gestão de Investimentos</h3>
-          <div className="grid grid-cols-1 gap-6">
-            <AllocationModule fullWidth={true} />
-            <DividendModule fullWidth={true} />
-            <Suspense fallback={<LoadingComponent />}>
-              <InvestmentPlanningModule fullWidth={true} />
-            </Suspense>
-            <LiquidityReserveModule fullWidth={true} />
-          </div>
+        <div className="space-y-8">
+          <h3 className="text-2xl font-light text-white/80 px-2">
+            Gestão de Investimentos
+          </h3>
+          <AllocationModule fullWidth={true} />
+          <DividendModule fullWidth={true} />
+          <Suspense fallback={<LoadingComponent />}>
+            <InvestmentPlanningModule fullWidth={true} />
+          </Suspense>
+          <LiquidityReserveModule fullWidth={true} />
         </div>
         
         {/* Insights and Planning Section */}
-        <div className="lg:col-span-6 space-y-6">
-          <h3 className="text-xl font-light text-white/80 px-2">Insights e Planejamento</h3>
-          <div className="grid grid-cols-1 gap-6">
-            <Suspense fallback={<LoadingComponent />}>
-              <RecommendationsModule fullWidth={true} />
-            </Suspense>
-            <AIInsightsHubModule fullWidth={true} />
-            <SentimentInsightsModule fullWidth={true} />
-            <Suspense fallback={<LoadingComponent />}>
-              <InteligenciaModule fullWidth={true} />
-            </Suspense>
-          </div>
+        <div className="space-y-8">
+          <h3 className="text-2xl font-light text-white/80 px-2">
+            Insights e Planejamento
+          </h3>
+          <Suspense fallback={<LoadingComponent />}>
+            <RecommendationsModule fullWidth={true} />
+          </Suspense>
+          <AIInsightsHubModule fullWidth={true} />
+          <SentimentInsightsModule fullWidth={true} />
+          <Suspense fallback={<LoadingComponent />}>
+            <InteligenciaModule fullWidth={true} />
+          </Suspense>
         </div>
       </div>
       
-      {/* Social and Personalized Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6">
-        <SocialComparisonModule fullWidth={false} />
-        <FamousInvestorsModule fullWidth={false} />
+      {/* Additional Features Section */}
+      <div className="space-y-8 pb-12">
+        <h3 className="text-2xl font-light text-white/80 px-2">
+          Recursos Adicionais
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <SocialComparisonModule fullWidth={true} />
+          <FamousInvestorsModule fullWidth={true} />
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Suspense fallback={<LoadingComponent />}>
+            <FutureProjectionModule fullWidth={true} />
+          </Suspense>
+          <Suspense fallback={<LoadingComponent />}>
+            <OnePageFinancialPlanModule fullWidth={true} />
+          </Suspense>
+        </div>
       </div>
     </div>
   );

@@ -27,10 +27,14 @@ import {
   getPortfolioSummaryHelper 
 } from "./financialOverview/utils";
 
+// Additional imports
+import { Shield } from "lucide-react";
+import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
+
 interface FinancialOverviewModuleProps {
   fullWidth?: boolean;
-  useSyntheticData?: boolean; // New prop to control data source
-  steveJobsMode?: boolean; // Added for Steve Jobs UI
+  useSyntheticData?: boolean;
+  steveJobsMode?: boolean;
 }
 
 const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false, steveJobsMode = false }: FinancialOverviewModuleProps) => {
@@ -62,7 +66,7 @@ const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false, 
   if (!hasOpenFinance && !useSyntheticData) {
     return (
       <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
-        <CardHeader className="pb-2">
+        <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
               Meu Panorama Financeiro
@@ -79,26 +83,24 @@ const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false, 
           </div>
           <DataSourceInfoPanel showDataSourceInfo={showDataSourceInfo} />
         </CardHeader>
-        <CardContent>
-          <div className="space-y-6">
-            {/* Limited Net Worth Section */}
-            <NetWorthSection 
-              finData={finData} 
-              netWorthHistory={netWorthHistory} 
-              getPortfolioSummary={getPortfolioSummary}
-              defaultTrend={defaultTrend}
-            />
-            
-            {/* OpenFinance needed banner */}
-            <OpenFinanceBanner />
+        <CardContent className="space-y-8">
+          {/* Limited Net Worth Section */}
+          <NetWorthSection 
+            finData={finData} 
+            netWorthHistory={netWorthHistory} 
+            getPortfolioSummary={getPortfolioSummary}
+            defaultTrend={defaultTrend}
+          />
+          
+          {/* OpenFinance needed banner */}
+          <OpenFinanceBanner />
 
-            {/* Investment Stats */}
-            <InvestmentStatsGrid 
-              finData={finData} 
-              getPortfolioSummary={getPortfolioSummary}
-              data={data} 
-            />
-          </div>
+          {/* Investment Stats */}
+          <InvestmentStatsGrid 
+            finData={finData} 
+            getPortfolioSummary={getPortfolioSummary}
+            data={data} 
+          />
         </CardContent>
       </Card>
     );
@@ -109,7 +111,7 @@ const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false, 
 
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
             {useSyntheticData ? "Meu Panorama Financeiro (Versão Full)" : "Meu Panorama Financeiro"}
@@ -134,97 +136,91 @@ const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false, 
         </div>
         <DataSourceInfoPanel showDataSourceInfo={showDataSourceInfo} />
       </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          {/* Main Financial Overview Section - Full version only */}
-          {useSyntheticData && (
-            <MainFinancialOverview 
-              finData={finData} 
-              hasOpenFinance={hasOpenFinance || useSyntheticData} 
-              getPortfolioSummary={getPortfolioSummary} 
-            />
-          )}
-          
-          {/* Net Worth Section - Always show */}
-          <NetWorthSection 
+      <CardContent className="space-y-8">
+        {/* Main Financial Overview Section - Full version only */}
+        {useSyntheticData && (
+          <MainFinancialOverview 
             finData={finData} 
-            netWorthHistory={netWorthHistory} 
-            getPortfolioSummary={getPortfolioSummary}
-            defaultTrend={defaultTrend}
-          />
-          
-          {/* Assets & Liabilities Summary - Always show */}
-          <AssetsLiabilitiesGrid 
-            finData={finData} 
+            hasOpenFinance={hasOpenFinance || useSyntheticData} 
             getPortfolioSummary={getPortfolioSummary} 
           />
-          
-          {/* Financial Health Indicators - Always show */}
-          <FinancialHealthIndicators 
-            finData={finData} 
-            getPortfolioSummary={getPortfolioSummary}
-            useSyntheticData={useSyntheticData}
-          />
-          
-          {/* OpenFinance Insights Section - Full version only */}
-          {useSyntheticData && (
-            <div className="mt-6">
-              <div className="mb-4 border-b border-white/10 pb-2">
-                <div className="flex items-center text-lg font-medium text-white gap-2">
-                  <Shield className="h-5 w-5 text-green-400" />
-                  <span>Dados OpenFinance</span>
-                  <TypeSafeDataSourceTag source="synthetic" />
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Financial Behavior */}
-                <FinancialBehaviorSection useSyntheticData={useSyntheticData} />
-                
-                {/* Cross-Institutional Analysis */}
-                <CrossInstitutionalAnalysis useSyntheticData={useSyntheticData} />
+        )}
+        
+        {/* Net Worth Section - Always show */}
+        <NetWorthSection 
+          finData={finData} 
+          netWorthHistory={netWorthHistory} 
+          getPortfolioSummary={getPortfolioSummary}
+          defaultTrend={defaultTrend}
+        />
+        
+        {/* Assets & Liabilities Summary - Always show */}
+        <AssetsLiabilitiesGrid 
+          finData={finData} 
+          getPortfolioSummary={getPortfolioSummary} 
+        />
+        
+        {/* Financial Health Indicators - Always show */}
+        <FinancialHealthIndicators 
+          finData={finData} 
+          getPortfolioSummary={getPortfolioSummary}
+          useSyntheticData={useSyntheticData}
+        />
+        
+        {/* OpenFinance Insights Section - Full version only */}
+        {useSyntheticData && (
+          <div className="mt-8">
+            <div className="mb-6 border-b border-white/10 pb-2">
+              <div className="flex items-center text-lg font-medium text-white gap-2">
+                <Shield className="h-5 w-5 text-green-400" />
+                <span>Dados OpenFinance</span>
+                <TypeSafeDataSourceTag source="synthetic" />
               </div>
             </div>
-          )}
-          
-          {/* Financial History Highlights - Full version only */}
-          {useSyntheticData && (
-            <div className="mt-6">
-              <div className="mb-4 flex justify-between items-center">
-                <div className="text-lg font-medium text-white">
-                  Sua história financeira em 2025
-                  <TypeSafeDataSourceTag source="synthetic" />
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-blue-400" 
-                  onClick={() => setShowBehavioralInsights(!showBehavioralInsights)}
-                >
-                  {showBehavioralInsights ? "Mostrar menos" : "Mostrar mais"}
-                </Button>
-              </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Financial Behavior */}
+              <FinancialBehaviorSection useSyntheticData={useSyntheticData} />
               
-              <FinancialHistoryHighlights 
-                showBehavioralInsights={showBehavioralInsights} 
-                useSyntheticData={useSyntheticData} 
-              />
+              {/* Cross-Institutional Analysis */}
+              <CrossInstitutionalAnalysis useSyntheticData={useSyntheticData} />
             </div>
-          )}
-          
-          {/* Recommended Next Steps - Full version only */}
-          {useSyntheticData && <RecommendedSteps useSyntheticData={useSyntheticData} />}
-          
-          {/* Top Risks - Full version only */}
-          {useSyntheticData && <TopRisks finData={finData} useSyntheticData={useSyntheticData} />}
-        </div>
+          </div>
+        )}
+        
+        {/* Financial History Highlights - Full version only */}
+        {useSyntheticData && (
+          <div className="mt-8">
+            <div className="mb-6 flex justify-between items-center">
+              <div className="text-lg font-medium text-white">
+                Sua história financeira em 2025
+                <TypeSafeDataSourceTag source="synthetic" />
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-blue-400" 
+                onClick={() => setShowBehavioralInsights(!showBehavioralInsights)}
+              >
+                {showBehavioralInsights ? "Mostrar menos" : "Mostrar mais"}
+              </Button>
+            </div>
+            
+            <FinancialHistoryHighlights 
+              showBehavioralInsights={showBehavioralInsights} 
+              useSyntheticData={useSyntheticData} 
+            />
+          </div>
+        )}
+        
+        {/* Recommended Next Steps - Full version only */}
+        {useSyntheticData && <RecommendedSteps useSyntheticData={useSyntheticData} />}
+        
+        {/* Top Risks - Full version only */}
+        {useSyntheticData && <TopRisks finData={finData} useSyntheticData={useSyntheticData} />}
       </CardContent>
     </Card>
   );
 };
-
-// Add missing imports
-import { Shield } from "lucide-react";
-import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 
 export default FinancialOverviewModule;

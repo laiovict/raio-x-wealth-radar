@@ -68,7 +68,7 @@ const DividendModule = ({ fullWidth = false, useSyntheticData = false }: Dividen
         </CardTitle>
       </CardHeader>
       
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-8">
         {/* Stats Cards */}
         <DividendStats 
           totalDividends={totalDividends || 0} 
@@ -77,8 +77,10 @@ const DividendModule = ({ fullWidth = false, useSyntheticData = false }: Dividen
           dataSource={dataSource}
         />
         
-        {/* Chart */}
-        <DividendChart chartData={chartData} dataSource={dataSource} />
+        {/* Chart - Give it more height */}
+        <div className="h-72 md:h-80">
+          <DividendChart chartData={chartData} dataSource={dataSource} />
+        </div>
         
         {/* Recent Dividends Table */}
         <RecentDividendsTable recentDividends={recentDividends} dataSource={dataSource} />
