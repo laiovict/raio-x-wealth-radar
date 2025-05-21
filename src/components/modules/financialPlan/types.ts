@@ -1,15 +1,6 @@
 
 import { DataSourceType } from '@/types/raioXTypes';
-
-export interface DetailItem {
-  label: string;
-  value: string;
-  progress?: number;
-}
-
-export interface ActionItem {
-  text: string;
-}
+import { DetailItem, ActionItem } from '@/types/moduleTypes';
 
 export interface PlanSectionData {
   id: string;

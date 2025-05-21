@@ -22,3 +22,35 @@ export interface ModuleDataState<T> {
   /** Flag indicating if synthetic data is being used */
   isSynthetic: boolean;
 }
+
+/**
+ * Detail item for financial plan sections
+ */
+export interface DetailItem {
+  label: string;
+  value: string;
+  progress?: number;
+}
+
+/**
+ * Action item for financial plan sections
+ */
+export interface ActionItem {
+  text: string;
+}
+
+/**
+ * Financial plan data structure
+ */
+export interface FinancialPlanData {
+  lastUpdated: string;
+  sections: {
+    id: string;
+    title: string;
+    icon: string;
+    summary: string;
+    details: DetailItem[];
+    actions?: ActionItem[];
+    dataSource?: DataSourceType;
+  }[];
+}

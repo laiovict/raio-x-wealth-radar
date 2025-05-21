@@ -199,7 +199,7 @@ const PersonalInsightsModuleBase = ({ fullWidth = false, dataState }: PersonalIn
                 {dataSource === 'supabase' && clientData?.tags && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {/* Show extracted tags as badges */}
-                    {clientData.tags.filter(tag => tag.trim()).map(tag => (
+                    {clientData.tags.filter(tag => typeof tag === 'string' && tag.trim()).map(tag => (
                       <Badge key={tag} variant="outline" className="bg-blue-900/30 text-blue-300 border-blue-700/30">
                         <Tag className="h-3 w-3 mr-1.5" />
                         {tag}

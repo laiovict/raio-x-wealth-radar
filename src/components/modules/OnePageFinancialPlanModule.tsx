@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { useState } from "react";
@@ -6,23 +7,9 @@ import PlanSection from './financialPlan/PlanSection';
 import PlanHeader from './financialPlan/PlanHeader';
 import PlanFooter from './financialPlan/PlanFooter';
 import { usePlanData } from './financialPlan/usePlanData';
-import { BaseModuleProps, ModuleDataState } from '@/types/moduleTypes';
+import { BaseModuleProps, ModuleDataState, FinancialPlanData, DetailItem, ActionItem } from '@/types/moduleTypes';
 import { withSafeData } from '@/components/hoc/withSafeData';
 import { DataSourceType } from '@/types/raioXTypes';
-
-// Define the type for financial plan data
-interface FinancialPlanData {
-  lastUpdated: Date;
-  sections: {
-    id: string;
-    title: string;
-    icon: string;
-    summary: string;
-    details: string;
-    actions?: string[];
-    dataSource?: DataSourceType;
-  }[];
-}
 
 // Extending the BaseModuleProps interface ensures consistency across modules
 interface OnePageFinancialPlanModuleProps extends BaseModuleProps {
@@ -39,7 +26,7 @@ const OnePageFinancialPlanModuleBase = ({
   
   // Use the financial plan data from the dataState
   const financialPlan = dataState?.data || { 
-    lastUpdated: new Date(), 
+    lastUpdated: new Date().toISOString(), 
     sections: [] 
   };
   
@@ -72,7 +59,7 @@ const OnePageFinancialPlanModuleBase = ({
               summary={section.summary}
               dataSource={section.dataSource || dataState?.dataSource || 'synthetic'}
               details={section.details}
-              actions={section.actions}
+              actions={section.actions || []}
               isExpanded={expandedSections[section.id] || false}
               onToggle={() => toggleSection(section.id)}
             />
@@ -83,6 +70,22 @@ const OnePageFinancialPlanModuleBase = ({
       </CardContent>
     </Card>
   );
+};
+
+// Helper functions for formatting
+const formatCurrency = (value: any): string => {
+  const numValue = Number(value);
+  if (isNaN(numValue)) return 'R$ 0';
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(numValue);
+};
+
+const formatPercentage = (value: any): string => {
+  const numValue = Number(value);
+  if (isNaN(numValue)) return '0%';
+  return `${numValue.toFixed(1)}%`;
 };
 
 // Get real data function for withSafeData HOC
@@ -104,36 +107,69 @@ const getRealFinancialPlanData = (props: OnePageFinancialPlanModuleProps): Finan
       title: 'Visão Geral Financeira',
       icon: 'chart-bar',
       summary: `Patrimônio total de ${financialSummary?.totalAssets ? formatCurrency(financialSummary.totalAssets) : formatCurrency(portfolioSummary?.total_portfolio_value || 0)}`,
-      details: `Seu patrimônio é composto principalmente por ${portfolioSummary?.fixed_income_representation ? formatPercentage(portfolioSummary.fixed_income_representation) : '0%'} em renda fixa e ${portfolioSummary?.stocks_representation ? formatPercentage(portfolioSummary.stocks_representation) : '0%'} em renda variável.`,
+      details: [
+        {
+          label: 'Patrimônio Total',
+          value: `${formatCurrency(financialSummary?.totalAssets || portfolioSummary?.total_portfolio_value || 0)}`
+        },
+        {
+          label: 'Renda Fixa',
+          value: `${formatPercentage(portfolioSummary?.fixed_income_representation || 0)}`
+        },
+        {
+          label: 'Renda Variável',
+          value: `${formatPercentage(portfolioSummary?.stocks_representation || 0)}`
+        }
+      ],
       dataSource: 'supabase'
     });
   }
   
   // Investment Strategy Section - include if we have allocation data
   if (data.allocation) {
+    const allocationKeys = Object.entries(data.allocation.current)
+      .filter(([key]) => key !== 'total')
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 4)
+      .map(([key]) => key);
+    
     sections.push({
       id: 'investment-strategy',
       title: 'Estratégia de Investimento',
       icon: 'trending-up',
       summary: 'Alocação atual vs. recomendada',
-      details: `Sua alocação atual prioriza ${Object.entries(data.allocation.current)
-        .filter(([key]) => key !== 'total')
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 2)
-        .map(([key]) => key)
-        .join(' e ')}.`,
+      details: allocationKeys.map(key => ({
+        label: key,
+        value: `${formatPercentage(data.allocation.current[key] || 0)}`
+      })),
       dataSource: data.allocation.dataSource || 'supabase'
     });
   }
   
   // Dividend Analysis - include if we have dividend history
   if (dividendHistory && dividendHistory.length > 0) {
+    const uniqueAssets = new Set(dividendHistory.map(d => d.asset)).size;
+    const totalDividends = dividendHistory.reduce((sum, d) => sum + Number(d.value), 0);
+    
     sections.push({
       id: 'dividend-analysis',
       title: 'Análise de Dividendos',
       icon: 'dollar-sign',
       summary: 'Fluxo constante de renda passiva',
-      details: `Você recebeu dividendos de ${new Set(dividendHistory.map(d => d.asset)).size} ativos diferentes nos últimos 12 meses.`,
+      details: [
+        {
+          label: 'Total Recebido (12m)',
+          value: formatCurrency(totalDividends)
+        },
+        {
+          label: 'Quantidade de Ativos',
+          value: `${uniqueAssets} ativos`
+        },
+        {
+          label: 'Média Mensal',
+          value: formatCurrency(totalDividends / 12)
+        }
+      ],
       dataSource: 'supabase'
     });
   }
@@ -145,19 +181,48 @@ const getRealFinancialPlanData = (props: OnePageFinancialPlanModuleProps): Finan
       title: 'Planejamento de Aposentadoria',
       icon: 'calendar',
       summary: 'Preparação para o futuro financeiro',
-      details: 'Com base na sua renda atual e padrão de poupança, estamos analisando a sua trajetória para a independência financeira.',
+      details: [
+        {
+          label: 'Renda Mensal Atual',
+          value: formatCurrency(financialSummary.monthlyIncome)
+        },
+        {
+          label: 'Patrimônio Atual',
+          value: formatCurrency(financialSummary.totalAssets)
+        },
+        {
+          label: 'Taxa de Poupança',
+          value: `${formatPercentage((financialSummary.savingsRate || 0) * 100)}`
+        }
+      ],
       dataSource: financialSummary.dataSource || 'supabase'
     });
   }
   
   // Stocks Analysis - include if we have stocks data
   if (stocks && stocks.length > 0) {
+    const topStocks = stocks.slice(0, 3).map(s => s.asset).join(', ');
+    const totalValue = stocks.reduce((sum, s) => sum + Number(s.total_value || 0), 0);
+    
     sections.push({
       id: 'stocks-analysis',
       title: 'Análise de Ações',
       icon: 'activity',
       summary: `Carteira com ${stocks.length} ações`,
-      details: `Principais posições em ${stocks.slice(0, 3).map(s => s.asset).join(', ')}.`,
+      details: [
+        {
+          label: 'Valor Total',
+          value: formatCurrency(totalValue)
+        },
+        {
+          label: 'Principais Posições',
+          value: topStocks
+        },
+        {
+          label: 'Diversificação',
+          value: `${stocks.length} ativos diferentes`
+        }
+      ],
       dataSource: 'supabase'
     });
   }
@@ -165,29 +230,13 @@ const getRealFinancialPlanData = (props: OnePageFinancialPlanModuleProps): Finan
   // If we have sections, return a structured financial plan
   if (sections.length > 0) {
     return {
-      lastUpdated: new Date(),
+      lastUpdated: new Date().toISOString(),
       sections
     };
   }
   
   // If we couldn't build any meaningful sections, return null to use synthetic data
   return null;
-};
-
-// Helper functions for formatting
-const formatCurrency = (value: any): string => {
-  const numValue = Number(value);
-  if (isNaN(numValue)) return 'R$ 0';
-  return new Intl.NumberFormat('pt-BR', {
-    style: 'currency',
-    currency: 'BRL'
-  }).format(numValue);
-};
-
-const formatPercentage = (value: any): string => {
-  const numValue = Number(value);
-  if (isNaN(numValue)) return '0%';
-  return `${numValue.toFixed(1)}%`;
 };
 
 // Get synthetic data function for withSafeData HOC
