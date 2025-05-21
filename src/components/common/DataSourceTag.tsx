@@ -11,7 +11,7 @@ import { Globe } from '@/components/common/icons';
 import { DataSourceType } from '@/types/raioXTypes';
 
 interface DataSourceTagProps {
-  source?: DataSourceType | string;
+  source?: 'synthetic' | 'supabase' | DataSourceType;
   className?: string;
 }
 

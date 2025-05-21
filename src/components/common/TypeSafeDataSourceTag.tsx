@@ -26,8 +26,8 @@ const TypeSafeDataSourceTag: React.FC<TypeSafeDataSourceTagProps> = ({
 }) => {
   if (source === undefined || source === null) return null;
   
-  // Convert source to string and then to the limited types expected by DataSourceTag
-  const sourceAsString = toSafeString(source);
+  // Convert to the limited types expected by DataSourceTag directly
+  // without an intermediate string conversion that could cause type issues
   const compatibleSource = toLimitedDataSource(source);
   
   return (

@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { useEffect, useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import { formatCurrency } from '@/utils/formattingUtils';
-import { toNumber, ensureString, toSafeString } from '@/utils/typeConversionHelpers';
 import { DataSourceType } from '@/types/raioXTypes';
 import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 
@@ -16,9 +15,13 @@ interface LifeGoalsModuleProps {
   fullWidth?: boolean;
 }
 
-// Updated to accept any type of source and explicitly delegate type handling to TypeSafeDataSourceTag
+/**
+ * Component that safely displays a data source indicator using TypeSafeDataSourceTag
+ * It explicitly accepts string, number and DataSourceType
+ */
 const DataSourceIndicator = ({ source }: { source?: DataSourceType | string | number }) => {
   if (source === undefined || source === null) return null;
+  // TypeSafeDataSourceTag handles the type conversion internally
   return <TypeSafeDataSourceTag source={source} />;
 };
 
