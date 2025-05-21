@@ -1,100 +1,69 @@
-import { useRaioX } from "@/context/RaioXContext";
+
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUp, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import { formatCurrency } from '@/utils/formattingUtils';
-import { DataSourceType } from '@/types/raioXTypes';
 
 interface LifeGoalsModuleProps {
   fullWidth?: boolean;
 }
 
-/**
- * Simplified data source indicator that doesn't rely on complex type conversions
- * This component directly handles displaying the indicator without relying on other components
- */
-const SimplifiedDataSourceIndicator = ({ source }: { source?: DataSourceType | string | number | null }) => {
-  if (source === undefined || source === null) return null;
-  
-  // Simple logic to determine if this is real or synthetic data
-  const isRealData = typeof source === 'string' && source !== 'synthetic';
-  
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <span className={`ml-1 ${isRealData ? 'text-green-400' : 'text-amber-400'}`}>
-            {isRealData ? '✓' : '*'}
-          </span>
-        </TooltipTrigger>
-        <TooltipContent side="top">
-          <p className="text-xs">{isRealData ? 'Dados reais' : 'Dados sintéticos'}</p>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
-  );
-};
+// Define types for our life goals
+interface LifeGoal {
+  name: string;
+  timeframe: string;
+  progress: number;
+  currentAmount: number;
+  targetAmount: number;
+  adjustmentNeeded: number;
+  category: string;
+}
+
+interface LifeGoals {
+  goals: LifeGoal[];
+  summary: string;
+}
 
 const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
-  const { data, portfolioSummary } = useRaioX();
   const [moduleLoaded, setModuleLoaded] = useState(false);
   
-  // Default goals in case data is missing
-  const lifeGoals = useMemo(() => {
-    // Get the portfolio total value from Supabase data if available
-    const portfolioValue = portfolioSummary ? parseFloat(portfolioSummary.total_portfolio_value || "0") : 0;
-    const hasRealData = portfolioSummary && portfolioValue > 0;
-    
-    // If we have data from the context, use that
-    if (data?.lifeGoals) {
-      return {
-        ...data.lifeGoals,
-        dataSource: hasRealData ? 'supabase' : 'synthetic'
-      };
-    }
-    
-    // Otherwise, provide default goals, but enhanced with real data if available
-    return {
-      goals: [
-        {
-          name: "Aposentadoria",
-          timeframe: "Longo Prazo",
-          progress: hasRealData ? Math.round((portfolioValue * 0.6 / 800000) * 100) : 45,
-          currentAmount: hasRealData ? portfolioValue * 0.6 : 360000,
-          targetAmount: 800000,
-          adjustmentNeeded: 10,
-          category: "investment",
-          dataSource: hasRealData ? 'supabase' as const : 'synthetic' as const
-        },
-        {
-          name: "Reserva de Emergência",
-          timeframe: "Curto Prazo",
-          progress: hasRealData ? Math.round((portfolioValue * 0.1 / 50000) * 100) : 80,
-          currentAmount: hasRealData ? portfolioValue * 0.1 : 40000,
-          targetAmount: 50000,
-          adjustmentNeeded: 0,
-          category: "saving",
-          dataSource: hasRealData ? 'supabase' as const : 'synthetic' as const
-        },
-        {
-          name: "Compra de Imóvel",
-          timeframe: "Médio Prazo",
-          progress: hasRealData ? Math.round((portfolioValue * 0.25 / 300000) * 100) : 25,
-          currentAmount: hasRealData ? portfolioValue * 0.25 : 75000,
-          targetAmount: 300000,
-          adjustmentNeeded: 15,
-          category: "property",
-          dataSource: hasRealData ? 'supabase' as const : 'synthetic' as const
-        }
-      ],
-      summary: "Seus objetivos financeiros estão em bom progresso. A reserva de emergência está quase completa, mas os objetivos de longo prazo precisam de aportes consistentes.",
-      dataSource: hasRealData ? 'supabase' as const : 'synthetic' as const
-    };
-  }, [data?.lifeGoals, portfolioSummary]);
+  // Simplified synthetic data directly in the component
+  const lifeGoals: LifeGoals = {
+    goals: [
+      {
+        name: "Aposentadoria",
+        timeframe: "Longo Prazo",
+        progress: 45,
+        currentAmount: 360000,
+        targetAmount: 800000,
+        adjustmentNeeded: 10,
+        category: "investment"
+      },
+      {
+        name: "Reserva de Emergência",
+        timeframe: "Curto Prazo",
+        progress: 80,
+        currentAmount: 40000,
+        targetAmount: 50000,
+        adjustmentNeeded: 0,
+        category: "saving"
+      },
+      {
+        name: "Compra de Imóvel",
+        timeframe: "Médio Prazo",
+        progress: 25,
+        currentAmount: 75000,
+        targetAmount: 300000,
+        adjustmentNeeded: 15,
+        category: "property"
+      }
+    ],
+    summary: "Seus objetivos financeiros estão em bom progresso. A reserva de emergência está quase completa, mas os objetivos de longo prazo precisam de aportes consistentes."
+  };
   
   useEffect(() => {
     // Set module as loaded immediately to avoid streaming delay issues
