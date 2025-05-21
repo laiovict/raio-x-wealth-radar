@@ -1,4 +1,3 @@
-
 // Basic data types for the RaioX application
 
 export type DataSourceType = 'synthetic' | 'supabase' | 'xp' | 'openfinance' | 'calculated';
@@ -57,7 +56,7 @@ export interface RaioXData {
   profitability?: any;
   clientSummary?: ClientSummary;
   marketSentiment?: any;
-  monthlyExpenses?: number; // Added to fix BehavioralFinanceModule error
+  monthlyExpenses?: number; // Added for BehavioralFinanceModule
 }
 
 // Types for financial data and insights
@@ -74,6 +73,17 @@ export interface FinancialSummary {
   investmentBalance?: number;
   cashReserves?: number; // Added for portfolioService
   variableIncomePercent?: number; // Added for raioXUtils
+  realEstatePercent?: number; // Added for raioXUtils
+  otherPercent?: number; // Added for raioXUtils
+  monthlyDividends?: number; // Added for raioXUtils
+  annualDividends?: number; // Added for raioXUtils
+  dividendYield?: number; // Added for raioXUtils
+  debtTotal?: number; // Added for portfolioService
+  profitability?: {
+    ytd: number;
+    sixMonths: number;
+    twelveMonths: number;
+  };
 }
 
 export interface PortfolioSummary {
@@ -242,6 +252,7 @@ export interface AIInsight {
   type?: 'risk' | 'opportunity' | 'insight';
   impact?: 'high' | 'medium' | 'low';
   dataSource?: DataSourceType;
+  actions?: string[]; // Added for InsightCard compatibility
 }
 
 // Helper type for the financial behavior module

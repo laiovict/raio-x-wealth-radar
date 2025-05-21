@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
@@ -15,7 +14,7 @@ import InsightsTabContent from "./inteligencia/InsightsTabContent";
 import ActionsTabContent from "./inteligencia/ActionsTabContent";
 import RecommendationsTabContent from "./inteligencia/RecommendationsTabContent";
 import { getRecommendedActions } from "./inteligencia/helpers";
-import { generatePortfolioInsights } from '@/services/insightGeneratorService';
+import { generateAIInsights } from '@/services/insightGeneratorService';
 import { DataSourceType } from '@/types/raioXTypes';
 
 interface InteligenciaModuleProps {
@@ -62,23 +61,13 @@ const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
     }
     
     // Generate insights based on available portfolio data
-    return generatePortfolioInsights(
+    return generateAIInsights(
       data.portfolioSummary,
-      data.stocks,
-      data.fixedIncome,
-      data.investmentFunds,
-      data.realEstate,
-      data.profitability,
       data.dividendHistory
     );
   }, [
     data.financialInsightData, 
     data.portfolioSummary,
-    data.stocks,
-    data.fixedIncome,
-    data.investmentFunds,
-    data.realEstate,
-    data.profitability,
     data.dividendHistory
   ]);
 

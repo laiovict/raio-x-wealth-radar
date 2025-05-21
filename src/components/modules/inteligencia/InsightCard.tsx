@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { 
   Card, 
@@ -13,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
+import { DataSourceType } from '@/types/raioXTypes';
 
 export interface InsightCardProps {
   insight: {
@@ -23,7 +23,7 @@ export interface InsightCardProps {
     category?: string;
     impact?: string;
     actions?: string[];
-    dataSource?: 'synthetic' | 'supabase' | 'xp' | 'openfinance';
+    dataSource?: DataSourceType; // Updated to use the complete DataSourceType
     agent?: string;
     priority?: string;
     isNew?: boolean;

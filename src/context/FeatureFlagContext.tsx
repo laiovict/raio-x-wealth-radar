@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 // Define the structure of our feature flags
@@ -7,7 +6,8 @@ export interface FeatureFlags {
   enable_metrics: boolean;
   dashboard_debug: boolean;
   advanced_insights: boolean;
-  steve_jobs: boolean;  // Added this flag
+  steve_jobs: boolean;
+  openfinance: boolean; // Added openfinance flag
 }
 
 // Establish the default state for all flags
@@ -16,7 +16,8 @@ export const defaultFlags: FeatureFlags = {
   enable_metrics: true,
   dashboard_debug: false,
   advanced_insights: true,
-  steve_jobs: true,  // Default to true for now
+  steve_jobs: true,
+  openfinance: false, // Default to false
 };
 
 // Create a context with the default flags

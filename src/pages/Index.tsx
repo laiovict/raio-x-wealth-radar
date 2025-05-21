@@ -78,7 +78,7 @@ const Index = () => {
   return (
     <FeatureFlagProvider initialFlags={{
       synthetic_data: true, // Changed to true to enable the Steve Jobs experience
-      openfinance: hasOpenFinance,
+      openfinance: hasOpenFinance, // Using the openfinance flag properly
       beta_features: true,
       steve_jobs: true // Added new feature flag for Steve Jobs tab
     }}>

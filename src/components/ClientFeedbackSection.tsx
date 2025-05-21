@@ -10,6 +10,9 @@ interface ClientFeedbackSectionProps {
 
 const ClientFeedbackSection = ({ isAdvisorView = false }: ClientFeedbackSectionProps) => {
   const { selectedClient } = useRaioX();
+  
+  // Convert selectedClient to a number or null
+  const clientId = selectedClient ? toNumber(selectedClient) : null;
 
   return (
     <div className="space-y-8">
@@ -21,12 +24,12 @@ const ClientFeedbackSection = ({ isAdvisorView = false }: ClientFeedbackSectionP
         <>
           {/* Advisors see the list of all feedback */}
           <FeedbackList clientId={null} />
-          <FeedbackForm clientId={selectedClient ? toNumber(selectedClient) : null} isAdvisor={true} />
+          <FeedbackForm clientId={clientId} isAdvisor={true} />
         </>
       ) : (
         <>
           {/* Clients only see their feedback form without the list */}
-          <FeedbackForm clientId={selectedClient ? toNumber(selectedClient) : null} />
+          <FeedbackForm clientId={clientId} />
         </>
       )}
     </div>
@@ -35,6 +38,7 @@ const ClientFeedbackSection = ({ isAdvisorView = false }: ClientFeedbackSectionP
 
 export default ClientFeedbackSection;
 
+// Helper functions for validation
 const validateClientRating = (rating: string | number | null): number => {
   if (rating === null) return 0;
   const numRating = Number(rating);

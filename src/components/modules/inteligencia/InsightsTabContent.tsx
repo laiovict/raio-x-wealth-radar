@@ -2,6 +2,7 @@
 import React from 'react';
 import InsightCard from './InsightCard';
 import { AIInsight } from '@/types/raioXTypes';
+import { InsightCardProps } from './InsightCard';
 
 interface InsightsTabContentProps {
   insights: AIInsight[];
@@ -17,7 +18,7 @@ const InsightsTabContent: React.FC<InsightsTabContentProps> = ({
   financialInsightData 
 }) => {
   // Helper function to adapt AIInsight to the format expected by InsightCard
-  const adaptInsightForCard = (insight: AIInsight) => {
+  const adaptInsightForCard = (insight: AIInsight): InsightCardProps['insight'] => {
     return {
       id: insight.id || '',
       title: insight.title,
@@ -25,7 +26,7 @@ const InsightsTabContent: React.FC<InsightsTabContentProps> = ({
       type: insight.type || 'insight',
       category: insight.category || '',
       impact: insight.impact || 'medium',
-      actions: [],
+      actions: insight.actions || [],
       dataSource: insight.dataSource || 'synthetic',
       agent: insight.agent || '',
       priority: insight.priority || 'medium',
