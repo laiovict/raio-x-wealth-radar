@@ -1,10 +1,10 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import InsightCard from './InsightCard';
 import { AIInsight } from '@/types/raioXTypes';
 
 interface InsightsTabContentProps {
-  insights: any[];
+  insights: AIInsight[];
   loadingStates: {
     insights: boolean;
   };
@@ -18,9 +18,9 @@ const InsightsTabContent: React.FC<InsightsTabContentProps> = ({
 }) => {
   return (
     <div className="p-4 space-y-4">
-      {financialInsightData ? (
+      {financialInsightData && financialInsightData.insights ? (
         <div className="space-y-4">
-          {(financialInsightData.insights || []).map((insight: any, index: number) => (
+          {(financialInsightData.insights || []).map((insight: AIInsight, index: number) => (
             <InsightCard key={index} insight={insight} />
           ))}
         </div>

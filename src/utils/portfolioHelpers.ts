@@ -1,4 +1,6 @@
+
 import { DividendHistory } from '@/types/raioXTypes';
+import { toParseableString } from '@/utils/typeConversionHelpers';
 
 /**
  * Creates a deep clone of an object
@@ -46,7 +48,7 @@ export const removeDuplicateDividends = (dividends: DividendHistory[]): Dividend
   
   dividends.forEach(dividend => {
     // Create a unique key based on asset, date and value
-    const key = `${dividend.asset}-${dividend.payment_date}-${dividend.value}`;
+    const key = `${dividend.asset}-${dividend.payment_date}-${String(dividend.value)}`;
     
     // Only add to map if this key doesn't exist yet
     if (!uniqueDividendsMap.has(key)) {
@@ -76,7 +78,7 @@ export const calculateTotalDividends = (dividendHistory: DividendHistory[]): num
   
   return deduplicated.reduce((total, item) => {
     // Parse value safely
-    const value = parseFloat(item.value);
+    const value = parseFloat(toParseableString(item.value));
     if (isNaN(value)) return total;
     return total + value;
   }, 0);
@@ -102,7 +104,7 @@ export const groupDividendsByMonth = (dividendHistory: DividendHistory[]): Map<s
     
     const monthYearKey = `${paymentDate.getMonth() + 1}-${paymentDate.getFullYear()}`;
     const currentValue = monthlyDividends.get(monthYearKey) || 0;
-    const dividendValue = parseFloat(dividend.value) || 0;
+    const dividendValue = parseFloat(toParseableString(dividend.value)) || 0;
     
     monthlyDividends.set(monthYearKey, currentValue + dividendValue);
   });

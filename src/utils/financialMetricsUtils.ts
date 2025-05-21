@@ -2,6 +2,24 @@
 import { DataSourceType, FinancialBehaviorMetrics } from '@/types/raioXTypes';
 
 /**
+ * Calculates savings rate based on income and expenses
+ */
+export const calculateSavingsRate = (
+  monthlyIncome: number,
+  monthlyExpenses: number
+): number => {
+  if (!monthlyIncome || !monthlyExpenses || monthlyIncome <= 0) {
+    return 0;
+  }
+  
+  const savings = monthlyIncome - monthlyExpenses;
+  const savingsRate = (savings / monthlyIncome) * 100;
+  
+  // Ensure the result is between 0 and 100
+  return Math.max(0, Math.min(100, savingsRate));
+};
+
+/**
  * Calculates financial behavior metrics based on portfolio data
  */
 export const calculateFinancialBehaviorMetrics = (

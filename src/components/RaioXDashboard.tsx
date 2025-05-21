@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Mic, Search, Share2, Download } from "lucide-react";
@@ -10,6 +11,7 @@ import { useFeatureFlags } from "@/context/FeatureFlagContext";
 import AllocationModule from "./modules/AllocationModule";
 import LiquidityReserveModule from "./modules/LiquidityReserveModule";
 import SentimentInsightsModule from "./modules/SentimentInsightsModule";
+import SocialComparisonModule from "./modules/SocialComparisonModule";
 import PdfPreview from "./PdfPreview";
 import FinancialOverviewModule from "./modules/FinancialOverviewModule";
 import OnePageFinancialPlanModule from "./modules/OnePageFinancialPlanModule";
@@ -19,6 +21,10 @@ import WelcomeBanner from "./WelcomeBanner";
 import InteligenciaModule from "./modules/InteligenciaModule";
 import DividendModule from "./modules/DividendModule";
 import SteveJobsReportModule from "./modules/SteveJobsReportModule";
+import LifeGoalsModule from "./modules/LifeGoalsModule";
+import FutureProjectionModule from "./modules/FutureProjectionModule";
+import InvestmentPlanningModule from "./modules/InvestmentPlanningModule";
+import PersonalInsightsModule from "./modules/PersonalInsightsModule";
 import { toast } from "@/hooks/use-toast";
 import FeedbackSection from "./FeedbackSection";
 import ClientFeedbackSection from "./ClientFeedbackSection";
@@ -47,7 +53,8 @@ const RaioXDashboard = ({
 }: RaioXDashboardProps) => {
   const { data, hasOpenFinance, selectedClient } = useRaioX();
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("raiox-beta"); // Default tab
+  // Set default tab to "raiox-beta"
+  const [activeTab, setActiveTab] = useState("raiox-beta");
   const { t } = useLanguage();
   const dashboardRef = useRef<HTMLDivElement>(null);
   
@@ -94,21 +101,11 @@ const RaioXDashboard = ({
     };
   }, [onOpenFinanceActivate, activeTab, enableFlag, disableFlag]);
 
-  // Extract the first name from data.clientName
-  const getClientFirstName = () => {
-    if (!data.clientName) return "";
-    // Split by space and take the first part as the first name
-    return data.clientName.split(" ")[0];
-  };
-
   // Handle search query submission
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     
     if (searchQuery.trim()) {
-      // Navigate to chat tab
-      setActiveTab("chat");
-      
       // Create custom event to pre-load message in the chat
       const chatEvent = new CustomEvent('load-chat-message', { 
         detail: { message: searchQuery }
@@ -152,7 +149,6 @@ const RaioXDashboard = ({
 
     recognition.onresult = (event: any) => {
       const speechResult = event.results[0][0].transcript;
-      setActiveTab("chat");
       
       // Create custom event to pre-load message in the chat
       const chatEvent = new CustomEvent('load-chat-message', { 
@@ -267,34 +263,22 @@ const RaioXDashboard = ({
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="mb-8 rounded-lg overflow-x-auto grid grid-cols-3 scrollbar-none bg-white/5 backdrop-blur-md border border-white/10">
-          {/* Added new "By Steve Jobs" tab with special styling */}
-          <TabsTrigger 
-            value="steve-jobs" 
-            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#6680FF] data-[state=active]:to-black data-[state=active]:text-white"
-          >
-            Por Steve Jobs
-          </TabsTrigger>
-          {/* Other tabs */}
           <TabsTrigger value="raiox-beta" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">
             RaioX Beta
           </TabsTrigger>
           <TabsTrigger value="versao-full" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">
             Versão Full
           </TabsTrigger>
+          {/* Added "Por Steve Jobs" tab with special styling */}
+          <TabsTrigger 
+            value="steve-jobs" 
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#6680FF] data-[state=active]:to-black data-[state=active]:text-white"
+          >
+            Por Steve Jobs
+          </TabsTrigger>
         </TabsList>
 
-        {/* Tab 1: Steve Jobs - The reimagined financial diagnostic */}
-        <TabsContent value="steve-jobs" className="space-y-8">
-          <SteveJobsReportModule fullWidth />
-          <FeedbackSection sectionId="steve-jobs-report" />
-          
-          {/* Footer for this tab */}
-          <div className="w-full py-10 text-center border-t border-[#6680FF]/40 mt-12">
-            <p className="text-gray-400">Fim da seção - Por Steve Jobs</p>
-          </div>
-        </TabsContent>
-
-        {/* Tab 2: RaioX Beta - Only showing components with real data */}
+        {/* Tab 1: RaioX Beta - Only showing components with real data */}
         <TabsContent value="raiox-beta" className="space-y-8">
           <div>
             {/* Financial Overview with useSyntheticData={false} */}
@@ -326,7 +310,7 @@ const RaioXDashboard = ({
           </div>
         </TabsContent>
         
-        {/* Tab 3: Versão Full - Full version with all features */}
+        {/* Tab 2: Versão Full - Full version with all features */}
         <TabsContent value="versao-full" className="space-y-8">
           {/* Starting with Financial Overview with synthetic data explicitly enabled */}
           <div>
@@ -367,6 +351,33 @@ const RaioXDashboard = ({
             </div>
           </div>
           
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <FutureProjectionModule useSyntheticData={flags.synthetic_data} />
+              <FeedbackSection sectionId="full-future-projection" />
+            </div>
+            <div>
+              <InvestmentPlanningModule useSyntheticData={flags.synthetic_data} />
+              <FeedbackSection sectionId="full-investment-planning" />
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <SocialComparisonModule useSyntheticData={flags.synthetic_data} />
+              <FeedbackSection sectionId="full-social-comparison" />
+            </div>
+            <div>
+              <PersonalInsightsModule useSyntheticData={flags.synthetic_data} />
+              <FeedbackSection sectionId="full-personal-insights" />
+            </div>
+          </div>
+          
+          <div>
+            <LifeGoalsModule useSyntheticData={flags.synthetic_data} />
+            <FeedbackSection sectionId="full-life-goals" />
+          </div>
+          
           {/* Add the feedback section at the end of the full version tab */}
           <div>
             <ClientFeedbackSection isAdvisorView={userRole === "advisor"} />
@@ -375,6 +386,40 @@ const RaioXDashboard = ({
           {/* Footer for this tab */}
           <div className="w-full py-10 text-center border-t border-white/10 mt-12">
             <p className="text-gray-400">Fim da seção - Versão Full</p>
+          </div>
+        </TabsContent>
+        
+        {/* Tab 3: Steve Jobs - The reimagined financial diagnostic */}
+        <TabsContent value="steve-jobs" className="space-y-8">
+          <SteveJobsReportModule fullWidth />
+          <FeedbackSection sectionId="steve-jobs-report" />
+          
+          {/* Steve Jobs Implementation of the RaioX based on the mandate */}
+          <div className="space-y-8">
+            <FinancialOverviewModule useSyntheticData={true} steveJobsMode={true} />
+            <FeedbackSection sectionId="steve-jobs-financial-overview" />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div>
+                <LiquidityReserveModule useSyntheticData={true} steveJobsMode={true} />
+                <FeedbackSection sectionId="steve-jobs-liquidity" />
+              </div>
+              <div>
+                <AllocationModule useSyntheticData={true} steveJobsMode={true} />
+                <FeedbackSection sectionId="steve-jobs-allocation" />
+              </div>
+            </div>
+            
+            <DividendModule fullWidth useSyntheticData={true} steveJobsMode={true} />
+            <FeedbackSection sectionId="steve-jobs-dividends" />
+            
+            <BehavioralFinanceModule useSyntheticData={true} steveJobsMode={true} />
+            <FeedbackSection sectionId="steve-jobs-behavioral" />
+          </div>
+          
+          {/* Footer for this tab */}
+          <div className="w-full py-10 text-center border-t border-[#6680FF]/40 mt-12">
+            <p className="text-gray-400">Fim da seção - Por Steve Jobs</p>
           </div>
         </TabsContent>
       </Tabs>

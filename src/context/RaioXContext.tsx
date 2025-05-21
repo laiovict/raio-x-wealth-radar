@@ -6,7 +6,11 @@ import {
   RaioXProviderProps,
   FinancialSummary,
   Allocation,
-  Liquidity
+  Liquidity,
+  AIInsight,
+  PortfolioSummary,
+  DividendHistory, 
+  ClientSummary
 } from '@/types/raioXTypes';
 import { defaultRaioXData, sampleAIInsights } from '@/data/mockRaioXData';
 import { generateFinancialSummary } from '@/utils/raioXUtils';
@@ -16,12 +20,12 @@ import { useRaioXData } from '@/hooks/useRaioXData';
 export type { FinancialSummary, AIInsight, PortfolioSummary, DividendHistory, ClientSummary, Allocation, Liquidity } from '@/types/raioXTypes';
 
 // Ensure sample AI insights have the required properties for timestamp
-const enhancedAIInsights = sampleAIInsights.map(insight => ({
+const enhancedAIInsights: AIInsight[] = sampleAIInsights.map(insight => ({
   ...insight,
   timestamp: new Date(),
   isNew: Math.random() > 0.7,
   priority: ['high', 'medium', 'low'][Math.floor(Math.random() * 3)] as 'high' | 'medium' | 'low',
-  agent: ['planner', 'investor', 'farmer', 'insurancer', 'credit'][Math.floor(Math.random() * 5)]
+  agent: ['planner', 'investor', 'farmer', 'insurancer', 'credit'][Math.floor(Math.random() * 5)] as 'planner' | 'investor' | 'farmer' | 'insurancer' | 'credit'
 }));
 
 // Create default allocation and liquidity data
@@ -120,7 +124,7 @@ export const RaioXProvider = ({
     openFinanceTransactions,
     openFinanceInsights,
     consolidatedFinancialReport
-  } = useRaioXData(selectedClient);
+  } = useRaioXData(selectedClient ? Number(selectedClient) : null);
   
   // Function to refresh AI analysis
   const refreshAIAnalysis = () => {
@@ -141,12 +145,12 @@ export const RaioXProvider = ({
       // Add missing properties required for FinancialOverviewModule
       const enhancedFinancialSummary: FinancialSummary = {
         ...newFinancialSummary,
-        netWorth: parseFloat(portfolioData.portfolioSummary?.total_portfolio_value?.toString() || "0") - 0,
+        netWorth: parseFloat(String(portfolioData.portfolioSummary?.total_portfolio_value || "0")) - 0,
         monthlyIncome: 12000,
         monthlyExpenses: 8000,
         totalLiabilities: 0,
         savingsRate: 25,
-        liquidAssets: parseFloat(portfolioData.portfolioSummary?.fixed_income_value?.toString() || "0") * 0.5
+        liquidAssets: parseFloat(String(portfolioData.portfolioSummary?.fixed_income_value || "0")) * 0.5
       };
       
       setFinancialSummary(enhancedFinancialSummary);

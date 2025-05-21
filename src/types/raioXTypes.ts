@@ -3,12 +3,60 @@
 
 export type DataSourceType = 'synthetic' | 'supabase' | 'xp' | 'openfinance' | 'calculated';
 
-export interface RaioXContextData {
-  data: any;
+export interface RaioXContextProps {
+  data: RaioXData;
   hasOpenFinance: boolean;
-  isAIAnalysisLoading: boolean;
-  selectedClient: string | null;
-  refreshAIAnalysis: () => void;
+  selectedClient: string | number | null;
+  financialSummary?: FinancialSummary;
+  isAIAnalysisLoading?: boolean;
+  refreshAIAnalysis?: () => void;
+  aiInsights?: AIInsight[];
+  portfolioSummary?: PortfolioSummary;
+  profitability?: any;
+  dividendHistory?: DividendHistory[];
+  clientSummary?: ClientSummary;
+  totalDividends: number;
+  averageMonthlyDividends: number;
+  stocks: any[];
+  hasOpenFinanceData?: boolean;
+  openFinanceAccounts?: any[];
+  openFinanceInvestments?: any[];
+  openFinanceTransactions?: any[];
+  openFinanceInsights?: any;
+  consolidatedFinancialReport?: any;
+}
+
+export interface RaioXProviderProps {
+  children: React.ReactNode;
+  hasOpenFinance?: boolean;
+  selectedClient?: string | number | null;
+}
+
+export interface RaioXData {
+  clientName: string;
+  clientAge?: number;
+  portfolioSummary?: PortfolioSummary;
+  financialSummary?: FinancialSummary;
+  sentiment?: any;
+  allocation?: Allocation;
+  liquidity?: Liquidity;
+  projection?: any;
+  lifeGoals?: any;
+  fixedIncome: any[];
+  investmentFunds: any[];
+  realEstate: any[];
+  stocks: any[];
+  dividendHistory: DividendHistory[];
+  recommendations?: any[];
+  financialInsightData?: FinancialInsightData;
+  socialComparison?: SocialComparisonData;
+  wrapped?: WrappedData;
+  openFinanceMonths?: number;
+  hasOpenFinance?: boolean;
+  summary?: string;
+  profitability?: any;
+  clientSummary?: ClientSummary;
+  marketSentiment?: any;
 }
 
 // Types for financial data and insights
@@ -21,6 +69,8 @@ export interface FinancialSummary {
   savingsRate: number;
   liquidAssets: number;
   dataSource?: DataSourceType;
+  fixedIncomePercent?: number;
+  investmentBalance?: number;
 }
 
 export interface PortfolioSummary {
@@ -29,6 +79,11 @@ export interface PortfolioSummary {
   total_portfolio_value: number | string;
   stocks_value: number | string;
   real_estate_value?: number | string;
+  fixed_income_representation?: number;
+  stocks_representation?: number | string;
+  investment_fund_representation?: number;
+  investment_international_representation?: number | string;
+  total_value?: number | string;
   dataSource?: DataSourceType;
 }
 
@@ -122,51 +177,52 @@ export interface WrappedData {
 }
 
 export interface FinancialInsightData {
-  highestSpendingMonth: {
+  highestSpendingMonth?: {
     month: string;
     amount: number;
     categories: { name: string; amount: number }[];
     dataSource?: DataSourceType;
   };
-  wastedMoney: {
+  wastedMoney?: {
     total: number;
     categories: { name: string; amount: number }[];
     dataSource?: DataSourceType;
   };
-  topCategories: {
+  topCategories?: {
     categories: { name: string; amount: number; percentage: number }[];
     total: number;
     dataSource?: DataSourceType;
   };
-  negativeMonths: {
+  negativeMonths?: {
     count: number;
     months: string[];
     totalDeficit: number;
     dataSource?: DataSourceType;
   };
-  investmentGrowth: {
+  investmentGrowth?: {
     annual: number;
     total: number;
     bestAsset: { name: string; growth: number };
     dataSource?: DataSourceType;
   };
-  potentialSavings: {
+  potentialSavings?: {
     amount: number;
     suggestions: string[];
     dataSource?: DataSourceType;
   };
-  bestInvestment: {
+  bestInvestment?: {
     name: string;
     return: number;
     period: string;
     dataSource?: DataSourceType;
   };
-  retirementReadiness: {
+  retirementReadiness?: {
     score: number;
     years: number;
     monthlyNeeded: number;
     dataSource?: DataSourceType;
   };
+  insights?: AIInsight[];
   dataSource?: DataSourceType;
 }
 
@@ -183,60 +239,6 @@ export interface AIInsight {
   type?: 'risk' | 'opportunity' | 'insight';
   impact?: 'high' | 'medium' | 'low';
   dataSource?: DataSourceType;
-}
-
-// Main data type that contains all RaioX data
-export interface RaioXData {
-  clientName: string;
-  clientAge?: number;
-  portfolioSummary?: PortfolioSummary;
-  financialSummary?: FinancialSummary;
-  sentiment?: any;
-  allocation?: Allocation;
-  liquidity?: Liquidity;
-  projection?: any;
-  lifeGoals?: any;
-  fixedIncome: any[];
-  investmentFunds: any[];
-  realEstate: any[];
-  stocks: any[];
-  dividendHistory: DividendHistory[];
-  recommendations?: any[];
-  financialInsightData?: FinancialInsightData;
-  socialComparison?: SocialComparisonData;
-  wrapped?: WrappedData;
-  openFinanceMonths?: number;
-  hasOpenFinance?: boolean;
-  summary?: string;
-}
-
-export interface RaioXContextProps {
-  data: RaioXData;
-  hasOpenFinance: boolean;
-  selectedClient: string | number | null;
-  financialSummary?: FinancialSummary;
-  isAIAnalysisLoading?: boolean;
-  refreshAIAnalysis?: () => void;
-  aiInsights?: AIInsight[];
-  portfolioSummary?: PortfolioSummary;
-  profitability?: any;
-  dividendHistory?: DividendHistory[];
-  clientSummary?: ClientSummary;
-  totalDividends: number;
-  averageMonthlyDividends: number;
-  stocks: any[];
-  hasOpenFinanceData?: boolean;
-  openFinanceAccounts?: any[];
-  openFinanceInvestments?: any[];
-  openFinanceTransactions?: any[];
-  openFinanceInsights?: any;
-  consolidatedFinancialReport?: any;
-}
-
-export interface RaioXProviderProps {
-  children: React.ReactNode;
-  hasOpenFinance?: boolean;
-  selectedClient?: string | number | null;
 }
 
 // Helper type for the financial behavior module
