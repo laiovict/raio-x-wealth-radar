@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,9 +7,27 @@ import { useMobileBreakpoint } from "@/hooks/use-mobile";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { useEffect, useState } from "react";
+import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
+import { DataSourceType } from '@/types/raioXTypes';
 
 interface SentimentInsightsModuleProps {
   fullWidth?: boolean;
+}
+
+// Define a specific type for asset data
+interface SentimentAsset {
+  ticker: string;
+  sentiment: number;
+  impact: number;
+  recentNews: string;
+  dataSource: DataSourceType | 'synthetic' | 'supabase';
+}
+
+// Define the structure of sentiment data
+interface SentimentData {
+  assets?: SentimentAsset[];
+  summary: string;
+  dataSource: DataSourceType | 'synthetic' | 'supabase';
 }
 
 const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleProps) => {
@@ -16,12 +35,11 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
   const isMobile = useMobileBreakpoint();
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Create sentiment data based on actual client stocks with safe defaults
-  const [clientSentimentData, setClientSentimentData] = useState({
+  // Initialize with properly typed default state
+  const [clientSentimentData, setClientSentimentData] = useState<SentimentData>({
     assets: [],
     summary: "",
-    dataSource: 'synthetic' as const
-    // Initialize with empty assets array to prevent undefined.slice() error
+    dataSource: 'synthetic'
   });
 
   useEffect(() => {
@@ -33,11 +51,10 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
     // Generate sentiment data based on the client's actual stocks
     if (stocks && Array.isArray(stocks) && stocks.length > 0) {
       // Extract ticker symbols from client's stocks (up to 2 for display)
-      // Ensure we have a valid array before slicing
       const clientStocks = stocks.slice(0, 2).map(stockItem => ({
         ticker: stockItem.asset || "",
         sentiment: Math.floor(Math.random() * 30) + 60, // Generate a sentiment score between 60-90
-        impact: parseFloat((Math.random() * 5 * (Math.random() > 0.5 ? 1 : -1)).toFixed(1)), // Convert to number
+        impact: parseFloat((Math.random() * 5 * (Math.random() > 0.5 ? 1 : -1)).toFixed(1)),
         recentNews: generateNewsForStock(stockItem.asset || ""),
         dataSource: 'supabase' as const
       }));
@@ -46,12 +63,17 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
         setClientSentimentData({
           assets: clientStocks,
           summary: generateSummaryFromStocks(clientStocks),
-          dataSource: 'supabase' as const
+          dataSource: 'supabase'
         });
       }
-    } else if (data.sentiment && data.sentiment.assets) {
-      // Use existing sentiment data if available
-      setClientSentimentData(data.sentiment);
+    } else if (data.sentiment) {
+      // Safely convert any incoming data to our expected format
+      const sentimentData: SentimentData = {
+        assets: data.sentiment.assets || [],
+        summary: data.sentiment.summary || "Sem dados de sentimento disponíveis.",
+        dataSource: data.sentiment.dataSource || 'synthetic'
+      };
+      setClientSentimentData(sentimentData);
     }
     
     return () => clearTimeout(timer);
@@ -161,7 +183,7 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
   };
   
   // Generate summary based on stocks data
-  const generateSummaryFromStocks = (stocks: any[]) => {
+  const generateSummaryFromStocks = (stocks: SentimentAsset[]) => {
     if (!stocks || !Array.isArray(stocks) || stocks.length === 0) {
       return "Sem dados de sentimento disponíveis para sua carteira atual.";
     }
@@ -185,9 +207,9 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
   };
 
   const getSentimentBg = (score: number) => {
-    if (score >= 70) return "bg-green-50 dark:bg-green-900/40 border-green-100 dark:border-green-800/60";
-    if (score >= 50) return "bg-amber-50 dark:bg-amber-900/40 border-amber-100 dark:border-amber-800/60";
-    return "bg-red-50 dark:bg-red-900/40 border-red-100 dark:border-red-800/60";
+    if (score >= 70) return "bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/40 dark:to-emerald-800/40 border-green-200 dark:border-green-800/60";
+    if (score >= 50) return "bg-gradient-to-br from-amber-50 to-yellow-100 dark:from-amber-900/40 dark:to-yellow-800/40 border-amber-200 dark:border-amber-800/60";
+    return "bg-gradient-to-br from-red-50 to-rose-100 dark:from-red-900/40 dark:to-rose-800/40 border-red-200 dark:border-red-800/60";
   };
 
   const getImpactColor = (impact: number) => {
@@ -233,51 +255,52 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
   };
 
   return (
-    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full shadow-md hover:shadow-lg transition-shadow`}>
-      <CardHeader className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/70 dark:to-indigo-900/70 pb-4 rounded-t-lg border-b border-gray-200 dark:border-gray-700 flex flex-row justify-between items-center">
+    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/30 dark:to-blue-900/30`}>
+      <CardHeader className="bg-gradient-to-r from-blue-500 to-indigo-600 pb-4 rounded-t-lg border-b border-indigo-200 dark:border-indigo-800 flex flex-row justify-between items-center">
         <CardTitle className="text-xl flex items-center">
-          <span className="text-blue-800 dark:text-blue-200">
+          <span className="font-bold text-white">
             Insights de Sentimento
           </span>
+          <TypeSafeDataSourceTag source={clientSentimentData.dataSource} />
         </CardTitle>
-        <Button variant="outline" size="sm" onClick={handleDownloadPdf} className="flex items-center gap-1 bg-white/80 dark:bg-gray-800/80">
+        <Button variant="secondary" size="sm" onClick={handleDownloadPdf} className="flex items-center gap-1 bg-white/90 dark:bg-indigo-800/90 hover:bg-white dark:hover:bg-indigo-700 text-indigo-700 dark:text-indigo-200">
           <Download className="h-4 w-4" /> PDF
         </Button>
       </CardHeader>
-      <CardContent className="pt-5 bg-white dark:bg-slate-900">
+      <CardContent className="pt-5 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
         {isLoaded ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Ensure assets exist and is an array before attempting to slice */}
               {clientSentimentData.assets && Array.isArray(clientSentimentData.assets) && 
-               clientSentimentData.assets.slice(0, 2).map((asset, index) => (
+               clientSentimentData.assets.length > 0 ? clientSentimentData.assets.slice(0, 2).map((asset, index) => (
                 <div 
                   key={index} 
-                  className={`${getSentimentBg(asset.sentiment)} p-4 rounded-lg shadow-sm border transition-all hover:shadow-md hover:translate-y-[-2px]`}
+                  className={`${getSentimentBg(asset.sentiment)} p-4 rounded-lg shadow-lg border-2 transition-all hover:shadow-xl hover:translate-y-[-2px]`}
                 >
-                  <div className="flex justify-between items-center mb-2">
+                  <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center">
-                      <span className="text-lg font-semibold text-gray-900 dark:text-white">
+                      <span className="text-xl font-bold text-gray-900 dark:text-white">
                         {asset.ticker}
                       </span>
-                      <Badge className="ml-2 px-2" variant="outline">
-                        <span className={getSentimentColor(asset.sentiment)}>
+                      <Badge className="ml-2 px-2" variant={asset.sentiment >= 70 ? "default" : asset.sentiment >= 50 ? "secondary" : "destructive"}>
+                        <span className="font-bold">
                           {`${asset.sentiment}/100`}
                         </span>
                       </Badge>
                     </div>
-                    <span className={`flex items-center font-medium ${getImpactColor(asset.impact)}`}>
+                    <span className={`flex items-center font-bold ${getImpactColor(asset.impact)}`}>
                       {asset.impact > 0 ? (
-                        <TrendingUp className="h-4 w-4 mr-1" />
+                        <TrendingUp className="h-5 w-5 mr-1" />
                       ) : (
-                        <TrendingDown className="h-4 w-4 mr-1" />
+                        <TrendingDown className="h-5 w-5 mr-1" />
                       )}
                       {`${getImpactPrefix(asset.impact)}${asset.impact.toFixed(1)}%`}
                     </span>
                   </div>
-                  <div className="flex items-start mt-2">
-                    <Newspaper className="h-4 w-4 mr-2 mt-1 flex-shrink-0 text-gray-500 dark:text-gray-400" />
-                    <p className="text-gray-800 dark:text-gray-100 text-sm">
+                  <div className="flex items-start mt-3 bg-white/80 dark:bg-slate-800/80 p-3 rounded-lg shadow-inner">
+                    <Newspaper className="h-5 w-5 mr-2 mt-1 flex-shrink-0 text-indigo-500 dark:text-indigo-400" />
+                    <p className="text-gray-800 dark:text-gray-100">
                       {asset.recentNews}
                     </p>
                   </div>
@@ -285,19 +308,23 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="w-full text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-800/50"
+                      className="w-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-300 dark:border-indigo-700 hover:bg-indigo-600/20"
                       onClick={() => handleChatAction(asset.ticker)}
                     >
                       Perguntar ao Nicolas
                     </Button>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div className="col-span-2 p-6 text-center bg-gray-100/50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+                  <p className="text-gray-600 dark:text-gray-300">Nenhum ativo disponível para análise de sentimento.</p>
+                </div>
+              )}
             </div>
             
             {/* Ensure we have summary data or provide a fallback */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/40 dark:to-indigo-900/40 p-4 rounded-lg border border-blue-100 dark:border-blue-800/50 mt-4">
-              <p className="text-gray-800 dark:text-gray-100">
+            <div className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/40 dark:to-indigo-900/40 p-4 rounded-lg border-2 border-blue-200 dark:border-blue-800/50 mt-4 shadow-lg">
+              <p className="text-gray-800 dark:text-gray-100 font-medium">
                 {clientSentimentData.summary || "Sem dados disponíveis para análise de sentimento."}
               </p>
             </div>

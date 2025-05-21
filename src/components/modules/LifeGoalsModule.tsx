@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -8,9 +9,7 @@ import { useEffect, useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import { formatCurrency } from '@/utils/formattingUtils';
 import { toNumber, ensureString, toSafeString } from '@/utils/typeConversionHelpers';
-import DataSourceTag from '@/components/common/DataSourceTag';
 import { DataSourceType } from '@/types/raioXTypes';
-import { toLimitedDataSource } from '@/utils/dataSourceAdapter';
 import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 
 interface LifeGoalsModuleProps {
@@ -103,44 +102,44 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
   };
 
   return (
-    <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
-      <CardHeader className="pb-2 flex flex-row justify-between items-center">
-        <CardTitle className="text-xl bg-gradient-to-r from-blue-400 to-indigo-500 bg-clip-text text-transparent">
+    <Card className={`${fullWidth ? "w-full" : "w-full"} border-2 border-indigo-100 dark:border-indigo-800/30 shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20`}>
+      <CardHeader className="pb-2 flex flex-row justify-between items-center bg-gradient-to-r from-blue-500 to-indigo-600 rounded-t-lg">
+        <CardTitle className="text-xl text-white font-bold">
           Metas de Vida
           <DataSourceIndicator source={lifeGoals.dataSource} />
         </CardTitle>
-        <Button variant="outline" size="sm" onClick={handleDownloadPdf} className="flex items-center gap-1">
+        <Button variant="secondary" size="sm" onClick={handleDownloadPdf} className="flex items-center gap-1 bg-white/90 text-indigo-700">
           <Download className="h-4 w-4" /> PDF
         </Button>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-5">
         <div className="space-y-6">
           {lifeGoals.goals.map((goal, index) => (
-            <div key={index} className="space-y-2 p-4 bg-white/5 rounded-lg">
+            <div key={index} className="space-y-2 p-5 bg-white/70 dark:bg-indigo-900/30 rounded-lg border-2 border-indigo-100 dark:border-indigo-800/30 shadow-md hover:shadow-lg transition-all">
               <div className="flex justify-between items-center">
                 <div>
                   <div className="flex items-center">
-                    <span className="text-md font-medium text-white">
+                    <span className="text-lg font-bold bg-gradient-to-r from-blue-700 to-indigo-700 bg-clip-text text-transparent dark:from-blue-400 dark:to-indigo-400">
                       {goal.name}
                     </span>
-                    <Badge className="ml-2 bg-blue-600/60">
+                    <Badge className="ml-2 bg-indigo-500 hover:bg-indigo-600">
                       {goal.timeframe}
                     </Badge>
                     <DataSourceIndicator source={goal.dataSource} />
                   </div>
                 </div>
                 <div className="text-right">
-                  <span className="text-sm font-medium">
-                    <span className="text-white">
+                  <span className="text-sm font-bold">
+                    <span className="text-indigo-700 dark:text-indigo-300">
                       {`${goal.progress}%`}
                     </span>
                     {goal.adjustmentNeeded > 0 && (
-                      <Badge className="ml-2 bg-amber-600/60">
+                      <Badge className="ml-2 bg-amber-500 hover:bg-amber-600">
                         {`+${goal.adjustmentNeeded}% necessário`}
                       </Badge>
                     )}
                     {goal.adjustmentNeeded <= 0 && (
-                      <Badge className="ml-2 bg-green-600/60">
+                      <Badge className="ml-2 bg-green-500 hover:bg-green-600">
                         No Caminho
                       </Badge>
                     )}
@@ -149,29 +148,32 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
               </div>
               <Progress 
                 value={goal.progress} 
-                className="h-3 bg-gray-800" 
+                className="h-3 bg-gray-200 dark:bg-gray-700"
+                style={{
+                  background: "linear-gradient(to right, rgba(79, 70, 229, 0.2), rgba(99, 102, 241, 0.2))",
+                }}
               />
-              <div className="flex justify-between items-center text-xs text-gray-400">
+              <div className="flex justify-between items-center text-sm text-gray-600 dark:text-gray-300 font-medium">
                 <span>
-                  {`Atual: ${formatCurrency(goal.currentAmount)}`}
+                  {`Atual: ${formatCurrency(goal.currentAmount.toString())}`}
                 </span>
                 <span>
-                  {`Meta: ${formatCurrency(goal.targetAmount)}`}
+                  {`Meta: ${formatCurrency(goal.targetAmount.toString())}`}
                 </span>
               </div>
               {goal.adjustmentNeeded > 0 && (
-                <div className="mt-2 text-xs text-amber-400 flex items-center">
-                  <ArrowUp className="h-3.5 w-3.5 mr-1" />
-                  <span>
-                    {`Sugestão: Aumentar aportes em ${formatCurrency((goal.targetAmount * goal.adjustmentNeeded / 100) / 12)} mensais`}
+                <div className="mt-2 text-sm text-amber-600 dark:text-amber-400 flex items-center bg-amber-50 dark:bg-amber-900/20 p-2 rounded-md">
+                  <ArrowUp className="h-4 w-4 mr-1" />
+                  <span className="font-medium">
+                    {`Sugestão: Aumentar aportes em ${formatCurrency(((goal.targetAmount * goal.adjustmentNeeded / 100) / 12).toString())} mensais`}
                   </span>
                 </div>
               )}
             </div>
           ))}
           
-          <div className="bg-blue-900/20 p-4 rounded-lg border border-blue-900/30">
-            <p className="text-sm text-gray-300">
+          <div className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 p-5 rounded-lg border-2 border-blue-200 dark:border-blue-800/40 shadow-md">
+            <p className="text-gray-800 dark:text-gray-200 font-medium">
               {lifeGoals.summary}
             </p>
           </div>
