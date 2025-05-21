@@ -20,10 +20,10 @@ const EmptyDividendState: React.FC<EmptyDividendStateProps> = ({ isDataLoading =
             Dados de dividendos não disponíveis para este cliente.
           </p>
           <p className="text-gray-500 text-sm max-w-md">
-            Para visualizar dividendos, importe o histórico de proventos da base de dados.
+            Os dados de dividendos são obtidos automaticamente da tabela de histórico de proventos.
           </p>
           <div className="mt-4 flex items-center text-blue-400 text-sm hover:text-blue-300 transition-colors cursor-pointer">
-            <span>Como importar dados de dividendos</span>
+            <span>Contate o suporte para mais informações</span>
             <ArrowRight className="w-4 h-4 ml-1" />
           </div>
         </>
