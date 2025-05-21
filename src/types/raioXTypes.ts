@@ -84,6 +84,8 @@ export interface FinancialSummary {
     sixMonths: number;
     twelveMonths: number;
   };
+  emergencyFundCoverage?: number; // Added to resolve TS error
+  investmentGrowthRate?: number; // Added to resolve TS error
 }
 
 export interface PortfolioSummary {
