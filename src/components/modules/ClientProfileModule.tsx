@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent } from "@/components/ui/card";
@@ -48,11 +49,18 @@ const extractProfileSections = (summary: string) => {
 };
 
 const ClientProfileModuleBase = ({ fullWidth = false, dataState }: ClientProfileModuleProps) => {
+  const { selectedClient } = useRaioX();
   const clientData = dataState?.data;
   const dataSource = dataState?.dataSource || 'synthetic';
   
-  if (!clientData) {
-    return <div>Carregando...</div>;
+  // Don't render anything if we don't have client data or if the data is synthetic but no client is selected
+  if (!clientData || (dataSource === 'synthetic' && !selectedClient)) {
+    return null;
+  }
+  
+  // Don't show default "Cliente Exemplo" when it's clearly synthetic data
+  if (clientData.investor_name === "Cliente Exemplo" && dataSource === 'synthetic' && !selectedClient) {
+    return null;
   }
   
   return (
@@ -80,7 +88,7 @@ const ClientProfileModuleBase = ({ fullWidth = false, dataState }: ClientProfile
               
               <div className="mt-4 text-center">
                 <h2 className="text-2xl font-light text-slate-800 dark:text-white tracking-wide">
-                  {clientData.investor_name || "Perfil do Cliente"}
+                  {clientData.investor_name || `Cliente ${selectedClient}`}
                 </h2>
                 {clientData.clientAge && (
                   <div className="mt-1 text-slate-500 dark:text-slate-400">
@@ -162,7 +170,7 @@ const ClientProfileModuleBase = ({ fullWidth = false, dataState }: ClientProfile
 // Get real data from the RaioX context
 const getRealClientProfileData = (props: ClientProfileModuleProps) => {
   // Extract data from context
-  const { clientSummary } = useRaioX();
+  const { clientSummary, selectedClient } = useRaioX();
 
   // If there's no client summary, return null to use synthetic data
   if (!clientSummary || !clientSummary.summary) {
@@ -199,12 +207,19 @@ const getRealClientProfileData = (props: ClientProfileModuleProps) => {
   }
 };
 
-// Get synthetic data as a fallback
+// Get synthetic data as a fallback - but only when a client is selected
 const getSyntheticClientProfileData = (props: ClientProfileModuleProps) => {
+  const { selectedClient } = useRaioX();
+  
+  // Don't provide synthetic data if no client is selected
+  if (!selectedClient) {
+    return null;
+  }
+  
   return {
     summary: "Cliente com perfil conservador, busca estabilidade financeira e renda passiva. Trabalha no setor de tecnologia com planos de aposentadoria em 15 anos.",
     tags: ["Tecnologia", "Conservador", "Renda Passiva"],
-    investor_name: "Cliente Exemplo",
+    investor_name: `Cliente ${selectedClient}`,
     currentStatus: "Profissional de tecnologia com sólida carreira e estabilidade financeira, mas sem estratégia clara para o futuro.",
     ambitions: "Busca alcançar independência financeira e aposentadoria antecipada nos próximos 15 anos, com foco em qualidade de vida e equilíbrio.",
     needs: "Necessita diversificar investimentos, criar fontes de renda passiva e estruturar um plano robusto de aposentadoria.",

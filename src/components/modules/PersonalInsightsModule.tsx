@@ -17,24 +17,14 @@ interface PersonalInsightsModuleProps {
 }
 
 const PersonalInsightsModule: React.FC<PersonalInsightsModuleProps> = ({ fullWidth = false }) => {
-  const { data, clientSummary } = useRaioX();
+  const { data, clientSummary, selectedClient } = useRaioX();
   const { flags } = useFeatureFlags();
 
   // Determine data source for the component
   const dataSource = clientSummary?.dataSource || 'synthetic';
   
-  // Default summary for demo or when real data is not available
-  const defaultSummary = `## Perfil Profissional
-Este cliente tem mais de 15 anos de experiência como executivo do setor financeiro, atualmente ocupa posição de diretor em um banco de investimentos. Possui elevado conhecimento do mercado financeiro e experiência em gestão de patrimônio.
-#tags: Executivo, Setor Financeiro, Diretor, Banco de Investimentos
-
-## Perfil Financeiro
-Investidor com patrimônio expressivo, busca preservação de capital com crescimento moderado. Valoriza segurança e diversificação, mas aceita alocações estratégicas em ativos de maior risco para potencializar retornos.
-#tags: Patrimônio Expressivo, Preservação de Capital, Diversificação
-
-## Objetivos Financeiros
-Focado em planejamento sucessório e estratégias fiscais eficientes. Busca renda passiva para complementar estilo de vida e preparação para aposentadoria nos próximos 10-15 anos.
-#tags: Sucessão, Eficiência Fiscal, Renda Passiva, Aposentadoria`;
+  // Skip the default summary for better UX when no real data is available
+  const defaultSummary = '';
 
   // Use new hook to extract sections
   const { sections } = useProfileSections(clientSummary, defaultSummary);
@@ -72,6 +62,16 @@ Focado em planejamento sucessório e estratégias fiscais eficientes. Busca rend
     return { score, label };
   }, [clientSummary]);
 
+  // Don't render anything if there's no real client data and no selected client
+  if ((!clientSummary || !clientSummary.summary) && (!data.clientName || data.clientName === "Cliente Padrão") && !selectedClient) {
+    return null;
+  }
+  
+  // If we have no sections (meaning no real or synthetic data), don't render the component
+  if (sections.length === 0) {
+    return null;
+  }
+
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism h-full`}>
       <CardHeader className="pb-3">
@@ -84,15 +84,17 @@ Focado em planejamento sucessório e estratégias fiscais eficientes. Busca rend
         {/* Profile Header Component */}
         <ProfileHeader
           clientSummary={clientSummary}
-          clientName={data.clientName}
+          clientName={data.clientName !== "Cliente Padrão" ? data.clientName : ""}
           dataSource={dataSource}
         />
         
-        {/* Risk Profile Component */}
-        <RiskProfile
-          riskScore={riskProfile.score}
-          riskLabel={riskProfile.label}
-        />
+        {/* Risk Profile Component - Only show if we have real data */}
+        {clientSummary?.summary && (
+          <RiskProfile
+            riskScore={riskProfile.score}
+            riskLabel={riskProfile.label}
+          />
+        )}
         
         {/* Profile Sections */}
         <div className="space-y-4 mt-4">

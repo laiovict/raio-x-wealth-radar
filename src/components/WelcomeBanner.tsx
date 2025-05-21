@@ -51,13 +51,8 @@ const WelcomeBanner = ({ selectedClient }: WelcomeBannerProps) => {
         if (error) {
           console.error("Error fetching client data:", error);
           
-          // Use a randomized name if not found to make it more personalized
-          const randomNames = [
-            "Alexandre", "Beatriz", "Carlos", "Daniela", 
-            "Eduardo", "Flávia", "Gabriel", "Helena"
-          ];
-          const randomName = randomNames[Math.floor(Math.random() * randomNames.length)];
-          setClientName(`${randomName}`);
+          // Use client ID as the name if not found
+          setClientName(`Cliente ${clientId}`);
           return;
         }
         
@@ -81,6 +76,7 @@ const WelcomeBanner = ({ selectedClient }: WelcomeBannerProps) => {
     return clientName.split(" ")[0];
   };
   
+  // Don't render the banner if no client is selected
   if (!selectedClient || !clientName) return null;
   
   // Personalized welcome messages
