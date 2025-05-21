@@ -22,17 +22,17 @@ import DividendModule from "@/components/modules/DividendModule";
 import SocialComparisonModule from "@/components/modules/SocialComparisonModule";
 import FamousInvestorsModule from "@/components/modules/FamousInvestorsModule";
 import ClientProfileModule from "@/components/modules/ClientProfileModule";
+import InteligenciaModule from "@/components/modules/InteligenciaModule";
+import WholeBankingModule from "@/components/modules/WholeBankingModule";
 
 // Lazy-load less frequently used components
 const RecommendationsModule = lazy(() => import("@/components/modules/RecommendationsModule"));
 const RecommendedActionsModule = lazy(() => import("@/components/modules/RecommendedActionsModule"));
-const InteligenciaModule = lazy(() => import("@/components/modules/InteligenciaModule"));
 const InvestmentPlanningModule = lazy(() => import("@/components/modules/InvestmentPlanningModule"));
 const LifeGoalsModule = lazy(() => import("@/components/modules/LifeGoalsModule"));
 const WrappedModule = lazy(() => import("@/components/modules/WrappedModule"));
 const FutureProjectionModule = lazy(() => import("@/components/modules/FutureProjectionModule"));
 const OnePageFinancialPlanModule = lazy(() => import("@/components/modules/OnePageFinancialPlanModule"));
-const WholeBankingModule = lazy(() => import("@/components/modules/WholeBankingModule"));
 const BehavioralFinanceModule = lazy(() => import("@/components/modules/BehavioralFinanceModule"));
 const MeuFuturoFinanceiroModule = lazy(() => import("@/components/modules/MeuFuturoFinanceiroModule"));
 const PersonalInsightsModule = lazy(() => import("@/components/modules/PersonalInsightsModule"));
@@ -135,12 +135,17 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
     setSearchParams({ tab: value });
   };
 
-  // Define RaioX Beta tab content
+  // Define RaioX Beta tab content - moved InteligenciaModule to top
   const BetaTabContent = () => (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-6">
       {/* Visão Geral section */}
       <div className="lg:col-span-2">
         <FinancialOverviewModule fullWidth={true} />
+      </div>
+
+      {/* Inteligência Financeira section - Moved to top */}
+      <div className="lg:col-span-2">
+        <InteligenciaModule fullWidth={true} />
       </div>
       
       <div>
@@ -166,15 +171,25 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
         <SocialComparisonModule fullWidth={true} />
         <FamousInvestorsModule fullWidth={true} />
       </div>
+
+      {/* Added WholeBanking module */}
+      <div className="lg:col-span-2">
+        <WholeBankingModule fullWidth={true} />
+      </div>
     </div>
   );
 
-  // Define RaioX Full tab content with improved, consistent layout
+  // Define RaioX Full tab content - moved InteligenciaModule to top and restored WholeBankingModule
   const FullTabContent = () => (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 pb-6">
+      {/* Main content area first (full width) */}
+      <div className="lg:col-span-12 space-y-8">
+        <FinancialOverviewModule fullWidth={true} />
+        <InteligenciaModule fullWidth={true} />
+      </div>
+      
       {/* Sidebar with client profile (1/3 width) */}
       <div className="lg:col-span-4 space-y-8">
-        <ClientProfileModule fullWidth={true} />
         <Suspense fallback={<LoadingComponent />}>
           <RecommendationsModule fullWidth={true} />
         </Suspense>
@@ -185,11 +200,6 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
       
       {/* Main content area (2/3 width) */}
       <div className="lg:col-span-8 space-y-8">
-        <FinancialOverviewModule fullWidth={true} />
-        <Suspense fallback={<LoadingComponent />}>
-          <InteligenciaModule fullWidth={true} />
-        </Suspense>
-        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <DividendModule fullWidth={true} />
           <AllocationModule fullWidth={true} />
@@ -216,6 +226,9 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
           </Suspense>
         </div>
         
+        {/* Added WholeBanking module */}
+        <WholeBankingModule fullWidth={true} />
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <SocialComparisonModule fullWidth={true} />
           <FamousInvestorsModule fullWidth={true} />
@@ -233,17 +246,19 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
     </div>
   );
 
-  // Define RaioX Full v2 (Jony Ive design) tab content with improved organization
+  // Define RaioX Full v2 (Jony Ive design) tab content - moved InteligenciaModule to top and restored WholeBankingModule
   const FullV2TabContent = () => (
     <div className="jony-ive-design space-y-12">
       {/* Header row - key overview components */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-4">
-          <ClientProfileModule fullWidth={true} />
-        </div>
-        <div className="lg:col-span-8">
+        <div className="lg:col-span-12">
           <FinancialOverviewModule fullWidth={true} />
         </div>
+      </div>
+      
+      {/* Inteligência Financeira section - Moved to top */}
+      <div className="grid grid-cols-1 gap-8">
+        <InteligenciaModule fullWidth={true} />
       </div>
       
       {/* Main content grid - organized by categories */}
@@ -271,14 +286,16 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
           </Suspense>
           <AIInsightsHubModule fullWidth={true} />
           <SentimentInsightsModule fullWidth={true} />
-          <Suspense fallback={<LoadingComponent />}>
-            <InteligenciaModule fullWidth={true} />
-          </Suspense>
         </div>
       </div>
       
-      {/* Additional Features Section */}
+      {/* WholeBanking and Additional Features Section */}
       <div className="space-y-8 pb-12">
+        <h3 className="text-2xl font-light text-white/80 px-2">
+          Whole Banking
+        </h3>
+        <WholeBankingModule fullWidth={true} />
+        
         <h3 className="text-2xl font-light text-white/80 px-2">
           Recursos Adicionais
         </h3>

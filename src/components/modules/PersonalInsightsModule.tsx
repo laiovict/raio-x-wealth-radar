@@ -62,16 +62,19 @@ const PersonalInsightsModule: React.FC<PersonalInsightsModuleProps> = ({ fullWid
     return { score, label };
   }, [clientSummary]);
 
-  // Don't render anything if there's no real client data and no selected client
-  if ((!clientSummary || !clientSummary.summary) && (!data.clientName || data.clientName === "Cliente Padrão") && !selectedClient) {
+  // Enhanced conditions to prevent displaying synthetic/default data:
+  // 1. Don't show if no client summary and client name is default OR no selected client
+  // 2. Don't show if client name is "Cliente Padrão"
+  // 3. Don't show if no sections
+  if (
+    (!clientSummary || !clientSummary.summary) && 
+    (data.clientName === "Cliente Padrão" || !selectedClient) ||
+    data.clientName === "Cliente Padrão" ||
+    sections.length === 0
+  ) {
     return null;
   }
   
-  // If we have no sections (meaning no real or synthetic data), don't render the component
-  if (sections.length === 0) {
-    return null;
-  }
-
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism h-full`}>
       <CardHeader className="pb-3">

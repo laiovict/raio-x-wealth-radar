@@ -53,33 +53,35 @@ const ClientProfileModuleBase = ({ fullWidth = false, dataState }: ClientProfile
   const clientData = dataState?.data;
   const dataSource = dataState?.dataSource || 'synthetic';
   
-  // Don't render anything if we don't have client data or if the data is synthetic but no client is selected
-  if (!clientData || (dataSource === 'synthetic' && !selectedClient)) {
-    return null;
-  }
-  
-  // Don't show default "Cliente Exemplo" when it's clearly synthetic data
-  if (clientData.investor_name === "Cliente Exemplo" && dataSource === 'synthetic' && !selectedClient) {
+  // More strict conditions to not render with synthetic data:
+  // 1. Don't render if we don't have client data 
+  // 2. Don't render if the data is synthetic but no client is selected
+  // 3. Don't render if the investor_name is "Cliente Exemplo" 
+  // 4. Don't render if the data is synthetic and we have the default name pattern
+  if (!clientData || 
+      (dataSource === 'synthetic' && !selectedClient) || 
+      clientData.investor_name === "Cliente Exemplo" ||
+      (dataSource === 'synthetic' && clientData.investor_name === `Cliente ${selectedClient}`)) {
     return null;
   }
   
   return (
-    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full overflow-hidden border-none bg-[#fafafa] dark:bg-slate-900`}>
+    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full overflow-hidden border-none bg-slate-900/80 dark:bg-slate-900`}>
       <CardContent className="p-0 h-full">
         <div className="relative h-full">
-          {/* Glass-styled overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-white/80 to-white/50 dark:from-slate-900/90 dark:to-slate-800/80 backdrop-blur-sm z-10"></div>
+          {/* Glass-styled overlay - updated to match dark theme */}
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900/90 to-slate-800/80 backdrop-blur-sm z-10"></div>
           
-          {/* Background elements */}
+          {/* Background elements - updated for dark theme */}
           <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -right-20 -top-20 w-64 h-64 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 blur-3xl"></div>
-            <div className="absolute -left-20 -bottom-20 w-64 h-64 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 blur-3xl"></div>
+            <div className="absolute -right-20 -top-20 w-64 h-64 rounded-full bg-gradient-to-br from-blue-900/30 to-indigo-900/30 blur-3xl"></div>
+            <div className="absolute -left-20 -bottom-20 w-64 h-64 rounded-full bg-gradient-to-br from-indigo-900/30 to-purple-900/30 blur-3xl"></div>
           </div>
           
           {/* Content */}
           <div className="relative z-20 h-full flex flex-col">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-slate-100 to-white dark:from-slate-900 dark:to-slate-800 py-8 px-10 border-b border-slate-200 dark:border-slate-700/50">
+            {/* Header - updated styling for dark theme */}
+            <div className="bg-gradient-to-r from-slate-900 to-slate-800 py-8 px-10 border-b border-slate-700/50">
               <div className="flex justify-center">
                 <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-xl">
                   <User className="h-8 w-8 text-white" strokeWidth={1.5} />
@@ -87,11 +89,11 @@ const ClientProfileModuleBase = ({ fullWidth = false, dataState }: ClientProfile
               </div>
               
               <div className="mt-4 text-center">
-                <h2 className="text-2xl font-light text-slate-800 dark:text-white tracking-wide">
-                  {clientData.investor_name || `Cliente ${selectedClient}`}
+                <h2 className="text-2xl font-light text-white tracking-wide">
+                  {clientData.investor_name}
                 </h2>
                 {clientData.clientAge && (
-                  <div className="mt-1 text-slate-500 dark:text-slate-400">
+                  <div className="mt-1 text-slate-400">
                     {clientData.clientAge} anos
                   </div>
                 )}
@@ -101,7 +103,7 @@ const ClientProfileModuleBase = ({ fullWidth = false, dataState }: ClientProfile
                     {clientData.tags && clientData.tags.slice(0, 3).map((tag, index) => (
                       <Badge 
                         key={index} 
-                        className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/50 dark:to-indigo-900/50 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/50"
+                        className="bg-gradient-to-r from-blue-900/50 to-indigo-900/50 text-blue-300 border border-blue-800/50"
                       >
                         {tag}
                       </Badge>
@@ -120,10 +122,10 @@ const ClientProfileModuleBase = ({ fullWidth = false, dataState }: ClientProfile
                     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-md">
                       <User className="h-4 w-4 text-white" strokeWidth={1.5} />
                     </div>
-                    <h3 className="text-lg font-medium text-blue-800 dark:text-blue-300">Situação Atual</h3>
+                    <h3 className="text-lg font-medium text-blue-300">Situação Atual</h3>
                   </div>
                   <div className="pl-9">
-                    <p className="text-slate-600 dark:text-slate-300 text-lg font-light leading-relaxed">
+                    <p className="text-slate-300 text-lg font-light leading-relaxed">
                       {clientData.currentStatus || "Informação não disponível."}
                     </p>
                   </div>
@@ -135,10 +137,10 @@ const ClientProfileModuleBase = ({ fullWidth = false, dataState }: ClientProfile
                     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-md">
                       <Star className="h-4 w-4 text-white" strokeWidth={1.5} />
                     </div>
-                    <h3 className="text-lg font-medium text-purple-800 dark:text-purple-300">Ambições</h3>
+                    <h3 className="text-lg font-medium text-purple-300">Ambições</h3>
                   </div>
                   <div className="pl-9">
-                    <p className="text-slate-600 dark:text-slate-300 text-lg font-light leading-relaxed">
+                    <p className="text-slate-300 text-lg font-light leading-relaxed">
                       {clientData.ambitions || "Informação não disponível."}
                     </p>
                   </div>
@@ -150,10 +152,10 @@ const ClientProfileModuleBase = ({ fullWidth = false, dataState }: ClientProfile
                     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-md">
                       <Target className="h-4 w-4 text-white" strokeWidth={1.5} />
                     </div>
-                    <h3 className="text-lg font-medium text-amber-800 dark:text-amber-300">Necessidades</h3>
+                    <h3 className="text-lg font-medium text-amber-300">Necessidades</h3>
                   </div>
                   <div className="pl-9">
-                    <p className="text-slate-600 dark:text-slate-300 text-lg font-light leading-relaxed">
+                    <p className="text-slate-300 text-lg font-light leading-relaxed">
                       {clientData.needs || "Informação não disponível."}
                     </p>
                   </div>
@@ -187,7 +189,7 @@ const getRealClientProfileData = (props: ClientProfileModuleProps) => {
       : (Array.isArray(clientSummary.tags) ? clientSummary.tags : []);
     
     const investor_name = clientSummary.investor_name || '';
-    const clientAge = clientSummary.clientAge || ''; // Updated property name to match type
+    const clientAge = clientSummary.clientAge || '';
     
     // Extract profile sections
     const { currentStatus, ambitions, needs } = extractProfileSections(summary);
@@ -211,8 +213,8 @@ const getRealClientProfileData = (props: ClientProfileModuleProps) => {
 const getSyntheticClientProfileData = (props: ClientProfileModuleProps) => {
   const { selectedClient } = useRaioX();
   
-  // Don't provide synthetic data if no client is selected
-  if (!selectedClient) {
+  // Don't provide synthetic data if no client is selected or if it's client 240275
+  if (!selectedClient || selectedClient === 240275) {
     return null;
   }
   
