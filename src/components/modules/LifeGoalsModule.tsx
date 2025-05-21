@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -9,7 +8,6 @@ import { useEffect, useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import { formatCurrency } from '@/utils/formattingUtils';
 import { DataSourceType } from '@/types/raioXTypes';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface LifeGoalsModuleProps {
   fullWidth?: boolean;
@@ -124,7 +122,6 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
       <CardHeader className="pb-2 flex flex-row justify-between items-center bg-gradient-to-r from-slate-800 to-slate-700 rounded-t-lg">
         <CardTitle className="text-xl text-white font-bold">
           Metas de Vida
-          <SimplifiedDataSourceIndicator source={lifeGoals.dataSource} />
         </CardTitle>
         <Button variant="secondary" size="sm" onClick={handleDownloadPdf} className="flex items-center gap-1 bg-slate-700/90 hover:bg-slate-600 text-slate-200">
           <Download className="h-4 w-4" /> PDF
@@ -143,7 +140,6 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
                     <Badge className="ml-2 bg-slate-700 hover:bg-slate-600">
                       {goal.timeframe}
                     </Badge>
-                    <SimplifiedDataSourceIndicator source={goal.dataSource} />
                   </div>
                 </div>
                 <div className="text-right">
