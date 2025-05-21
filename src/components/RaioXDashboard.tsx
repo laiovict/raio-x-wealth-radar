@@ -9,7 +9,6 @@ import { useLanguage } from "@/context/LanguageContext";
 import { useFeatureFlags } from "@/context/FeatureFlagContext";
 import { getMonthlyReportUrl } from "@/utils/reportUtils";
 import { generatePdf } from "@/utils/pdfGenerator";
-import { saveAs } from 'file-saver';
 import { Eye, Download, XCircle } from "lucide-react";
 
 // Import Module Components
@@ -67,15 +66,22 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
     };
   }, [setSearchParams, searchParams]);
 
-  // Function to generate and download the report
+  // Function to generate and download the report using native browser APIs
   const handleDownloadReport = async () => {
     try {
       // Generate the PDF
       const clientId = typeof selectedClient === 'string' ? parseInt(selectedClient, 10) : selectedClient;
       const pdfBlob = await generatePdf(clientId);
 
-      // Save the PDF
-      saveAs(pdfBlob, `raiox-report-${selectedClient}.pdf`);
+      // Use browser APIs to create download
+      const url = URL.createObjectURL(pdfBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `raiox-report-${selectedClient}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
       toast({
         title: "Relatório gerado com sucesso!",
