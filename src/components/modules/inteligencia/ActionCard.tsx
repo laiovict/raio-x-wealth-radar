@@ -1,7 +1,11 @@
 
 import React from 'react';
-import { PieChart, ArrowUp, BadgeCheck, ArrowRight } from 'lucide-react';
+import { 
+  PieChart, ArrowUp, BadgeCheck, ArrowRight, 
+  TrendingUp, Shield, AlertTriangle, Leaf 
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 
 interface ActionCardProps {
   action: {
@@ -12,44 +16,116 @@ interface ActionCardProps {
     urgency: string;
     iconType: string;
     iconColor: string;
+    dataSource?: string;
   };
 }
 
 const ActionCard: React.FC<ActionCardProps> = ({ action }) => {
-  const renderIcon = () => {
-    const iconClasses = `h-10 w-10 text-${action.iconColor}-600 dark:text-${action.iconColor}-400 p-2 bg-${action.iconColor}-100 dark:bg-${action.iconColor}-900/30 rounded-md`;
-    
-    switch (action.iconType) {
+  // Define icon based on action type
+  const getIcon = () => {
+    switch(action.iconType) {
       case 'PieChart':
-        return <PieChart className={iconClasses} />;
+        return <PieChart className={`h-5 w-5 text-${action.iconColor}-400`} />;
       case 'ArrowUp':
-        return <ArrowUp className={iconClasses} />;
+        return <TrendingUp className={`h-5 w-5 text-${action.iconColor}-400`} />;
       case 'BadgeCheck':
-        return <BadgeCheck className={iconClasses} />;
+        return <BadgeCheck className={`h-5 w-5 text-${action.iconColor}-400`} />;
+      case 'Shield':
+        return <Shield className={`h-5 w-5 text-${action.iconColor}-400`} />;
+      case 'AlertTriangle':
+        return <AlertTriangle className={`h-5 w-5 text-${action.iconColor}-400`} />;
+      case 'Leaf':
+        return <Leaf className={`h-5 w-5 text-${action.iconColor}-400`} />;
       default:
-        return <PieChart className={iconClasses} />;
+        return <ArrowRight className={`h-5 w-5 text-${action.iconColor}-400`} />;
+    }
+  };
+
+  // Define card style based on urgency
+  const getCardStyle = () => {
+    switch(action.urgency.toLowerCase()) {
+      case 'alto':
+        return 'bg-gradient-to-br from-amber-900/10 to-amber-700/5 border-amber-800/30';
+      case 'médio':
+        return 'bg-gradient-to-br from-blue-900/10 to-blue-700/5 border-blue-800/30';
+      case 'baixo':
+        return 'bg-gradient-to-br from-emerald-900/10 to-emerald-700/5 border-emerald-800/30';
+      default:
+        return 'bg-gradient-to-br from-indigo-900/10 to-indigo-900/5 border-indigo-800/30';
+    }
+  };
+
+  // Define impact badge color
+  const getImpactBadgeClass = () => {
+    switch(action.potentialImpact.toLowerCase()) {
+      case 'alto':
+        return 'bg-blue-500 hover:bg-blue-600';
+      case 'médio':
+        return 'bg-indigo-500 hover:bg-indigo-600';
+      case 'baixo':
+        return 'bg-violet-500 hover:bg-violet-600';
+      default:
+        return 'bg-blue-500 hover:bg-blue-600';
+    }
+  };
+
+  // Define urgency badge color
+  const getUrgencyBadgeClass = () => {
+    switch(action.urgency.toLowerCase()) {
+      case 'alto':
+        return 'bg-amber-500 hover:bg-amber-600';
+      case 'médio':
+        return 'bg-blue-500 hover:bg-blue-600';
+      case 'baixo':
+        return 'bg-emerald-500 hover:bg-emerald-600';
+      default:
+        return 'bg-gray-500 hover:bg-gray-600';
     }
   };
 
   return (
-    <div className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-white/5 hover:bg-white/10 dark:hover:bg-gray-700/30 transition-colors cursor-pointer">
-      <div className="flex items-start gap-4">
-        {renderIcon()}
-        <div className="flex-1">
-          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 mb-2">
-            <h3 className="text-base font-medium text-gray-900 dark:text-gray-100">{action.title}</h3>
-            <div className="flex items-center">
-              <Badge className={action.urgency === 'Alto' ? 'bg-red-100 text-red-800' : action.urgency === 'Médio' ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'}>
-                {action.urgency}
-              </Badge>
-              <Badge className="bg-blue-100 text-blue-800 ml-2">
-                {action.potentialImpact}
-              </Badge>
+    <div className={`overflow-hidden border rounded-lg ${getCardStyle()} transition-all duration-300 hover:shadow-md hover:translate-y-[-2px]`}>
+      <div className="p-4">
+        <div className="flex items-start gap-3">
+          <div className={`p-2 rounded-full ${
+            action.iconColor === 'emerald' ? 'bg-emerald-900/50' :
+            action.iconColor === 'amber' ? 'bg-amber-900/50' :
+            action.iconColor === 'red' ? 'bg-red-900/50' :
+            'bg-blue-900/50'
+          }`}>
+            {getIcon()}
+          </div>
+          
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                <h3 className={`font-medium text-${action.iconColor}-400`}>
+                  {action.title}
+                </h3>
+                {action.dataSource && (
+                  <TypeSafeDataSourceTag source={action.dataSource as any} />
+                )}
+              </div>
+              
+              <div className="flex gap-2">
+                <Badge className={getUrgencyBadgeClass()}>
+                  Urgência: {action.urgency}
+                </Badge>
+                <Badge className={getImpactBadgeClass()}>
+                  Impacto: {action.potentialImpact}
+                </Badge>
+              </div>
+            </div>
+            
+            <p className="text-sm text-gray-300 mb-3">{action.description}</p>
+            
+            <div className="flex justify-end">
+              <button className="text-sm flex items-center gap-1.5 text-blue-400 hover:text-blue-300 transition-colors">
+                Ver detalhes <ArrowRight className="h-3.5 w-3.5" />
+              </button>
             </div>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-300">{action.description}</p>
         </div>
-        <ArrowRight className="h-5 w-5 text-gray-400" />
       </div>
     </div>
   );
