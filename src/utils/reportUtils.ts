@@ -1,3 +1,4 @@
+
 /**
  * Generates a URL for the monthly financial report based on date and client.
  */
@@ -33,6 +34,9 @@ export const getMonthlyReportUrl = (selectedClient: number | null) => {
   // Format month as MM
   const formattedMonth = (reportMonth + 1).toString().padStart(2, '0');
   
+  // Convert client ID to string for URL, ensuring it's properly handled if null
+  const clientIdParam = selectedClient !== null ? selectedClient.toString() : '';
+  
   // Return the URL for the report
-  return `https://report.letsreinvent.vc/reinvent/5b552db1-7aa6-4f0b-b25e-f145a2688936/report?period=${reportYear}${formattedMonth}&reportId=c767ceee-e4f4-449a-bd3e-ea00a5567880&clientId=${selectedClient || ''}`;
+  return `https://report.letsreinvent.vc/reinvent/5b552db1-7aa6-4f0b-b25e-f145a2688936/report?period=${reportYear}${formattedMonth}&reportId=c767ceee-e4f4-449a-bd3e-ea00a5567880&clientId=${clientIdParam}`;
 };

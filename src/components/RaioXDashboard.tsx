@@ -71,7 +71,8 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
   const handleDownloadReport = async () => {
     try {
       // Generate the PDF
-      const pdfBlob = await generatePdf(selectedClient);
+      const clientId = typeof selectedClient === 'string' ? parseInt(selectedClient, 10) : selectedClient;
+      const pdfBlob = await generatePdf(clientId);
 
       // Save the PDF
       saveAs(pdfBlob, `raiox-report-${selectedClient}.pdf`);
@@ -172,7 +173,7 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
             </div>
             <CardContent className="flex-grow overflow-hidden">
               <embed
-                src={getMonthlyReportUrl(Number(selectedClient))}
+                src={getMonthlyReportUrl(typeof selectedClient === 'string' ? parseInt(selectedClient, 10) : selectedClient)}
                 type={`application/${mediaType}`}
                 className="w-full h-full"
               />

@@ -101,9 +101,10 @@ export interface PortfolioSummary {
 }
 
 export interface ClientSummary {
-  investor_name: string;
+  investor_name?: string;
   summary?: string;
-  tags?: string[];
+  tags?: string[] | string;
+  clientAge?: string; // Add this property
   dataSource?: DataSourceType;
 }
 
