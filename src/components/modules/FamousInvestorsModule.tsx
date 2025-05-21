@@ -1,9 +1,34 @@
+
 import { useRaioX } from "@/context/RaioXContext";
-import React from "react";
+import React, { useState } from "react";
+import { 
+  Card,
+  CardHeader,
+  CardContent,
+  CardTitle,
+  Badge,
+  Button,
+} from "@/components/ui";
+import {
+  Sparkles,
+  ThumbsUp,
+  ThumbsDown,
+  Brain
+} from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext
+} from "@/components/ui/carousel";
+import { useLanguage } from "@/context/LanguageContext";
+import { useStreamingContent } from "@/hooks/use-streaming-content";
+import { toast } from "@/hooks/use-toast";
 
 interface FamousInvestorsModuleProps {
   fullWidth?: boolean;
-  useSyntheticData?: boolean;  // Adding this prop
+  useSyntheticData?: boolean;
 }
 
 const FamousInvestorsModule = ({ fullWidth = false, useSyntheticData = false }: FamousInvestorsModuleProps) => {

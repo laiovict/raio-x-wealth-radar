@@ -9,6 +9,7 @@ import { calculateFinancialBehaviorMetrics } from "@/utils/financialMetricsUtils
 import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 import { BaseModuleProps } from '@/types/moduleTypes';
 import { withSafeData } from '@/components/hoc/withSafeData';
+import { DataSourceType } from '@/types/raioXTypes';
 
 interface BehavioralFinanceModuleProps extends BaseModuleProps {
   // Additional props specific to this module
@@ -58,7 +59,7 @@ const BehavioralFinanceModuleBase = ({
               Finanças Comportamentais
             </span>
           </CardTitle>
-          <TypeSafeDataSourceTag source={behaviorMetrics.dataSource} />
+          <TypeSafeDataSourceTag source={behaviorMetrics.dataSource as DataSourceType} />
         </div>
       </CardHeader>
       <CardContent>

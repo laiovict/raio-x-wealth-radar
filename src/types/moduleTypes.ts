@@ -40,3 +40,17 @@ export interface SavingsRateData {
   /** The source of this data */
   dataSource: DataSourceType;
 }
+
+/**
+ * Interface for sentiment data
+ */
+export interface SentimentData {
+  /** The current sentiment description */
+  currentSentiment: string;
+  /** Historical sentiment data points */
+  historicalSentiment: Array<{ date: string; value: number }>;
+  /** List of insights about the sentiment */
+  insights: string[];
+  /** The source of this data */
+  dataSource: DataSourceType;
+}

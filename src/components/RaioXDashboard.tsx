@@ -26,6 +26,7 @@ import FamousInvestorsModule from "./modules/FamousInvestorsModule";
 import WelcomeBanner from "./WelcomeBanner";
 import InteligenciaModule from "./modules/InteligenciaModule";
 import DividendModule from "./modules/DividendModule";
+import SteveJobsReportModule from "./modules/SteveJobsReportModule";
 import { toast } from "@/hooks/use-toast";
 import FeedbackSection from "./FeedbackSection";
 import ClientFeedbackSection from "./ClientFeedbackSection";
@@ -54,7 +55,7 @@ const RaioXDashboard = ({
 }: RaioXDashboardProps) => {
   const { data, hasOpenFinance, selectedClient } = useRaioX();
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("raiox-beta"); // Changed default tab to raiox-beta
+  const [activeTab, setActiveTab] = useState("raiox-beta"); // Default tab
   const { t } = useLanguage();
   const dashboardRef = useRef<HTMLDivElement>(null);
   
@@ -66,7 +67,7 @@ const RaioXDashboard = ({
   
   useEffect(() => {
     // Update the showSyntheticData state based on the active tab
-    setShowSyntheticData(activeTab === "versao-full");
+    setShowSyntheticData(activeTab === "versao-full" || activeTab === "steve-jobs");
     
     const handleActivateOpenFinance = () => {
       if (onOpenFinanceActivate) {
@@ -78,7 +79,7 @@ const RaioXDashboard = ({
       if (event.detail?.tabId) {
         setActiveTab(event.detail.tabId);
         // Update synthetic data state when changing tabs
-        setShowSyntheticData(event.detail.tabId === "versao-full");
+        setShowSyntheticData(event.detail.tabId === "versao-full" || event.detail.tabId === "steve-jobs");
         // Scroll to top when changing tabs
         if (dashboardRef.current) {
           dashboardRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -104,7 +105,7 @@ const RaioXDashboard = ({
   const handleQuickNavClick = (tabId: string) => {
     setActiveTab(tabId);
     // Update synthetic data state when changing tabs
-    setShowSyntheticData(tabId === "versao-full");
+    setShowSyntheticData(tabId === "versao-full" || tabId === "steve-jobs");
     // Scroll to top when changing tabs
     if (dashboardRef.current) {
       dashboardRef.current.scrollIntoView({ behavior: 'smooth' });
@@ -283,8 +284,15 @@ const RaioXDashboard = ({
       <FeedbackSection sectionId="top-inteligencia" />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="mb-8 rounded-lg overflow-x-auto grid grid-cols-7 scrollbar-none bg-white/5 backdrop-blur-md border border-white/10">
-          {/* New "RaioX Beta" tab as the first tab */}
+        <TabsList className="mb-8 rounded-lg overflow-x-auto grid grid-cols-8 scrollbar-none bg-white/5 backdrop-blur-md border border-white/10">
+          {/* Added new "By Steve Jobs" tab with special styling */}
+          <TabsTrigger 
+            value="steve-jobs" 
+            className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#6680FF] data-[state=active]:to-black data-[state=active]:text-white"
+          >
+            Por Steve Jobs
+          </TabsTrigger>
+          {/* Other tabs */}
           <TabsTrigger value="raiox-beta" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">
             RaioX Beta
           </TabsTrigger>
@@ -293,11 +301,21 @@ const RaioXDashboard = ({
           <TabsTrigger value="market" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('aiTab')}</TabsTrigger>
           <TabsTrigger value="future" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('futureTab')}</TabsTrigger>
           <TabsTrigger value="chat" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">{t('chatTab')}</TabsTrigger>
-          {/* Former "overview" tab moved to the end and renamed "Versão Full" */}
           <TabsTrigger value="versao-full" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-indigo-700 data-[state=active]:text-white">
             Versão Full
           </TabsTrigger>
         </TabsList>
+
+        {/* New Tab: "By Steve Jobs" - The reimagined financial diagnostic */}
+        <TabsContent value="steve-jobs" className="space-y-8">
+          <SteveJobsReportModule fullWidth />
+          <FeedbackSection sectionId="steve-jobs-report" />
+          
+          {/* Footer for this tab */}
+          <div className="w-full py-10 text-center border-t border-[#6680FF]/40 mt-12">
+            <p className="text-gray-400">Fim da seção - Por Steve Jobs</p>
+          </div>
+        </TabsContent>
 
         {/* Tab 1: RaioX Beta - Only showing components with real data */}
         <TabsContent value="raiox-beta" className="space-y-8">

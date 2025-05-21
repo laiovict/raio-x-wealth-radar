@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import ClientSelector from "@/components/ClientSelector";
@@ -76,9 +77,10 @@ const Index = () => {
 
   return (
     <FeatureFlagProvider initialFlags={{
-      synthetic_data: false,
+      synthetic_data: true, // Changed to true to enable the Steve Jobs experience
       openfinance: hasOpenFinance,
-      beta_features: true
+      beta_features: true,
+      steve_jobs: true // Added new feature flag for Steve Jobs tab
     }}>
       <RaioXProvider 
         hasOpenFinance={hasOpenFinance}
