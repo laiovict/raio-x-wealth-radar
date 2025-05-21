@@ -5,9 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { ModuleDataState, BaseModuleProps } from '@/types/moduleTypes';
 import { withSafeData } from '@/components/hoc/withSafeData';
-import { formatPercentage } from '@/utils/raioXUtils';
+// formatPercentage is not used here, but raioXUtils might have other useful functions.
+// import { formatPercentage } from '@/utils/raioXUtils';
 import { Allocation, DataSourceType } from '@/types/raioXTypes';
 import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
+import { ensureNumber } from '@/utils/typeConversionHelpers'; // Added for parsing
+import { defaultRaioXData } from '@/data/mockRaioXData'; // For default recommended allocation
 
 // Define the props for the base component
 interface AllocationModuleProps extends BaseModuleProps {
@@ -22,38 +25,38 @@ const AllocationModuleBase = ({ fullWidth = false, dataState }: AllocationModule
   const dataSource = dataState?.dataSource || 'synthetic';
   
   // Transform allocation data for the chart
-  const prepareChartData = (allocation: Allocation | undefined) => {
-    if (!allocation || !allocation.current) return [];
+  const prepareChartData = (allocationData: Allocation | undefined) => {
+    if (!allocationData || !allocationData.current) return [];
     
-    // Filter out the 'total' property which isn't part of the actual allocation
-    return Object.entries(allocation.current)
+    // Filter out the 'total' property if it exists (it won't with the new logic for current)
+    return Object.entries(allocationData.current)
       .filter(([key]) => key !== 'total')
       .map(([key, value]) => ({
         name: key,
-        value: Number(value)
+        value: Number(value) // Value should already be a number
       }));
   };
   
   const chartData = prepareChartData(allocation);
   
   // Prepare a comparison of current vs recommended allocation
-  const prepareComparisonData = (allocation: Allocation | undefined) => {
-    if (!allocation || !allocation.current || !allocation.recommended) {
+  const prepareComparisonData = (allocationData: Allocation | undefined) => {
+    if (!allocationData || !allocationData.current || !allocationData.recommended) {
       return [];
     }
     
     // Collect all unique asset classes from both current and recommended
     const assetClasses = new Set([
-      ...Object.keys(allocation.current).filter(key => key !== 'total'),
-      ...Object.keys(allocation.recommended)
+      ...Object.keys(allocationData.current).filter(key => key !== 'total'),
+      ...Object.keys(allocationData.recommended)
     ]);
     
     // Create comparison data
     return Array.from(assetClasses).map(key => ({
       name: key,
-      current: allocation.current[key] || 0,
-      recommended: allocation.recommended[key] || 0,
-      difference: (allocation.recommended[key] || 0) - (allocation.current[key] || 0)
+      current: allocationData.current[key] || 0,
+      recommended: allocationData.recommended[key] || 0,
+      difference: (allocationData.recommended[key] || 0) - (allocationData.current[key] || 0)
     }));
   };
   
@@ -135,28 +138,68 @@ const AllocationModuleBase = ({ fullWidth = false, dataState }: AllocationModule
 };
 
 // Define how to extract real allocation data from the RaioX context
-const getRealAllocationData = (props: AllocationModuleProps) => {
+const getRealAllocationData = (props: AllocationModuleProps): Allocation | null => {
   const { data } = useRaioX();
-  return data?.allocation;
+  const portfolioSummary = data?.portfolioSummary;
+
+  if (!portfolioSummary) {
+    console.log("AllocationModule: No portfolioSummary in context, using synthetic data for allocation.");
+    return null;
+  }
+
+  const currentAllocation: { [key: string]: number } = {};
+  let hasValidData = false;
+
+  // Mapping from investor_portfolio_summary _representation fields to display names
+  const representationMapping: { [key: string]: string } = {
+    fixed_income_representation: "Renda Fixa",
+    stocks_representation: "Ações BR",
+    investment_fund_representation: "Fundos",
+    real_estate_representation: "FIIs",
+    private_pension_representation: "Previdência",
+    treasure_representation: "Tesouro Direto",
+    coe_representation: "COE",
+    investment_international_representation: "Internacional",
+  };
+
+  for (const key in portfolioSummary) {
+    if (key.endsWith("_representation") && representationMapping[key]) {
+      const assetName = representationMapping[key];
+      const value = ensureNumber(portfolioSummary[key as keyof typeof portfolioSummary]);
+      
+      if (value > 0) { // Only include asset classes with a non-zero percentage
+        currentAllocation[assetName] = value;
+        hasValidData = true;
+      }
+    }
+  }
+
+  if (!hasValidData) {
+    console.log("AllocationModule: portfolioSummary processed, but no valid _representation fields found or all are zero. Using synthetic for current allocation.");
+    return null; // Fallback to synthetic if no valid _representation fields are found
+  }
+  
+  const recommendedAllocation = data.allocation?.recommended || defaultRaioXData.allocation.recommended;
+
+  return {
+    current: currentAllocation,
+    recommended: recommendedAllocation, // Keep recommended consistent
+    dataSource: portfolioSummary.dataSource || 'supabase', // Pass the dataSource
+  };
 };
 
 // Define synthetic allocation data to be used as a fallback
 const getSyntheticAllocationData = (props: AllocationModuleProps): Allocation => {
+  // Using the defaultRaioXData for consistency in synthetic recommended allocation
   return {
     current: {
       "Renda Fixa": 45,
       "Ações BR": 25,
       "Fundos": 20,
       "Caixa": 10,
-      total: 100
+      // total: 100 // 'total' is not strictly needed for chart data preparation
     },
-    recommended: {
-      "Renda Fixa": 30,
-      "Ações BR": 30,
-      "Fundos": 15,
-      "Internacional": 15,
-      "Caixa": 10
-    },
+    recommended: defaultRaioXData.allocation.recommended,
     dataSource: 'synthetic'
   };
 };
@@ -166,7 +209,7 @@ const AllocationModule = withSafeData(
   AllocationModuleBase,
   getRealAllocationData,
   getSyntheticAllocationData,
-  'supabase'
+  'supabase' // Default source type if not overridden by data
 );
 
 export default AllocationModule;
