@@ -1,5 +1,6 @@
 
 import { DataSourceType } from '@/types/raioXTypes';
+import React from 'react';
 
 /**
  * Base props interface for all module components
@@ -47,7 +48,7 @@ export interface FinancialPlanData {
   sections: {
     id: string;
     title: string;
-    icon: string;
+    icon: React.ReactNode | string;
     summary: string;
     details: DetailItem[];
     actions?: ActionItem[];

@@ -1,6 +1,7 @@
 
 import { DataSourceType } from '@/types/raioXTypes';
 import { DetailItem, ActionItem } from '@/types/moduleTypes';
+import React from 'react';
 
 export interface PlanSectionData {
   id: string;

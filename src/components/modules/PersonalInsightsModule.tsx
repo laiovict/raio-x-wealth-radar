@@ -411,7 +411,11 @@ const getRealPersonalInsightsData = (props: PersonalInsightsModuleProps) => {
   try {
     // Extract data from client summary
     const summary = clientSummary.summary;
-    const tags = clientSummary.tags ? clientSummary.tags.split(',').map(tag => tag.trim()) : [];
+    // Handle tags which could be either a string or an array
+    const tags = typeof clientSummary.tags === 'string' 
+      ? clientSummary.tags.split(',').map(tag => tag.trim()) 
+      : (Array.isArray(clientSummary.tags) ? clientSummary.tags : []);
+    
     const investor_name = clientSummary.investor_name || '';
     const clientAge = extractAge(summary);
     
