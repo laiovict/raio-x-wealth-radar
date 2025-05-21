@@ -1,33 +1,65 @@
-
 import { DividendHistory } from '@/types/raioXTypes';
 
 /**
- * Remove duplicate dividend entries based on Asset and Payment Date
- * @param dividendHistory The raw dividend history from the database
- * @returns Deduplicated dividend history
+ * Creates a deep clone of an object
+ * @param obj The object to clone
+ * @returns A deep clone of the input object
  */
-export const removeDuplicateDividends = (dividendHistory: DividendHistory[]): DividendHistory[] => {
-  if (!dividendHistory || dividendHistory.length === 0) {
+export const deepClone = <T>(obj: T): T => {
+  if (obj === null || typeof obj !== 'object') {
+    return obj;
+  }
+
+  // Handle Date
+  if (obj instanceof Date) {
+    return new Date(obj.getTime()) as any;
+  }
+
+  // Handle Array
+  if (Array.isArray(obj)) {
+    return obj.map(item => deepClone(item)) as any;
+  }
+
+  // Handle Object
+  if (obj instanceof Object) {
+    const copy: Record<string, any> = {};
+    Object.keys(obj).forEach(key => {
+      copy[key] = deepClone((obj as Record<string, any>)[key]);
+    });
+    return copy as T;
+  }
+
+  throw new Error(`Unable to copy obj! Its type isn't supported: ${typeof obj}`);
+};
+
+/**
+ * Removes duplicate dividend entries from dividend history
+ * based on asset, payment_date and value
+ */
+export const removeDuplicateDividends = (dividends: DividendHistory[]): DividendHistory[] => {
+  if (!dividends || !Array.isArray(dividends)) {
     return [];
   }
   
-  const uniqueMap = new Map<string, DividendHistory>();
+  // Create a Map to track unique dividends
+  const uniqueDividendsMap = new Map();
   
-  dividendHistory.forEach(dividend => {
-    // Get just the date part (without time) for comparison
-    const paymentDateObj = new Date(dividend.payment_date);
-    const datePart = paymentDateObj.toISOString().split('T')[0];
+  dividends.forEach(dividend => {
+    // Create a unique key based on asset, date and value
+    const key = `${dividend.asset}-${dividend.payment_date}-${dividend.value}`;
     
-    // Create a unique key based on asset and payment date
-    const uniqueKey = `${dividend.asset}-${datePart}`;
-    
-    // Only add if not already in the map
-    if (!uniqueMap.has(uniqueKey)) {
-      uniqueMap.set(uniqueKey, dividend);
+    // Only add to map if this key doesn't exist yet
+    if (!uniqueDividendsMap.has(key)) {
+      uniqueDividendsMap.set(key, dividend);
     }
   });
   
-  return Array.from(uniqueMap.values());
+  // Convert map values back to array
+  const uniqueDividends = Array.from(uniqueDividendsMap.values());
+  
+  console.info(`Filtered dividends: ${uniqueDividends.length} paid out of ${dividends.length} total`);
+  
+  return uniqueDividends;
 };
 
 /**
