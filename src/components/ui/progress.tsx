@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils"
 const Progress = React.forwardRef<
   React.ElementRef<typeof ProgressPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root> & {
-    variant?: "default" | "success" | "warning" | "destructive"
+    variant?: "default" | "success" | "warning" | "destructive";
+    indicatorClassName?: string; // Adicionando a propriedade indicatorClassName
   }
->(({ className, value, variant = "default", ...props }, ref) => (
+>(({ className, value, variant = "default", indicatorClassName, ...props }, ref) => (
   <ProgressPrimitive.Root
     ref={ref}
     className={cn(
@@ -26,7 +27,8 @@ const Progress = React.forwardRef<
           "bg-green-500": variant === "success",
           "bg-amber-500": variant === "warning",
           "bg-red-500": variant === "destructive"
-        }
+        },
+        indicatorClassName // Usando a propriedade indicatorClassName
       )}
       style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
     />

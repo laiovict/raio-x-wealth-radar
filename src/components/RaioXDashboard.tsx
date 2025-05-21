@@ -135,11 +135,23 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
         );
       case 'raiox-full':
         return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
-            <ClientProfileModule />
-            <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-6">
+            <div className="lg:col-span-1">
+              <ClientProfileModule />
+            </div>
+            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
               <RecommendationsModule />
               <RecommendedActionsModule />
+              <InteligenciaModule />
+              <InvestmentPlanningModule />
+              <LifeGoalsModule />
+              <DividendModule />
+              <AllocationModule />
+              <LiquidityReserveModule />
+              <FutureProjectionModule />
+              <SocialComparisonModule />
+              <AIInsightsHubModule />
+              <BehavioralFinanceModule />
             </div>
           </div>
         );
@@ -383,6 +395,13 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
           </Tabs>
         </ScrollArea>
       </div>
+
+      {/* Tab Content */}
+      {activeTab && (
+        <div>
+          {renderTabContent(activeTab)}
+        </div>
+      )}
     </>
   );
 };
