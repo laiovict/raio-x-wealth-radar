@@ -1,5 +1,23 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import React from "react";
+import { 
+  Card, 
+  CardHeader, 
+  CardTitle, 
+  CardContent, 
+  Badge, 
+  Button,
+  Progress
+} from "@/components/ui";
+import { 
+  RefreshCw, 
+  Shield, 
+  CreditCard, 
+  Repeat, 
+  Handshake,
+  Lock
+} from "lucide-react";
 
 interface WholeBankingModuleProps {
   fullWidth?: boolean;
