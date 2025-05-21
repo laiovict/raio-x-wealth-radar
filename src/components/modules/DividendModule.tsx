@@ -32,11 +32,9 @@ const DividendModule = ({ fullWidth = false, useSyntheticData = false }: Dividen
   const hasRealData = !useSyntheticData && dividendHistory && dividendHistory.length > 0;
   
   // Determine data source
-  const dataSource = hasRealData && dividendHistory && dividendHistory[0]?.dataSource === 'supabase' 
-    ? 'supabase' 
-    : 'synthetic';
+  const dataSource = hasRealData ? 'supabase' : 'synthetic';
   
-  // For Beta version with no real data, show empty state
+  // If we have no real data and synthetic data is not allowed, show empty state
   if (!hasRealData && !useSyntheticData) {
     return (
       <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
@@ -52,7 +50,7 @@ const DividendModule = ({ fullWidth = false, useSyntheticData = false }: Dividen
     );
   }
 
-  // For Beta version with real data or Full version with synthetic data
+  // For real data or synthetic data
   return (
     <Card className={`${fullWidth ? "w-full" : "w-full"} border border-white/10 glass-morphism`}>
       <CardHeader className="pb-2">
