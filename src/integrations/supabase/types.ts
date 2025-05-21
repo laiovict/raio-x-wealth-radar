@@ -270,6 +270,84 @@ export type Database = {
         }
         Relationships: []
       }
+      investor_portfolio_summary_history: {
+        Row: {
+          coe_representation: string | null
+          coe_value: string | null
+          created_at: string | null
+          fixed_income_representation: string | null
+          fixed_income_value: string | null
+          id: number
+          investment_fund_representation: string | null
+          investment_fund_value: string | null
+          investment_international_representation: string | null
+          investment_international_value: string | null
+          investor_account_on_brokerage_house: number | null
+          private_pension_representation: string | null
+          private_pension_value: string | null
+          real_estate_representation: string | null
+          real_estate_value: string | null
+          stocks_representation: string | null
+          stocks_value: string | null
+          total_balance: string | null
+          total_balance_representation: string | null
+          total_portfolio_value: string | null
+          treasure_representation: string | null
+          treasure_value: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          coe_representation?: string | null
+          coe_value?: string | null
+          created_at?: string | null
+          fixed_income_representation?: string | null
+          fixed_income_value?: string | null
+          id: number
+          investment_fund_representation?: string | null
+          investment_fund_value?: string | null
+          investment_international_representation?: string | null
+          investment_international_value?: string | null
+          investor_account_on_brokerage_house?: number | null
+          private_pension_representation?: string | null
+          private_pension_value?: string | null
+          real_estate_representation?: string | null
+          real_estate_value?: string | null
+          stocks_representation?: string | null
+          stocks_value?: string | null
+          total_balance?: string | null
+          total_balance_representation?: string | null
+          total_portfolio_value?: string | null
+          treasure_representation?: string | null
+          treasure_value?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          coe_representation?: string | null
+          coe_value?: string | null
+          created_at?: string | null
+          fixed_income_representation?: string | null
+          fixed_income_value?: string | null
+          id?: number
+          investment_fund_representation?: string | null
+          investment_fund_value?: string | null
+          investment_international_representation?: string | null
+          investment_international_value?: string | null
+          investor_account_on_brokerage_house?: number | null
+          private_pension_representation?: string | null
+          private_pension_value?: string | null
+          real_estate_representation?: string | null
+          real_estate_value?: string | null
+          stocks_representation?: string | null
+          stocks_value?: string | null
+          total_balance?: string | null
+          total_balance_representation?: string | null
+          total_portfolio_value?: string | null
+          treasure_representation?: string | null
+          treasure_value?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       investors_summaries: {
         Row: {
           created_at: string | null

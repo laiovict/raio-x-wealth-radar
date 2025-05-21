@@ -1,7 +1,8 @@
 
 import { PieChart, ArrowUp, BadgeCheck } from 'lucide-react';
+import { Action } from '@/types/goalTypes';
 
-export const getRecommendedActions = () => {
+export const getRecommendedActions = (): Action[] => {
   return [
     {
       id: 'diversify',

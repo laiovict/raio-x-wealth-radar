@@ -6,18 +6,10 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
+import { Action } from '@/types/goalTypes';
 
 interface ActionCardProps {
-  action: {
-    id: string;
-    title: string;
-    description: string;
-    potentialImpact: string;
-    urgency: string;
-    iconType: string;
-    iconColor: string;
-    dataSource?: string;
-  };
+  action: Action;
 }
 
 const ActionCard: React.FC<ActionCardProps> = ({ action }) => {
