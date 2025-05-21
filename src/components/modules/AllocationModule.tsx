@@ -5,6 +5,7 @@ import { useMobileBreakpoint } from "@/hooks/use-mobile";
 import { useEffect, useState } from "react";
 import { toNumber } from "@/utils/typeConversionHelpers";
 import { DataSourceType } from "@/types/raioXTypes";
+import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 
 interface AllocationModuleProps {
   fullWidth?: boolean;
@@ -178,17 +179,15 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
   };
 
   return (
-    <Card className={fullWidth ? "w-full" : "w-full"}>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl text-blue-700 dark:text-blue-300 flex items-center justify-between flex-wrap">
-          <span>Alocação & Diversificação 360°</span>
-          <span className="text-sm font-normal text-green-600 dark:text-green-400">
+    <Card className={`${fullWidth ? "w-full" : "w-full"} border-2 border-slate-700/50 bg-gradient-to-br from-slate-900/80 to-slate-800/80`}>
+      <CardHeader className="pb-2 bg-gradient-to-r from-slate-800 to-slate-700 rounded-t-lg">
+        <CardTitle className="text-xl text-white flex items-center justify-between flex-wrap">
+          <div className="flex items-center">
+            <span>Alocação & Diversificação 360°</span>
+            <TypeSafeDataSourceTag source={allocationData.dataSource} />
+          </div>
+          <span className="text-sm font-normal text-green-400">
             +{allocationData.optimizationGain}% potencial
-            {allocationData.dataSource === 'supabase' && (
-              <span className="ml-1 text-green-400">
-                <span className="inline-block h-3 w-3">✓</span>
-              </span>
-            )}
           </span>
         </CardTitle>
       </CardHeader>
@@ -198,12 +197,12 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
             <div className={`${isMobile ? "h-[220px]" : "h-[300px]"}`}>
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
-                  <PolarGrid />
-                  <PolarAngleAxis dataKey="subject" tick={{ fontSize: isMobile ? 10 : 12 }} />
-                  <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: isMobile ? 10 : 12 }} />
+                  <PolarGrid stroke="#334155" />
+                  <PolarAngleAxis dataKey="subject" tick={{ fontSize: isMobile ? 10 : 12, fill: '#94a3b8' }} />
+                  <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fontSize: isMobile ? 10 : 12, fill: '#94a3b8' }} />
                   <Radar name="Atual" dataKey="current" stroke="#8884d8" fill="#8884d8" fillOpacity={0.6} />
                   <Radar name="Recomendada" dataKey="recommended" stroke="#82ca9d" fill="#82ca9d" fillOpacity={0.6} />
-                  <Legend wrapperStyle={{ fontSize: isMobile ? 10 : 12 }} />
+                  <Legend wrapperStyle={{ fontSize: isMobile ? 10 : 12, color: '#94a3b8' }} />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
@@ -213,13 +212,8 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
             <div className={`${isMobile ? "h-52" : "h-64 md:h-52"}`}>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <p className="text-sm font-medium text-center mb-2">
+                  <p className="text-sm font-medium text-center mb-2 text-slate-300">
                     Alocação Atual
-                    {allocationData.dataSource === 'supabase' && (
-                      <span className="ml-1 text-green-400">
-                        <span className="inline-block h-3 w-3">✓</span>
-                      </span>
-                    )}
                   </p>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -241,13 +235,8 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
                   </ResponsiveContainer>
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-center mb-2">
+                  <p className="text-sm font-medium text-center mb-2 text-slate-300">
                     Alocação Recomendada
-                    {allocationData.dataSource === 'supabase' && (
-                      <span className="ml-1 text-green-400">
-                        <span className="inline-block h-3 w-3">✓</span>
-                      </span>
-                    )}
                   </p>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
@@ -271,8 +260,8 @@ const AllocationModule = ({ fullWidth = false }: AllocationModuleProps) => {
               </div>
             </div>
             
-            <div className="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-lg">
-              <p className="text-sm text-gray-700 dark:text-gray-200">
+            <div className="bg-slate-800/70 p-3 rounded-lg border border-slate-700/50">
+              <p className="text-sm text-slate-300">
                 {generateAllocationDescription()}
               </p>
             </div>

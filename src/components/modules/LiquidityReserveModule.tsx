@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -68,10 +67,10 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
   };
   
   const getProgressBackgroundClass = () => {
-    if (progress >= 100) return "bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30";
-    if (progress >= 75) return "bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30";
-    if (progress >= 50) return "bg-gradient-to-r from-amber-100 to-yellow-100 dark:from-amber-900/30 dark:to-yellow-900/30";
-    return "bg-gradient-to-r from-red-100 to-rose-100 dark:from-red-900/30 dark:to-rose-900/30";
+    if (progress >= 100) return "bg-gradient-to-r from-slate-800/70 to-slate-700/70";
+    if (progress >= 75) return "bg-gradient-to-r from-slate-800/70 to-slate-700/70";
+    if (progress >= 50) return "bg-gradient-to-r from-slate-800/70 to-slate-700/70";
+    return "bg-gradient-to-r from-slate-800/70 to-slate-700/70";
   };
   
   const getStatusColor = () => {
@@ -124,8 +123,8 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
   };
 
   return (
-    <Card className={`${fullWidth ? "w-full" : "w-full"} shadow-lg hover:shadow-xl transition-all border-2 border-gray-100 dark:border-gray-800/50 ${getProgressBackgroundClass()}`}>
-      <CardHeader className="pb-4 bg-gradient-to-r from-slate-700 to-slate-800 rounded-t-lg">
+    <Card className={`${fullWidth ? "w-full" : "w-full"} shadow-lg hover:shadow-xl transition-all border-2 border-slate-700/50 ${getProgressBackgroundClass()}`}>
+      <CardHeader className="pb-4 bg-gradient-to-r from-slate-800 to-slate-700 rounded-t-lg">
         <CardTitle className="text-xl text-white flex items-center justify-between">
           <div className="flex items-center gap-2">
             {getStatusIcon()}
@@ -134,7 +133,7 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
           </div>
           <div className="flex items-center gap-2">
             <span 
-              className={`text-lg font-bold ${progress >= 100 ? 'text-green-400' : 'text-amber-400'} bg-gray-800/50 px-3 py-1 rounded-full`}
+              className={`text-lg font-bold ${progress >= 100 ? 'text-green-400' : 'text-amber-400'} bg-slate-800/50 px-3 py-1 rounded-full`}
             >
               {liquidityData.currentIdleMonths} meses
             </span>
@@ -142,37 +141,37 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
         </CardTitle>
       </CardHeader>
       
-      <CardContent className="p-6 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
+      <CardContent className="p-6 bg-slate-900/80 backdrop-blur-sm">
         <div className="space-y-6">
-          <div className="flex flex-wrap justify-between items-end gap-4 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md">
+          <div className="flex flex-wrap justify-between items-end gap-4 p-4 bg-slate-800/70 rounded-xl shadow-md border border-slate-700/50">
             <div>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Reserva Atual</p>
-              <p className="text-3xl font-bold bg-gradient-to-r from-slate-700 to-slate-900 bg-clip-text text-transparent dark:from-slate-300 dark:to-white">
+              <p className="text-sm text-slate-400">Reserva Atual</p>
+              <p className="text-3xl font-bold text-slate-200">
                 {formatCurrency(String(liquidityData.currentIdle))}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-500 dark:text-gray-400">Ideal</p>
-              <p className="text-2xl font-bold text-gray-500 dark:text-gray-300">
+              <p className="text-sm text-slate-400">Ideal</p>
+              <p className="text-2xl font-bold text-slate-500">
                 {formatCurrency(String(liquidityData.recommended))}
               </p>
             </div>
           </div>
           
-          <div className="space-y-3 p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md">
+          <div className="space-y-3 p-4 bg-slate-800/70 rounded-xl shadow-md border border-slate-700/50">
             <div className="flex justify-between items-center text-sm">
               <span className={`${getStatusColor()} font-bold text-base`}>
                 {Math.round(progress)}% do ideal
               </span>
-              <span className="text-gray-500 dark:text-gray-400 font-medium">
+              <span className="text-slate-400 font-medium">
                 Meta: {liquidityData.recommendedMonths} meses
               </span>
             </div>
             <Progress
               value={progress}
-              className="h-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700"
+              className="h-3 rounded-full overflow-hidden"
               style={{
-                background: 'rgba(209, 213, 219, 0.5)',
+                background: 'rgba(51, 65, 85, 0.5)',
               }}
             >
               <div 
@@ -184,7 +183,7 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
               ></div>
             </Progress>
             
-            <div className="flex justify-between text-xs text-gray-500 mt-1 px-1">
+            <div className="flex justify-between text-xs text-slate-500 mt-1 px-1">
               <span>0%</span>
               <span>50%</span>
               <span>100%</span>
@@ -192,39 +191,39 @@ const LiquidityReserveModule = ({ fullWidth = false }: LiquidityReserveModulePro
           </div>
           
           <div className="mt-6 space-y-4">
-            <div className={`p-5 rounded-xl flex gap-4 items-start shadow-md ${progress >= 100 ? 'bg-green-50 dark:bg-green-900/30 border-2 border-green-200 dark:border-green-800/30' : 'bg-blue-50 dark:bg-blue-900/30 border-2 border-blue-200 dark:border-blue-800/30'}`}>
+            <div className={`p-5 rounded-xl flex gap-4 items-start shadow-md bg-slate-800/70 border border-slate-700/50`}>
               <Info className="h-6 w-6 text-blue-500 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-base font-medium">{getMessage()}</p>
+                <p className="text-base font-medium text-slate-300">{getMessage()}</p>
               </div>
             </div>
             
             {liquidityData.difference < 0 && (
-              <div className="bg-amber-50 dark:bg-amber-900/20 p-5 rounded-xl flex gap-4 items-start border-2 border-amber-200 dark:border-amber-800/30 shadow-md">
+              <div className="bg-amber-900/20 p-5 rounded-xl flex gap-4 items-start border border-amber-800/30 shadow-md">
                 <CircleAlert className="h-6 w-6 text-amber-500 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-base font-medium text-amber-800 dark:text-amber-400 mb-2">
+                  <p className="text-base font-medium text-amber-400 mb-2">
                     Valor em falta
                   </p>
-                  <p className="text-base">
+                  <p className="text-base text-slate-300">
                     Você precisa de mais {formatCurrency(String(Math.abs(liquidityData.difference)))} para atingir o valor ideal de reserva.
                   </p>
                 </div>
               </div>
             )}
             
-            <div className="space-y-3 bg-white dark:bg-gray-800 p-5 rounded-xl border-2 border-gray-100 dark:border-gray-700 shadow-md">
-              <p className="font-bold text-lg text-gray-800 dark:text-gray-200 flex items-center">
+            <div className="space-y-3 bg-slate-800/70 p-5 rounded-xl border border-slate-700/50 shadow-md">
+              <p className="font-bold text-lg text-slate-200 flex items-center">
                 <TrendingUp className="h-5 w-5 mr-2 text-indigo-500" />
                 Ações recomendadas
               </p>
               <ul className="space-y-2 mt-2">
                 {getActions().map((action, index) => (
-                  <li key={index} className="flex gap-3 items-center bg-slate-50 dark:bg-slate-900/50 p-3 rounded-lg border border-slate-200 dark:border-slate-800">
-                    <div className="bg-indigo-100 dark:bg-indigo-800/40 text-indigo-600 dark:text-indigo-400 w-6 h-6 flex items-center justify-center rounded-full font-bold text-sm">
+                  <li key={index} className="flex gap-3 items-center bg-slate-900/50 p-3 rounded-lg border border-slate-800">
+                    <div className="bg-indigo-800/40 text-indigo-400 w-6 h-6 flex items-center justify-center rounded-full font-bold text-sm">
                       {index + 1}
                     </div>
-                    <span className="text-gray-800 dark:text-gray-200 font-medium">{action}</span>
+                    <span className="text-slate-300 font-medium">{action}</span>
                   </li>
                 ))}
               </ul>

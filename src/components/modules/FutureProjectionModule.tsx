@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import { useMobileBreakpoint } from "@/hooks/use-mobile";
 import { TrendingUp } from "lucide-react";
+import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 
 interface FutureProjectionModuleProps {
   fullWidth?: boolean;
@@ -19,7 +20,8 @@ const FutureProjectionModule = ({ fullWidth = false }: FutureProjectionModulePro
     scenarios: {
       base: { "1 ano": 120000, "3 anos": 180000, "5 anos": 250000 },
       stress: { "1 ano": 110000, "3 anos": 150000, "5 anos": 200000 }
-    }
+    },
+    dataSource: 'synthetic'
   };
   
   const isMobile = useMobileBreakpoint();
@@ -58,27 +60,28 @@ const FutureProjectionModule = ({ fullWidth = false }: FutureProjectionModulePro
   };
 
   return (
-    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full overflow-hidden border-none shadow-lg`}>
-      <CardHeader className="bg-gradient-to-r from-indigo-700 to-blue-700 pb-3">
+    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full overflow-hidden border-2 border-slate-700/50 shadow-lg`}>
+      <CardHeader className="bg-gradient-to-r from-slate-800 to-slate-700 pb-3">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className="rounded-lg bg-indigo-600/50 p-2">
-              <TrendingUp className="h-5 w-5 text-indigo-100" />
+            <div className="rounded-lg bg-slate-600/50 p-2">
+              <TrendingUp className="h-5 w-5 text-slate-200" />
             </div>
             <CardTitle className="text-xl text-white">
               Projeção Futuro Próximo
             </CardTitle>
+            <TypeSafeDataSourceTag source={projection.dataSource} />
           </div>
-          <Badge variant="outline" className="bg-indigo-600/30 text-indigo-100 border-indigo-500/40">
+          <Badge variant="outline" className="bg-slate-700/30 text-slate-200 border-slate-600/40">
             Aporte: {formatCurrency(projection.monthlyContribution)}/mês
           </Badge>
         </div>
-        <p className="text-indigo-200 mt-1 text-sm">
+        <p className="text-slate-400 mt-1 text-sm">
           Estimativa de crescimento patrimonial baseado em diferentes cenários
         </p>
       </CardHeader>
 
-      <CardContent className="bg-gradient-to-b from-gray-950 to-gray-900/95 pt-4">
+      <CardContent className="bg-gradient-to-b from-slate-900 to-slate-800 pt-4">
         <div className={`${fullWidth && !isMobile ? "h-72" : isMobile ? "h-48" : "h-60"} mb-4`}>
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 5, right: 20, left: 5, bottom: 5 }}>
@@ -134,14 +137,14 @@ const FutureProjectionModule = ({ fullWidth = false }: FutureProjectionModulePro
         </div>
         
         <div className="grid grid-cols-2 gap-4 mt-3">
-          <div className="bg-indigo-900/20 backdrop-blur-md p-4 rounded-lg border border-indigo-800/30">
-            <p className="text-sm font-medium text-indigo-300 mb-1">Cenário Base (5 anos)</p>
+          <div className="bg-slate-800/70 backdrop-blur-md p-4 rounded-lg border border-slate-700/50">
+            <p className="text-sm font-medium text-indigo-400 mb-1">Cenário Base (5 anos)</p>
             <p className="text-lg font-bold text-white">
               {formatCurrency(projection.scenarios.base["5 anos"])}
             </p>
           </div>
-          <div className="bg-amber-900/20 backdrop-blur-md p-4 rounded-lg border border-amber-800/30">
-            <p className="text-sm font-medium text-amber-300 mb-1">Cenário Stress (5 anos)</p>
+          <div className="bg-slate-800/70 backdrop-blur-md p-4 rounded-lg border border-slate-700/50">
+            <p className="text-sm font-medium text-amber-400 mb-1">Cenário Stress (5 anos)</p>
             <p className="text-lg font-bold text-white">
               {formatCurrency(projection.scenarios.stress["5 anos"])}
             </p>

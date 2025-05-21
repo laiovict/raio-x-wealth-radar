@@ -13,13 +13,13 @@ interface SentimentInsightsModuleProps {
   fullWidth?: boolean;
 }
 
-// Define a specific type for asset data - changed the dataSource type to be optional to match its usage
+// Define a specific type for asset data with dataSource optional
 interface SentimentAsset {
   ticker: string;
   sentiment: number;
   impact: number;
   recentNews: string;
-  dataSource?: DataSourceType | 'synthetic' | 'supabase'; // Made optional with "?"
+  dataSource?: DataSourceType | 'synthetic' | 'supabase';
 }
 
 // Define the structure of sentiment data
@@ -199,6 +199,7 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
     }
   };
 
+  // Styling helper functions
   const getSentimentColor = (score: number) => {
     if (score >= 70) return "text-green-600 dark:text-green-400";
     if (score >= 50) return "text-amber-600 dark:text-amber-400";
@@ -206,9 +207,9 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
   };
 
   const getSentimentBg = (score: number) => {
-    if (score >= 70) return "bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/40 dark:to-emerald-800/40 border-green-200 dark:border-green-800/60";
-    if (score >= 50) return "bg-gradient-to-br from-amber-50 to-yellow-100 dark:from-amber-900/40 dark:to-yellow-800/40 border-amber-200 dark:border-amber-800/60";
-    return "bg-gradient-to-br from-red-50 to-rose-100 dark:from-red-900/40 dark:to-rose-800/40 border-red-200 dark:border-red-800/60";
+    if (score >= 70) return "bg-gradient-to-br from-slate-800/50 to-slate-700/50 border-slate-600/50";
+    if (score >= 50) return "bg-gradient-to-br from-slate-800/50 to-slate-700/50 border-slate-600/50";
+    return "bg-gradient-to-br from-slate-800/50 to-slate-700/50 border-slate-600/50";
   };
 
   const getImpactColor = (impact: number) => {
@@ -254,19 +255,19 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
   };
 
   return (
-    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/30 dark:to-blue-900/30`}>
-      <CardHeader className="bg-gradient-to-r from-blue-500 to-indigo-600 pb-4 rounded-t-lg border-b border-indigo-200 dark:border-indigo-800 flex flex-row justify-between items-center">
+    <Card className={`${fullWidth ? "w-full" : "w-full"} h-full shadow-lg hover:shadow-xl transition-shadow bg-gradient-to-br from-slate-900/80 to-slate-800/80 border-slate-700/50`}>
+      <CardHeader className="bg-gradient-to-r from-slate-800 to-slate-700 pb-4 rounded-t-lg border-b border-slate-600/50 flex flex-row justify-between items-center">
         <CardTitle className="text-xl flex items-center">
           <span className="font-bold text-white">
             Insights de Sentimento
           </span>
           <TypeSafeDataSourceTag source={clientSentimentData.dataSource} />
         </CardTitle>
-        <Button variant="secondary" size="sm" onClick={handleDownloadPdf} className="flex items-center gap-1 bg-white/90 dark:bg-indigo-800/90 hover:bg-white dark:hover:bg-indigo-700 text-indigo-700 dark:text-indigo-200">
+        <Button variant="secondary" size="sm" onClick={handleDownloadPdf} className="flex items-center gap-1 bg-slate-700/90 dark:bg-slate-800/90 hover:bg-slate-600 dark:hover:bg-slate-700 text-slate-200">
           <Download className="h-4 w-4" /> PDF
         </Button>
       </CardHeader>
-      <CardContent className="pt-5 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
+      <CardContent className="pt-5 bg-slate-900/80 backdrop-blur-sm">
         {isLoaded ? (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -275,11 +276,11 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
                clientSentimentData.assets.length > 0 ? clientSentimentData.assets.slice(0, 2).map((asset, index) => (
                 <div 
                   key={index} 
-                  className={`${getSentimentBg(asset.sentiment)} p-4 rounded-lg shadow-lg border-2 transition-all hover:shadow-xl hover:translate-y-[-2px]`}
+                  className={`${getSentimentBg(asset.sentiment)} p-4 rounded-lg shadow-lg border transition-all hover:shadow-xl hover:translate-y-[-2px]`}
                 >
                   <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center">
-                      <span className="text-xl font-bold text-gray-900 dark:text-white">
+                      <span className="text-xl font-bold text-slate-200">
                         {asset.ticker}
                       </span>
                       <Badge className="ml-2 px-2" variant={asset.sentiment >= 70 ? "default" : asset.sentiment >= 50 ? "secondary" : "destructive"}>
@@ -297,9 +298,9 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
                       {`${getImpactPrefix(asset.impact)}${asset.impact.toFixed(1)}%`}
                     </span>
                   </div>
-                  <div className="flex items-start mt-3 bg-white/80 dark:bg-slate-800/80 p-3 rounded-lg shadow-inner">
-                    <Newspaper className="h-5 w-5 mr-2 mt-1 flex-shrink-0 text-indigo-500 dark:text-indigo-400" />
-                    <p className="text-gray-800 dark:text-gray-100">
+                  <div className="flex items-start mt-3 bg-slate-800/80 p-3 rounded-lg shadow-inner">
+                    <Newspaper className="h-5 w-5 mr-2 mt-1 flex-shrink-0 text-slate-400" />
+                    <p className="text-slate-300">
                       {asset.recentNews}
                     </p>
                   </div>
@@ -307,7 +308,7 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
                     <Button 
                       variant="outline" 
                       size="sm"
-                      className="w-full bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-300 dark:border-indigo-700 hover:bg-indigo-600/20"
+                      className="w-full bg-slate-800/50 text-slate-300 border-slate-600/50 hover:bg-slate-700/50"
                       onClick={() => handleChatAction(asset.ticker)}
                     >
                       Perguntar ao Nicolas
@@ -315,24 +316,24 @@ const SentimentInsightsModule = ({ fullWidth = false }: SentimentInsightsModuleP
                   </div>
                 </div>
               )) : (
-                <div className="col-span-2 p-6 text-center bg-gray-100/50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
-                  <p className="text-gray-600 dark:text-gray-300">Nenhum ativo disponível para análise de sentimento.</p>
+                <div className="col-span-2 p-6 text-center bg-slate-800/50 rounded-lg border border-slate-700/50">
+                  <p className="text-slate-400">Nenhum ativo disponível para análise de sentimento.</p>
                 </div>
               )}
             </div>
             
             {/* Ensure we have summary data or provide a fallback */}
-            <div className="bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/40 dark:to-indigo-900/40 p-4 rounded-lg border-2 border-blue-200 dark:border-blue-800/50 mt-4 shadow-lg">
-              <p className="text-gray-800 dark:text-gray-100 font-medium">
+            <div className="bg-gradient-to-r from-slate-800/70 to-slate-700/70 p-4 rounded-lg border border-slate-600/50 mt-4 shadow-lg">
+              <p className="text-slate-300 font-medium">
                 {clientSentimentData.summary || "Sem dados disponíveis para análise de sentimento."}
               </p>
             </div>
           </>
         ) : (
           <div className="space-y-4">
-            <div className="h-32 bg-gray-200 animate-pulse dark:bg-gray-800/40 rounded-lg"></div>
-            <div className="h-32 bg-gray-200 animate-pulse dark:bg-gray-800/40 rounded-lg"></div>
-            <div className="h-16 bg-gray-200 animate-pulse dark:bg-gray-800/40 rounded-lg"></div>
+            <div className="h-32 bg-slate-800/40 animate-pulse rounded-lg"></div>
+            <div className="h-32 bg-slate-800/40 animate-pulse rounded-lg"></div>
+            <div className="h-16 bg-slate-800/40 animate-pulse rounded-lg"></div>
           </div>
         )}
       </CardContent>

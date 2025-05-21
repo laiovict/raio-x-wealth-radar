@@ -5,7 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Users, Award, TrendingUp, BarChart4 } from "lucide-react";
 import { formatCurrency, formatPercentage } from "@/utils/formattingUtils";
-import { toNumber, compareToNumber, toString, ensureString, toSafeString, toParseableString } from '@/utils/typeConversionHelpers';
+import { toNumber, compareToNumber, toString, ensureString } from '@/utils/typeConversionHelpers';
 import { DataSourceType } from '@/types/raioXTypes';
 import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 
@@ -44,7 +44,7 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
       // Parse safely ensuring we handle both string and number types
       const diversityScore = 
         data.portfolioSummary.fixed_income_representation > 0 ? 25 : 0 +
-        parseFloat(toParseableString(data.portfolioSummary.stocks_representation)) > 0 ? 25 : 0 +
+        parseFloat(toString(data.portfolioSummary.stocks_representation)) > 0 ? 25 : 0 +
         data.portfolioSummary.real_estate_representation > 0 ? 25 : 0 +
         data.portfolioSummary.investment_fund_representation > 0 ? 25 : 0;
       
@@ -76,8 +76,8 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
   const comparisonData = socialComparison || generateComparisonData();
 
   return (
-    <Card className="w-full border-2 border-blue-100 dark:border-blue-800/30 shadow-lg hover:shadow-xl transition-all bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900/50 dark:to-blue-900/20">
-      <CardHeader className="flex flex-row justify-between items-center pb-2 bg-gradient-to-r from-blue-600 to-indigo-700 rounded-t-lg">
+    <Card className="w-full border-2 border-slate-700/50 shadow-lg hover:shadow-xl transition-all bg-gradient-to-br from-slate-900/80 to-slate-800/80">
+      <CardHeader className="flex flex-row justify-between items-center pb-2 bg-gradient-to-r from-slate-800 to-slate-700 rounded-t-lg">
         <CardTitle className="text-xl text-white flex items-center">
           <Users className="h-5 w-5 mr-2" />
           Comparação Social
@@ -86,11 +86,11 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
       </CardHeader>
       <CardContent className="p-6 space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-md space-y-4 border-2 border-blue-50 dark:border-blue-900/20">
+          <div className="bg-slate-800/70 rounded-xl p-5 shadow-md space-y-4 border-2 border-slate-700/50">
             <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <Award className="h-5 w-5 text-blue-500 mr-2" />
-                <span className="font-bold text-gray-800 dark:text-gray-200">Ranking Percentual</span>
+                <span className="font-bold text-slate-200">Ranking Percentual</span>
               </div>
               <Badge className={`text-white ${getScoreBadgeColor(comparisonData.percentileRank)}`}>
                 {comparisonData.percentileRank ? `${comparisonData.percentileRank}%` : "N/A"}
@@ -99,39 +99,39 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
             
             <div>
               <div className="flex justify-between items-center mb-1">
-                <span className="text-sm text-gray-600 dark:text-gray-400">Você está aqui</span>
-                <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{comparisonData.percentileRank}%</span>
+                <span className="text-sm text-slate-400">Você está aqui</span>
+                <span className="text-sm font-medium text-slate-300">{comparisonData.percentileRank}%</span>
               </div>
-              <div className="h-3 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-3 w-full bg-slate-700/70 rounded-full overflow-hidden">
                 <div 
                   className="h-full bg-gradient-to-r from-blue-500 to-indigo-600" 
                   style={{width: `${comparisonData.percentileRank}%`}}
                 ></div>
               </div>
-              <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <div className="flex justify-between text-xs text-slate-500 mt-1">
                 <span>0%</span>
                 <span>100%</span>
               </div>
             </div>
             
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              <span className="text-sm font-medium text-slate-400">
                 Grupo de Pares
               </span>
-              <span className="text-sm font-medium bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 px-3 py-1 rounded-full">
+              <span className="text-sm font-medium bg-slate-700/70 text-slate-300 px-3 py-1 rounded-full">
                 {comparisonData.peerGroup || "N/A"}
               </span>
             </div>
           </div>
           
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-md space-y-4 border-2 border-blue-50 dark:border-blue-900/20">
+          <div className="bg-slate-800/70 rounded-xl p-5 shadow-md space-y-4 border-2 border-slate-700/50">
             <div className="flex items-center">
               <TrendingUp className="h-5 w-5 text-green-500 mr-2" />
-              <span className="font-bold text-gray-800 dark:text-gray-200">Seu Desempenho</span>
+              <span className="font-bold text-slate-200">Seu Desempenho</span>
             </div>
             
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              <span className="text-sm font-medium text-slate-400">
                 Retorno vs. Pares
               </span>
               <span className="text-xl font-bold text-green-600 dark:text-green-400">
@@ -141,10 +141,10 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
             
             <div className="pt-2">
               <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <span className="text-sm font-medium text-slate-400">
                   Diversificação
                 </span>
-                <span className="text-sm font-bold text-blue-700 dark:text-blue-400">
+                <span className="text-sm font-bold text-blue-400">
                   {comparisonData.diversificationScore}/100
                 </span>
               </div>
@@ -152,7 +152,7 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
                 value={comparisonData.diversificationScore}
                 className="h-2"
                 style={{
-                  background: 'rgba(209, 213, 219, 0.5)',
+                  background: 'rgba(51, 65, 85, 0.5)',
                 }}
               >
                 <div 
@@ -167,11 +167,11 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
           </div>
         </div>
         
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-md space-y-4 border-2 border-blue-50 dark:border-blue-900/20">
+        <div className="bg-slate-800/70 rounded-xl p-5 shadow-md space-y-4 border-2 border-slate-700/50">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <BarChart4 className="h-5 w-5 text-indigo-500 mr-2" />
-              <span className="font-bold text-gray-800 dark:text-gray-200">Pontuação Geral</span>
+              <span className="font-bold text-slate-200">Pontuação Geral</span>
             </div>
             <Badge className={`text-white ${getScoreBadgeColor(comparisonData.overallScore)}`}>
               {getScoreLevel(comparisonData.overallScore)}
@@ -180,14 +180,14 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
           
           <div className="pt-1">
             <div className="flex justify-between items-center mb-1">
-              <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              <span className="text-sm font-medium text-slate-400">
                 Score
               </span>
-              <span className="text-sm font-medium text-gray-800 dark:text-gray-200">
+              <span className="text-sm font-medium text-slate-300">
                 {comparisonData.overallScore}/100
               </span>
             </div>
-            <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+            <div className="h-4 w-full bg-slate-700/70 rounded-full overflow-hidden">
               <div 
                 className="h-full"
                 style={{
@@ -196,7 +196,7 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
                 }}
               ></div>
             </div>
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <div className="flex justify-between text-xs text-slate-500 mt-1">
               <span>0</span>
               <span>25</span>
               <span>50</span>
@@ -206,8 +206,8 @@ const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModulePro
           </div>
         </div>
         
-        <div className="bg-gradient-to-r from-indigo-100 to-blue-100 dark:from-indigo-900/40 dark:to-blue-900/40 p-5 rounded-xl border-2 border-indigo-200 dark:border-indigo-800/50 shadow-md">
-          <p className="text-gray-800 dark:text-gray-100 font-medium">
+        <div className="bg-gradient-to-r from-slate-800/70 to-slate-700/70 p-5 rounded-xl border-2 border-slate-600/50 shadow-md">
+          <p className="text-slate-300 font-medium">
             {comparisonData.summary || "Dados adicionais disponíveis ao conectar mais fontes financeiras."}
           </p>
         </div>
