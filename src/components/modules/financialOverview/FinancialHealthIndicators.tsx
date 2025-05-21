@@ -15,7 +15,7 @@ interface FinancialHealthIndicatorsProps {
 const FinancialHealthIndicators = ({ finData, getPortfolioSummary, useSyntheticData = false }: FinancialHealthIndicatorsProps) => {
   const portfolioSummary = getPortfolioSummary();
   
-  // Calculate savings rate - implement the corrected formula (assets / liabilities)
+  // Calculate savings rate - using the utility function
   let savingsRateData;
   
   if (!useSyntheticData && portfolioSummary) {
@@ -23,15 +23,8 @@ const FinancialHealthIndicators = ({ finData, getPortfolioSummary, useSyntheticD
     const totalAssets = ensureNumber(portfolioSummary?.total_portfolio_value);
     const totalLiabilities = ensureNumber(finData.totalLiabilities) || 1; // Avoid division by zero
     
-    // Calculate savings rate as assets divided by liabilities (corrected formula)
-    const savingsRateValue = totalAssets / totalLiabilities;
-    const formattedRate = Math.min(savingsRateValue * 100, 999.9).toFixed(1); // Cap at 999.9%
-    
-    savingsRateData = {
-      rate: formattedRate,
-      trend: "+2.3%", // Could be dynamic if we had historical data
-      dataSource: portfolioSummary?.dataSource || 'calculated',
-    };
+    // Use our utility function to calculate savings rate
+    savingsRateData = calculateSavingsRate(totalAssets, totalLiabilities);
   } else {
     // In Full mode or when lacking real data, use the synthetic calculation
     savingsRateData = calculateSavingsRate(

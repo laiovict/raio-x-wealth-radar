@@ -28,3 +28,15 @@ export interface ModuleDataState<T> {
   /** Whether this is real or synthetic data */
   isSynthetic: boolean;
 }
+
+/**
+ * Interface for savings rate data returned by calculateSavingsRate
+ */
+export interface SavingsRateData {
+  /** The savings rate as a formatted string (with decimal places) */
+  rate: string;
+  /** The trend compared to a previous period */
+  trend: string;
+  /** The source of this data */
+  dataSource: DataSourceType;
+}
