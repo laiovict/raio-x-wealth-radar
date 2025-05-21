@@ -28,7 +28,7 @@ const TypeSafeDataSourceTag: React.FC<TypeSafeDataSourceTagProps> = ({
   
   // Convert source to string and then to the limited types expected by DataSourceTag
   const sourceAsString = toSafeString(source);
-  const compatibleSource = toLimitedDataSource(sourceAsString);
+  const compatibleSource = toLimitedDataSource(source);
   
   return (
     <div className="flex items-center">

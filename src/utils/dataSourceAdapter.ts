@@ -12,7 +12,12 @@ import { DataSourceType } from '@/types/raioXTypes';
  * @param sourceType The original DataSourceType value
  * @returns 'synthetic' or 'supabase' for legacy component compatibility
  */
-export const toLimitedDataSource = (sourceType?: DataSourceType | string): 'synthetic' | 'supabase' => {
+export const toLimitedDataSource = (sourceType?: DataSourceType | string | number): 'synthetic' | 'supabase' => {
+  // Convert numbers to strings if needed
+  if (typeof sourceType === 'number') {
+    sourceType = String(sourceType);
+  }
+  
   if (!sourceType || sourceType === 'synthetic') {
     return 'synthetic';
   }

@@ -1,3 +1,4 @@
+
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -15,10 +16,9 @@ interface LifeGoalsModuleProps {
   fullWidth?: boolean;
 }
 
-// Data source indicator component - updated to accept any type of source
+// Updated to accept any type of source and explicitly delegate type handling to TypeSafeDataSourceTag
 const DataSourceIndicator = ({ source }: { source?: DataSourceType | string | number }) => {
   if (source === undefined || source === null) return null;
-  // TypeSafeDataSourceTag now accepts string | number | DataSourceType
   return <TypeSafeDataSourceTag source={source} />;
 };
 
