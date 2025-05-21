@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -12,29 +12,41 @@ import { getMonthlyReportUrl } from "@/utils/reportUtils";
 import { generatePdf } from "@/utils/pdfGenerator";
 import { LayoutDashboard, Download, XCircle } from "lucide-react";
 
-// Import Module Components
-import PersonalInsightsModule from "@/components/modules/PersonalInsightsModule";
-import RecommendationsModule from "@/components/modules/RecommendationsModule";
-import RecommendedActionsModule from "@/components/modules/RecommendedActionsModule";
-import InvestmentPlanningModule from "@/components/modules/InvestmentPlanningModule";
-import InteligenciaModule from "@/components/modules/InteligenciaModule";
-import ClientProfileModule from "@/components/modules/ClientProfileModule";
-import AllocationModule from "@/components/modules/AllocationModule";
-import LifeGoalsModule from "@/components/modules/LifeGoalsModule";
-import WrappedModule from "@/components/modules/WrappedModule";
-import DividendModule from "@/components/modules/DividendModule";
+// Import static components
 import FinancialOverviewModule from "@/components/modules/FinancialOverviewModule";
+import AllocationModule from "@/components/modules/AllocationModule";
 import LiquidityReserveModule from "@/components/modules/LiquidityReserveModule";
 import AIInsightsHubModule from "@/components/modules/AIInsightsHubModule";
 import SentimentInsightsModule from "@/components/modules/SentimentInsightsModule";
+import DividendModule from "@/components/modules/DividendModule";
 import SocialComparisonModule from "@/components/modules/SocialComparisonModule";
 import FamousInvestorsModule from "@/components/modules/FamousInvestorsModule";
-import OnePageFinancialPlanModule from "@/components/modules/OnePageFinancialPlanModule";
-import FutureProjectionModule from "@/components/modules/FutureProjectionModule";
-import SteveJobsReportModule from "@/components/modules/SteveJobsReportModule";
-import WholeBankingModule from "@/components/modules/WholeBankingModule";
-import BehavioralFinanceModule from "@/components/modules/BehavioralFinanceModule";
-import MeuFuturoFinanceiroModule from "@/components/modules/MeuFuturoFinanceiroModule";
+import ClientProfileModule from "@/components/modules/ClientProfileModule";
+
+// Lazy-load less frequently used components
+const RecommendationsModule = lazy(() => import("@/components/modules/RecommendationsModule"));
+const RecommendedActionsModule = lazy(() => import("@/components/modules/RecommendedActionsModule"));
+const InteligenciaModule = lazy(() => import("@/components/modules/InteligenciaModule"));
+const InvestmentPlanningModule = lazy(() => import("@/components/modules/InvestmentPlanningModule"));
+const LifeGoalsModule = lazy(() => import("@/components/modules/LifeGoalsModule"));
+const WrappedModule = lazy(() => import("@/components/modules/WrappedModule"));
+const FutureProjectionModule = lazy(() => import("@/components/modules/FutureProjectionModule"));
+const OnePageFinancialPlanModule = lazy(() => import("@/components/modules/OnePageFinancialPlanModule"));
+const SteveJobsReportModule = lazy(() => import("@/components/modules/SteveJobsReportModule"));
+const WholeBankingModule = lazy(() => import("@/components/modules/WholeBankingModule"));
+const BehavioralFinanceModule = lazy(() => import("@/components/modules/BehavioralFinanceModule"));
+const MeuFuturoFinanceiroModule = lazy(() => import("@/components/modules/MeuFuturoFinanceiroModule"));
+const PersonalInsightsModule = lazy(() => import("@/components/modules/PersonalInsightsModule"));
+
+// Loading component for Suspense
+const LoadingComponent = () => (
+  <Card className="p-4 min-h-[200px] w-full flex items-center justify-center">
+    <div className="flex flex-col items-center gap-2">
+      <div className="w-8 h-8 border-4 border-l-indigo-500 border-r-indigo-500 border-t-transparent border-b-transparent rounded-full animate-spin"></div>
+      <p className="text-sm text-slate-400">Carregando...</p>
+    </div>
+  </Card>
+);
 
 interface RaioXDashboardProps {
   showPdfPreview: boolean;
@@ -123,99 +135,129 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
     setSearchParams({ tab: value });
   };
 
-  // Define tab content components
-  const renderTabContent = (tabId: string) => {
-    switch (tabId) {
-      case 'raiox-beta':
-        return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
-            {/* Visão Geral section */}
-            <FinancialOverviewModule fullWidth={true} />
-            <div className="grid grid-cols-1 gap-6">
-              <AllocationModule />
-              <LiquidityReserveModule />
-            </div>
-            
-            {/* Insights AI section */}
-            <AIInsightsHubModule fullWidth={false} />
-            <SentimentInsightsModule />
-            
-            {/* Investimentos section */}
-            <DividendModule fullWidth={false} />
-            <div className="grid grid-cols-1 gap-6">
-              <SocialComparisonModule />
-              <FamousInvestorsModule />
-            </div>
-          </div>
-        );
-      case 'raiox-full':
-        return (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-6">
-            <div className="lg:col-span-1">
-              <ClientProfileModule />
-            </div>
-            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* All modules */}
-              <RecommendationsModule />
-              <RecommendedActionsModule />
-              <InteligenciaModule />
-              <InvestmentPlanningModule />
-              <LifeGoalsModule />
-              <DividendModule />
-              <AllocationModule />
-              <LiquidityReserveModule />
-              <FutureProjectionModule />
-              <SocialComparisonModule />
-              <AIInsightsHubModule />
-              <BehavioralFinanceModule />
-              <FinancialOverviewModule />
-              <OnePageFinancialPlanModule />
-              <SentimentInsightsModule />
-              <FamousInvestorsModule />
-              <WrappedModule />
-              <SteveJobsReportModule />
-              <MeuFuturoFinanceiroModule />
-              <WholeBankingModule />
-              <PersonalInsightsModule />
-            </div>
-          </div>
-        );
-      case 'raiox-full-v2':
-        return (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6 jony-ive-design">
-            <ClientProfileModule fullWidth={false} />
-            <div className="grid grid-cols-1 gap-6">
-              <InvestmentPlanningModule />
-              <InteligenciaModule />
-            </div>
-            <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <RecommendationsModule />
-              <RecommendedActionsModule />
-              <LifeGoalsModule />
-              <DividendModule />
-              <AllocationModule />
-              <LiquidityReserveModule />
-              <FutureProjectionModule />
-              <SocialComparisonModule />
-              <AIInsightsHubModule />
-              <BehavioralFinanceModule />
-              <FinancialOverviewModule />
-              <OnePageFinancialPlanModule />
-              <SentimentInsightsModule />
-              <FamousInvestorsModule />
-            </div>
-          </div>
-        );
-      default:
-        return (
-          <Card className="glass-morphism p-6">
-            <CardContent>
-              {t("defaultTabContent")}
-            </CardContent>
-          </Card>
-        );
-    }
-  };
+  // Define RaioX Beta tab content
+  const BetaTabContent = () => (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
+      {/* Visão Geral section */}
+      <FinancialOverviewModule fullWidth={true} />
+      <div className="grid grid-cols-1 gap-6">
+        <AllocationModule />
+        <LiquidityReserveModule />
+      </div>
+      
+      {/* Insights AI section */}
+      <AIInsightsHubModule fullWidth={false} />
+      <SentimentInsightsModule />
+      
+      {/* Investimentos section */}
+      <DividendModule fullWidth={false} />
+      <div className="grid grid-cols-1 gap-6">
+        <SocialComparisonModule />
+        <FamousInvestorsModule />
+      </div>
+    </div>
+  );
+
+  // Define RaioX Full tab content
+  const FullTabContent = () => (
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pb-6">
+      <div className="lg:col-span-1">
+        <ClientProfileModule />
+      </div>
+      <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Suspense fallback={<LoadingComponent />}>
+          <RecommendationsModule />
+        </Suspense>
+        <Suspense fallback={<LoadingComponent />}>
+          <RecommendedActionsModule />
+        </Suspense>
+        <Suspense fallback={<LoadingComponent />}>
+          <InteligenciaModule />
+        </Suspense>
+        <Suspense fallback={<LoadingComponent />}>
+          <InvestmentPlanningModule />
+        </Suspense>
+        <Suspense fallback={<LoadingComponent />}>
+          <LifeGoalsModule />
+        </Suspense>
+        <DividendModule />
+        <AllocationModule />
+        <LiquidityReserveModule />
+        <Suspense fallback={<LoadingComponent />}>
+          <FutureProjectionModule />
+        </Suspense>
+        <SocialComparisonModule />
+        <AIInsightsHubModule />
+        <Suspense fallback={<LoadingComponent />}>
+          <BehavioralFinanceModule />
+        </Suspense>
+        <FinancialOverviewModule />
+        <Suspense fallback={<LoadingComponent />}>
+          <OnePageFinancialPlanModule />
+        </Suspense>
+        <SentimentInsightsModule />
+        <FamousInvestorsModule />
+        <Suspense fallback={<LoadingComponent />}>
+          <WrappedModule />
+        </Suspense>
+        <Suspense fallback={<LoadingComponent />}>
+          <SteveJobsReportModule />
+        </Suspense>
+        <Suspense fallback={<LoadingComponent />}>
+          <MeuFuturoFinanceiroModule />
+        </Suspense>
+        <Suspense fallback={<LoadingComponent />}>
+          <WholeBankingModule />
+        </Suspense>
+        <Suspense fallback={<LoadingComponent />}>
+          <PersonalInsightsModule />
+        </Suspense>
+      </div>
+    </div>
+  );
+
+  // Define RaioX Full v2 (Jony Ive design) tab content
+  const FullV2TabContent = () => (
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6 jony-ive-design">
+      <ClientProfileModule fullWidth={false} />
+      <div className="grid grid-cols-1 gap-6">
+        <Suspense fallback={<LoadingComponent />}>
+          <InvestmentPlanningModule />
+        </Suspense>
+        <Suspense fallback={<LoadingComponent />}>
+          <InteligenciaModule />
+        </Suspense>
+      </div>
+      <div className="lg:col-span-2 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <Suspense fallback={<LoadingComponent />}>
+          <RecommendationsModule />
+        </Suspense>
+        <Suspense fallback={<LoadingComponent />}>
+          <RecommendedActionsModule />
+        </Suspense>
+        <Suspense fallback={<LoadingComponent />}>
+          <LifeGoalsModule />
+        </Suspense>
+        <DividendModule />
+        <AllocationModule />
+        <LiquidityReserveModule />
+        <Suspense fallback={<LoadingComponent />}>
+          <FutureProjectionModule />
+        </Suspense>
+        <SocialComparisonModule />
+        <AIInsightsHubModule />
+        <Suspense fallback={<LoadingComponent />}>
+          <BehavioralFinanceModule />
+        </Suspense>
+        <FinancialOverviewModule />
+        <Suspense fallback={<LoadingComponent />}>
+          <OnePageFinancialPlanModule />
+        </Suspense>
+        <SentimentInsightsModule />
+        <FamousInvestorsModule />
+      </div>
+    </div>
+  );
 
   return (
     <>
@@ -249,7 +291,7 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
         </div>
       )}
 
-      {/* Tab Navigation - Simplified to only 3 tabs */}
+      {/* Tab Navigation */}
       <div className="mb-6">
         <ScrollArea className="w-full whitespace-nowrap rounded-md border">
           <Tabs
@@ -283,24 +325,17 @@ const RaioXDashboard: React.FC<RaioXDashboardProps> = ({
 
             {/* Tab Contents */}
             <TabsContent value="raiox-beta">
-              {renderTabContent('raiox-beta')}
+              <BetaTabContent />
             </TabsContent>
             <TabsContent value="raiox-full">
-              {renderTabContent('raiox-full')}
+              <FullTabContent />
             </TabsContent>
             <TabsContent value="raiox-full-v2">
-              {renderTabContent('raiox-full-v2')}
+              <FullV2TabContent />
             </TabsContent>
           </Tabs>
         </ScrollArea>
       </div>
-
-      {/* Tab Content */}
-      {activeTab && (
-        <div>
-          {renderTabContent(activeTab)}
-        </div>
-      )}
     </>
   );
 };

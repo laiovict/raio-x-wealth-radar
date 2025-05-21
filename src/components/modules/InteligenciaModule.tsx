@@ -1,5 +1,5 @@
 
-import { useRaioX } from "@/context/RaioXContext";
+import React, { useMemo } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { 
   Lightbulb, 
@@ -9,12 +9,12 @@ import {
   ArrowRight,
   Zap
 } from "lucide-react";
-import { useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
-import { generateAIInsights } from '@/services/insightGeneratorService';
+import { useRaioX } from "@/context/RaioXContext";
 import { DataSourceType } from '@/types/raioXTypes';
+import useTabContent from "@/hooks/useTabContent";
 
 // Import subcomponents
 import InsightsTabContent from "./inteligencia/InsightsTabContent";
@@ -27,150 +27,20 @@ interface InteligenciaModuleProps {
 }
 
 const InteligenciaModule = ({ fullWidth = false }: InteligenciaModuleProps) => {
-  const { data, isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
-  const [activeContent, setActiveContent] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  
-  // Mock data for insights, actions and recommendations
-  const [mockInsights, setMockInsights] = useState([]);
-  const [mockActions, setMockActions] = useState([]);
-  const [mockRecommendations, setMockRecommendations] = useState([]);
-  
-  // Define the content loading status
-  const [contentLoaded, setContentLoaded] = useState({
-    insights: false,
-    actions: false,
-    recommendations: false
-  });
+  const { isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
   
   // Define a random client seed to ensure varied mock data
   const clientSeed = useMemo(() => Math.floor(Math.random() * 10000), []);
   
-  // Generate mock insights when requested
-  const generateMockInsights = () => {
-    setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      const insights = [
-        {
-          id: `insight-${clientSeed}-1`,
-          title: "Concentração excessiva em FIIs",
-          description: "Sua carteira tem mais de 40% alocado em fundos imobiliários, o que pode aumentar seu risco setorial. Considere diversificar em outras classes de ativos.",
-          type: "risk",
-          impact: "high",
-          actions: [
-            "Reduzir exposição a FIIs para no máximo 25% da carteira",
-            "Aumentar alocação em ações de outros setores"
-          ],
-          isNew: true,
-          dataSource: "synthetic" as DataSourceType
-        },
-        {
-          id: `insight-${clientSeed}-2`,
-          title: "Oportunidade em dividendos",
-          description: "Os dividendos recebidos aumentaram 22% em relação ao mesmo período do ano passado, indicando bom desempenho dos ativos de renda.",
-          type: "opportunity",
-          impact: "medium",
-          actions: [
-            "Aumentar posição em ações pagadoras de dividendos",
-            "Reinvestir automaticamente os dividendos recebidos"
-          ],
-          dataSource: "synthetic" as DataSourceType
-        },
-        {
-          id: `insight-${clientSeed}-3`,
-          title: "Desbalanceamento da carteira",
-          description: `A distribuição atual da sua carteira desviou ${clientSeed % 10 + 5}% da alocação estratégica ideal. Uma realocação pode otimizar o retorno considerando seu perfil de risco.`,
-          type: "insight",
-          impact: "medium",
-          actions: [
-            "Realizar rebalanceamento trimestral",
-            "Ajustar alocação entre renda fixa e variável"
-          ],
-          dataSource: "synthetic" as DataSourceType
-        }
-      ];
-      
-      setMockInsights(insights);
-      setContentLoaded(prev => ({ ...prev, insights: true }));
-      setIsLoading(false);
-    }, 1200);
-  };
-  
-  // Generate mock actions when requested
-  const generateMockActions = () => {
-    setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      const actionStatuses = [
-        { id: 'liquidity', label: 'Reserva de emergência', status: 'pending' },
-        { id: 'risk', label: 'Perfil de risco', status: 'complete' },
-        { id: 'diversification', label: 'Diversificação', status: 'partial' },
-        { id: `action-${clientSeed}`, label: 'Rebalanceamento', status: clientSeed % 2 === 0 ? 'pending' : 'complete' }
-      ];
-      
-      setMockActions(actionStatuses);
-      setContentLoaded(prev => ({ ...prev, actions: true }));
-      setIsLoading(false);
-    }, 1000);
-  };
-  
-  // Generate mock recommendations when requested
-  const generateMockRecommendations = () => {
-    setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
-      const recommendations = [
-        {
-          id: `rec-${clientSeed}-1`,
-          title: "Aumente sua reserva de emergência",
-          description: "Sua reserva atual cobre apenas 3 meses de despesas. O ideal é ter entre 6 a 12 meses.",
-          urgency: "Alto",
-          impact: "Alto",
-        },
-        {
-          id: `rec-${clientSeed}-2`,
-          title: "Diversifique internacionalmente",
-          description: "Sua carteira está 100% no Brasil. Uma exposição de 15-30% ao mercado internacional pode reduzir riscos.",
-          urgency: "Médio",
-          impact: "Médio",
-        },
-        {
-          id: `rec-${clientSeed}-3`,
-          title: `Reveja seus seguros`,
-          description: `Os seguros atuais podem não cobrir adequadamente suas necessidades financeiras e familiares.`,
-          urgency: "Baixo",
-          impact: "Alto",
-        }
-      ];
-      
-      setMockRecommendations(recommendations);
-      setContentLoaded(prev => ({ ...prev, recommendations: true }));
-      setIsLoading(false);
-    }, 1500);
-  };
-
-  // Handle content button click
-  const handleContentClick = (contentType: string) => {
-    if (activeContent === contentType) {
-      setActiveContent(null); // Toggle off if already active
-      return;
-    }
-    
-    setActiveContent(contentType);
-    
-    // Generate appropriate mock data based on content type
-    if (contentType === "insights" && !contentLoaded.insights) {
-      generateMockInsights();
-    } else if (contentType === "actions" && !contentLoaded.actions) {
-      generateMockActions();
-    } else if (contentType === "recommendations" && !contentLoaded.recommendations) {
-      generateMockRecommendations();
-    }
-  };
+  // Use custom hook for tab content management
+  const {
+    activeContent,
+    isLoading,
+    mockInsights,
+    mockActions,
+    mockRecommendations,
+    handleContentClick
+  } = useTabContent({ clientSeed });
   
   // Animation variants for framer-motion
   const cardVariants = {

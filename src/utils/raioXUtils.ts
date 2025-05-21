@@ -1,117 +1,109 @@
-import { DividendHistory, FinancialSummary } from '@/types/raioXTypes';
-import { toNumber as convertToNumber, ensureNumber, ensureString } from '@/utils/typeConversionHelpers';
+
+import { FinancialSummary, DividendHistory } from '@/types/raioXTypes';
+import { calculateTotalDividends } from '@/services/dividendService';
+import { toNumber } from '@/utils/typeConversionHelpers';
 
 /**
- * Format currency values consistently
- * @param value Number or string to format as currency
- * @param minimumFractionDigits Minimum fraction digits
- * @param maximumFractionDigits Maximum fraction digits
- * @returns Formatted currency string
+ * Generate a financial summary from portfolio data
  */
-export const formatCurrency = (value: number | string | undefined | null, minimumFractionDigits = 0, maximumFractionDigits = 0): string => {
-  // Convert value to number if it's a string
-  const numValue = convertToNumber(value);
+export const generateFinancialSummary = (
+  portfolioSummary: any,
+  dividendHistory: DividendHistory[] | undefined
+): FinancialSummary => {
+  // Calculate monthly income and expenses
+  const monthlyIncome = calculateTotalDividends(dividendHistory || []);
+  const monthlyExpenses = calculateTotalDividends(portfolioSummary?.monthly_expenses || []);
+  
+  // Calculate savings rate
+  const savingsRate = monthlyIncome > 0 ? (monthlyIncome - monthlyExpenses) / monthlyIncome * 100 : 0;
+  
+  // Get portfolio value from summary
+  const portfolioValue = toNumber(portfolioSummary?.total_portfolio_value || '0');
+  
+  // Calculate asset percentages
+  const fixedIncomePercent = toNumber(portfolioSummary?.fixed_income_representation || '0');
+  const variableIncomePercent = toNumber(portfolioSummary?.stocks_representation || '0');
+  const realEstatePercent = toNumber(portfolioSummary?.real_estate_representation || '0');
+  const otherPercent = 100 - (fixedIncomePercent + variableIncomePercent + realEstatePercent);
+  
+  // Calculate dividend metrics
+  const monthlyDividends = monthlyIncome / 12; // Simple average
+  const annualDividends = monthlyIncome;
+  const dividendYield = portfolioValue > 0 ? (annualDividends / portfolioValue) * 100 : 0;
+  
+  // Create financial summary with all required properties
+  return {
+    totalAssets: portfolioValue,
+    netWorth: portfolioValue - (portfolioValue * 0.2), // Estimate net worth as assets minus 20% for liabilities
+    totalLiabilities: portfolioValue * 0.2, // Estimate liabilities as 20% of portfolio value
+    debtTotal: portfolioValue * 0.2, // Same as liabilities
+    
+    monthlyIncome: monthlyIncome,
+    monthlyExpenses: monthlyExpenses,
+    savingsRate: savingsRate,
+    
+    investmentBalance: portfolioValue * 0.9, // Estimate investment balance as 90% of portfolio
+    cashReserves: portfolioValue * 0.1, // Estimate cash reserves as 10% of portfolio
+    liquidAssets: portfolioValue * 0.3, // Estimate liquid assets as 30% of portfolio
+    
+    // Asset allocation
+    fixedIncomePercent,
+    variableIncomePercent,
+    realEstatePercent,
+    otherPercent,
+    
+    // Dividend information
+    monthlyDividends,
+    annualDividends,
+    dividendYield,
+    
+    // Data source
+    dataSource: portfolioSummary?.dataSource || 'synthetic',
+    
+    // Profitability (if available in portfolio summary)
+    profitability: portfolioSummary?.profitability || {
+      ytd: toNumber(portfolioSummary?.ytd || '0'),
+      sixMonths: toNumber(portfolioSummary?.six_months || '0'),
+      twelveMonths: toNumber(portfolioSummary?.twelve_months || '0'),
+    }
+  };
+};
+
+/**
+ * Format currency for display
+ */
+export const formatCurrency = (value: number | string): string => {
+  const numValue = typeof value === 'string' ? parseFloat(value) : value;
+  
+  if (isNaN(numValue)) {
+    return 'R$ 0,00';
+  }
   
   return new Intl.NumberFormat('pt-BR', {
     style: 'currency',
     currency: 'BRL',
-    minimumFractionDigits,
-    maximumFractionDigits,
   }).format(numValue);
 };
 
 /**
- * Format percentage values consistently
- * @param value Number to format as percentage
- * @param digits Decimal digits to display
- * @returns Formatted percentage string
+ * Format percentage for display
  */
-export const formatPercentage = (value: number | string | undefined | null, digits = 1): string => {
-  const numValue = convertToNumber(value);
-  return `${numValue.toFixed(digits)}%`;
+export const formatPercentage = (value: number | string): string => {
+  const numValue = typeof value === 'string' ? parseFloat(value) : value;
+  
+  if (isNaN(numValue)) {
+    return '0%';
+  }
+  
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'percent',
+    minimumFractionDigits: 1,
+    maximumFractionDigits: 1,
+  }).format(numValue / 100);
 };
 
-/**
- * Format date values consistently
- * @param date Date to format
- * @param options Intl.DateTimeFormatOptions
- * @returns Formatted date string
- */
-export const formatDate = (date: Date | string, options?: Intl.DateTimeFormatOptions): string => {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
-  return dateObj.toLocaleDateString('pt-BR', options || {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric'
-  });
-};
-
-/**
- * Parse string values to numbers (handling Brazilian currency format)
- * @param value String value to parse
- * @returns Number value
- */
-export const parseValueToNumber = (value: string | number): number => {
-  if (typeof value === 'number') return value;
-  
-  // Handle Brazilian currency format and other formats
-  return Number(value.replace(/[^\d,-]/g, '').replace(',', '.')) || 0;
-};
-
-/**
- * Calculate total dividends from dividend history
- * @param dividendHistory Array of dividend history entries
- * @returns Total dividends
- */
-export const calculateTotalDividends = (dividendHistory: DividendHistory[] | undefined): number => {
-  if (!dividendHistory || dividendHistory.length === 0) return 0;
-  
-  return dividendHistory.reduce((total, item) => {
-    return total + parseValueToNumber(ensureString(item.value || '0'));
-  }, 0);
-};
-
-/**
- * Export toNumber from typeConversionHelpers for backward compatibility
- */
-export const toNumber = convertToNumber;
-
-/**
- * Generate financial summary from portfolio data
- * @param portfolioSummary Portfolio summary data
- * @param dividendHistory Dividend history data
- * @returns FinancialSummary object
- */
-export const generateFinancialSummary = (portfolioSummary: any, dividendHistory: DividendHistory[] | undefined): FinancialSummary => {
-  const total = convertToNumber(portfolioSummary?.total_portfolio_value);
-  const fixedIncome = convertToNumber(portfolioSummary?.fixed_income_value);
-  const stocks = convertToNumber(portfolioSummary?.stocks_value);
-  const realEstate = convertToNumber(portfolioSummary?.real_estate_value);
-  const other = convertToNumber(portfolioSummary?.investment_fund_value) + 
-                convertToNumber(portfolioSummary?.private_pension_value);
-  
-  const totalDividends = calculateTotalDividends(dividendHistory);
-  const dividendYield = total > 0 ? (totalDividends / total) * 100 : 0;
-  
-  return {
-    totalAssets: total,
-    fixedIncomePercent: total > 0 ? (fixedIncome / total) * 100 : 0,
-    variableIncomePercent: total > 0 ? (stocks / total) * 100 : 0,
-    realEstatePercent: total > 0 ? (realEstate / total) * 100 : 0,
-    otherPercent: total > 0 ? (other / total) * 100 : 0,
-    monthlyDividends: totalDividends / 12,
-    annualDividends: totalDividends,
-    dividendYield,
-    profitability: {
-      ytd: 5.2,
-      sixMonths: 3.1,
-      twelveMonths: 8.7
-    },
-    netWorth: total * 0.8, // Synthetic calculation: assets - debts (approximation)
-    monthlyIncome: totalDividends / 12 * 2.5, // Synthetic calculation: dividend income + estimated other income
-    monthlyExpenses: totalDividends / 12 * 0.6, // Synthetic calculation: 60% of monthly income
-    savingsRate: 0.4, // Synthetic calculation: 40% savings rate
-    liquidAssets: total * 0.3, // Synthetic calculation: 30% of total assets as liquid assets
-    dataSource: portfolioSummary?.dataSource || 'synthetic'
-  };
+export default {
+  generateFinancialSummary,
+  formatCurrency,
+  formatPercentage
 };

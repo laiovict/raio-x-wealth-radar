@@ -1,52 +1,41 @@
 
-import { useState, useEffect } from 'react';
+import { useMemo } from 'react';
 
 interface TextEnhancementOptions {
   highlightTerms?: string[];
   boldTerms?: string[];
-  linkTerms?: Record<string, string>; // term: url
+  maxLength?: number;
 }
 
-export const useTextEnhancement = (
-  text: string,
-  options: TextEnhancementOptions = {}
-) => {
-  const [enhancedText, setEnhancedText] = useState(text);
+export const useTextEnhancement = (text: string | undefined, options: TextEnhancementOptions = {}) => {
+  const { highlightTerms = [], boldTerms = [], maxLength } = options;
   
-  useEffect(() => {
-    if (!text) {
-      setEnhancedText('');
-      return;
-    }
+  const enhancedText = useMemo(() => {
+    if (!text) return '';
     
     let processedText = text;
-    const { highlightTerms = [], boldTerms = [], linkTerms = {} } = options;
     
-    // Apply bold formatting
-    if (boldTerms.length > 0) {
-      const boldRegex = new RegExp(`(${boldTerms.join('|')})`, 'gi');
-      processedText = processedText.replace(boldRegex, '<strong>$1</strong>');
+    // Trim text if maxLength is specified
+    if (maxLength && text.length > maxLength) {
+      processedText = `${text.substring(0, maxLength)}...`;
     }
     
-    // Apply highlighting
-    if (highlightTerms.length > 0) {
-      const highlightRegex = new RegExp(`(${highlightTerms.join('|')})`, 'gi');
-      processedText = processedText.replace(highlightRegex, '<span class="text-indigo-300">$1</span>');
-    }
-    
-    // Apply links
-    Object.entries(linkTerms).forEach(([term, url]) => {
-      const linkRegex = new RegExp(`(${term})`, 'gi');
-      processedText = processedText.replace(linkRegex, `<a href="${url}" class="text-blue-400 hover:underline">$1</a>`);
+    // Process highlighting and formatting
+    // This is a simple implementation - could be expanded with more sophisticated formatting
+    highlightTerms.forEach(term => {
+      const regex = new RegExp(`(${term})`, 'gi');
+      processedText = processedText.replace(regex, '<span class="text-indigo-300">$1</span>');
     });
     
-    setEnhancedText(processedText);
-  }, [text, options]);
+    boldTerms.forEach(term => {
+      const regex = new RegExp(`(${term})`, 'gi');
+      processedText = processedText.replace(regex, '<strong>$1</strong>');
+    });
+    
+    return processedText;
+  }, [text, highlightTerms, boldTerms, maxLength]);
   
-  return { 
-    enhancedText,
-    getEnhancedHTML: () => ({ __html: enhancedText })
-  };
+  return enhancedText;
 };
 
 export default useTextEnhancement;

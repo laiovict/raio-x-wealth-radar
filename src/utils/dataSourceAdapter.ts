@@ -1,48 +1,49 @@
 
 import { DataSourceType } from '@/types/raioXTypes';
 
-/**
- * Convert any data source type to a limited set for display purposes
- * This helps with consistency in UI display of data sources
- * 
- * @param dataSource The data source to convert
- * @returns A simplified data source type for display
- */
-export const toLimitedDataSource = (dataSource: DataSourceType | string | undefined): 'supabase' | 'synthetic' => {
-  if (!dataSource) return 'synthetic';
-  
-  // Map all real data sources to 'supabase'
-  if (dataSource === 'supabase' || dataSource === 'xp' || dataSource === 'openfinance') {
-    return 'supabase';
+// Converting different data sources to a limited set for UI display
+export const toLimitedDataSource = (source: DataSourceType | string): 'supabase' | 'synthetic' => {
+  // If source is a string but not a valid DataSourceType, convert it
+  if (typeof source === 'string') {
+    if (['supabase', 'xp', 'openfinance', 'calculated'].includes(source)) {
+      return 'supabase';
+    }
   }
   
-  // For calculated data, it depends on what the source data was
-  if (dataSource === 'calculated') {
-    // In our system, calculated data is still considered real data
-    return 'supabase';
-  }
-  
-  // Default to synthetic
+  // Return synthetic for any other value
   return 'synthetic';
 };
 
-/**
- * Function to standardize data sources across the application
- * @param source Original data source
- * @returns Standardized data source
- */
-export const standardizeDataSource = (source: string | undefined): DataSourceType => {
-  if (!source) return 'synthetic';
+// Get appropriate label for data source display
+export const getDataSourceLabel = (source: DataSourceType | string): string => {
+  const mappedSource = toLimitedDataSource(source);
   
-  switch (source.toLowerCase()) {
+  switch (mappedSource) {
     case 'supabase':
-    case 'xp':
-      return 'supabase';
-    case 'openfinance':
-      return 'openfinance';
-    case 'calculated':
-      return 'calculated';
+      return 'Dados reais';
+    case 'synthetic':
+      return 'Dados simulados';
     default:
-      return 'synthetic';
+      return 'Fonte desconhecida';
   }
+};
+
+// Get appropriate color for data source display
+export const getDataSourceColor = (source: DataSourceType | string): string => {
+  const mappedSource = toLimitedDataSource(source);
+  
+  switch (mappedSource) {
+    case 'supabase':
+      return 'text-green-400';
+    case 'synthetic':
+      return 'text-amber-400';
+    default:
+      return 'text-gray-400';
+  }
+};
+
+export default {
+  toLimitedDataSource,
+  getDataSourceLabel,
+  getDataSourceColor
 };
