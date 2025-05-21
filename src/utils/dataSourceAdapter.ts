@@ -13,12 +13,18 @@ import { DataSourceType } from '@/types/raioXTypes';
  * @returns 'synthetic' or 'supabase' for legacy component compatibility
  */
 export const toLimitedDataSource = (sourceType?: DataSourceType | string | number): 'synthetic' | 'supabase' => {
+  // Handle null/undefined cases
+  if (sourceType === undefined || sourceType === null) {
+    return 'synthetic';
+  }
+  
   // Convert numbers to strings if needed
   if (typeof sourceType === 'number') {
     sourceType = String(sourceType);
   }
   
-  if (!sourceType || sourceType === 'synthetic') {
+  // Handle synthetic case directly
+  if (sourceType === 'synthetic') {
     return 'synthetic';
   }
   
@@ -110,8 +116,13 @@ export const hasActualValue = (value: any): boolean => {
  * @param sourceType The data source type
  * @returns A user-friendly name for the data source
  */
-export const getDataSourceDisplayName = (sourceType?: DataSourceType | string): string => {
-  if (!sourceType) return 'Dados sintéticos';
+export const getDataSourceDisplayName = (sourceType?: DataSourceType | string | number): string => {
+  if (sourceType === undefined || sourceType === null) return 'Dados sintéticos';
+  
+  // Convert number to string if needed
+  if (typeof sourceType === 'number') {
+    sourceType = String(sourceType);
+  }
   
   switch (sourceType) {
     case 'xp':

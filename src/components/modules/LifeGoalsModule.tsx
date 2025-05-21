@@ -9,20 +9,36 @@ import { useEffect, useState, useMemo } from "react";
 import { toast } from "@/hooks/use-toast";
 import { formatCurrency } from '@/utils/formattingUtils';
 import { DataSourceType } from '@/types/raioXTypes';
-import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface LifeGoalsModuleProps {
   fullWidth?: boolean;
 }
 
 /**
- * Component that safely displays a data source indicator using TypeSafeDataSourceTag
- * It explicitly accepts string, number and DataSourceType
+ * Simplified data source indicator that doesn't rely on complex type conversions
+ * This component directly handles displaying the indicator without relying on other components
  */
-const DataSourceIndicator = ({ source }: { source?: DataSourceType | string | number }) => {
+const SimplifiedDataSourceIndicator = ({ source }: { source?: DataSourceType | string | number | null }) => {
   if (source === undefined || source === null) return null;
-  // TypeSafeDataSourceTag handles the type conversion internally
-  return <TypeSafeDataSourceTag source={source} />;
+  
+  // Simple logic to determine if this is real or synthetic data
+  const isRealData = typeof source === 'string' && source !== 'synthetic';
+  
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <span className={`ml-1 ${isRealData ? 'text-green-400' : 'text-amber-400'}`}>
+            {isRealData ? '✓' : '*'}
+          </span>
+        </TooltipTrigger>
+        <TooltipContent side="top">
+          <p className="text-xs">{isRealData ? 'Dados reais' : 'Dados sintéticos'}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
 };
 
 const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
@@ -108,7 +124,7 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
       <CardHeader className="pb-2 flex flex-row justify-between items-center bg-gradient-to-r from-slate-800 to-slate-700 rounded-t-lg">
         <CardTitle className="text-xl text-white font-bold">
           Metas de Vida
-          <DataSourceIndicator source={lifeGoals.dataSource} />
+          <SimplifiedDataSourceIndicator source={lifeGoals.dataSource} />
         </CardTitle>
         <Button variant="secondary" size="sm" onClick={handleDownloadPdf} className="flex items-center gap-1 bg-slate-700/90 hover:bg-slate-600 text-slate-200">
           <Download className="h-4 w-4" /> PDF
@@ -127,7 +143,7 @@ const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
                     <Badge className="ml-2 bg-slate-700 hover:bg-slate-600">
                       {goal.timeframe}
                     </Badge>
-                    <DataSourceIndicator source={goal.dataSource} />
+                    <SimplifiedDataSourceIndicator source={goal.dataSource} />
                   </div>
                 </div>
                 <div className="text-right">

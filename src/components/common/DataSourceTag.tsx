@@ -11,7 +11,7 @@ import { Globe } from '@/components/common/icons';
 import { DataSourceType } from '@/types/raioXTypes';
 
 interface DataSourceTagProps {
-  source?: 'synthetic' | 'supabase' | DataSourceType;
+  source?: 'synthetic' | 'supabase' | DataSourceType | string | number;
   className?: string;
 }
 
@@ -21,8 +21,11 @@ interface DataSourceTagProps {
 const DataSourceTag: React.FC<DataSourceTagProps> = ({ source, className = '' }) => {
   if (!source) return null;
   
+  // Convert number to string if needed
+  const sourceValue = typeof source === 'number' ? String(source) : source;
+  
   const getTagContent = () => {
-    switch (source) {
+    switch (sourceValue) {
       case 'xp':
         return (
           <>
@@ -52,12 +55,18 @@ const DataSourceTag: React.FC<DataSourceTagProps> = ({ source, className = '' })
           </>
         );
       default:
-        return null;
+        // Fallback to synthetic display for unknown sources
+        return (
+          <>
+            <span className="text-amber-400">*</span>
+            <span className="sr-only">Fonte de dados desconhecida</span>
+          </>
+        );
     }
   };
   
   const getTooltipContent = () => {
-    switch (source) {
+    switch (sourceValue) {
       case 'xp':
         return "Dados reais da XP Investimentos";
       case 'openfinance':
@@ -67,7 +76,7 @@ const DataSourceTag: React.FC<DataSourceTagProps> = ({ source, className = '' })
       case 'synthetic':
         return "Dados sintéticos para demonstração";
       default:
-        return "";
+        return "Fonte de dados desconhecida";
     }
   };
   
