@@ -10,6 +10,7 @@ import { formatCurrency } from '@/utils/formattingUtils';
 
 interface LifeGoalsModuleProps {
   fullWidth?: boolean;
+  useSyntheticData?: boolean;
 }
 
 // Define types for our life goals
@@ -28,7 +29,7 @@ interface LifeGoals {
   summary: string;
 }
 
-const LifeGoalsModule = ({ fullWidth = false }: LifeGoalsModuleProps) => {
+const LifeGoalsModule = ({ fullWidth = false, useSyntheticData = false }: LifeGoalsModuleProps) => {
   const [moduleLoaded, setModuleLoaded] = useState(false);
   
   // Simplified synthetic data directly in the component

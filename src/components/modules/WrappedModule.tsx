@@ -1,33 +1,12 @@
-
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Carousel, 
-  CarouselContent, 
-  CarouselItem, 
-  CarouselNext, 
-  CarouselPrevious 
-} from "@/components/ui/carousel";
-import React, { useState, useMemo, useRef } from "react";
 import { useRaioX } from "@/context/RaioXContext";
-import DataSourceTag from '@/components/common/DataSourceTag';
-import DataSourceIndicator from '@/components/modules/financialPlan/DataSourceIndicator';
-
-// Import the refactored components
-import CoverSlide from './wrapped/CoverSlide';
-import InsightSlide from './wrapped/InsightSlide';
-import InvestmentStatsSlide from './wrapped/InvestmentStatsSlide';
-import UnusualInvestmentSlide from './wrapped/UnusualInvestmentSlide';
-import FunFactsSlide from './wrapped/FunFactsSlide';
-import CallToActionSlide from './wrapped/CallToActionSlide';
-
-// Import custom hooks
-import { useWrappedData } from './wrapped/useWrappedData';
+import React from "react";
 
 interface WrappedModuleProps {
   fullWidth?: boolean;
+  useSyntheticData?: boolean;  // Adding this prop
 }
 
-const WrappedModule = ({ fullWidth = false }: WrappedModuleProps) => {
+const WrappedModule = ({ fullWidth = false, useSyntheticData = false }: WrappedModuleProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioUrl, setAudioUrl] = useState("");
   const audioRef = useRef<HTMLAudioElement>(null);

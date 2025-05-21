@@ -1,19 +1,12 @@
-
 import { useRaioX } from "@/context/RaioXContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Users, Award, TrendingUp, BarChart4 } from "lucide-react";
-import { formatCurrency, formatPercentage } from "@/utils/formattingUtils";
-import { toNumber, compareToNumber, toString, ensureString } from '@/utils/typeConversionHelpers';
-import { DataSourceType } from '@/types/raioXTypes';
-import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
+import React from "react";
 
 interface SocialComparisonModuleProps {
   fullWidth?: boolean;
+  useSyntheticData?: boolean;  // Adding this prop
 }
 
-const SocialComparisonModule = ({ fullWidth = false }: SocialComparisonModuleProps) => {
+const SocialComparisonModule = ({ fullWidth = false, useSyntheticData = false }: SocialComparisonModuleProps) => {
   const { data } = useRaioX();
   const { socialComparison } = data;
 

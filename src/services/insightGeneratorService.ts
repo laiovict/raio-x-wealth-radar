@@ -1,8 +1,8 @@
-
 import { DataSourceType, PortfolioSummary, DividendHistory, AIInsight } from '@/types/raioXTypes';
 import { toNumber, ensureNumber } from '@/utils/typeConversionHelpers';
 import { formatCurrency, formatPercentage } from '@/utils/formattingUtils';
-import { calculateDiversificationScore } from '@/utils/financialMetricsUtils';
+import { deepClone } from "@/utils/portfolioHelpers";
+import { calculateSavingsRate, calculateFinancialBehaviorMetrics, calculateDiversificationScore } from "@/utils/financialMetricsUtils";
 
 /**
  * Generate insights based on portfolio data

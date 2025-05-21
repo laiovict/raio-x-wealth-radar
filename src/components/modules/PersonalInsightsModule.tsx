@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 
 interface PersonalInsightsModuleProps {
   fullWidth?: boolean;
+  useSyntheticData?: boolean;  // Adding this prop
 }
 
 // Key sections we want to identify in the summary text
@@ -120,7 +120,7 @@ const extractAge = (text: string): string => {
   return "";
 };
 
-const PersonalInsightsModule = ({ fullWidth = false }: PersonalInsightsModuleProps) => {
+const PersonalInsightsModule = ({ fullWidth = false, useSyntheticData = false }: PersonalInsightsModuleProps) => {
   const { data, clientSummary } = useRaioX();
   const [parsedSummary, setParsedSummary] = useState<string>("");
   const [clientAge, setClientAge] = useState<string>("");

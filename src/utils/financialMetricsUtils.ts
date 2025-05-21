@@ -1,4 +1,3 @@
-
 import { ensureNumber } from './typeConversionHelpers';
 
 /**
@@ -37,6 +36,72 @@ export const calculateSavingsRate = (
   }
   
   return defaultResponse;
+};
+
+/**
+ * Calculate diversification score based on portfolio allocation
+ * @param portfolioSummary Portfolio summary with asset allocations
+ * @returns Score between 0-100 and data source
+ */
+export const calculateDiversificationScore = (portfolioSummary: any) => {
+  // Default response for insufficient data
+  const defaultResponse = {
+    score: 65,
+    dataSource: "synthetic"
+  };
+  
+  // Check if we have portfolio data
+  if (!portfolioSummary) {
+    return defaultResponse;
+  }
+  
+  // Extract asset values with fallbacks to 0
+  const fixedIncome = ensureNumber(portfolioSummary.fixed_income_value || 0);
+  const investmentFund = ensureNumber(portfolioSummary.investment_fund_value || 0);
+  const stocks = ensureNumber(portfolioSummary.stocks_value || 0);
+  const realEstate = ensureNumber(portfolioSummary.real_estate_value || 0);
+  const international = ensureNumber(portfolioSummary.investment_international_value || 0);
+  
+  // Calculate total assets
+  const totalAssets = fixedIncome + investmentFund + stocks + realEstate + international;
+  
+  if (totalAssets <= 0) {
+    return defaultResponse;
+  }
+  
+  // Calculate percentages
+  const fixedIncomePercent = (fixedIncome / totalAssets) * 100;
+  const investmentFundPercent = (investmentFund / totalAssets) * 100;
+  const stocksPercent = (stocks / totalAssets) * 100;
+  const realEstatePercent = (realEstate / totalAssets) * 100;
+  const internationalPercent = (international / totalAssets) * 100;
+  
+  // Count asset classes with more than 5% allocation
+  let assetClassCount = 0;
+  if (fixedIncomePercent > 5) assetClassCount++;
+  if (investmentFundPercent > 5) assetClassCount++;
+  if (stocksPercent > 5) assetClassCount++;
+  if (realEstatePercent > 5) assetClassCount++;
+  if (internationalPercent > 5) assetClassCount++;
+  
+  // Calculate concentration in highest asset class
+  const maxPercent = Math.max(
+    fixedIncomePercent,
+    investmentFundPercent,
+    stocksPercent,
+    realEstatePercent,
+    internationalPercent
+  );
+  
+  // Score based on asset class count and concentration
+  // Higher score for more asset classes and lower concentration
+  let score = Math.min(assetClassCount * 15, 60) + Math.max(0, 40 - maxPercent * 0.4);
+  score = Math.min(100, Math.max(0, score));
+  
+  return {
+    score: Math.round(score),
+    dataSource: "calculated"
+  };
 };
 
 /**

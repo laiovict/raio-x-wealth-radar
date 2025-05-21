@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency, formatPercentage } from "@/utils/formattingUtils";
@@ -11,9 +10,10 @@ import { DataSourceType } from '@/types/raioXTypes';
 
 interface InvestmentPlanningModuleProps {
   fullWidth?: boolean;
+  useSyntheticData?: boolean;
 }
 
-const InvestmentPlanningModule = ({ fullWidth = false }: InvestmentPlanningModuleProps) => {
+const InvestmentPlanningModule = ({ fullWidth = false, useSyntheticData = false }: InvestmentPlanningModuleProps) => {
   const { data } = useRaioX();
 
   const recommendations = [

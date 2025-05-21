@@ -1,26 +1,12 @@
-
 import { useRaioX } from "@/context/RaioXContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  Carousel, 
-  CarouselContent, 
-  CarouselItem, 
-  CarouselNext, 
-  CarouselPrevious 
-} from "@/components/ui/carousel";
-import { useLanguage } from "@/context/LanguageContext";
-import { ThumbsUp, ThumbsDown, Sparkles, Brain } from "lucide-react";
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
-import { useStreamingContent } from "@/hooks/use-streaming-content";
+import React from "react";
 
 interface FamousInvestorsModuleProps {
   fullWidth?: boolean;
+  useSyntheticData?: boolean;  // Adding this prop
 }
 
-const FamousInvestorsModule = ({ fullWidth = false }: FamousInvestorsModuleProps) => {
+const FamousInvestorsModule = ({ fullWidth = false, useSyntheticData = false }: FamousInvestorsModuleProps) => {
   const { data, selectedClient } = useRaioX();
   const { t } = useLanguage();
   const [likesCount, setLikesCount] = useState(0);

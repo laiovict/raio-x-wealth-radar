@@ -10,9 +10,10 @@ import { toast } from "@/hooks/use-toast";
 
 interface MeuFuturoFinanceiroModuleProps {
   fullWidth?: boolean;
+  useSyntheticData?: boolean;
 }
 
-const MeuFuturoFinanceiroModule = ({ fullWidth = false }: MeuFuturoFinanceiroModuleProps) => {
+const MeuFuturoFinanceiroModule = ({ fullWidth = false, useSyntheticData = false }: MeuFuturoFinanceiroModuleProps) => {
   const { data, hasOpenFinance } = useRaioX();
   const isMobile = useMobileBreakpoint();
   const [likesCount, setLikesCount] = useState(0);

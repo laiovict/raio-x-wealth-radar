@@ -1,4 +1,3 @@
-
 import { useRaioX } from "@/context/RaioXContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -9,9 +8,10 @@ import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag';
 
 interface FutureProjectionModuleProps {
   fullWidth?: boolean;
+  useSyntheticData?: boolean;
 }
 
-const FutureProjectionModule = ({ fullWidth = false }: FutureProjectionModuleProps) => {
+const FutureProjectionModule = ({ fullWidth = false, useSyntheticData = false }: FutureProjectionModuleProps) => {
   const { data } = useRaioX();
   // Ensure projection exists with default values if not
   const projection = data?.projection || {
@@ -21,7 +21,7 @@ const FutureProjectionModule = ({ fullWidth = false }: FutureProjectionModulePro
       base: { "1 ano": 120000, "3 anos": 180000, "5 anos": 250000 },
       stress: { "1 ano": 110000, "3 anos": 150000, "5 anos": 200000 }
     },
-    dataSource: 'synthetic'
+    dataSource: useSyntheticData ? 'synthetic' : 'calculated'
   };
   
   const isMobile = useMobileBreakpoint();

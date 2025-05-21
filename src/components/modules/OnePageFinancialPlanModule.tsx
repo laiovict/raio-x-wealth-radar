@@ -10,9 +10,10 @@ import { usePlanData } from './financialPlan/usePlanData';
 
 interface OnePageFinancialPlanModuleProps {
   fullWidth?: boolean;
+  useSyntheticData?: boolean;
 }
 
-const OnePageFinancialPlanModule = ({ fullWidth = false }: OnePageFinancialPlanModuleProps) => {
+const OnePageFinancialPlanModule = ({ fullWidth = false, useSyntheticData = false }: OnePageFinancialPlanModuleProps) => {
   const { isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
   const { financialPlan, expandedSections, toggleSection } = usePlanData();
 

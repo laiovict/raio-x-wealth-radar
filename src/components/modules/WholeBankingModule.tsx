@@ -1,16 +1,12 @@
-
 import { useRaioX } from "@/context/RaioXContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Shield, CreditCard, Repeat, Handshake, AlertTriangle, RefreshCw, Lock } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
+import React from "react";
 
 interface WholeBankingModuleProps {
   fullWidth?: boolean;
+  useSyntheticData?: boolean;  // Adding this prop
 }
 
-const WholeBankingModule = ({ fullWidth = false }: WholeBankingModuleProps) => {
+const WholeBankingModule = ({ fullWidth = false, useSyntheticData = false }: WholeBankingModuleProps) => {
   const { hasOpenFinance, isAIAnalysisLoading, refreshAIAnalysis } = useRaioX();
 
   // Format currency helper
