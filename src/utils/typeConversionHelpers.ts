@@ -1,4 +1,3 @@
-
 /**
  * Safely convert a value to a number
  */
@@ -48,14 +47,14 @@ export const toSafeString = (value: any): string => {
  * Convert a string or number to a parseable string
  * that can be used for calculation
  */
-export const toParseableString = (value: string | number | null | undefined): string => {
-  if (value === null || value === undefined) return '0';
+export const toParseableString = (value: string | number | null | undefined, defaultValue: string = '0'): string => {
+  if (value === null || value === undefined) return defaultValue;
   if (typeof value === 'number') return value.toString();
   if (typeof value === 'string') {
     // Remove all non-numeric characters except for the decimal point
-    return value.replace(/[^\d.-]/g, '') || '0';
+    return value.replace(/[^\d.-]/g, '') || defaultValue;
   }
-  return '0';
+  return defaultValue;
 };
 
 /**

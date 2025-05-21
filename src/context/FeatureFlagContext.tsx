@@ -7,7 +7,8 @@ export interface FeatureFlags {
   dashboard_debug: boolean;
   advanced_insights: boolean;
   steve_jobs: boolean;
-  openfinance: boolean; // Added openfinance flag
+  openfinance: boolean;
+  beta_features: boolean; // Added beta_features flag
 }
 
 // Establish the default state for all flags
@@ -17,7 +18,8 @@ export const defaultFlags: FeatureFlags = {
   dashboard_debug: false,
   advanced_insights: true,
   steve_jobs: true,
-  openfinance: false, // Default to false
+  openfinance: false,
+  beta_features: true, // Default to true
 };
 
 // Create a context with the default flags

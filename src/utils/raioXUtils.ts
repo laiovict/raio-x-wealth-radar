@@ -1,4 +1,3 @@
-
 import { DividendHistory, FinancialSummary } from '@/types/raioXTypes';
 import { toNumber as convertToNumber, ensureNumber, ensureString } from '@/utils/typeConversionHelpers';
 
@@ -108,6 +107,11 @@ export const generateFinancialSummary = (portfolioSummary: any, dividendHistory:
       sixMonths: 3.1,
       twelveMonths: 8.7
     },
+    netWorth: total * 0.8, // Synthetic calculation: assets - debts (approximation)
+    monthlyIncome: totalDividends / 12 * 2.5, // Synthetic calculation: dividend income + estimated other income
+    monthlyExpenses: totalDividends / 12 * 0.6, // Synthetic calculation: 60% of monthly income
+    savingsRate: 0.4, // Synthetic calculation: 40% savings rate
+    liquidAssets: total * 0.3, // Synthetic calculation: 30% of total assets as liquid assets
     dataSource: portfolioSummary?.dataSource || 'synthetic'
   };
 };
