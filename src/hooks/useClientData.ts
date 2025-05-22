@@ -9,7 +9,7 @@ import {
   getClientDividendHistory,
   getClientSummary,
   getClientPortfolioSummaryHistory
-} from '@/services/portfolioService';
+} from '@/services/portfolioQueryService';
 
 import { toNumber } from '@/utils/typeConversionHelpers';
 import { removeDuplicateDividends } from '@/utils/portfolioHelpers';

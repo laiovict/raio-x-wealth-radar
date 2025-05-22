@@ -1,11 +1,9 @@
-
 import React from 'react';
 import { ArrowUp } from "lucide-react";
 import { formatCurrency } from "@/utils/raioXUtils";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import DataSourceTag from './DataSourceTag'; // This is the old one, should be TypeSafeDataSourceTag or similar from common
 import TypeSafeDataSourceTag from '@/components/common/TypeSafeDataSourceTag'; // Use the common one
-import { ensureString, toNumber } from '@/utils/typeConversionHelpers';
+import { ensureString, toNumber, ensureNumber } from '@/utils/typeConversionHelpers';
 import { cssClasses } from '@/utils/style-themes';
 import { DataSourceType } from '@/types/raioXTypes';
 
@@ -89,4 +87,3 @@ const NetWorthSection = ({ finData, netWorthHistory, netWorthHistoryDataSource, 
 };
 
 export default NetWorthSection;
-

@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Info, RefreshCw } from "lucide-react";
-import { toNumber } from "@/utils/typeConversionHelpers";
+import { toNumber, ensureNumber } from "@/utils/typeConversionHelpers";
 
 // Import sub-components
 import DataSourceInfoPanel from "./financialOverview/DataSourceInfoPanel";

@@ -19,7 +19,7 @@ interface UseRaioXDataReturn {
   annualDividendsThisYear: number;
   stocks: any[];
   hasOpenFinanceData: boolean;
-  openFinanceAccounts: string[];
+  openFinanceAccounts: any[];
   openFinanceInvestments: any[];
   openFinanceTransactions: any[];
   openFinanceInsights: any;
@@ -47,7 +47,7 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
   const [error, setError] = useState<string | null>(null);
   const [portfolioData, setPortfolioData] = useState<RaioXData>(defaultRaioXData);
   const [totalDividends, setTotalDividends] = useState<number>(0);
-  const [averageMonthlyDividends, setAverageMonthlyDividends] = useState<number>(0);
+  const [averageMonthlyDividendsState, setAverageMonthlyDividendsState] = useState<number>(0);
   const [annualDividendsThisYear, setAnnualDividendsThisYear] = useState<number>(0);
 
   // Use our refactored hooks to fetch data
@@ -93,7 +93,7 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
           const avgMonthlyDivs = calculateMonthlyAverageDividends(dedupedDividendHistory);
           
           setTotalDividends(ensureNumber(totalDivs));
-          setAverageMonthlyDividends(ensureNumber(avgMonthlyDivs));
+          setAverageMonthlyDividendsState(ensureNumber(avgMonthlyDivs));
 
           // Calculate annual dividends for the current year
           const currentYear = new Date().getFullYear();
@@ -108,7 +108,7 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
           
           console.log("Dividend calculations:", {
             totalDividends: totalDivs,
-            avgMonthlyDividends: avgMonthlyDividends,
+            avgMonthlyDividends: avgMonthlyDivs,
             annualDividendsThisYear: currentYearDividends,
             dividendCount: dedupedDividendHistory.length
           });
@@ -116,12 +116,12 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
           console.error("Error calculating dividend stats:", error);
           // Use default values if calculation fails
           setTotalDividends(0);
-          setAverageMonthlyDividends(0);
+          setAverageMonthlyDividendsState(0);
           setAnnualDividendsThisYear(0);
         }
       } else {
         setTotalDividends(0);
-        setAverageMonthlyDividends(0);
+        setAverageMonthlyDividendsState(0);
         setAnnualDividendsThisYear(0);
       }
       
@@ -225,7 +225,7 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
     portfolioData,
     isLoading,
     totalDividends,
-    averageMonthlyDividends,
+    averageMonthlyDividends: averageMonthlyDividendsState,
     annualDividendsThisYear,
     stocks: clientStocks || [],
     hasOpenFinanceData,
