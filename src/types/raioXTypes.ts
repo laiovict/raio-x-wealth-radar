@@ -31,10 +31,17 @@ export interface RaioXProviderProps {
   selectedClient?: string | number | null;
 }
 
+export interface PortfolioSummaryHistoryEntry {
+  updated_at: string;
+  total_portfolio_value: string | number | null;
+  dataSource?: DataSourceType;
+}
+
 export interface RaioXData {
   clientName: string;
   clientAge?: number;
   portfolioSummary?: PortfolioSummary;
+  portfolioSummaryHistory?: PortfolioSummaryHistoryEntry[]; // Added this line
   financialSummary?: FinancialSummary;
   sentiment?: any;
   allocation?: Allocation;

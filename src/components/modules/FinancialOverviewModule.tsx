@@ -25,7 +25,8 @@ import {
   generateNetWorthHistory, 
   getSyntheticData, 
   getPortfolioSummaryHelper 
-} from "./financialOverview/utils";
+} from "./financialOverview/utils"; // generateNetWorthHistory now returns an object
+import { PortfolioSummaryHistoryEntry } from "@/types/raioXTypes"; // Import if needed for typing
 
 // Additional imports
 import { Shield } from "lucide-react";
@@ -50,12 +51,15 @@ const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false, 
 
   // Use real data when financial summary is available and not forced to use synthetic,
   // otherwise use synthetic data
-  const finData = (hasOpenFinance && financialSummary && !useSyntheticData)
+  const finData = (financialSummary && !useSyntheticData) // Removed hasOpenFinance check here for simplicity, finData relies on financialSummary
     ? financialSummary
     : getSyntheticData(selectedClient ? toNumber(selectedClient) : null, getPortfolioSummary());
     
-  // Get historical net worth data
-  const netWorthHistory = generateNetWorthHistory(finData.netWorth);
+  // Get historical net worth data using portfolioSummaryHistory from context data
+  const { points: netWorthHistory, dataSource: netWorthHistoryDataSource } = generateNetWorthHistory(
+    ensureNumber(finData.netWorth), // Ensure currentNetWorth is a number
+    data.portfolioSummaryHistory // Pass the actual history data
+  );
 
   // Display loading view if loading OpenFinance data
   if (isAIAnalysisLoading) {
@@ -84,18 +88,16 @@ const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false, 
           <DataSourceInfoPanel showDataSourceInfo={showDataSourceInfo} />
         </CardHeader>
         <CardContent className="space-y-8">
-          {/* Limited Net Worth Section */}
           <NetWorthSection 
             finData={finData} 
             netWorthHistory={netWorthHistory} 
+            netWorthHistoryDataSource={netWorthHistoryDataSource} // Pass the data source
             getPortfolioSummary={getPortfolioSummary}
             defaultTrend={defaultTrend}
           />
           
-          {/* OpenFinance needed banner */}
           <OpenFinanceBanner />
 
-          {/* Investment Stats */}
           <InvestmentStatsGrid 
             finData={finData} 
             getPortfolioSummary={getPortfolioSummary}
@@ -137,7 +139,6 @@ const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false, 
         <DataSourceInfoPanel showDataSourceInfo={showDataSourceInfo} />
       </CardHeader>
       <CardContent className="space-y-8">
-        {/* Main Financial Overview Section - Full version only */}
         {useSyntheticData && (
           <MainFinancialOverview 
             finData={finData} 
@@ -146,21 +147,19 @@ const FinancialOverviewModule = ({ fullWidth = false, useSyntheticData = false, 
           />
         )}
         
-        {/* Net Worth Section - Always show */}
         <NetWorthSection 
           finData={finData} 
-          netWorthHistory={netWorthHistory} 
+          netWorthHistory={netWorthHistory}
+          netWorthHistoryDataSource={netWorthHistoryDataSource} // Pass the data source
           getPortfolioSummary={getPortfolioSummary}
           defaultTrend={defaultTrend}
         />
         
-        {/* Assets & Liabilities Summary - Always show */}
         <AssetsLiabilitiesGrid 
           finData={finData} 
           getPortfolioSummary={getPortfolioSummary} 
         />
         
-        {/* Financial Health Indicators - Always show */}
         <FinancialHealthIndicators 
           finData={finData} 
           getPortfolioSummary={getPortfolioSummary}

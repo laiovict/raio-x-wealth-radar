@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { 
   getClientPortfolioSummary, 
@@ -8,12 +7,13 @@ import {
   getClientStocks, 
   getClientProfitability,
   getClientDividendHistory,
-  getClientSummary
+  getClientSummary,
+  getClientPortfolioSummaryHistory
 } from '@/services/portfolioService';
 
 import { toNumber } from '@/utils/typeConversionHelpers';
 import { removeDuplicateDividends } from '@/utils/portfolioHelpers';
-import { DividendHistory } from '@/types/raioXTypes';
+import { DividendHistory, PortfolioSummaryHistoryEntry } from '@/types/raioXTypes';
 
 interface UseClientDataReturn {
   clientPortfolioSummary: any;
@@ -25,6 +25,7 @@ interface UseClientDataReturn {
   clientDividendHistory: DividendHistory[];
   dedupedDividendHistory: DividendHistory[];
   clientSummary: any;
+  clientPortfolioSummaryHistory: PortfolioSummaryHistoryEntry[];
   isLoading: boolean;
   error: string | null;
 }
@@ -46,11 +47,22 @@ export const useClientData = (clientId: number | null): UseClientDataReturn => {
   const [clientDividendHistory, setClientDividendHistory] = useState<DividendHistory[]>([]);
   const [dedupedDividendHistory, setDedupedDividendHistory] = useState<DividendHistory[]>([]);
   const [clientSummary, setClientSummary] = useState<any>(null);
+  const [clientPortfolioSummaryHistory, setClientPortfolioSummaryHistory] = useState<PortfolioSummaryHistoryEntry[]>([]);
   
   useEffect(() => {
     const fetchClientData = async () => {
       if (!clientId) {
         setIsLoading(false);
+        setClientPortfolioSummary(null);
+        setClientFixedIncome([]);
+        setClientInvestmentFunds([]);
+        setClientRealEstate([]);
+        setClientStocks([]);
+        setClientProfitability(null);
+        setClientDividendHistory([]);
+        setDedupedDividendHistory([]);
+        setClientSummary(null);
+        setClientPortfolioSummaryHistory([]);
         return;
       }
       
@@ -67,7 +79,8 @@ export const useClientData = (clientId: number | null): UseClientDataReturn => {
           stocks,
           profitability,
           dividendHistory,
-          clientInfo
+          clientInfo,
+          summaryHistory
         ] = await Promise.all([
           getClientPortfolioSummary(clientId),
           getClientFixedIncome(clientId),
@@ -76,7 +89,8 @@ export const useClientData = (clientId: number | null): UseClientDataReturn => {
           getClientStocks(clientId),
           getClientProfitability(clientId),
           getClientDividendHistory(clientId),
-          getClientSummary(clientId)
+          getClientSummary(clientId),
+          getClientPortfolioSummaryHistory(clientId)
         ]);
         
         // Store fetched data
@@ -87,6 +101,7 @@ export const useClientData = (clientId: number | null): UseClientDataReturn => {
         setClientStocks(stocks || []);
         setClientProfitability(profitability);
         setClientDividendHistory(dividendHistory || []);
+        setClientPortfolioSummaryHistory(summaryHistory || []);
         
         // Remove duplicates from dividend history as per requirements
         const deduped = removeDuplicateDividends(dividendHistory || []);
@@ -115,6 +130,7 @@ export const useClientData = (clientId: number | null): UseClientDataReturn => {
     clientDividendHistory,
     dedupedDividendHistory,
     clientSummary,
+    clientPortfolioSummaryHistory,
     isLoading,
     error
   };

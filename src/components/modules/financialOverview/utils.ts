@@ -1,34 +1,84 @@
-import { ensureNumber } from '@/utils/typeConversionHelpers';
+import { toNumber, ensureNumber } from '@/utils/typeConversionHelpers';
+import { PortfolioSummary, RaioXData, PortfolioSummaryHistoryEntry, DataSourceType } from '@/types/raioXTypes';
+import { format, parseISO } from 'date-fns';
+// import { ptBR } from 'date-fns/locale'; // Optional: for Portuguese month names
 
 /**
  * Generate synthetic history data for net worth chart
  * @param currentValue Current net worth value
  * @returns Array of monthly net worth data points
  */
-export const generateNetWorthHistory = (currentValue: number) => {
-  const months = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-  const result = [];
-  
-  // Start with a value 12% lower than current
-  let startValue = currentValue * 0.88;
-  
-  // Generate monthly data with slight randomness
-  for (let i = 0; i < 12; i++) {
-    // Add some randomness to growth
-    const monthlyGrowth = 1 + (0.005 + Math.random() * 0.01);
-    startValue = Math.round(startValue * monthlyGrowth);
-    
-    result.push({
-      month: months[i],
-      amount: startValue,
-      dataSource: 'synthetic' as const // Use const assertion to fix the type
-    });
+export const generateNetWorthHistory = (
+  currentNetWorth: number,
+  history?: PortfolioSummaryHistoryEntry[]
+): GeneratedNetWorthData => {
+  if (history && history.length > 0) {
+    const validHistoryPoints = history
+      .map(entry => {
+        try {
+          const date = parseISO(entry.updated_at);
+          const value = toNumber(entry.total_portfolio_value);
+          if (isNaN(value) || !entry.updated_at) return null;
+          return { date, value, dataSource: entry.dataSource };
+        } catch (e) {
+          return null; // Ignore entries with invalid dates
+        }
+      })
+      .filter(p => p !== null) as { date: Date; value: number, dataSource?: DataSourceType }[];
+
+    if (validHistoryPoints.length > 0) {
+      // Sort by date to ensure correct processing for month logic
+      validHistoryPoints.sort((a, b) => a.date.getTime() - b.date.getTime());
+      
+      const monthlyDataMap = new Map<string, { value: number; date: Date; dataSource?: DataSourceType }>();
+      
+      validHistoryPoints.forEach(point => {
+        // Use YYYY-MM as key to get latest value for each month
+        const monthKey = format(point.date, 'yyyy-MM');
+        monthlyDataMap.set(monthKey, { value: point.value, date: point.date, dataSource: point.dataSource });
+      });
+
+      const sortedMonthlyPoints = Array.from(monthlyDataMap.entries())
+        .map(([_, data]) => data)
+        .sort((a, b) => a.date.getTime() - b.date.getTime());
+        
+      const last12MonthsPoints = sortedMonthlyPoints.slice(-12);
+
+      const chartPoints = last12MonthsPoints.map(point => ({
+        // month: format(point.date, 'MMM', { locale: ptBR }), // Example with Portuguese locale
+        month: format(point.date, 'MMM'), // English short month name (Jan, Feb, etc.)
+        amount: point.value,
+        year: point.date.getFullYear(),
+      }));
+      
+      // Determine overall data source (if all 'supabase', then 'supabase', else 'synthetic' or 'calculated')
+      // For simplicity, if any point has a dataSource, we consider it mixed.
+      // If all points come from 'supabase', we can say 'supabase'.
+      // Here, we'll assume if we used history, the source is primarily from that history.
+      // The first entry in history should have a dataSource.
+      const primaryDataSource = history[0]?.dataSource || 'calculated';
+
+      return { points: chartPoints, dataSource: primaryDataSource };
+    }
   }
-  
-  // Ensure the final value matches our target
-  result[11].amount = currentValue;
-  
-  return result;
+
+  // Fallback to synthetic data generation
+  const syntheticPoints: NetWorthChartPoint[] = [];
+  const monthNames = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+  let lastAmount = currentNetWorth * 0.8; // Start from 80% of current net worth for upward trend
+
+  for (let i = 0; i < 12; i++) {
+    if (i > 0) {
+      const fluctuation = (Math.random() - 0.4) * (lastAmount * 0.05); // Fluctuate +/- 5%
+      lastAmount += fluctuation;
+    }
+    // Ensure the last point is close to currentNetWorth
+    if (i === 11) {
+        lastAmount = currentNetWorth;
+    }
+    syntheticPoints.push({ month: monthNames[i], amount: Math.max(0, parseFloat(lastAmount.toFixed(0))) });
+  }
+  return { points: syntheticPoints, dataSource: 'synthetic' };
 };
 
 /**
@@ -190,3 +240,14 @@ export const getPortfolioSummaryHelper = (data: any) => {
   }
   return null;
 };
+
+interface NetWorthChartPoint {
+  month: string;
+  amount: number;
+  year?: number; // Optional, for multi-year scenarios
+}
+
+interface GeneratedNetWorthData {
+  points: NetWorthChartPoint[];
+  dataSource: DataSourceType;
+}

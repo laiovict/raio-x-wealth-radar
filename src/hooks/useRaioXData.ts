@@ -7,7 +7,7 @@ import {
 import { defaultRaioXData } from '@/data/mockRaioXData';
 import { toNumber, ensureNumber } from '@/utils/typeConversionHelpers';
 import { removeDuplicateDividends } from '@/utils/portfolioHelpers';
-import { RaioXData, DividendHistory } from '@/types/raioXTypes';
+import { RaioXData, DividendHistory, PortfolioSummaryHistoryEntry } from '@/types/raioXTypes';
 import { useClientData } from '@/hooks/useClientData';
 import { useOpenFinanceData } from '@/hooks/useOpenFinanceData';
 
@@ -61,6 +61,7 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
     clientDividendHistory,
     dedupedDividendHistory,
     clientSummary,
+    clientPortfolioSummaryHistory,
     isLoading: isLoadingClient
   } = useClientData(selectedClient);
   
@@ -83,7 +84,7 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
     
     try {
       // Try to get client name from summary or use default
-      const clientName = clientSummary?.investor_name || `Cliente ${selectedClient}`;
+      const clientName = clientSummary?.investor_name || (selectedClient ? `Cliente ${selectedClient}` : defaultRaioXData.clientName);
       
       // Calculate dividend totals from real data if available
       if (dedupedDividendHistory && dedupedDividendHistory.length > 0) {
@@ -107,7 +108,7 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
           
           console.log("Dividend calculations:", {
             totalDividends: totalDivs,
-            avgMonthlyDividends: avgMonthlyDivs,
+            avgMonthlyDividends: avgMonthlyDividends,
             annualDividendsThisYear: currentYearDividends,
             dividendCount: dedupedDividendHistory.length
           });
@@ -125,16 +126,17 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
       }
       
       // Check if we have any real data from Supabase
-      const hasRealData = clientPortfolioSummary || 
-                      (clientFixedIncome && clientFixedIncome.length) || 
-                      (clientInvestmentFunds && clientInvestmentFunds.length) || 
-                      (clientRealEstate && clientRealEstate.length) || 
-                      (clientStocks && clientStocks.length) || 
-                      clientProfitability || 
-                      (dedupedDividendHistory && dedupedDividendHistory.length) || 
-                      clientSummary;
+      const hasRealClientData = clientPortfolioSummary || 
+                            (clientFixedIncome && clientFixedIncome.length > 0) || 
+                            (clientInvestmentFunds && clientInvestmentFunds.length > 0) || 
+                            (clientRealEstate && clientRealEstate.length > 0) || 
+                            (clientStocks && clientStocks.length > 0) || 
+                            clientProfitability || 
+                            (dedupedDividendHistory && dedupedDividendHistory.length > 0) || 
+                            clientSummary ||
+                            (clientPortfolioSummaryHistory && clientPortfolioSummaryHistory.length > 0);
       
-      if (hasRealData) {
+      if (hasRealClientData) {
         // Update portfolio data with real values from Supabase
         setPortfolioData(prevData => {
           // Create new portfolio data object
@@ -142,13 +144,14 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
             ...prevData,
             clientName,
             portfolioSummary: clientPortfolioSummary || prevData.portfolioSummary,
+            portfolioSummaryHistory: clientPortfolioSummaryHistory || [], // Add history here
             fixedIncome: clientFixedIncome || [],
             investmentFunds: clientInvestmentFunds || [],
             realEstate: clientRealEstate || [],
             stocks: clientStocks || [],
             profitability: clientProfitability || prevData.profitability,
             dividendHistory: dedupedDividendHistory || [],
-            clientSummary,
+            clientSummary: clientSummary || prevData.clientSummary,
             // Add OpenFinance data if available
             openFinanceData: {
               hasOpenFinanceData,
@@ -169,7 +172,8 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
         // If we don't have real data, use default data with client ID
         setPortfolioData(prevData => ({
           ...defaultRaioXData,
-          clientName: `Cliente ${selectedClient}`,
+          clientName: selectedClient ? `Cliente ${selectedClient}` : defaultRaioXData.clientName,
+          portfolioSummaryHistory: clientPortfolioSummaryHistory || [], // Also add here for default case
           openFinanceData: {
             hasOpenFinanceData,
             openFinanceAccounts: openFinanceAccounts || [],
@@ -190,7 +194,7 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
       // On error, revert to default data but preserve client info
       setPortfolioData(prevData => ({
         ...defaultRaioXData,
-        clientName: `Cliente ${selectedClient}`,
+        clientName: selectedClient ? `Cliente ${selectedClient}` : defaultRaioXData.clientName,
         hasOpenFinance: false
       }));
     } finally {
@@ -208,6 +212,7 @@ export const useRaioXData = (selectedClient: number | null): UseRaioXDataReturn 
     clientProfitability,
     dedupedDividendHistory,
     clientSummary,
+    clientPortfolioSummaryHistory, // Add to dependency array
     openFinanceAccounts,
     openFinanceInvestments,
     openFinanceTransactions,

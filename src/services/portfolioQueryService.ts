@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { DataSourceType } from '@/types/raioXTypes';
 
@@ -245,6 +244,33 @@ export const getClientSummary = async (clientId: number | null) => {
   }
 };
 
+/**
+ * Fetches client's portfolio summary history
+ * @param clientId Client account ID
+ * @returns Portfolio summary history data
+ */
+export const getClientPortfolioSummaryHistory = async (clientId: number | null) => {
+  if (!clientId) return [];
+
+  try {
+    const { data, error } = await supabase
+      .from('investor_portfolio_summary_history')
+      .select('updated_at, total_portfolio_value')
+      .eq('investor_account_on_brokerage_house', clientId)
+      .order('updated_at', { ascending: true });
+
+    if (error) {
+      console.error("Error fetching portfolio summary history:", error);
+      return [];
+    }
+
+    return data ? data.map(item => ({ ...item, dataSource: 'supabase' as DataSourceType })) : [];
+  } catch (error) {
+    console.error("Error in portfolio summary history fetch:", error);
+    return [];
+  }
+};
+
 export default {
   getClientPortfolioSummary,
   getClientFixedIncome,
@@ -253,5 +279,6 @@ export default {
   getClientStocks,
   getClientProfitability,
   getClientDividendHistory,
-  getClientSummary
+  getClientSummary,
+  getClientPortfolioSummaryHistory
 };
